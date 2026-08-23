@@ -8,7 +8,7 @@ import BibleReader from '@/components/BibleReader';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://les-fondements-parcours.digi-team-8068.chatgpt.site'),
   title: {
     default: 'Les Fondements — Une foi enracinée',
     template: '%s | Les Fondements',
