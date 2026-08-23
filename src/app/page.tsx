@@ -1,15 +1,12 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowRight,
   BookOpen,
-  Brain,
   CheckCircle2,
   Compass,
-  Headphones,
   HeartHandshake,
-  MessageCircleHeart,
   PenLine,
-  PlayCircle,
   Sparkles,
   Users,
 } from 'lucide-react';
@@ -45,105 +42,53 @@ const rhythms = [
 export default function Home() {
   return (
     <div className="min-h-screen overflow-hidden bg-[#f8f3e9] text-slate-950">
-      <section className="relative isolate min-h-[860px] overflow-hidden bg-[#08172d] px-4 pb-24 pt-32 text-white sm:px-6 lg:px-8">
-        <div className="absolute inset-0 hero-grid opacity-40" />
-        <div className="absolute -left-28 top-20 h-96 w-96 rounded-full border border-amber-300/15" />
-        <div className="absolute -left-12 top-36 h-72 w-72 rounded-full border border-amber-300/10" />
-        <div className="absolute right-[-12rem] top-[-10rem] h-[42rem] w-[42rem] rounded-full bg-amber-400/10 blur-3xl" />
+      <section className="relative isolate min-h-[860px] overflow-hidden bg-[#07162b] text-white">
+        <Image
+          src="/hero-community-v2.png"
+          alt="Un petit groupe réuni autour d’un livre ouvert sur un chemin doré"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[68%_center]"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,#07162b_0%,rgba(7,22,43,.96)_32%,rgba(7,22,43,.46)_62%,rgba(7,22,43,.08)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#07162b] to-transparent" />
+        <div className="absolute left-[46%] top-28 hidden h-20 w-20 rotate-12 items-center justify-center rounded-full border border-amber-300/50 bg-[#07162b]/70 font-serif text-xs italic text-amber-200 backdrop-blur-md lg:flex">ensemble</div>
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.03fr_.97fr]">
-          <div>
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-amber-200/25 bg-amber-100/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">
-              <Sparkles className="h-3.5 w-3.5" /> Parcours de discipleship numérique
+        <div className="relative mx-auto flex min-h-[860px] max-w-7xl flex-col justify-center px-4 pb-40 pt-32 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-[#07162b]/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200 backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5" /> Un parcours à vivre, pas à terminer
             </div>
-            <h1 className="max-w-4xl font-serif text-5xl font-semibold leading-[0.98] tracking-[-0.035em] text-[#fff8e8] sm:text-7xl lg:text-[5.6rem]">
-              Une foi enracinée.
-              <span className="mt-2 block text-amber-300">Une vie transformée.</span>
+            <h1 className="font-serif text-5xl font-semibold leading-[0.93] tracking-[-0.045em] text-[#fff8e8] sm:text-7xl lg:text-[6.4rem]">
+              Une foi
+              <span className="block italic text-amber-300">enracinée.</span>
+              Une vie transformée.
             </h1>
-            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
-              Les Fondements devient un compagnon de croissance sur 20 semaines : une expérience personnelle profonde, portée par la force du petit groupe.
+            <p className="mt-8 max-w-xl text-lg leading-8 text-slate-200 sm:text-xl">
+              20 semaines pour apprendre en profondeur, parler en vérité et mettre sa foi en mouvement — personnellement et avec cinq autres personnes.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Link href="/login" className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-300 px-7 py-4 text-sm font-bold text-[#08172d] shadow-[0_18px_50px_rgba(251,191,36,.18)] transition hover:-translate-y-0.5 hover:bg-amber-200">
-                Commencer mon parcours <ArrowRight className="h-4 w-4" />
+                Commencer le chemin <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="#experience" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-4 text-sm font-semibold text-white transition hover:bg-white/10">
-                <PlayCircle className="h-4 w-4 text-amber-300" /> Découvrir l’expérience
+              <Link href="#experience" className="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/15">
+                Comprendre la méthode
               </Link>
-            </div>
-
-            <div className="mt-14 grid max-w-2xl grid-cols-3 border-t border-white/10 pt-7">
-              <div>
-                <p className="font-serif text-3xl text-amber-300">20</p>
-                <p className="mt-1 text-xs text-slate-400">étapes progressives</p>
-              </div>
-              <div className="border-l border-white/10 pl-5 sm:pl-8">
-                <p className="font-serif text-3xl text-amber-300">171</p>
-                <p className="mt-1 text-xs text-slate-400">questions de réflexion</p>
-              </div>
-              <div className="border-l border-white/10 pl-5 sm:pl-8">
-                <p className="font-serif text-3xl text-amber-300">5–6</p>
-                <p className="mt-1 text-xs text-slate-400">personnes par groupe</p>
-              </div>
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl lg:mx-0">
-            <div className="absolute -inset-6 rounded-[3rem] bg-amber-300/10 blur-2xl" />
-            <div className="relative rounded-[2rem] border border-white/15 bg-white/10 p-3 shadow-2xl backdrop-blur-xl">
-              <div className="rounded-[1.55rem] bg-[#fcf8ef] p-5 text-slate-900 sm:p-7">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#102447] text-amber-300">
-                      <BookOpen className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Semaine 09</p>
-                      <p className="font-serif text-lg font-bold">La présence de l’Esprit</p>
-                    </div>
-                  </div>
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold text-emerald-700">EN COURS</span>
-                </div>
-
-                <div className="mt-6 grid gap-4 sm:grid-cols-[1.35fr_.65fr]">
-                  <div className="rounded-2xl bg-[#102447] p-5 text-white">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">Votre progression</p>
-                    <div className="mt-4 flex items-end justify-between">
-                      <p className="font-serif text-4xl">42%</p>
-                      <p className="text-xs text-slate-400">8 / 20 fiches</p>
-                    </div>
-                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full w-[42%] rounded-full bg-amber-300" />
-                    </div>
-                    <div className="mt-6 flex items-center gap-2 text-xs text-slate-300">
-                      <Headphones className="h-4 w-4 text-amber-300" /> 12 min d’écoute disponibles
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                    <Brain className="h-5 w-5 text-amber-700" />
-                    <p className="mt-8 font-serif text-2xl font-bold">7</p>
-                    <p className="text-xs leading-5 text-slate-600">versets à revoir aujourd’hui</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-700">Prochaine rencontre</p>
-                      <p className="mt-1 font-serif text-lg font-bold">Groupe Vie · jeudi 19 h</p>
-                    </div>
-                    <div className="flex -space-x-2">
-                      {['MA', 'JN', 'AK', '+3'].map((person, index) => (
-                        <span key={person} className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-white text-[10px] font-bold ${index === 3 ? 'bg-amber-300 text-slate-900' : 'bg-indigo-100 text-indigo-800'}`}>{person}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                    <MessageCircleHeart className="h-4 w-4 text-rose-500" /> 3 sujets de prière partagés cette semaine
-                  </div>
-                </div>
+          <div className="absolute inset-x-4 bottom-8 grid max-w-3xl grid-cols-3 overflow-hidden rounded-2xl border border-white/15 bg-[#07162b]/70 backdrop-blur-xl sm:left-6 sm:right-auto sm:w-[44rem] lg:left-8">
+            {[
+              ['20', 'étapes progressives'],
+              ['171', 'questions de réflexion'],
+              ['5–6', 'personnes par groupe'],
+            ].map(([value, label], index) => (
+              <div key={value} className={`p-4 sm:p-5 ${index > 0 ? 'border-l border-white/10' : ''}`}>
+                <p className="font-serif text-2xl text-amber-300 sm:text-3xl">{value}</p>
+                <p className="mt-1 text-[10px] leading-4 text-slate-300 sm:text-xs">{label}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -178,30 +123,30 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#e8dfcf] px-4 py-24 sm:px-6 lg:px-8">
+      <section className="editorial-paper bg-[#e8dfcf] px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-[.85fr_1.15fr]">
-            <div className="lg:sticky lg:top-28 lg:self-start">
-              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-indigo-800">
-                <Compass className="h-4 w-4" /> Une architecture de transformation
-              </div>
-              <h2 className="mt-5 font-serif text-4xl font-semibold leading-tight text-[#0b1d38] sm:text-5xl">20 étapes. Un seul chemin cohérent.</h2>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">Le parcours va de la découverte de Dieu jusqu’à une foi capable de servir, transmettre et espérer. Chaque chapitre prépare le suivant.</p>
-              <Link href="/login" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-indigo-800 hover:text-indigo-600">Voir les 20 fiches <ArrowRight className="h-4 w-4" /></Link>
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-indigo-800">
+              <Compass className="h-4 w-4" /> La feuille de route
             </div>
-            <div className="space-y-4">
-              {chapters.map((chapter, index) => (
-                <article key={chapter.range} className="grid gap-5 rounded-[1.75rem] border border-white/70 bg-[#f8f3e9] p-6 sm:grid-cols-[7rem_1fr_auto] sm:items-center sm:p-8">
-                  <p className="font-serif text-3xl text-amber-700">{chapter.range}</p>
-                  <div>
-                    <h3 className="font-serif text-2xl font-semibold text-[#0b1d38]">{chapter.title}</h3>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">{chapter.detail}</p>
-                  </div>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-xs font-bold text-slate-500">{index + 1}</span>
-                </article>
-              ))}
-            </div>
+            <h2 className="mt-5 font-serif text-4xl font-semibold leading-tight text-[#0b1d38] sm:text-6xl">20 étapes.<br /><span className="italic text-amber-700">Un chemin qui vous déplace.</span></h2>
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600">Le parcours avance comme une histoire : recevoir, être transformé, devenir disciple, puis demeurer et transmettre.</p>
           </div>
+
+          <div className="roadmap-track relative mt-20 grid gap-5 lg:grid-cols-4">
+            {chapters.map((chapter, index) => (
+              <article key={chapter.range} className={`relative z-10 min-h-64 rounded-[2rem] border border-white/80 p-7 shadow-[0_18px_50px_rgba(15,23,42,.08)] ${index % 2 === 0 ? 'bg-[#fffaf0] lg:-translate-y-5' : 'bg-[#0b1d38] text-white lg:translate-y-5'}`}>
+                <div className="flex items-center justify-between">
+                  <p className={`text-[10px] font-bold uppercase tracking-[0.2em] ${index % 2 === 0 ? 'text-amber-700' : 'text-amber-300'}`}>Chapitre {index + 1}</p>
+                  <span className={`flex h-9 w-9 items-center justify-center rounded-full font-serif text-sm ${index % 2 === 0 ? 'bg-amber-300 text-[#0b1d38]' : 'bg-white/10 text-amber-300'}`}>{index + 1}</span>
+                </div>
+                <p className={`mt-10 font-serif text-3xl ${index % 2 === 0 ? 'text-amber-700' : 'text-amber-300'}`}>{chapter.range}</p>
+                <h3 className="mt-3 font-serif text-2xl font-semibold">{chapter.title}</h3>
+                <p className={`mt-3 text-sm leading-6 ${index % 2 === 0 ? 'text-slate-600' : 'text-slate-300'}`}>{chapter.detail}</p>
+              </article>
+            ))}
+          </div>
+          <div className="mt-16 text-center"><Link href="/login" className="inline-flex items-center gap-2 rounded-full border border-[#0b1d38]/20 bg-white/50 px-6 py-3 text-sm font-bold text-indigo-900 transition hover:bg-white">Explorer les 20 fiches <ArrowRight className="h-4 w-4" /></Link></div>
         </div>
       </section>
 

@@ -67,6 +67,38 @@ h1, h2, h3, h4, h5, h6 {
   mask-image: linear-gradient(to bottom, black, transparent 92%);
 }
 
+.editorial-paper {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 85% 70%, rgba(11, 29, 56, 0.07) 0 1px, transparent 1.5px);
+  background-size: 24px 24px, 31px 31px;
+}
+
+.roadmap-track::before {
+  content: '';
+  position: absolute;
+  left: 3%;
+  right: 3%;
+  top: 46%;
+  height: 74px;
+  border-radius: 999px;
+  background: #f6c453;
+  transform: rotate(-2deg);
+  box-shadow: 0 12px 30px rgba(146, 93, 14, 0.12);
+}
+
+@media (max-width: 1023px) {
+  .roadmap-track::before {
+    left: 32px;
+    right: auto;
+    top: 2%;
+    bottom: 2%;
+    width: 64px;
+    height: auto;
+    transform: rotate(1deg);
+  }
+}
+
 ::selection {
   background: #fcd34d;
   color: #08172d;
