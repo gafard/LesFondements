@@ -19,11 +19,9 @@ import {
   Award,
   MessageCircle
 } from 'lucide-react';
-import { auth } from '@/lib/firebase';
-import { signOut } from 'firebase/auth';
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,7 +39,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await logout();
     } catch (error) {
       console.error("Logout error", error);
     }

@@ -10,7 +10,7 @@ mkdir -p "$output_dir/server" "$output_dir/client"
 find "$output_dir" -mindepth 1 -delete
 mkdir -p "$output_dir/server" "$output_dir/client"
 cp -R "$source_dir"/. "$output_dir/server"/
-cp "$output_dir/server/worker.js" "$output_dir/server/index.js"
+cp "$project_dir/scripts/sites-worker-entry.mjs" "$output_dir/server/index.js"
 cp -R "$source_dir/assets"/. "$output_dir/client"/
 
 test -f "$output_dir/server/index.js"

@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
-import { auth } from '@/lib/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { BookOpen } from 'lucide-react';
 
 export default function Login() {
@@ -15,7 +13,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { user } = useAuth();
+  const { user, signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -31,12 +29,9 @@ export default function Login() {
 
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmail(email, password);
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        if (name) {
-          await updateProfile(userCredential.user, { displayName: name });
-        }
+        await signUpWithEmail(email, password, name);
       }
     } catch (err: unknown) {
       console.error(err);
@@ -53,8 +48,7 @@ export default function Login() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      await signInWithGoogle();
     } catch (err) {
       console.error(err);
       setError('Erreur lors de la connexion avec Google.');

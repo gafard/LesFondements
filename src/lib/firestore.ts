@@ -1,17 +1,14 @@
-import { db } from './firebase';
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  query,
-  orderBy,
-  deleteDoc,
-  serverTimestamp,
-  Timestamp,
-  FieldValue
-} from 'firebase/firestore';
+import { getFirebaseDb } from './firebase';
+import type { FieldValue, Timestamp } from 'firebase/firestore';
+
+const getFirestoreClient = async () => {
+  const [db, firestore] = await Promise.all([
+    getFirebaseDb(),
+    import('firebase/firestore'),
+  ]);
+
+  return { db, firestore };
+};
 
 // ============ Types ============
 
@@ -35,6 +32,7 @@ export interface JournalEntry extends JournalEntryData {
 // ============ User Progress ============
 
 export const getUserProgress = async (userId: string) => {
+  const { db, firestore: { collection, getDocs } } = await getFirestoreClient();
   const progressRef = collection(db, 'users', userId, 'progress');
   const snapshot = await getDocs(progressRef);
 
@@ -65,6 +63,7 @@ export const saveFicheProgress = async (
   ficheId: number,
   data: Omit<FicheProgressData, 'lastUpdated'>
 ) => {
+  const { db, firestore: { doc, serverTimestamp, setDoc } } = await getFirestoreClient();
   const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
   await setDoc(
     docRef,
@@ -77,6 +76,7 @@ export const saveFicheProgress = async (
 };
 
 export const markFicheCompleted = async (userId: string, ficheId: number) => {
+  const { db, firestore: { doc, serverTimestamp, setDoc } } = await getFirestoreClient();
   const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
   await setDoc(
     docRef,
@@ -91,6 +91,7 @@ export const markFicheCompleted = async (userId: string, ficheId: number) => {
 // ============ Answers ============
 
 export const getAnswers = async (userId: string, ficheId: number) => {
+  const { db, firestore: { doc, getDoc } } = await getFirestoreClient();
   const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
@@ -106,6 +107,7 @@ export const saveAnswer = async (
   questionId: string,
   answer: string
 ) => {
+  const { db, firestore: { doc, serverTimestamp, setDoc } } = await getFirestoreClient();
   const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
   await setDoc(
     docRef,
@@ -122,6 +124,7 @@ export const saveAnswers = async (
   ficheId: number,
   answers: Record<string, string>
 ) => {
+  const { db, firestore: { doc, serverTimestamp, setDoc } } = await getFirestoreClient();
   const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
   await setDoc(
     docRef,
@@ -151,6 +154,7 @@ export const timestampToDate = (value: unknown): Date | null => {
 // ============ Journal ============
 
 export const getJournalEntries = async (userId: string): Promise<JournalEntry[]> => {
+  const { db, firestore: { collection, getDocs, orderBy, query } } = await getFirestoreClient();
   const journalRef = collection(db, 'users', userId, 'journal');
   const q = query(journalRef, orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
@@ -162,6 +166,7 @@ export const getJournalEntries = async (userId: string): Promise<JournalEntry[]>
 };
 
 export const addJournalEntry = async (userId: string, content: string) => {
+  const { db, firestore: { collection, doc, serverTimestamp, setDoc } } = await getFirestoreClient();
   const journalRef = doc(collection(db, 'users', userId, 'journal'));
   const newEntry = {
     title: '',
@@ -179,6 +184,7 @@ export const updateJournalEntry = async (
   entryId: string,
   content: string
 ) => {
+  const { db, firestore: { doc, serverTimestamp, setDoc } } = await getFirestoreClient();
   const entryRef = doc(db, 'users', userId, 'journal', entryId);
   await setDoc(
     entryRef,
@@ -191,6 +197,7 @@ export const updateJournalEntry = async (
 };
 
 export const deleteJournalEntry = async (userId: string, entryId: string) => {
+  const { db, firestore: { deleteDoc, doc } } = await getFirestoreClient();
   const entryRef = doc(db, 'users', userId, 'journal', entryId);
   await deleteDoc(entryRef);
 };
