@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import {
   Award,
+  Bell,
   BookMarked,
   BookOpen,
   Brain,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
+import NotificationCenter from '@/components/NotificationCenter';
 
 /**
  * La coque de l'application.
@@ -70,6 +72,7 @@ function estActive(pathname: string, href: string): boolean {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const [notifOuvert, setNotifOuvert] = useState(false);
 
   const sansCoque = useMemo(
     () =>
@@ -84,10 +87,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-parchemin-100 lg:flex">
-      <ColonneLaterale pathname={pathname} />
+      <ColonneLaterale pathname={pathname} onOuvrirNotifs={() => setNotifOuvert(true)} />
 
       <div className="min-w-0 flex-1">
-        <BarreMobile />
+        <BarreMobile onOuvrirNotifs={() => setNotifOuvert(true)} />
         {/* La marge basse laisse la place à la barre d'onglets et au pouce. */}
         <main className="pb-[calc(5.25rem+env(safe-area-inset-bottom))] lg:pb-0">
           {children}
@@ -95,6 +98,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <BarreOnglets pathname={pathname} />
+
+      <NotificationCenter ouvert={notifOuvert} onFermer={() => setNotifOuvert(false)} />
     </div>
   );
 }
@@ -103,7 +108,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 // Grand écran : une colonne latérale permanente
 // ─────────────────────────────────────────────────────────────
 
-function ColonneLaterale({ pathname }: { pathname: string }) {
+function ColonneLaterale({
+  pathname,
+  onOuvrirNotifs,
+}: {
+  pathname: string;
+  onOuvrirNotifs: () => void;
+}) {
   const { logout } = useAuth();
   const { group, gate } = useParcours();
 
@@ -157,6 +168,14 @@ function ColonneLaterale({ pathname }: { pathname: string }) {
       </nav>
 
       <button
+        onClick={onOuvrirNotifs}
+        className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-2xs font-bold text-or-300 transition-colors hover:bg-white/12"
+      >
+        <Bell className="h-4 w-4" strokeWidth={1.75} />
+        Rappels & Notifications
+      </button>
+
+      <button
         onClick={() => void logout()}
         className="mt-auto flex items-center gap-3 rounded-xl px-3 py-2.5 text-2xs font-bold text-parchemin-100/45 transition-colors hover:bg-white/8 hover:text-rose-300"
       >
@@ -189,7 +208,7 @@ function LienLateral({ lien, actif }: { lien: Destination; actif: boolean }) {
 // Mobile : une barre de titre contextuelle, une barre d'onglets
 // ─────────────────────────────────────────────────────────────
 
-function BarreMobile() {
+function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
   const pathname = usePathname();
   const { group } = useParcours();
 
@@ -199,13 +218,22 @@ function BarreMobile() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-parchemin-300 bg-parchemin-50/90 px-4 pb-2.5 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl lg:hidden">
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="truncate font-serif text-lg font-bold text-encre-950">{titre}</h1>
-        {group && (
-          <span className="shrink-0 rounded-full bg-or-100 px-2.5 py-0.5 text-2xs font-bold text-or-700">
-            Fiche {group.currentStep}/20
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onOuvrirNotifs}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-parchemin-300"
+            aria-label="Rappels et notifications"
+          >
+            <Bell className="h-4 w-4" />
+          </button>
+          {group && (
+            <span className="shrink-0 rounded-full bg-or-100 px-2.5 py-0.5 text-2xs font-bold text-or-700">
+              Fiche {group.currentStep}/20
+            </span>
+          )}
+        </div>
       </div>
     </header>
   );

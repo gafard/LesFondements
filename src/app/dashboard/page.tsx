@@ -6,6 +6,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRight,
   Award,
+  BellRing,
   BookOpen,
   Bookmark,
   Brain,
@@ -25,6 +26,7 @@ import ParcoursGate from '@/components/ParcoursGate';
 import ProgressBar from '@/components/ProgressBar';
 import YearHeatmap from '@/components/YearHeatmap';
 import ModernIcon from '@/components/ModernIcon';
+import NotificationCenter from '@/components/NotificationCenter';
 import { getCachedJournalEntries, getJournalEntries, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
 import { getCachedPosts, getPosts, nextMeetingDate, subscribe } from '@/lib/parcoursStore';
@@ -40,6 +42,7 @@ const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 's
 function DashboardContent() {
   const { user } = useAuth();
   const { group, members, membership, session, isLeader } = useParcours();
+  const [notifOuvert, setNotifOuvert] = useState(false);
   const [journal, setJournal] = useState<JournalEntry[]>(() =>
     user ? getCachedJournalEntries(user.uid).slice(0, 3) : []
   );
@@ -279,6 +282,33 @@ function DashboardContent() {
             </div>
           </div>
         </div>
+
+        {/* ══ Rappels & Méditations du jour ══ */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-3xl border border-or-300/80 bg-gradient-to-r from-or-50/80 via-white/80 to-indigo-50/80 p-5 shadow-xs">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-or-100 text-or-800 shadow-2xs">
+              <BellRing className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-serif text-sm font-bold text-encre-950">
+                Goutte de Rosée & Rappels quotidiens
+              </p>
+              <p className="text-2xs text-encre-500">
+                Recevez le verset du matin et vos rappels de cellule via notifications Cloudflare Workers.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setNotifOuvert(true)}
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-encre-950 px-4 py-2 text-2xs font-bold text-parchemin-100 shadow-xs transition-colors hover:bg-encre-900"
+          >
+            <BellRing className="h-3.5 w-3.5 text-or-300" />
+            Régler mes rappels
+          </button>
+        </div>
+
+        <NotificationCenter ouvert={notifOuvert} onFermer={() => setNotifOuvert(false)} />
 
         {/* ══ Le pouls de la cellule : Mur de Post-its colorés ══ */}
         <section className="space-y-4">
