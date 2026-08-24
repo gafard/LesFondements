@@ -14,7 +14,7 @@ interface VersetCardProps {
 export default function VersetCard({ reference, text, type = 'quote' }: VersetCardProps) {
   const [copied, setCopied] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-  const [version, setVersion] = useState<'lsg' | 'bds' | 's21' | 'nfc'>('lsg');
+  const [version, setVersion] = useState<'lsg' | 'bds' | 's21' | 'nfc'>('bds');
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [audioJoue, setAudioJoue] = useState<'lsg' | 'bds' | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -107,9 +107,19 @@ export default function VersetCard({ reference, text, type = 'quote' }: VersetCa
           </div>
 
           <div className="flex items-center gap-1">
-            {/* Version Toggles */}
+            {/* Version Toggles (Semeur par défaut) */}
             {comparaison && (
               <div className="flex items-center rounded-lg bg-black/5 p-0.5 mr-1">
+                <button
+                  type="button"
+                  onClick={() => setVersion('bds')}
+                  className={`px-2 py-0.5 rounded text-2xs font-bold transition-all ${
+                    version === 'bds' ? 'bg-white shadow-xs text-indigo-900' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="La Bible du Semeur (Traduction du livret)"
+                >
+                  Semeur
+                </button>
                 <button
                   type="button"
                   onClick={() => setVersion('lsg')}
@@ -119,16 +129,6 @@ export default function VersetCard({ reference, text, type = 'quote' }: VersetCa
                   title="Louis Segond 1910"
                 >
                   LSG
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setVersion('bds')}
-                  className={`px-2 py-0.5 rounded text-2xs font-bold transition-all ${
-                    version === 'bds' ? 'bg-white shadow-xs text-indigo-900' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                  title="La Bible du Semeur"
-                >
-                  Semeur
                 </button>
                 {comparaison.s21 && (
                   <button
@@ -145,7 +145,23 @@ export default function VersetCard({ reference, text, type = 'quote' }: VersetCa
               </div>
             )}
 
-            {/* Real Bible Audio */}
+            {/* Real Bible Audio (Semeur par défaut) */}
+            {comparaison?.audioBds && (
+              <button
+                type="button"
+                onClick={() => jouerAudio('bds')}
+                className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-2xs font-bold ${
+                  audioEnCours && audioJoue === 'bds'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-indigo-800 hover:bg-white/80'
+                }`}
+                title="Écouter en Bible du Semeur (Audio réel)"
+              >
+                {audioEnCours && audioJoue === 'bds' ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">Audio Semeur</span>
+              </button>
+            )}
+
             {comparaison?.audioLsg && (
               <button
                 type="button"
@@ -159,22 +175,6 @@ export default function VersetCard({ reference, text, type = 'quote' }: VersetCa
               >
                 {audioEnCours && audioJoue === 'lsg' ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">LSG</span>
-              </button>
-            )}
-
-            {comparaison?.audioBds && (
-              <button
-                type="button"
-                onClick={() => jouerAudio('bds')}
-                className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-2xs font-bold ${
-                  audioEnCours && audioJoue === 'bds'
-                    ? 'bg-indigo-500 text-white shadow-xs'
-                    : 'text-slate-500 hover:text-indigo-700 hover:bg-white/80'
-                }`}
-                title="Écouter en Bible du Semeur (Audio réel)"
-              >
-                {audioEnCours && audioJoue === 'bds' ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                <span className="hidden sm:inline">Semeur</span>
               </button>
             )}
 

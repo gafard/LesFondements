@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -19,6 +19,7 @@ import ParcoursGate from '@/components/ParcoursGate';
 import { getAnswers } from '@/lib/firestore';
 import { chargerLivret, versetsDe } from '@/lib/livret';
 import { texteDuVerset } from '@/data/versets';
+import { getComparaisonVerset } from '@/lib/bibleVersions';
 import { lectureDisponible, lireAVoixHaute } from '@/lib/ambiance';
 import { FICHES_META } from '@/data/fichesMeta';
 
@@ -43,6 +44,8 @@ function MemorisationContent() {
   const [index, setIndex] = useState(0);
   const [retournee, setRetournee] = useState(false);
   const [filtre, setFiltre] = useState<number | 'toutes'>('toutes');
+  const [audioEnCours, setAudioEnCours] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [maitrisees, setMaitrisees] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
@@ -276,20 +279,49 @@ function MemorisationContent() {
                     )}
                   </div>
 
-                  {(carte.texte || carte.copie) && lectureDisponible() && (
+                  {(carte.texte || carte.copie) && (
                     <button
                       onClick={(event) => {
                         event.stopPropagation();
-                        lireAVoixHaute(`${carte.reference}. ${carte.texte ?? carte.copie}`);
+                        const comp = getComparaisonVerset(carte.reference);
+                        const audioUrl = comp?.audioBds || comp?.audioLsg;
+                        if (audioEnCours) {
+                          audioRef.current?.pause();
+                          setAudioEnCours(false);
+                          return;
+                        }
+                        if (audioUrl && audioRef.current) {
+                          audioRef.current.src = audioUrl;
+                          audioRef.current
+                            .play()
+                            .then(() => setAudioEnCours(true))
+                            .catch(() => {
+                              setAudioEnCours(false);
+                              lireAVoixHaute(`${carte.reference}. ${comp?.bds ?? carte.texte ?? carte.copie}`);
+                            });
+                        } else if (lectureDisponible()) {
+                          lireAVoixHaute(`${carte.reference}. ${comp?.bds ?? carte.texte ?? carte.copie}`);
+                        }
                       }}
-                      className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-parchemin-100 px-3.5 py-2 text-2xs font-bold text-encre-600 transition-colors hover:bg-parchemin-200"
+                      className={`mt-5 inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-2xs font-bold transition-colors ${
+                        audioEnCours
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'bg-parchemin-100 text-encre-600 hover:bg-indigo-100 hover:text-indigo-900'
+                      }`}
                     >
-                      <Volume2 className="h-3.5 w-3.5" /> Écouter
+                      <Volume2 className="h-3.5 w-3.5" />
+                      {audioEnCours ? 'Pause' : 'Écouter (Semeur)'}
                     </button>
                   )}
                 </div>
               </div>
             </button>
+
+            <audio
+              ref={audioRef}
+              onEnded={() => setAudioEnCours(false)}
+              onError={() => setAudioEnCours(false)}
+            />
 
             {/* ── Commandes ── */}
             <div className="mt-6 flex items-center justify-between gap-3">

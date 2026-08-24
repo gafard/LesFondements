@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BookOpen, Check, Copy, Loader2, Volume2, X } from 'lucide-react';
+import { BookOpen, Check, Copy, Loader2, Pause, Volume2, X } from 'lucide-react';
 import { fermerBulle, useBulleVerset } from '@/lib/bulleVerset';
 import { ouvrirEtude } from '@/lib/panneauEtude';
 import { lirePassage, texteSeul, type Passage } from '@/lib/etudes';
 import { formaterReference } from '@/lib/reference';
 import { texteDuVerset } from '@/data/versets';
+import { getAudioChapitre, getComparaisonVerset } from '@/lib/bibleVersions';
 import { arreterLecture, lectureDisponible, lireAVoixHaute } from '@/lib/ambiance';
 
 const LARGEUR = 340;
@@ -20,7 +21,7 @@ interface PositionBulle {
   au_dessus: boolean;
 }
 
-function calculerPosition(element: HTMLElement, hauteurEstimee = 200): PositionBulle {
+function calculerPosition(element: HTMLElement, hauteurEstimee = 220): PositionBulle {
   const rect = element.getBoundingClientRect();
   const vw = typeof window !== 'undefined' ? window.innerWidth : 380;
   const vh = typeof window !== 'undefined' ? window.innerHeight : 600;
@@ -39,20 +40,16 @@ function calculerPosition(element: HTMLElement, hauteurEstimee = 200): PositionB
   let auDessus = false;
 
   if (espaceEnBas >= hauteurEstimee + 16) {
-    // Il y a de la place en dessous
     haut = rect.bottom + 8;
     auDessus = false;
   } else if (espaceEnHaut >= hauteurEstimee + 16) {
-    // Il y a de la place au-dessus
     haut = rect.top - hauteurEstimee - 8;
     auDessus = true;
   } else {
-    // Écran très petit : centrer verticalement avec marge de sécurité
     haut = Math.max(MARGE, (vh - hauteurEstimee) / 2);
     auDessus = false;
   }
 
-  // La petite flèche pointe vers le centre du mot
   const pointe = Math.max(16, Math.min(largeurEffective - 30, centreElement - gauche - 7));
 
   return {
@@ -65,15 +62,18 @@ function calculerPosition(element: HTMLElement, hauteurEstimee = 200): PositionB
 }
 
 /**
- * Un bout de papier posé sous le verset cliqué : la référence manuscrite,
- * le texte biblique Segond, et les actions (écouter, copier, étude complète).
+ * Papillon d'étude posé sous le verset cliqué :
+ * Privilégie La Bible du Semeur (BDS) et son streaming audio réel en studio.
  */
 export default function BulleVerset() {
   const bulle = useBulleVerset();
   const [passage, setPassage] = useState<Passage | null | undefined>(undefined);
+  const [versionChoisie, setVersionChoisie] = useState<'bds' | 'lsg'>('bds');
   const [copie, setCopie] = useState(false);
+  const [audioEnCours, setAudioEnCours] = useState(false);
   const [position, setPosition] = useState<PositionBulle | null>(null);
   const boite = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [bullePrecedente, setBullePrecedente] = useState(bulle);
 
   // ── Réinitialisation synchrone au changement de bulle ──
@@ -81,6 +81,8 @@ export default function BulleVerset() {
     setBullePrecedente(bulle);
     setPassage(undefined);
     setCopie(false);
+    setAudioEnCours(false);
+    setVersionChoisie('bds');
     if (bulle?.ancre) {
       setPosition(calculerPosition(bulle.ancre));
     } else {
@@ -102,14 +104,14 @@ export default function BulleVerset() {
     };
   }, [bulle]);
 
-  // ── Recalcul précis de la géométrie une fois le DOM mesurable ──
+  // ── Recalcul précis de la géométrie ──
   const repositionner = useCallback(() => {
     if (!bulle?.ancre) {
       setPosition(null);
       return;
     }
     try {
-      const hauteurReelle = boite.current?.offsetHeight || 200;
+      const hauteurReelle = boite.current?.offsetHeight || 220;
       setPosition(calculerPosition(bulle.ancre, hauteurReelle));
     } catch {
       /* ignorer */
@@ -118,10 +120,12 @@ export default function BulleVerset() {
 
   useEffect(() => {
     repositionner();
-  }, [repositionner, passage]);
+  }, [repositionner, passage, versionChoisie]);
 
-  // ── Fermeture & événements (scroll, escape, resize) ──
+  // ── Fermeture & événements ──
   const fermer = useCallback(() => {
+    audioRef.current?.pause();
+    setAudioEnCours(false);
     arreterLecture();
     fermerBulle();
   }, []);
@@ -136,7 +140,6 @@ export default function BulleVerset() {
     const auMouvement = () => {
       try {
         const rect = bulle.ancre.getBoundingClientRect();
-        // Ferme seulement si l'élément sort largement de l'écran (scroll lointain)
         const sorti = rect.bottom < -150 || rect.top > window.innerHeight + 150;
         if (sorti) fermer();
         else repositionner();
@@ -158,14 +161,48 @@ export default function BulleVerset() {
   if (!bulle) return null;
 
   const titre = formaterReference(bulle.reference, true);
-  const texteConnu = texteDuVerset(bulle.reference.brut) || texteDuVerset(formaterReference(bulle.reference));
-  const texte = passage ? texteSeul(passage.versets) : texteConnu || '';
-  const tropLong = texte.length > 380;
+  const comparaison = getComparaisonVerset(bulle.reference.brut) || getComparaisonVerset(formaterReference(bulle.reference));
+  const texteConnuSegond = texteDuVerset(bulle.reference.brut) || texteDuVerset(formaterReference(bulle.reference));
+
+  // Texte à afficher selon la version (BDS par défaut si disponible)
+  const texteSemeur = comparaison?.bds;
+  const texteSegond = passage ? texteSeul(passage.versets) : texteConnuSegond || comparaison?.lsg || '';
+  
+  const texteAffiche = versionChoisie === 'bds' && texteSemeur ? texteSemeur : texteSegond;
+  const tropLong = texteAffiche.length > 360;
+
+  // Audio réel (Bible du Semeur par défaut)
+  const audioUrl = versionChoisie === 'bds'
+    ? (comparaison?.audioBds || getAudioChapitre(bulle.reference.livre.numero, bulle.reference.livre.nom, bulle.reference.chapitre, 'semeur'))
+    : (comparaison?.audioLsg || getAudioChapitre(bulle.reference.livre.numero, bulle.reference.livre.nom, bulle.reference.chapitre, 'lsg'));
+
+  const jouerAudio = () => {
+    if (audioEnCours) {
+      audioRef.current?.pause();
+      setAudioEnCours(false);
+      return;
+    }
+
+    if (audioUrl && audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current
+        .play()
+        .then(() => setAudioEnCours(true))
+        .catch(() => {
+          // Fallback vocal si le streaming échoue
+          setAudioEnCours(false);
+          lireAVoixHaute(`${titre}. ${texteAffiche}`);
+        });
+    } else {
+      lireAVoixHaute(`${titre}. ${texteAffiche}`);
+    }
+  };
 
   const copier = async () => {
     try {
       const nomPassage = passage?.titre || titre;
-      await navigator.clipboard.writeText(`« ${texte} » — ${nomPassage} (Segond 1910)`);
+      const nomVersion = versionChoisie === 'bds' && texteSemeur ? 'Bible du Semeur' : 'Segond 1910';
+      await navigator.clipboard.writeText(`« ${texteAffiche} » — ${nomPassage} (${nomVersion})`);
       setCopie(true);
       window.setTimeout(() => setCopie(false), 1800);
     } catch {
@@ -179,7 +216,13 @@ export default function BulleVerset() {
 
   return (
     <>
-      {/* 1. Voile d'arrière-plan pour fermer au clic */}
+      <audio
+        ref={audioRef}
+        onEnded={() => setAudioEnCours(false)}
+        onError={() => setAudioEnCours(false)}
+      />
+
+      {/* 1. Voile d'arrière-plan */}
       <div
         role="presentation"
         aria-hidden="true"
@@ -199,32 +242,72 @@ export default function BulleVerset() {
           top: `${posHaut}px`,
           width: `${posLargeur}px`,
           maxWidth: 'calc(100vw - 24px)',
-          maxHeight: 'min(75vh, 460px)',
+          maxHeight: 'min(75vh, 480px)',
           display: 'flex',
           flexDirection: 'column',
           ['--pointe' as string]: `${position?.pointe ?? 28}px`,
         }}
       >
-        {/* Ruban washi décoratif */}
         <span className="ruban -top-2.5 left-1/2 -translate-x-1/2 -rotate-2 rounded-[2px]" />
 
-        {/* En-tête */}
-        <div className="flex items-start justify-between gap-2 border-b border-parchemin-300/80 pb-2">
-          <p className="manuscrit text-2xl font-bold leading-none text-or-700">{titre}</p>
-          <button
-            onClick={fermer}
-            className="-mr-1 -mt-1 rounded-full p-1.5 text-encre-400 transition-colors hover:bg-parchemin-200 hover:text-encre-900"
-            aria-label="Fermer"
-          >
-            <X className="h-4 w-4" />
-          </button>
+        {/* En-tête avec sélecteur de version (Semeur par défaut) */}
+        <div className="flex items-center justify-between gap-2 border-b border-parchemin-300/80 pb-2">
+          <div>
+            <p className="manuscrit text-2xl font-bold leading-none text-or-700">{titre}</p>
+            <span className="text-3xs font-bold uppercase tracking-wider text-encre-400">
+              {versionChoisie === 'bds' && texteSemeur ? 'Bible du Semeur (BDS)' : 'Louis Segond 1910'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            {texteSemeur && (
+              <div className="flex items-center rounded-lg bg-parchemin-200/70 p-0.5 text-3xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setVersionChoisie('bds')}
+                  className={`rounded px-1.5 py-0.5 transition-all ${
+                    versionChoisie === 'bds'
+                      ? 'bg-encre-950 text-white shadow-2xs'
+                      : 'text-encre-600 hover:text-encre-950'
+                  }`}
+                  title="La Bible du Semeur"
+                >
+                  Semeur
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVersionChoisie('lsg')}
+                  className={`rounded px-1.5 py-0.5 transition-all ${
+                    versionChoisie === 'lsg'
+                      ? 'bg-encre-950 text-white shadow-2xs'
+                      : 'text-encre-600 hover:text-encre-950'
+                  }`}
+                  title="Louis Segond 1910"
+                >
+                  LSG
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={fermer}
+              className="-mr-1 rounded-full p-1 text-encre-400 transition-colors hover:bg-parchemin-200 hover:text-encre-900"
+              aria-label="Fermer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Corps du texte biblique */}
+        {/* Corps du texte */}
         <div className="my-2.5 flex-1 overflow-y-auto pr-1">
-          {passage === undefined && !texteConnu ? (
+          {passage === undefined && !texteConnuSegond && !texteSemeur ? (
             <p className="flex items-center gap-2 py-4 text-xs text-encre-500">
               <Loader2 className="h-4 w-4 animate-spin text-or-600" /> Chargement du passage…
+            </p>
+          ) : texteAffiche ? (
+            <p className={`font-serif text-sm leading-relaxed text-encre-900 ${tropLong ? 'text-xs leading-relaxed' : ''}`}>
+              {texteAffiche}
             </p>
           ) : passage?.versets && passage.versets.length > 0 ? (
             <p className={`font-serif text-sm leading-relaxed text-encre-900 ${tropLong ? 'text-xs leading-relaxed' : ''}`}>
@@ -239,10 +322,6 @@ export default function BulleVerset() {
                 </span>
               ))}
             </p>
-          ) : texte ? (
-            <p className="font-serif text-sm leading-relaxed text-encre-900">
-              {texte}
-            </p>
           ) : (
             <p className="py-2 text-xs leading-relaxed text-encre-600">
               Ce passage est accessible dans l&apos;étude biblique complète.
@@ -250,22 +329,37 @@ export default function BulleVerset() {
           )}
         </div>
 
-        {/* Barre d'outils (actions) */}
+        {/* Actions : Audio studio réel BDS + Copie + Étude */}
         <div className="flex items-center gap-1.5 border-t border-parchemin-300/80 pt-2.5">
-          {lectureDisponible() && texte && (
+          {texteAffiche && (
             <button
-              onClick={() => lireAVoixHaute(`${titre}. ${texte}`)}
-              className="rounded-lg p-2 text-encre-600 transition-colors hover:bg-or-100 hover:text-or-800"
-              title="Écouter le passage"
+              onClick={jouerAudio}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-2xs font-bold transition-colors ${
+                audioEnCours
+                  ? 'bg-or-500 text-encre-950 shadow-xs'
+                  : 'bg-parchemin-200/70 text-encre-700 hover:bg-or-100 hover:text-or-900'
+              }`}
+              title={audioEnCours ? 'Mettre en pause' : 'Écouter (Audio Bible du Semeur)'}
               aria-label="Écouter le passage"
             >
-              <Volume2 className="h-4 w-4" />
+              {audioEnCours ? (
+                <>
+                  <Pause className="h-3.5 w-3.5 text-encre-950" />
+                  <span>Pause</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="h-3.5 w-3.5 text-or-700" />
+                  <span>Écouter {versionChoisie === 'bds' && texteSemeur ? 'Semeur' : ''}</span>
+                </>
+              )}
             </button>
           )}
-          {texte && (
+
+          {texteAffiche && (
             <button
               onClick={copier}
-              className="rounded-lg p-2 text-encre-600 transition-colors hover:bg-or-100 hover:text-or-800"
+              className="rounded-lg p-1.5 text-encre-600 transition-colors hover:bg-or-100 hover:text-or-800"
               title="Copier le passage"
               aria-label="Copier le passage"
             >

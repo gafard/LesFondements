@@ -52,7 +52,7 @@ export default function PanneauEtude() {
   const [onglet, setOnglet] = useState<Onglet>('texte');
   const [afficherStrong, setAfficherStrong] = useState(true);
   const [copie, setCopie] = useState(false);
-  const [audioVersion, setAudioVersion] = useState<'lsg' | 'semeur'>('lsg');
+  const [audioVersion, setAudioVersion] = useState<'lsg' | 'semeur'>('semeur');
   const [audioEnCours, setAudioEnCours] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [referencePrecedente, setReferencePrecedente] = useState(reference);
@@ -238,9 +238,22 @@ export default function PanneauEtude() {
               <Languages className="h-3 w-3" /> Strong
             </button>
 
-            {/* Audio réel (LSG & Semeur) */}
+            {/* Audio réel (Semeur par défaut & LSG) */}
             {passage && (
               <div className="flex items-center gap-1 rounded-full bg-white/10 p-0.5">
+                <button
+                  onClick={() => basculerAudio('semeur')}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
+                    audioVersion === 'semeur' && audioEnCours
+                      ? 'bg-amber-400 text-slate-950 shadow-xs'
+                      : 'text-amber-200/90 hover:bg-white/10'
+                  }`}
+                  title="Écouter en Bible du Semeur (Audio réel studio)"
+                >
+                  <Volume2 className="h-3 w-3" />
+                  <span>{audioVersion === 'semeur' && audioEnCours ? 'Pause Semeur' : 'Audio Semeur'}</span>
+                </button>
+
                 <button
                   onClick={() => basculerAudio('lsg')}
                   className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
@@ -251,20 +264,7 @@ export default function PanneauEtude() {
                   title="Écouter en Louis Segond (Audio réel)"
                 >
                   <Volume2 className="h-3 w-3" />
-                  <span>{audioVersion === 'lsg' && audioEnCours ? 'Pause LSG' : 'Audio LSG'}</span>
-                </button>
-
-                <button
-                  onClick={() => basculerAudio('semeur')}
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
-                    audioVersion === 'semeur' && audioEnCours
-                      ? 'bg-amber-400 text-slate-950 shadow-xs'
-                      : 'text-amber-200/90 hover:bg-white/10'
-                  }`}
-                  title="Écouter en Bible du Semeur (Audio réel)"
-                >
-                  <Volume2 className="h-3 w-3" />
-                  <span>{audioVersion === 'semeur' && audioEnCours ? 'Pause BDS' : 'Audio BDS'}</span>
+                  <span>{audioVersion === 'lsg' && audioEnCours ? 'Pause LSG' : 'LSG'}</span>
                 </button>
               </div>
             )}
