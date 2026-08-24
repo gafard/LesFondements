@@ -1,16 +1,18 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Headphones, X } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Play, Pause, SkipForward, SkipBack, Headphones, X, Sparkles } from 'lucide-react';
 import { lireAVoixHaute, arreterLecture, lectureDisponible } from '@/lib/ambiance';
 import { getAudioChapitre } from '@/lib/bibleVersions';
 import { analyserReference } from '@/lib/reference';
+import { chargerManifesteVoix, type Manifeste } from '@/lib/voix';
 
 export interface FicheEcoute {
   id: number;
   titre: string;
   sousTitre?: string;
   sections?: {
+    index?: number;
     titre: string;
     texte: string;
   }[];
@@ -24,8 +26,10 @@ interface EcouteContinueFicheProps {
 }
 
 interface PisteAudio {
+  id?: string;
   titre: string;
   type: 'enseignement' | 'bible';
+  source?: 'eleven' | 'humaine' | 'tts' | 'studio';
   texte?: string;
   urlAudio?: string;
 }
@@ -37,41 +41,63 @@ export default function EcouteContinueFiche({
 }: EcouteContinueFicheProps) {
   const [indexPiste, setIndexPiste] = useState(0);
   const [enLecture, setEnLecture] = useState(false);
+  const [manifeste, setManifeste] = useState<Manifeste | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Construire la playlist continue
-  const playlist: PisteAudio[] = [];
+  useEffect(() => {
+    void chargerManifesteVoix().then(setManifeste);
+  }, []);
 
-  // 1. Titre et sous-titre
-  playlist.push({
-    titre: `Introduction : ${fiche.titre}`,
-    type: 'enseignement',
-    texte: `${fiche.titre}. ${fiche.sousTitre || ''}.`,
-  });
+  // Construire la playlist continue avec ElevenLabs en priorité
+  const playlist = useMemo<PisteAudio[]>(() => {
+    const list: PisteAudio[] = [];
 
-  // 2. Sections de l'enseignement
-  if (fiche.sections) {
-    fiche.sections.forEach((sec, idx) => {
-      playlist.push({
-        titre: `Section ${idx + 1} : ${sec.titre}`,
-        type: 'enseignement',
-        texte: `${sec.titre}. ${sec.texte}`,
-      });
+    // 1. Introduction
+    const seuilTrack = manifeste?.pistes[`f${fiche.id}.seuil`];
+    list.push({
+      id: `f${fiche.id}.seuil`,
+      titre: `Introduction : ${fiche.titre}`,
+      type: 'enseignement',
+      source: seuilTrack ? 'eleven' : 'tts',
+      urlAudio: seuilTrack?.url,
+      texte: `${fiche.titre}. ${fiche.sousTitre || ''}.`,
     });
-  }
 
-  // 3. Chapitre biblique de lecture principale
-  if (fiche.lectures && fiche.lectures.length > 0) {
-    const premiereRef = fiche.lectures[0];
-    const parsed = analyserReference(premiereRef);
-    if (parsed) {
-      playlist.push({
-        titre: `Lecture Biblique : ${premiereRef}`,
-        type: 'bible',
-        urlAudio: getAudioChapitre(parsed.livre.numero, parsed.livre.nom, parsed.chapitre),
+    // 2. Sections d'enseignement
+    if (fiche.sections) {
+      fiche.sections.forEach((sec, idx) => {
+        const secIndex = sec.index ?? idx;
+        const secTrack =
+          manifeste?.pistes[`f${fiche.id}.s${secIndex}`] ||
+          manifeste?.pistes[`f${fiche.id}.s${secIndex}.b0`];
+
+        list.push({
+          id: `f${fiche.id}.s${secIndex}`,
+          titre: `Section ${idx + 1} : ${sec.titre || `Partie ${idx + 1}`}`,
+          type: 'enseignement',
+          source: secTrack ? 'eleven' : 'tts',
+          urlAudio: secTrack?.url,
+          texte: `${sec.titre}. ${sec.texte}`,
+        });
       });
     }
-  }
+
+    // 3. Chapitre biblique en audio studio
+    if (fiche.lectures && fiche.lectures.length > 0) {
+      const premiereRef = fiche.lectures[0];
+      const parsed = analyserReference(premiereRef);
+      if (parsed) {
+        list.push({
+          titre: `Lecture Biblique : ${premiereRef}`,
+          type: 'bible',
+          source: 'studio',
+          urlAudio: getAudioChapitre(parsed.livre.numero, parsed.livre.nom, parsed.chapitre),
+        });
+      }
+    }
+
+    return list;
+  }, [fiche, manifeste]);
 
   const pisteActuelle = playlist[indexPiste] || playlist[0];
 
@@ -85,28 +111,26 @@ export default function EcouteContinueFiche({
     setIndexPiste(idx);
     const piste = playlist[idx];
 
-    if (piste.type === 'bible' && piste.urlAudio && audioRef.current) {
+    if (piste?.urlAudio && audioRef.current) {
       arreterLecture();
       audioRef.current.src = piste.urlAudio;
       audioRef.current
         .play()
         .then(() => setEnLecture(true))
         .catch(() => setEnLecture(false));
-    } else if (piste.type === 'enseignement' && piste.texte) {
+    } else if (piste?.texte && lectureDisponible()) {
       if (audioRef.current) audioRef.current.pause();
-      if (lectureDisponible()) {
-        setEnLecture(true);
-        lireAVoixHaute(piste.texte, {
-          onFin: () => {
-            // Passer automatiquement à la piste suivante en lecture continue
-            if (idx + 1 < playlist.length) {
-              jouerPiste(idx + 1);
-            } else {
-              setEnLecture(false);
-            }
-          },
-        });
-      }
+      setEnLecture(true);
+      lireAVoixHaute(piste.texte, {
+        onFin: () => {
+          if (idx + 1 < playlist.length) {
+            jouerPiste(idx + 1);
+          } else {
+            setEnLecture(false);
+          }
+        },
+        onErreur: () => setEnLecture(false),
+      });
     }
   };
 
@@ -114,6 +138,7 @@ export default function EcouteContinueFiche({
     if (enLecture) {
       arreterLecture();
       audioRef.current?.pause();
+      setEnLecture(false);
     } else {
       jouerPiste(indexPiste);
     }
@@ -131,6 +156,7 @@ export default function EcouteContinueFiche({
     if (!ouvert) {
       arreterLecture();
       audioRef.current?.pause();
+      setEnLecture(false);
     }
   }, [ouvert]);
 
@@ -180,8 +206,16 @@ export default function EcouteContinueFiche({
         {/* Piste en cours */}
         <div className="my-4 flex items-center justify-between gap-4 rounded-2xl bg-white/[0.06] p-3.5 border border-white/5">
           <div className="min-w-0">
-            <span className="text-3xs font-bold uppercase tracking-wider text-or-300">
-              {pisteActuelle?.type === 'bible' ? 'Studio Bible Audio' : 'Enseignement Vocal'} ({indexPiste + 1}/{playlist.length})
+            <span className="inline-flex items-center gap-1.5 text-3xs font-bold uppercase tracking-wider text-or-300">
+              {pisteActuelle?.urlAudio ? (
+                <>
+                  <Sparkles className="h-3 w-3 text-or-400" />
+                  {pisteActuelle.type === 'bible' ? 'Studio Bible Audio' : 'Voix Studio (ElevenLabs)'}
+                </>
+              ) : (
+                'Synthèse vocale'
+              )}{' '}
+              · Piste {indexPiste + 1}/{playlist.length}
             </span>
             <p className="font-serif text-sm font-bold text-white truncate">
               {pisteActuelle?.titre}

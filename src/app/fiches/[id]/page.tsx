@@ -729,13 +729,15 @@ function FicheContent() {
             id: fiche.id,
             titre: fiche.titre,
             sousTitre: fiche.sousTitre,
-            sections: fiche.sections.map((s) => ({
+            sections: fiche.sections.map((s, idx) => ({
+              index: idx,
               titre: s.titre || '',
               texte: s.blocs
                 .map((b) => b.texte)
                 .filter(Boolean)
                 .join(' '),
             })),
+            lectures: fiche.resume.flatMap((r) => r.lectures),
           }}
           ouvert={ecouteContinueOuverte}
           onFermer={() => setEcouteContinueOuverte(false)}
