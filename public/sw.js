@@ -1,14 +1,6 @@
 // Service Worker pour Les Fondements PWA & Push Notifications
-const CACHE_NAME = 'lesfondements-v3';
+const CACHE_NAME = 'lesfondements-v4';
 const ASSETS_A_METTRE_EN_CACHE = [
-  '/',
-  '/dashboard',
-  '/fiches',
-  '/journal',
-  '/memorisation',
-  '/groupes',
-  '/recherche',
-  '/transformation',
   '/icon-192.png',
   '/icon-512.png',
   '/manifest.webmanifest',
@@ -41,17 +33,39 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Ignorer les requêtes non GET ou externes aux assets
+  // Ignorer les requêtes non GET, les API et les domaines tiers.
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
 
-  // Pour les requêtes d'API, audio externe ou Firebase, laisser passer en direct réseau
   if (
+    url.origin !== self.location.origin ||
     url.pathname.startsWith('/api') ||
-    url.hostname.includes('firebase') ||
-    url.hostname.includes('googleapis') ||
-    url.hostname.includes('wordproaudio')
+    url.pathname === '/sw.js'
   ) {
+    return;
+  }
+
+  // Une navigation doit toujours chercher la version publiée en premier.
+  // Le cache ne sert qu'en véritable mode hors ligne : il ne peut donc plus
+  // masquer un nouveau déploiement de la page d'accueil.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse.ok) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(async () => {
+          return (
+            (await caches.match(event.request, { ignoreSearch: true })) ||
+            (await caches.match('/')) ||
+            Response.error()
+          );
+        })
+    );
     return;
   }
 
@@ -71,11 +85,7 @@ self.addEventListener('fetch', (event) => {
           .catch(() => {});
         return cachedResponse;
       }
-      return fetch(event.request).catch(async () => {
-        // Ne jamais renvoyer du HTML à la place d'un JSON ou d'une image.
-        if (event.request.mode === 'navigate') return (await caches.match('/')) || Response.error();
-        return Response.error();
-      });
+      return fetch(event.request).catch(() => Response.error());
     })
   );
 });

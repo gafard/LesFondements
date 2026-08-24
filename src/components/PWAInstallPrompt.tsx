@@ -47,7 +47,10 @@ export default function PWAInstallPrompt() {
   useEffect(() => {
     // 0. Enregistrer le Service Worker
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      navigator.serviceWorker
+        .register('/sw.js', { updateViaCache: 'none' })
+        .then((registration) => registration.update())
+        .catch(() => {});
     }
 
     // 1. Ne rien afficher si l'application est déjà installée.

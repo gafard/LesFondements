@@ -80,52 +80,78 @@ export default function Home() {
       {/* ==================================================================== */}
       {/* HERO SECTION                                                         */}
       {/* ==================================================================== */}
-      <section className="relative isolate min-h-[92vh] flex items-center overflow-hidden bg-[#07162b] text-white pt-20 pb-16">
-        
-        {/* Hero Overhead Community Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/hero-community-v2.png"
-            alt="Petit groupe africain réuni autour d’un livre ouvert relié par un ruban doré"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-[70%_center] opacity-45 sm:opacity-55"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#07162b] via-[#07162b]/90 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#07162b] to-transparent" />
-        </div>
+      <section className="hero-bureau relative isolate min-h-[calc(100svh-4rem)] overflow-hidden px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+        <div aria-hidden="true" className="absolute -left-8 top-16 h-44 w-64 rotate-6 rounded-sm bg-[#d8c8ad]/55 shadow-xl" />
+        <div aria-hidden="true" className="absolute -bottom-20 right-[34%] h-48 w-72 -rotate-3 rounded-sm bg-[#f4ede0]/25 shadow-xl" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full py-12">
-          <div className="max-w-2xl">
-            <span className="timbre rounded-md px-3.5 py-1 text-2xs font-bold text-or-300 border-or-400/40">
-              LE PARCOURS DES 20 FONDEMENTS
-            </span>
+        <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[1.08fr_0.92fr] xl:gap-16">
+          <div className="hero-feuille feuille pose-1 relative max-w-3xl rounded-[6px] border border-parchemin-400 px-6 py-8 text-encre-950 sm:px-10 sm:py-10 lg:px-12 lg:py-11">
+            <span className="ruban -top-3 left-10 -rotate-2 rounded-[2px]" />
 
-            <h1 className="mt-5 font-serif text-4xl font-bold leading-[1.08] text-parchemin-100 sm:text-6xl lg:text-7xl">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="etiquette-classee">Le parcours des 20 fondements</span>
+              <span className="text-2xs font-black uppercase tracking-[0.2em] text-encre-500">Dossier 01—20</span>
+            </div>
+
+            <h1 className="mt-6 font-serif text-4xl font-bold leading-[1.02] text-encre-950 sm:text-5xl xl:text-6xl">
               Ancrer sa foi.<br />
-              <span className="italic text-or-400">Grandir ensemble.</span>
+              <span className="italic text-or-700">Grandir ensemble.</span>
             </h1>
 
-            <p className="mt-6 text-base leading-relaxed text-parchemin-100/80 sm:text-lg">
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-encre-700 sm:text-base">
               Un parcours interactif de 20 fiches pour plonger dans les fondements de la vie chrétienne,
               seul dans le secret et chaque semaine en cellule de communion.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
                 href="/login"
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-xs font-bold shadow-lg"
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold shadow-lg"
               >
                 Rejoindre ou créer une cellule
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/fiches"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3.5 text-xs font-bold text-white backdrop-blur-xs transition-colors hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-full border border-encre-200 bg-encre-950 px-6 py-3.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-encre-800"
               >
                 Découvrir le sentier
               </Link>
+            </div>
+
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 border-t border-dashed border-encre-200 pt-4 text-2xs font-bold text-encre-600">
+              <span className="inline-flex items-center gap-2"><BookOpen className="h-3.5 w-3.5 text-or-700" /> 20 fiches guidées</span>
+              <span className="inline-flex items-center gap-2"><Users className="h-3.5 w-3.5 text-or-700" /> Seul et en cellule</span>
+            </div>
+          </div>
+
+          <div className="hero-collage relative mx-auto min-h-[430px] w-full max-w-xl sm:min-h-[520px] lg:min-h-[560px]">
+            <figure className="hero-photo-tiree absolute inset-x-5 top-4 rotate-2 sm:inset-x-10 lg:inset-x-5">
+              <div className="relative aspect-[4/3] overflow-hidden bg-encre-950">
+                <Image
+                  src="/hero-community-v2.png"
+                  alt="Petit groupe africain réuni autour d’un livre ouvert relié par un ruban doré"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 92vw, 44vw"
+                  className="object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-encre-950/25 to-transparent" />
+              </div>
+              <figcaption className="manuscrit px-3 pb-1 pt-3 text-center text-sm font-bold text-encre-800">
+                Une foi préparée seul, vécue ensemble.
+              </figcaption>
+            </figure>
+
+            <div className="post-it-jaune !absolute -left-1 bottom-4 z-20 w-44 -rotate-3 p-5 sm:left-0 sm:w-48">
+              <p className="text-2xs font-black uppercase tracking-[0.16em] text-amber-900">Rythme du parcours</p>
+              <p className="mt-2 font-serif text-xl font-bold leading-tight text-encre-950">20 semaines</p>
+              <p className="mt-1 text-xs leading-relaxed text-encre-700">Une fiche, une rencontre, un pas concret.</p>
+            </div>
+
+            <div className="post-it-bleu !absolute -right-1 bottom-16 z-20 w-40 rotate-3 p-4 sm:right-0 sm:w-44">
+              <p className="text-2xs font-black uppercase tracking-[0.14em] text-encre-700">Sur le bureau</p>
+              <p className="mt-2 text-sm font-bold leading-snug text-encre-950">Bible, journal, voix et prières.</p>
             </div>
           </div>
         </div>
