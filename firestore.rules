@@ -2,118 +2,132 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function connecte() { return request.auth != null; }
+    function moi() { return request.auth.uid; }
 
-    function connecte() {
-      return request.auth != null;
-    }
-
-    function moi() {
-      return request.auth.uid;
-    }
-
-    /** Membre actif du groupe : la seule porte d'entrée sur sa vie interne. */
-    function estMembre(groupId) {
+    function estInscrit(groupId) {
       return connecte()
-        && exists(/databases/$(database)/documents/groups/$(groupId)/members/$(moi()))
+        && exists(/databases/$(database)/documents/groups/$(groupId)/members/$(moi()));
+    }
+
+    function estMembre(groupId) {
+      return estInscrit(groupId)
         && get(/databases/$(database)/documents/groups/$(groupId)/members/$(moi())).data.status == 'actif';
     }
 
     function estAnimateur(groupId) {
-      let membre = get(/databases/$(database)/documents/groups/$(groupId)/members/$(moi())).data;
-      return connecte()
-        && exists(/databases/$(database)/documents/groups/$(groupId)/members/$(moi()))
-        && membre.status == 'actif'
-        && (membre.role == 'animateur' || membre.role == 'co_animateur');
+      return estMembre(groupId)
+        && get(/databases/$(database)/documents/groups/$(groupId)/members/$(moi())).data.role in ['animateur', 'co_animateur'];
     }
 
-    // ── Profils ───────────────────────────────────────────────
-    // Chacun ne lit et n'écrit que le sien. Les noms affichés dans un groupe
-    // proviennent des documents « membre », pas des profils.
+    function estCreateur(groupId) {
+      return connecte()
+        && exists(/databases/$(database)/documents/groups/$(groupId))
+        && get(/databases/$(database)/documents/groups/$(groupId)).data.leaderId == moi();
+    }
+
     match /profiles/{userId} {
       allow read, write: if connecte() && moi() == userId;
     }
 
-    // ── Groupes ───────────────────────────────────────────────
-    match /groups/{groupId} {
-      // L'annuaire doit rester lisible : c'est ce qui permet de trouver un
-      // groupe près de chez soi avant d'en faire partie.
+    // Annuaire expurgé : ville approximative et horaire, sans adresse, lien
+    // visio, code d'invitation ni identifiant privé de l'animateur.
+    match /groupDirectory/{groupId} {
       allow read: if connecte();
+      allow create, update, delete: if estCreateur(groupId) || estAnimateur(groupId);
+    }
 
+    // Résolution d'un code d'invitation vers un identifiant de groupe. Le
+    // document ne contient aucune donnée personnelle.
+    match /groupInvites/{code} {
+      allow read: if connecte();
+      allow create, update: if estCreateur(request.resource.data.groupId)
+        || estAnimateur(request.resource.data.groupId);
+      allow delete: if estAnimateur(resource.data.groupId);
+    }
+
+    match /groups/{groupId} {
+      // Le document complet contient l'adresse et le lien de réunion : seuls
+      // les membres approuvés peuvent le consulter.
+      allow read: if estMembre(groupId);
       allow create: if connecte()
         && request.resource.data.leaderId == moi()
         && request.resource.data.membersCount == 1;
+      allow update, delete: if estAnimateur(groupId);
 
-      // Le compteur de membres bouge aussi quand quelqu'un rejoint un groupe
-      // ouvert : tout membre actif peut donc écrire, l'animateur pilote le reste.
-      allow update: if estMembre(groupId) || estAnimateur(groupId);
-      allow delete: if estAnimateur(groupId);
-
-      // ── Membres ─────────────────────────────────────────────
       match /members/{memberId} {
-        allow read: if connecte()
-          && (moi() == memberId || estMembre(groupId) || estAnimateur(groupId));
-
-        // On dépose sa propre demande d'adhésion, jamais celle d'un autre,
-        // et jamais en s'attribuant le statut « actif ».
+        allow read: if connecte() && (moi() == memberId || estMembre(groupId));
         allow create: if connecte()
           && moi() == memberId
           && request.resource.data.uid == moi()
-          && request.resource.data.status in ['en_attente', 'actif'];
-
-        allow update: if connecte()
-          && (moi() == memberId || estAnimateur(groupId));
-
+          && request.resource.data.groupId == groupId
+          && (
+            (get(/databases/$(database)/documents/groups/$(groupId)).data.leaderId == moi()
+              && request.resource.data.role == 'animateur'
+              && request.resource.data.status == 'actif')
+            || (request.resource.data.role == 'membre'
+              && request.resource.data.status == 'en_attente')
+          );
+        allow update: if estAnimateur(groupId)
+          || (connecte()
+            && moi() == memberId
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['preparedSteps', 'personalStep', 'nextAttendance', 'lastSeenAt']));
         allow delete: if estAnimateur(groupId);
       }
 
-      // ── Rencontres ──────────────────────────────────────────
       match /sessions/{sessionId} {
         allow read: if estMembre(groupId);
-        // Chaque membre annonce sa présence ; l'animateur conduit le déroulé.
-        allow create, update: if estMembre(groupId);
+        allow create: if estAnimateur(groupId)
+          || (estMembre(groupId)
+            && request.resource.data.groupId == groupId
+            && request.resource.data.status == 'planifiee'
+            && request.resource.data.liveStage == 0
+            && request.resource.data.attendance.size() == 0);
+        allow update: if estAnimateur(groupId)
+          || (estMembre(groupId)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendance'])
+            && request.resource.data.attendance.diff(resource.data.attendance).affectedKeys().hasOnly([moi()]));
         allow delete: if estAnimateur(groupId);
       }
 
-      // ── Mur du groupe ───────────────────────────────────────
       match /posts/{postId} {
         allow read: if estMembre(groupId);
-        allow create: if estMembre(groupId) && request.resource.data.authorId == moi();
-        // Les « j'ai prié » et « amen » modifient le message d'un autre :
-        // tout membre peut donc mettre à jour, mais seul l'auteur supprime.
-        allow update: if estMembre(groupId);
+        allow create: if estMembre(groupId)
+          && request.resource.data.authorId == moi()
+          && request.resource.data.groupId == groupId;
+        allow update: if estMembre(groupId) && (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['prayedBy', 'amenBy'])
+          || ((resource.data.authorId == moi() || estAnimateur(groupId))
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answered', 'answeredAt']))
+        );
         allow delete: if estMembre(groupId)
           && (resource.data.authorId == moi() || estAnimateur(groupId));
       }
     }
 
-    // ── Invitations ───────────────────────────────────────────
-    // Collection à plat pour qu'une personne puisse retrouver les invitations
-    // envoyées à son adresse, sans avoir accès aux groupes concernés.
     match /invitations/{inviteId} {
       allow read: if connecte()
         && (request.auth.token.email == resource.data.email
-            || estMembre(resource.data.groupId));
+          || estMembre(resource.data.groupId));
       allow create: if connecte()
         && request.resource.data.invitedBy == moi()
         && estMembre(request.resource.data.groupId);
-      // Accepter une invitation la marque comme utilisée.
       allow update: if connecte()
         && (request.auth.token.email == resource.data.email
-            || estAnimateur(resource.data.groupId));
+          || estAnimateur(resource.data.groupId));
       allow delete: if connecte() && estAnimateur(resource.data.groupId);
     }
 
-    // ── Progression personnelle (réponses, journal) ────────────
-    // Strictement privée : rien de ce qui est écrit dans une fiche n'est
-    // partagé sans un geste explicite de son auteur.
     match /users/{userId} {
       allow read, write: if connecte() && moi() == userId;
-
       match /progress/{ficheId} {
         allow read, write: if connecte() && moi() == userId;
       }
-
       match /journal/{entryId} {
+        allow read, write: if connecte() && moi() == userId;
+      }
+      match /memory/{documentId} {
         allow read, write: if connecte() && moi() == userId;
       }
     }

@@ -287,7 +287,7 @@ async function attachRemote(scope: Scope, callback: () => void): Promise<(() => 
 
   try {
     if (kind === 'groups') {
-      return f.onSnapshot(f.collection(db, 'groups'), () => callback());
+      return f.onSnapshot(f.collection(db, 'groupDirectory'), () => callback());
     }
     if (kind === 'group') {
       return f.onSnapshot(f.doc(db, 'groups', id), () => callback());
@@ -422,9 +422,11 @@ async function readAllGroups(): Promise<ParcoursGroup[]> {
   if (client) {
     try {
       const snap = await client.f.getDocs(
-        client.f.query(client.f.collection(client.db, 'groups'), client.f.limit(400))
+        client.f.query(client.f.collection(client.db, 'groupDirectory'), client.f.limit(400))
       );
-      return snap.docs.map((d) => d.data() as ParcoursGroup);
+      const groups = snap.docs.map((d) => d.data() as ParcoursGroup);
+      lsSet(KEY.groups, groups);
+      return groups;
     } catch (error) {
       noterEchec('Lecture des groupes', error);
     }
@@ -432,11 +434,54 @@ async function readAllGroups(): Promise<ParcoursGroup[]> {
   return lsGet<ParcoursGroup[]>(KEY.groups, []);
 }
 
+/** Version d'annuaire : aucun code, lien visio, adresse ou position précise. */
+function publicGroup(group: ParcoursGroup): ParcoursGroup {
+  return {
+    ...group,
+    inviteCode: '',
+    leaderId: '',
+    place: {
+      ...group.place,
+      lat: Math.round(group.place.lat * 100) / 100,
+      lng: Math.round(group.place.lng * 100) / 100,
+      precise: false,
+    },
+    meeting: {
+      mode: group.meeting.mode,
+      rhythm: group.meeting.rhythm,
+      weekday: group.meeting.weekday,
+      time: group.meeting.time,
+      timezone: group.meeting.timezone,
+    },
+  };
+}
+
+export async function getPublicGroup(groupId: string): Promise<ParcoursGroup | null> {
+  const client = await getClient();
+  if (client) {
+    try {
+      const snap = await client.f.getDoc(client.f.doc(client.db, 'groupDirectory', groupId));
+      return snap.exists() ? (snap.data() as ParcoursGroup) : null;
+    } catch (error) {
+      noterEchec('Lecture de l’annuaire', error);
+    }
+  }
+  return getCachedGroup(groupId);
+}
+
 async function writeGroup(group: ParcoursGroup): Promise<void> {
   const client = await getClient();
   if (client) {
     try {
       await client.f.setDoc(client.f.doc(client.db, 'groups', group.id), group, { merge: true });
+      await Promise.all([
+        client.f.setDoc(client.f.doc(client.db, 'groupDirectory', group.id), publicGroup(group)),
+        client.f.setDoc(client.f.doc(client.db, 'groupInvites', normalizeCode(group.inviteCode)), {
+          groupId: group.id,
+          code: normalizeCode(group.inviteCode),
+          updatedAt: Date.now(),
+        }),
+      ]);
     } catch (error) {
       noterEchec('Écriture du groupe', error);
     }
@@ -476,6 +521,17 @@ export async function getGroup(groupId: string): Promise<ParcoursGroup | null> {
 
 export async function getGroupByCode(code: string): Promise<ParcoursGroup | null> {
   const target = normalizeCode(code);
+  const client = await getClient();
+  if (client) {
+    try {
+      const invite = await client.f.getDoc(client.f.doc(client.db, 'groupInvites', target));
+      if (!invite.exists()) return null;
+      const groupId = (invite.data() as { groupId?: string }).groupId;
+      return groupId ? getPublicGroup(groupId) : null;
+    } catch (error) {
+      noterEchec('Lecture du code d’invitation', error);
+    }
+  }
   const groups = await readAllGroups();
   return groups.find((g) => g.inviteCode === target && !g.archived) ?? null;
 }
@@ -615,7 +671,7 @@ export interface JoinRequestInput {
  * un groupe `sur_demande` place la personne en attente de l'animateur.
  */
 export async function requestToJoin(input: JoinRequestInput): Promise<GroupMember> {
-  const group = await getGroup(input.groupId);
+  const group = (await getPublicGroup(input.groupId)) ?? (await getGroup(input.groupId));
   if (!group) throw new Error("Ce groupe n'existe plus.");
   if (group.membersCount >= group.capacity) throw new Error('Ce groupe est complet.');
   if (group.currentStep > 3)
@@ -626,7 +682,10 @@ export async function requestToJoin(input: JoinRequestInput): Promise<GroupMembe
   const existing = await getMembership(input.groupId, input.user.uid);
   if (existing && existing.status === 'actif') return existing;
 
-  const autoApproved = group.visibility === 'ouvert';
+  // À distance, toute adhésion passe par l'animateur : le client ne peut pas
+  // s'attribuer lui-même le statut actif. Les groupes de démonstration locale
+  // conservent leur accueil automatique.
+  const autoApproved = !hasRemoteBackend() && group.visibility === 'ouvert';
   const member: GroupMember = {
     uid: input.user.uid,
     groupId: group.id,
@@ -714,8 +773,18 @@ export async function getMembers(groupId: string): Promise<GroupMember[]> {
 }
 
 export async function getMembership(groupId: string, uid: string): Promise<GroupMember | null> {
-  const members = await getMembers(groupId);
-  return members.find((m) => m.uid === uid) ?? null;
+  const client = await getClient();
+  if (client) {
+    try {
+      const snap = await client.f.getDoc(
+        client.f.doc(client.db, 'groups', groupId, 'members', uid)
+      );
+      if (snap.exists()) return snap.data() as GroupMember;
+    } catch (error) {
+      noterEchec('Lecture de l’adhésion', error);
+    }
+  }
+  return getCachedMembers(groupId).find((m) => m.uid === uid) ?? null;
 }
 
 export async function approveMember(groupId: string, uid: string): Promise<void> {
@@ -726,20 +795,12 @@ export async function approveMember(groupId: string, uid: string): Promise<void>
   await writeMember({ ...member, status: 'actif', joinedAt: Date.now() });
   await writeGroup({ ...group, membersCount: group.membersCount + 1 });
 
-  const profile = await getProfile(uid);
-  if (profile && profile.groupId === groupId) {
-    await saveProfile({ ...profile, membershipStatus: 'actif' });
-  }
 }
 
 export async function rejectMember(groupId: string, uid: string): Promise<void> {
   const member = await getMembership(groupId, uid);
   if (!member) return;
   await writeMember({ ...member, status: 'refuse' });
-  const profile = await getProfile(uid);
-  if (profile && profile.groupId === groupId) {
-    await saveProfile({ ...profile, groupId: null, membershipStatus: 'refuse', role: null });
-  }
 }
 
 export async function removeMember(groupId: string, uid: string): Promise<void> {
@@ -748,10 +809,6 @@ export async function removeMember(groupId: string, uid: string): Promise<void> 
   await writeMember({ ...member, status: 'parti' });
   if (member.status === 'actif') {
     await writeGroup({ ...group, membersCount: Math.max(0, group.membersCount - 1) });
-  }
-  const profile = await getProfile(uid);
-  if (profile && profile.groupId === groupId) {
-    await saveProfile({ ...profile, groupId: null, membershipStatus: 'parti', role: null });
   }
 }
 
@@ -763,8 +820,6 @@ export async function setMemberRole(
   const member = await getMembership(groupId, uid);
   if (!member) return;
   await writeMember({ ...member, role });
-  const profile = await getProfile(uid);
-  if (profile && profile.groupId === groupId) await saveProfile({ ...profile, role });
 }
 
 /** Le membre déclare avoir préparé la fiche chez lui, avant la rencontre. */
@@ -924,7 +979,7 @@ export async function findInvitationsFor(email: string | null): Promise<Parcours
     );
   }
 
-  const groupes = await Promise.all(invites.map((invite) => getGroup(invite.groupId)));
+  const groupes = await Promise.all(invites.map((invite) => getPublicGroup(invite.groupId)));
   return groupes.filter((groupe): groupe is ParcoursGroup => !!groupe && !groupe.archived);
 }
 

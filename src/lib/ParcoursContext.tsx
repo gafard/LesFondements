@@ -12,7 +12,9 @@ import {
   getCachedSession,
   getCurrentSession,
   getGroup,
+  getMembership,
   getMembers,
+  getPublicGroup,
   hasRemoteBackend,
   saveProfile,
   subscribe,
@@ -86,7 +88,11 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const nextGroup = await getGroup(nextProfile.groupId);
+    const maPlace = await getMembership(nextProfile.groupId, user.uid);
+    const nextGroup =
+      maPlace?.status === 'actif'
+        ? await getGroup(nextProfile.groupId)
+        : await getPublicGroup(nextProfile.groupId);
     if (!nextGroup) {
       // Le groupe a disparu (supprimé, ou stockage local réinitialisé).
       await saveProfile({ ...nextProfile, groupId: null, membershipStatus: null, role: null });
@@ -99,9 +105,27 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
     }
 
     const [nextMembers, nextSession] = await Promise.all([
-      getMembers(nextGroup.id),
-      getCurrentSession(nextGroup.id),
+      maPlace?.status === 'actif' ? getMembers(nextGroup.id) : Promise.resolve(maPlace ? [maPlace] : []),
+      maPlace?.status === 'actif' ? getCurrentSession(nextGroup.id) : Promise.resolve(null),
     ]);
+
+    // L'animateur modifie le document d'adhésion, jamais le profil privé d'un
+    // autre utilisateur. À sa prochaine ouverture, chacun réconcilie donc son
+    // propre profil avec son adhésion — opération autorisée et explicite.
+    const placeReconcile = nextMembers.find((member) => member.uid === user.uid);
+    let profileReconcile = nextProfile;
+    if (
+      placeReconcile &&
+      (nextProfile.membershipStatus !== placeReconcile.status || nextProfile.role !== placeReconcile.role)
+    ) {
+      profileReconcile = {
+        ...nextProfile,
+        membershipStatus: placeReconcile.status,
+        role: placeReconcile.role,
+      };
+      await saveProfile(profileReconcile);
+      setProfile(profileReconcile);
+    }
 
     setGroup(nextGroup);
     setMembers(nextMembers);

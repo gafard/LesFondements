@@ -162,6 +162,9 @@ export default function Immersion({
   const [enchainer, setEnchainer] = useState(false);
   const [sommaire, setSommaire] = useState(false);
   const [cloture, setCloture] = useState(false);
+  const [audioEnCours, setAudioEnCours] = useState(false);
+  const [audioAvancement, setAudioAvancement] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const zone = useRef<HTMLDivElement>(null);
   const depart = useRef<number | null>(null);
 
@@ -252,6 +255,23 @@ export default function Immersion({
     if (texte) lireAVoixHaute(texte);
     return () => arreterLecture();
   }, [lecture, scene, texteDeLaScene, pisteCourante]);
+
+  // Lecture de la piste audio studio / ElevenLabs
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    setAudioAvancement(0);
+    el.currentTime = 0;
+    if (lecture && pisteCourante) {
+      void el
+        .play()
+        .then(() => setAudioEnCours(true))
+        .catch(() => setAudioEnCours(false));
+    } else {
+      el.pause();
+      setAudioEnCours(false);
+    }
+  }, [pisteCourante?.url, lecture]);
 
   // ── Gestes tactiles ─────────────────────────────────────────
   const debutTouche = (event: React.TouchEvent) => {
@@ -419,62 +439,117 @@ export default function Immersion({
         </div>
       </div>
 
-      {/* ── Voix off ── */}
-      {!cloture && lecture && pisteCourante && (
-        <LecteurVoix
-          piste={pisteCourante}
-          enchainer={enchainer}
-          onEnchainer={setEnchainer}
-          onFin={() => enchainer && aller(1)}
-        />
-      )}
-
-      {/* ── Barre basse ── */}
+      {/* ── Barre basse unifiée (Navigation + Lecteur Audio) ── */}
       {!cloture && (
-        <footer className="absolute inset-x-0 bottom-0 z-20 px-4 pb-5 sm:px-8 sm:pb-7">
-          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+        <footer className="absolute inset-x-0 bottom-0 z-20 px-3 pb-4 sm:px-8 sm:pb-7">
+          <div className="verre mx-auto flex max-w-3xl items-center justify-between gap-2.5 rounded-full px-3.5 py-2.5 shadow-2xl border border-white/10">
+            {/* Précédent */}
             <button
               onClick={() => aller(-1)}
               disabled={index === 0}
-              className={`inline-flex items-center gap-1.5 rounded-full bg-white/8 px-4 py-3 text-2xs font-bold text-parchemin-100/70 backdrop-blur-md transition-colors hover:bg-white/16 hover:text-parchemin-100 disabled:opacity-25 ${
+              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/8 text-parchemin-100/70 transition-colors hover:bg-white/16 hover:text-parchemin-100 disabled:opacity-20 ${
                 index === 0 ? 'invisible pointer-events-none' : ''
               }`}
+              aria-label="Précédent"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Précédent</span>
+              <ArrowLeft className="h-4 w-4" />
             </button>
 
-            <span className="hidden text-2xs text-parchemin-100/30 sm:block">
-              Flèches ou barre d&apos;espace pour avancer
-            </span>
+            {/* Centre : Audio ou indicateur de scène */}
+            {lecture && pisteCourante ? (
+              <div className="flex flex-1 items-center gap-2.5 min-w-0 px-1 sm:px-3">
+                <button
+                  onClick={() => {
+                    const el = audioRef.current;
+                    if (!el) return;
+                    if (el.paused) void el.play();
+                    else el.pause();
+                  }}
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-or-400 text-encre-950 transition-transform active:scale-95 shadow-xs"
+                  aria-label={audioEnCours ? 'Mettre en pause' : 'Lire'}
+                >
+                  {audioEnCours ? (
+                    <Pause className="h-3.5 w-3.5 fill-current" />
+                  ) : (
+                    <Play className="h-3.5 w-3.5 fill-current ml-0.5" />
+                  )}
+                </button>
 
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/15">
+                  <span
+                    className="block h-full rounded-full bg-or-400 transition-[width] duration-200"
+                    style={{ width: `${Math.round(audioAvancement * 100)}%` }}
+                  />
+                </div>
+
+                <button
+                  onClick={() => setEnchainer(!enchainer)}
+                  title="Passer automatiquement à la scène suivante"
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-3xs font-bold transition-colors ${
+                    enchainer
+                      ? 'bg-or-400 text-encre-950'
+                      : 'bg-white/10 text-parchemin-100/60 hover:bg-white/18'
+                  }`}
+                >
+                  Auto
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-1 items-center justify-center text-center px-2">
+                <span className="text-2xs font-semibold text-parchemin-100/40">
+                  {index + 1} / {scenario.length}
+                </span>
+              </div>
+            )}
+
+            {/* Bouton Suivant / Action */}
             {scene.type === 'cloture' ? (
               <button
                 onClick={() => void terminer()}
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold shadow-md"
+                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
               >
-                {dejaPreparee ? 'Terminer' : 'J’ai préparé la fiche'}
+                <span>{dejaPreparee ? 'Terminer' : 'J’ai préparé'}</span>
                 <Check className="h-4 w-4" strokeWidth={2.5} />
               </button>
             ) : scene.type === 'seuil' ? (
               <button
                 onClick={() => aller(1)}
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold shadow-md"
+                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
               >
-                Entrer dans la fiche
+                <span>Entrer</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </button>
             ) : (
               <button
                 onClick={() => aller(1)}
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold shadow-md"
+                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
               >
-                Continuer
+                <span>Continuer</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </button>
             )}
           </div>
         </footer>
+      )}
+
+      {/* Audio element background */}
+      {pisteCourante && (
+        <audio
+          ref={audioRef}
+          src={pisteCourante.url}
+          preload="auto"
+          onPlay={() => setAudioEnCours(true)}
+          onPause={() => setAudioEnCours(false)}
+          onTimeUpdate={(event) => {
+            const el = event.currentTarget;
+            if (el.duration) setAudioAvancement(el.currentTime / el.duration);
+          }}
+          onEnded={() => {
+            setAudioEnCours(false);
+            setAudioAvancement(1);
+            if (enchainer) aller(1);
+          }}
+        />
       )}
     </div>
   );
@@ -1002,101 +1077,7 @@ function SceneCloture({ fiche, onQuitter }: { fiche: FicheLivret; onQuitter: () 
   );
 }
 
-/**
- * Lecteur de la voix off. Discret : une ligne de progression, un bouton, et
- * la possibilité d'enchaîner automatiquement sur la scène suivante — pour
- * écouter la fiche comme un livre audio, sans toucher l'écran.
- */
-function LecteurVoix({
-  piste,
-  enchainer,
-  onEnchainer,
-  onFin,
-}: {
-  piste: Piste;
-  enchainer: boolean;
-  onEnchainer: (valeur: boolean) => void;
-  onFin: () => void;
-}) {
-  const audio = useRef<HTMLAudioElement>(null);
-  const [enCours, setEnCours] = useState(false);
-  const [avancement, setAvancement] = useState(0);
 
-  // Une nouvelle scène : on repart du début et on relance la lecture.
-  useEffect(() => {
-    const element = audio.current;
-    if (!element) return;
-    setAvancement(0);
-    element.currentTime = 0;
-    void element.play().catch(() => setEnCours(false));
-  }, [piste.url]);
-
-  return (
-    <div className="absolute inset-x-0 bottom-[4.75rem] z-20 px-4 sm:bottom-[5.5rem] sm:px-8">
-      <div className="verre mx-auto flex max-w-3xl items-center gap-3 rounded-full px-4 py-2.5">
-        <button
-          onClick={() => {
-            const element = audio.current;
-            if (!element) return;
-            if (element.paused) void element.play();
-            else element.pause();
-          }}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-or-400 text-encre-950"
-          aria-label={enCours ? 'Mettre la voix en pause' : 'Reprendre la voix'}
-        >
-          {enCours ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-        </button>
-
-        <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/12">
-          <span
-            className="block h-full rounded-full bg-or-400 transition-[width] duration-200"
-            style={{ width: `${Math.round(avancement * 100)}%` }}
-          />
-        </div>
-
-        <button
-          onClick={() => onEnchainer(!enchainer)}
-          title="Passer automatiquement à la scène suivante"
-          className={`shrink-0 rounded-full px-3 py-1 text-2xs font-bold transition-colors ${
-            enchainer
-              ? 'bg-or-400 text-encre-950'
-              : 'bg-white/10 text-parchemin-100/60 hover:bg-white/18'
-          }`}
-        >
-          Enchaîner
-        </button>
-
-        <span
-          className="hidden shrink-0 text-2xs text-parchemin-100/35 sm:inline"
-          title={
-            piste.source === 'humaine'
-              ? 'Enregistrement humain'
-              : 'Voix de lecture'
-          }
-        >
-          {piste.source === 'humaine' ? 'voix off' : 'audio guidé'}
-        </span>
-
-        <audio
-          ref={audio}
-          src={piste.url}
-          preload="auto"
-          onPlay={() => setEnCours(true)}
-          onPause={() => setEnCours(false)}
-          onTimeUpdate={(event) => {
-            const element = event.currentTarget;
-            if (element.duration) setAvancement(element.currentTime / element.duration);
-          }}
-          onEnded={() => {
-            setEnCours(false);
-            setAvancement(1);
-            onFin();
-          }}
-        />
-      </div>
-    </div>
-  );
-}
 
 export function ChargementImmersion() {
   return (
