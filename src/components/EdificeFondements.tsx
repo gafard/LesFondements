@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { FICHES_META } from '@/data/fichesMeta';
-import { Sparkles, Check, Lock, Compass } from 'lucide-react';
+import { Sparkles, Check, Compass } from 'lucide-react';
 
 interface EdificeFondementsProps {
   closedSteps?: number[];

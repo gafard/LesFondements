@@ -6,7 +6,6 @@ import Image from 'next/image';
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpen,
   PenLine,
   RotateCw,
   CalendarClock,

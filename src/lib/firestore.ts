@@ -176,6 +176,12 @@ export const getUserProgress = async (userId: string) => {
         }
       });
 
+      // Une fiche terminée hors-ligne garde priorité jusqu'à son envoi.
+      const local = getCachedUserProgress(userId);
+      for (const ficheId of local.completedFiches) {
+        if (!completedFiches.includes(ficheId)) completedFiches.push(ficheId);
+      }
+
       for (let i = 1; i <= 20; i++) {
         if (!completedFiches.includes(i)) {
           currentFicheId = i;
@@ -278,7 +284,12 @@ export const getAnswers = async (userId: string, ficheId: number) => {
       const docSnap = await avecDelai(getDoc(docRef));
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const answers = data.answers || {};
+        const distant = (data.answers || {}) as Record<string, string>;
+        const local = getCachedAnswers(userId, ficheId);
+        const aUneEcritureLocale = operationsEnAttente(userId).some(
+          (operation) => operation.kind === 'progress' && operation.ficheId === ficheId
+        );
+        const answers = aUneEcritureLocale ? { ...distant, ...local } : distant;
         try {
           const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
           const all = raw ? JSON.parse(raw) : {};
@@ -322,7 +333,7 @@ export const saveAnswer = async (
       await avecDelai(setDoc(
         docRef,
         {
-          answers: { [questionId]: answer },
+          answers: currAnswers,
           lastUpdated: serverTimestamp(),
         },
         { merge: true }
@@ -403,10 +414,25 @@ export const getJournalEntries = async (userId: string): Promise<JournalEntry[]>
       const q = query(journalRef, orderBy('createdAt', 'desc'));
       const snapshot = await avecDelai(getDocs(q));
 
-      const entries = snapshot.docs.map((docSnap) => ({
+      const distantes = snapshot.docs.map((docSnap) => ({
         id: docSnap.id,
         ...(docSnap.data() as JournalEntryData),
       }));
+      const operations = operationsEnAttente(userId);
+      const supprimees = new Set(
+        operations.filter((operation) => operation.kind === 'journal_delete').map((operation) => operation.entryId)
+      );
+      const localesEnAttente = new Set(
+        operations.filter((operation) => operation.kind === 'journal_upsert').map((operation) => operation.entryId)
+      );
+      const locales = getCachedJournalEntries(userId).filter((entry) => localesEnAttente.has(entry.id));
+      const parId = new Map(
+        distantes.filter((entry) => !supprimees.has(entry.id)).map((entry) => [entry.id, entry])
+      );
+      for (const entry of locales) parId.set(entry.id, entry);
+      const entries = [...parId.values()].sort(
+        (a, b) => timestampToDate(b.createdAt).getTime() - timestampToDate(a.createdAt).getTime()
+      );
       ecrireLocal(LOCAL_JOURNAL_KEY(userId), JSON.stringify(entries));
       return entries;
     } catch (e) {

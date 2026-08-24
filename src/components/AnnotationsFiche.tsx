@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { StickyNote, Plus, Trash2, Edit3, Check, X, Palette } from 'lucide-react';
+import { StickyNote, Plus, Trash2, Edit3, Check } from 'lucide-react';
 
 export type CouleurPostIt = 'jaune' | 'rose' | 'bleu' | 'vert';
 

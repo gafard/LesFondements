@@ -472,6 +472,11 @@ export function getAudioChapitre(
   chapitre: number = 1,
   version: 'lsg' | 'semeur' | 'bds' | string = 'semeur'
 ): string {
+  // Le catalogue distant utilisé ici est celui de la Bible du Semeur. Pour
+  // la Segond, mieux vaut une synthèse fidèle au texte affiché qu'un audio
+  // fluide mais provenant silencieusement d'une autre traduction.
+  if (version === 'lsg') return '';
+  void nomLivre;
   const num = Number(livreNumero) > 0 ? Number(livreNumero) : 1;
   const chap = Number(chapitre) > 0 ? Number(chapitre) : 1;
   return `https://www.wordproaudio.net/bibles/app/audio/7/${num}/${chap}.mp3`;

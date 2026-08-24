@@ -19,7 +19,6 @@ import {
   Heart,
   Users,
   Hourglass,
-  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -620,7 +619,7 @@ function FicheContent() {
             sections: fiche.sections.map((s) => ({
               titre: s.titre || '',
               texte: s.blocs
-                .map((b) => ('texte' in b ? (b as any).texte : ''))
+                .map((b) => b.texte)
                 .filter(Boolean)
                 .join(' '),
             })),

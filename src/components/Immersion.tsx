@@ -232,7 +232,7 @@ export default function Immersion({
   const texteDeLaScene = useCallback((courante: Scene): string | null => {
     switch (courante.type) {
       case 'bloc':
-        return `${courante.sousTitre ? `${courante.sousTitre}. ` : ''}${courante.bloc.texte}`;
+        return `${courante.sousTitre ? `${courante.sousTitre}. ` : ''}${courante.bloc.oral ?? courante.bloc.texte}`;
       case 'ouverture-section':
         return courante.titre;
       case 'resume':
@@ -260,7 +260,6 @@ export default function Immersion({
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
-    setAudioAvancement(0);
     el.currentTime = 0;
     if (lecture && pisteCourante) {
       void el
@@ -269,9 +268,8 @@ export default function Immersion({
         .catch(() => setAudioEnCours(false));
     } else {
       el.pause();
-      setAudioEnCours(false);
     }
-  }, [pisteCourante?.url, lecture]);
+  }, [pisteCourante, lecture]);
 
   // ── Gestes tactiles ─────────────────────────────────────────
   const debutTouche = (event: React.TouchEvent) => {
@@ -430,8 +428,6 @@ export default function Immersion({
                 fiche={fiche}
                 reponses={reponses}
                 onEnregistrer={onEnregistrer}
-                onSuivant={() => aller(1)}
-                onTerminer={terminer}
                 dejaPreparee={dejaPreparee}
               />
             </div>
@@ -564,16 +560,12 @@ function RenduScene({
   fiche,
   reponses,
   onEnregistrer,
-  onSuivant,
-  onTerminer,
   dejaPreparee,
 }: {
   scene: Scene;
   fiche: FicheLivret;
   reponses: Record<string, string>;
   onEnregistrer: (cle: string, valeur: string) => void;
-  onSuivant: () => void;
-  onTerminer: () => Promise<void> | void;
   dejaPreparee?: boolean;
 }) {
   switch (scene.type) {

@@ -90,9 +90,6 @@ function LoginContent() {
     }
   };
 
-  const champ =
-    'w-full rounded-2xl verre py-3.5 pl-11 pr-4 text-sm text-parchemin-100 outline-none placeholder:text-parchemin-100/35 transition-colors focus:border-or-400/50';
-
   return (
     <div className="nuit nuit-grain relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-20 lg:py-28">
       

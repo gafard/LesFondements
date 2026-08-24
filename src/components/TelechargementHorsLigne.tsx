@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Download, Check, HardDrive, WifiOff, X, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Download, Check, WifiOff, X } from 'lucide-react';
 import { chargerLivret } from '@/lib/livret';
+import { TOUS_LES_LIVRES } from '@/lib/reference';
 
 interface TelechargementHorsLigneProps {
   ouvert: boolean;
@@ -10,6 +11,8 @@ interface TelechargementHorsLigneProps {
 }
 
 const CLE_HORS_LIGNE = 'lf.horsLignePret';
+const VERSION_HORS_LIGNE = 'v3';
+const CACHE_HORS_LIGNE = `lesfondements-${VERSION_HORS_LIGNE}`;
 
 export default function TelechargementHorsLigne({
   ouvert,
@@ -17,35 +20,34 @@ export default function TelechargementHorsLigne({
 }: TelechargementHorsLigneProps) {
   const [enCours, setEnCours] = useState(false);
   const [progression, setProgression] = useState(0);
-  const [estPret, setEstPret] = useState(false);
-  const [etapeTexte, setEtapeTexte] = useState('');
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  const [estPret, setEstPret] = useState(() => {
+    if (typeof window === 'undefined') return false;
     try {
-      const status = localStorage.getItem(CLE_HORS_LIGNE);
-      if (status === 'true') setEstPret(true);
+      return localStorage.getItem(CLE_HORS_LIGNE) === VERSION_HORS_LIGNE;
     } catch {
-      /* ignorer */
+      return false;
     }
-  }, [ouvert]);
+  });
+  const [etapeTexte, setEtapeTexte] = useState('');
+  const [erreur, setErreur] = useState<string | null>(null);
 
   if (!ouvert) return null;
 
   const telechargerTout = async () => {
     setEnCours(true);
-    setProgression(10);
+    setErreur(null);
+    setProgression(3);
     setEtapeTexte('Chargement du livret des 20 fiches...');
 
     try {
       // 1. Charger tout le texte des fiches
       await chargerLivret();
-      setProgression(40);
-      setEtapeTexte('Mise en mémoire des versets et passages clés...');
+      setProgression(8);
+      setEtapeTexte('Préparation du bureau et des fiches…');
 
       // 2. Mettre en cache les URLs principales via CacheStorage
       if ('caches' in window) {
-        const cache = await caches.open('lesfondements-offline-v1');
+        const cache = await caches.open(CACHE_HORS_LIGNE);
         const urlsACacher = [
           '/',
           '/dashboard',
@@ -53,8 +55,12 @@ export default function TelechargementHorsLigne({
           '/journal',
           '/memorisation',
           '/groupes',
+          '/recherche',
+          '/transformation',
           '/index-thematique',
           '/certificat',
+          '/ressources',
+          '/carnet-export',
           '/icon-192.png',
           '/icon-512.png',
           '/manifest.webmanifest',
@@ -63,24 +69,49 @@ export default function TelechargementHorsLigne({
         for (let i = 1; i <= 20; i++) {
           urlsACacher.push(`/fiches/${i}`);
         }
+        urlsACacher.push(
+          ...TOUS_LES_LIVRES.map((livre) => `/etudes/segond/${livre.code}.json`)
+        );
 
-        await cache.addAll(urlsACacher).catch(() => {});
+        let reussies = 0;
+        const echecs: string[] = [];
+        for (const url of urlsACacher) {
+          try {
+            const reponse = await fetch(url, { credentials: 'same-origin' });
+            if (!reponse.ok) throw new Error(`${reponse.status}`);
+            await cache.put(url, reponse);
+            reussies += 1;
+          } catch {
+            echecs.push(url);
+          }
+          setProgression(8 + Math.round((reussies / urlsACacher.length) * 88));
+          setEtapeTexte(
+            url.startsWith('/etudes/')
+              ? `Classement de la Bible Segond · ${reussies}/${urlsACacher.length}`
+              : `Mise en cache des fiches · ${reussies}/${urlsACacher.length}`
+          );
+        }
+
+        if (echecs.length) {
+          throw new Error(`${echecs.length} élément${echecs.length > 1 ? 's' : ''} n’ont pas pu être enregistré${echecs.length > 1 ? 's' : ''}.`);
+        }
+      } else {
+        throw new Error('Le stockage hors-ligne n’est pas disponible dans ce navigateur.');
       }
 
-      setProgression(80);
-      setEtapeTexte('Enregistrement des concordances et données de méditation...');
-
-      await new Promise((resolve) => setTimeout(resolve, 600));
-
       setProgression(100);
-      setEtapeTexte('Tout le parcours est disponible hors-ligne !');
+      setEtapeTexte('Le parcours et la Bible sont disponibles hors-ligne.');
       setEstPret(true);
       try {
-        localStorage.setItem(CLE_HORS_LIGNE, 'true');
+        localStorage.setItem(CLE_HORS_LIGNE, VERSION_HORS_LIGNE);
       } catch {
         /* ignorer */
       }
     } catch (err) {
+      const message = err instanceof Error ? err.message : 'Le téléchargement a été interrompu.';
+      setErreur(message);
+      setEstPret(false);
+      setEtapeTexte('Téléchargement incomplet');
       console.warn('Erreur lors de la mise en cache hors-ligne:', err);
     } finally {
       setEnCours(false);
@@ -132,7 +163,13 @@ export default function TelechargementHorsLigne({
         {estPret && (
           <div className="mb-5 flex items-center gap-2.5 rounded-2xl bg-emerald-50 p-3.5 text-xs font-bold text-emerald-900 border border-emerald-200">
             <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-            <span>Votre parcours est 100% prêt pour une utilisation hors-ligne.</span>
+            <span>Les 20 fiches et la Bible Segond sont prêtes hors-ligne.</span>
+          </div>
+        )}
+
+        {erreur && (
+          <div role="alert" className="mb-5 rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-900">
+            {erreur} Vos données existantes restent intactes ; relancez le téléchargement avec une connexion stable.
           </div>
         )}
 

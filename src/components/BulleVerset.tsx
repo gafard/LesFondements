@@ -8,7 +8,7 @@ import { lirePassage, texteSeul, type Passage } from '@/lib/etudes';
 import { formaterReference } from '@/lib/reference';
 import { texteDuVerset } from '@/data/versets';
 import { getAudioChapitre, getComparaisonVerset } from '@/lib/bibleVersions';
-import { arreterLecture, lectureDisponible, lireAVoixHaute } from '@/lib/ambiance';
+import { arreterLecture, lireAVoixHaute } from '@/lib/ambiance';
 
 const LARGEUR = 340;
 const MARGE = 12;
@@ -119,7 +119,8 @@ export default function BulleVerset() {
   }, [bulle]);
 
   useEffect(() => {
-    repositionner();
+    const frame = window.requestAnimationFrame(repositionner);
+    return () => window.cancelAnimationFrame(frame);
   }, [repositionner, passage, versionChoisie]);
 
   // ── Fermeture & événements ──

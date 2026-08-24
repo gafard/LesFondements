@@ -10,6 +10,7 @@
     "preview:cloud": "opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "eslint",
+    "test:content": "node scripts/verifier-contenu.mjs",
     "etudes:importer": "python3 scripts/importer-etudes.py ../formation-biblique-app/data public/etudes",
     "livret:construire": "python3 scripts/parse-livret.py livret.txt /tmp/livret.json && python3 scripts/build-livret-data.py /tmp/livret.json src/data",
     "voix:estimation": "node scripts/generer-voix.mjs --estimation",

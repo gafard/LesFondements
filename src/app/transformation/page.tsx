@@ -56,7 +56,13 @@ function TransformationContent() {
         frequences.set(motBrut, (frequences.get(motBrut) ?? 0) + 1);
       }
       if (!annule) {
-        setTraces(details.map(({ texte: _texte, ...detail }) => detail));
+        setTraces(details.map((detail) => ({
+          id: detail.id,
+          titre: detail.titre,
+          reponses: detail.reponses,
+          mots: detail.mots,
+          terminee: detail.terminee,
+        })));
         setMotsJournal(journal.reduce((total, entree) => total + entree.content.split(/\s+/).filter(Boolean).length, 0));
         setThemes([...frequences].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([mot]) => mot));
       }

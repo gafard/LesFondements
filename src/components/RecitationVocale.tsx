@@ -48,7 +48,6 @@ export default function RecitationVocale({
 }: RecitationVocaleProps) {
   const [enEcoute, setEnEcoute] = useState(false);
   const [motsReconnus, setMotsReconnus] = useState<number>(0);
-  const [transcriptionBrute, setTranscriptionBrute] = useState<string>('');
   const [termine, setTermine] = useState(false);
   const [supporte] = useState(() => {
     if (typeof window === 'undefined') return true;
@@ -76,7 +75,6 @@ export default function RecitationVocale({
       for (let i = 0; i < event.results.length; i++) {
         texteTotal += event.results[i][0].transcript + ' ';
       }
-      setTranscriptionBrute(texteTotal);
 
       // Comparaison mot à mot
       const motsParles = texteTotal
@@ -130,7 +128,6 @@ export default function RecitationVocale({
       recognitionRef.current.stop();
       setEnEcoute(false);
     } else {
-      setTranscriptionBrute('');
       setMotsReconnus(0);
       setTermine(false);
       try {
@@ -148,7 +145,6 @@ export default function RecitationVocale({
       setEnEcoute(false);
     }
     setMotsReconnus(0);
-    setTranscriptionBrute('');
     setTermine(false);
   };
 

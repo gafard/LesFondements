@@ -21,6 +21,8 @@ export type BlocType =
 export interface Bloc {
   type: BlocType;
   texte: string;
+  /** Variante facultative écrite pour l'écoute ; le texte affiché reste canonique. */
+  oral?: string;
 }
 
 export interface SectionLivret {

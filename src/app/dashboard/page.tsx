@@ -302,7 +302,7 @@ function DashboardContent() {
                 Goutte de Rosée & Rappels quotidiens
               </p>
               <p className="text-2xs text-encre-500">
-                Recevez le verset du matin et vos rappels de cellule via notifications Cloudflare Workers.
+                Préparez vos rappels sur cet appareil ; les notifications distantes s’activent lorsque le service d’envoi est configuré.
               </p>
             </div>
           </div>

@@ -34,7 +34,6 @@ export default function MarquePageFlottant() {
         };
         try {
           localStorage.setItem(CLE_PASSAGE, JSON.stringify(nouveau));
-          setPassage(nouveau);
         } catch {
           /* ignorer */
         }
@@ -42,7 +41,10 @@ export default function MarquePageFlottant() {
     } else {
       try {
         const brut = localStorage.getItem(CLE_PASSAGE);
-        if (brut) setPassage(JSON.parse(brut));
+        if (brut) {
+          const timer = window.setTimeout(() => setPassage(JSON.parse(brut)), 0);
+          return () => window.clearTimeout(timer);
+        }
       } catch {
         /* ignorer */
       }

@@ -103,12 +103,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-parchemin-100 lg:flex">
+      <a href="#contenu-principal" className="skip-link">Aller au contenu</a>
       <ColonneLaterale pathname={pathname} onOuvrirNotifs={() => setNotifOuvert(true)} />
 
       <div className="min-w-0 flex-1">
         <BarreMobile onOuvrirNotifs={() => setNotifOuvert(true)} />
         {/* La marge basse laisse la place à la barre d'onglets et au pouce. */}
-        <main className="pb-[calc(5.25rem+env(safe-area-inset-bottom))] lg:pb-0">
+        <main id="contenu-principal" tabIndex={-1} className="pb-[calc(5.25rem+env(safe-area-inset-bottom))] lg:pb-0">
           {children}
         </main>
       </div>
@@ -241,7 +242,7 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
       <div className="flex items-center justify-between gap-3">
         <h1 className="truncate font-serif text-lg font-bold text-encre-950">{titre}</h1>
         <div className="flex items-center gap-2">
-          <div className="hidden sm:block">
+          <div className="mobile-sync">
             <SyncStatusBadge />
           </div>
           <button

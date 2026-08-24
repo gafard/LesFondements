@@ -1,5 +1,5 @@
 // Service Worker pour Les Fondements PWA & Push Notifications
-const CACHE_NAME = 'lesfondements-v2';
+const CACHE_NAME = 'lesfondements-v3';
 const ASSETS_A_METTRE_EN_CACHE = [
   '/',
   '/dashboard',
@@ -7,6 +7,8 @@ const ASSETS_A_METTRE_EN_CACHE = [
   '/journal',
   '/memorisation',
   '/groupes',
+  '/recherche',
+  '/transformation',
   '/icon-192.png',
   '/icon-512.png',
   '/manifest.webmanifest',
@@ -69,9 +71,10 @@ self.addEventListener('fetch', (event) => {
           .catch(() => {});
         return cachedResponse;
       }
-      return fetch(event.request).catch(() => {
-        // Hors-ligne fallback si disponible
-        return caches.match('/');
+      return fetch(event.request).catch(async () => {
+        // Ne jamais renvoyer du HTML à la place d'un JSON ou d'une image.
+        if (event.request.mode === 'navigate') return (await caches.match('/')) || Response.error();
+        return Response.error();
       });
     })
   );
@@ -140,21 +143,5 @@ self.addEventListener('notificationclick', (event) => {
         return self.clients.openWindow(urlCible);
       }
     })
-  );
-});
-
-self.addEventListener('pushsubscriptionchange', (event) => {
-  event.waitUntil(
-    self.registration.pushManager
-      .subscribe(event.oldSubscription?.options || { userVisibleOnly: true })
-      .then((nouvelAbonnement) => {
-        // Enregistrer le nouvel abonnement sur l'API Worker
-        return fetch('/api/notifications/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subscription: nouvelAbonnement }),
-        });
-      })
-      .catch((err) => console.warn('Erreur réabonnement push:', err))
   );
 });

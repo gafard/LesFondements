@@ -1,10 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import Link from 'next/link';
+import { useEffect, useState, useRef } from 'react';
 import {
   Heart,
-  MessageCircle,
   Plus,
   X,
   Mic,
@@ -13,13 +11,9 @@ import {
   Play,
   Pause,
   Sparkles,
-  Award,
   Check,
-  Radio,
-  Share2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import { useParcours } from '@/lib/ParcoursContext';
 import { FICHES_META } from '@/data/fichesMeta';
 import { lireAVoixHaute, lectureDisponible } from '@/lib/ambiance';
 
@@ -66,7 +60,6 @@ const CLE_STOCKAGE_TEMOIGNAGES = 'lf.temoignagesCommunautes';
 
 export default function TemoignagesPage() {
   const { user } = useAuth();
-  const { group, unlockedStep } = useParcours();
   const [temoignages, setTemoignages] = useState<TemoignageItem[]>(() => {
     if (typeof window === 'undefined') return TEMOIGNAGES_COMMUNAUTE_INITIAUX;
     try {
@@ -80,7 +73,6 @@ export default function TemoignagesPage() {
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
   const [ficheSelectionnee, setFicheSelectionnee] = useState<number>(1);
   const [texteTemoignage, setTexteTemoignage] = useState('');
-  const [modeAudio, setModeAudio] = useState(false);
   const [enEnregistrement, setEnEnregistrement] = useState(false);
   const [audioBlobUrl, setAudioBlobUrl] = useState<string | null>(null);
   const [audioEnLecture, setAudioEnLecture] = useState<string | null>(null);

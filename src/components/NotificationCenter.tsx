@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import {
   Bell,
   BellRing,
-  BellOff,
   Sparkles,
   BookOpen,
   Users,
@@ -41,13 +40,16 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
   const [prefs, setPrefs] = useState<NotificationPreferences>(PREFERENCES_DEFAUT);
 
   useEffect(() => {
-    const sup = verifierSupportNotifications();
-    setSupporte(sup);
-    if (sup) {
-      const perm = obtenirEtatPermission();
-      setActive(perm === 'granted');
-      setPrefs(chargerPreferencesLocales());
-    }
+    const timer = window.setTimeout(() => {
+      const sup = verifierSupportNotifications();
+      setSupporte(sup);
+      if (sup) {
+        const perm = obtenirEtatPermission();
+        setActive(perm === 'granted');
+        setPrefs(chargerPreferencesLocales());
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [ouvert]);
 
   if (!ouvert) return null;
@@ -89,7 +91,7 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
       url: '/dashboard',
     });
     if (res.success) {
-      setMessageSucces('Notification de test envoyée par le Worker ! Regardez votre écran.');
+      setMessageSucces('Notification de test envoyée. Regardez votre écran.');
     } else {
       setMessageErreur(res.error || 'Erreur lors du test.');
     }

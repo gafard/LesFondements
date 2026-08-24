@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Volume2, VolumeX, Sparkles, X, Heart } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX, X } from 'lucide-react';
 
 interface PauseSanctuaireProps {
   ouvert: boolean;
@@ -10,6 +10,23 @@ interface PauseSanctuaireProps {
 }
 
 type AmbianceType = 'pluie' | 'feu' | 'vent' | 'silence';
+type FenetreAudio = Window & { webkitAudioContext?: typeof AudioContext };
+type NoeudArretable = AudioNode & { stop?: () => void };
+
+function constructeurAudio(): typeof AudioContext | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return window.AudioContext ?? (window as FenetreAudio).webkitAudioContext;
+}
+
+function remplirBruit(sortie: Float32Array): void {
+  // Générateur déterministe : suffisamment irrégulier pour l'ambiance et
+  // stable vis-à-vis des règles de pureté React.
+  let graine = 0x51f15e;
+  for (let i = 0; i < sortie.length; i += 1) {
+    graine = (graine * 1664525 + 1013904223) >>> 0;
+    sortie[i] = (graine / 0xffffffff) * 2 - 1;
+  }
+}
 
 export default function PauseSanctuaire({
   ouvert,
@@ -23,11 +40,11 @@ export default function PauseSanctuaire({
   const [sonActive, setSonActive] = useState(true);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const soundNodesRef = useRef<any[]>([]);
+  const soundNodesRef = useRef<NoeudArretable[]>([]);
 
   // ── Minuteur ──
   useEffect(() => {
-    let interval: any = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
     if (actif && tempsRestant > 0) {
       interval = setInterval(() => {
         setTempsRestant((prev) => {
@@ -40,16 +57,35 @@ export default function PauseSanctuaire({
         });
       }, 1000);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [actif, tempsRestant]);
 
   // ── Générateur sonore Web Audio API procédural ──
-  const demarrerSon = (type: AmbianceType) => {
+  const arreterSon = useCallback(() => {
+    soundNodesRef.current.forEach((node) => {
+      try {
+        node.stop?.();
+        node.disconnect();
+      } catch {
+        /* ignorer */
+      }
+    });
+    soundNodesRef.current = [];
+    if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+      void audioCtxRef.current.close().catch(() => undefined);
+    }
+    audioCtxRef.current = null;
+  }, []);
+
+  const demarrerSon = useCallback((type: AmbianceType) => {
     arreterSon();
     if (!sonActive || type === 'silence' || typeof window === 'undefined') return;
 
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx = constructeurAudio();
+      if (!AudioCtx) return;
       const ctx = new AudioCtx();
       audioCtxRef.current = ctx;
 
@@ -58,9 +94,7 @@ export default function PauseSanctuaire({
         const bufferSize = ctx.sampleRate * 2;
         const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = Math.random() * 2 - 1;
-        }
+        remplirBruit(output);
 
         const whiteNoise = ctx.createBufferSource();
         whiteNoise.buffer = noiseBuffer;
@@ -94,30 +128,12 @@ export default function PauseSanctuaire({
     } catch {
       /* ignorer */
     }
-  };
-
-  const arreterSon = () => {
-    soundNodesRef.current.forEach((node) => {
-      try {
-        if (node.stop) node.stop();
-        node.disconnect();
-      } catch {
-        /* ignorer */
-      }
-    });
-    soundNodesRef.current = [];
-    if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
-      try {
-        audioCtxRef.current.close();
-      } catch {
-        /* ignorer */
-      }
-    }
-  };
+  }, [arreterSon, sonActive]);
 
   const jouerCarillonFin = () => {
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx = constructeurAudio();
+      if (!AudioCtx) return;
       const ctx = new AudioCtx();
       const notes = [523.25, 659.25, 783.99, 1046.5]; // Accord Do majeur
       notes.forEach((freq, i) => {
@@ -144,14 +160,15 @@ export default function PauseSanctuaire({
       arreterSon();
     }
     return () => arreterSon();
-  }, [actif, ambiance, sonActive]);
+  }, [actif, ambiance, sonActive, demarrerSon, arreterSon]);
 
   useEffect(() => {
     if (!ouvert) {
-      setActif(false);
       arreterSon();
+      const timer = window.setTimeout(() => setActif(false), 0);
+      return () => window.clearTimeout(timer);
     }
-  }, [ouvert]);
+  }, [ouvert, arreterSon]);
 
   if (!ouvert) return null;
 

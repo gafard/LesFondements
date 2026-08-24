@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Printer, ArrowLeft, BookOpen, Award, CheckCircle, PenLine, Sparkles } from 'lucide-react';
+import { Printer, ArrowLeft, BookOpen, Award, CheckCircle, PenLine } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import { FICHES_META } from '@/data/fichesMeta';
 import { getCachedJournalEntries, getCachedAnswers, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
+import { etatMemoireLocal } from '@/lib/memorisation';
 
 export default function CarnetExportPage() {
   const { user } = useAuth();
@@ -18,21 +19,18 @@ export default function CarnetExportPage() {
 
   useEffect(() => {
     if (!user) return;
-    setJournal(getCachedJournalEntries(user.uid));
-
-    // Charger les réponses pour les 20 fiches
-    const reponses: Record<number, Record<string, string>> = {};
-    for (let i = 1; i <= 20; i++) {
-      reponses[i] = getCachedAnswers(user.uid, i);
-    }
-    setReponsesParFiche(reponses);
-
-    try {
-      const brut = localStorage.getItem('lf.versetsMaitrises');
-      if (brut) setMaitrisees(JSON.parse(brut));
-    } catch {
-      /* ignorer */
-    }
+    const timer = window.setTimeout(() => {
+      setJournal(getCachedJournalEntries(user.uid));
+      const reponses: Record<number, Record<string, string>> = {};
+      for (let i = 1; i <= 20; i++) reponses[i] = getCachedAnswers(user.uid, i);
+      setReponsesParFiche(reponses);
+      setMaitrisees(
+        Object.values(etatMemoireLocal(user.uid))
+          .filter((record) => record.masteredAt)
+          .map((record) => record.reference)
+      );
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [user]);
 
   const imprimer = () => {
@@ -137,7 +135,7 @@ export default function CarnetExportPage() {
             2. Mes Réponses & Écritures Personnelles
           </h2>
 
-          {Object.entries(reponsesParFiche).some(([_, rep]) => Object.keys(rep).length > 0) ? (
+          {Object.entries(reponsesParFiche).some(([, rep]) => Object.keys(rep).length > 0) ? (
             Object.entries(reponsesParFiche).map(([ficheIdStr, reponses]) => {
               const ficheId = Number(ficheIdStr);
               const clesReponses = Object.keys(reponses);

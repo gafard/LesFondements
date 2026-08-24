@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Headphones, Volume2, X, Sparkles } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Headphones, X } from 'lucide-react';
 import { lireAVoixHaute, arreterLecture, lectureDisponible } from '@/lib/ambiance';
 import { getAudioChapitre } from '@/lib/bibleVersions';
 import { analyserReference } from '@/lib/reference';
@@ -114,7 +114,6 @@ export default function EcouteContinueFiche({
     if (enLecture) {
       arreterLecture();
       audioRef.current?.pause();
-      setEnLecture(false);
     } else {
       jouerPiste(indexPiste);
     }
@@ -132,7 +131,6 @@ export default function EcouteContinueFiche({
     if (!ouvert) {
       arreterLecture();
       audioRef.current?.pause();
-      setEnLecture(false);
     }
   }, [ouvert]);
 

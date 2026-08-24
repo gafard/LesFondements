@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Printer, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
+import { Printer, ArrowLeft, Lock } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
 import { useParcours } from '@/lib/ParcoursContext';
 
@@ -120,7 +120,7 @@ function CertificatPage() {
           </h1>
           
           <p className="mb-8 font-serif text-sm italic text-encre-600 sm:text-base">
-            Formation chrétienne & maturité spirituelle en 20 modules
+            Parcours chrétien vécu et partagé en 20 fiches
           </p>
 
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-encre-400">
@@ -153,7 +153,7 @@ function CertificatPage() {
 
             <div className="flex items-center gap-2">
               <span className="timbre rounded-md px-3 py-1.5 text-xs font-bold text-or-800">
-                SCEAU DE CELLULE VALIDÉ
+                PARCOURS ACHEVÉ EN CELLULE
               </span>
             </div>
 

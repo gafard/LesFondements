@@ -391,7 +391,7 @@ export default function Home() {
                   <div>
                     <h3 className="font-serif font-bold text-lg">Mon Parcours Guidé</h3>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Fiches enrichies, audio narration, questions interactives sauvegardées, quiz de révision et certification finale.
+                      Fiches enrichies, narration audio, questions sauvegardées, journal privé et attestation d’achèvement.
                     </p>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ export default function Home() {
                   <div>
                     <h3 className="font-serif font-bold text-lg">Mon Groupe & Mur de Prière</h3>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Petits groupes de 5-6 personnes, visioconférence intégrée, partage de pépites et requêtes de prière en direct.
+                      Petits groupes de 5-6 personnes, lien vers votre outil de visio, partage de pépites et requêtes de prière en direct.
                     </p>
                   </div>
                 </div>
@@ -442,10 +442,10 @@ export default function Home() {
               </div>
 
               <h3 className="font-serif font-bold text-2xl text-slate-900 mb-3">
-                Un certificat de fin de parcours
+                Une attestation de fin de parcours
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                À l&apos;issue des 20 étapes et de la validation des questions de réflexion, recevez votre attestation officielle personnalisée avec le verset de Colossiens 1:28.
+                Quand votre cellule a refermé les 20 fiches, imprimez une attestation personnalisée qui garde la mémoire du chemin parcouru ensemble.
               </p>
 
               <div className="bg-[#f8f3e9] p-4 rounded-2xl border border-amber-200 flex items-center gap-3">
