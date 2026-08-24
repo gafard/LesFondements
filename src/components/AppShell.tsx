@@ -237,6 +237,7 @@ function LienLateral({ lien, actif }: { lien: Destination; actif: boolean }) {
 function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
   const pathname = usePathname();
   const { group } = useParcours();
+  const { logout } = useAuth();
 
   const titre =
     [...PRINCIPALES, ...SECONDAIRES].find((lien) => estActive(pathname, lien.href))?.label ??
@@ -261,10 +262,19 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
           </div>
           <button
             onClick={onOuvrirNotifs}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-parchemin-300"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-parchemin-300 active:scale-95"
             aria-label="Rappels et notifications"
+            title="Rappels et notifications"
           >
             <Bell className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => void logout()}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-rose-100 hover:text-rose-700 active:scale-95"
+            aria-label="Se déconnecter"
+            title="Se déconnecter"
+          >
+            <LogOut className="h-4 w-4" />
           </button>
           {group && (
             <span className="shrink-0 rounded-full bg-or-100 px-2.5 py-0.5 text-2xs font-bold text-or-700">

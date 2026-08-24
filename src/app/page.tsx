@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import EcranLancement from '@/components/EcranLancement';
 import Image from 'next/image';
 import {
   ArrowRight,
@@ -73,14 +74,18 @@ export default function Home() {
     <div className="table-travail min-h-screen text-encre-900 selection:bg-amber-300 selection:text-slate-950 relative overflow-hidden">
       
       {/* Subtle Background Watermark Typography */}
-      <div className="watermark-text absolute right-6 top-32 text-[15vw] opacity-30 select-none">
+      <div className="watermark-text absolute right-6 top-32 hidden text-[15vw] opacity-30 select-none lg:block">
         FONDEMENTS
       </div>
+
+      {/* Sur mobile, on entre par un écran d'application ; la page
+          éditoriale reste dessous, pour qui veut la lire. */}
+      <EcranLancement />
 
       {/* ==================================================================== */}
       {/* HERO SECTION                                                         */}
       {/* ==================================================================== */}
-      <section className="hero-bureau relative isolate min-h-[calc(100svh-4rem)] overflow-hidden px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+      <section className="hero-bureau relative isolate hidden min-h-[calc(100svh-4rem)] overflow-hidden px-4 py-10 sm:px-6 lg:block lg:px-8 lg:py-12">
         <div aria-hidden="true" className="absolute -left-8 top-16 h-44 w-64 rotate-6 rounded-sm bg-[#d8c8ad]/55 shadow-xl" />
         <div aria-hidden="true" className="absolute -bottom-20 right-[34%] h-48 w-72 -rotate-3 rounded-sm bg-[#f4ede0]/25 shadow-xl" />
 

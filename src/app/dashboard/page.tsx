@@ -22,6 +22,7 @@ import {
   Hourglass,
   Printer,
   WifiOff,
+  LogOut,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -46,7 +47,7 @@ import type { GroupPost } from '@/lib/types';
 const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
 function DashboardContent() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { group, members, membership, session, isLeader } = useParcours();
   const [notifOuvert, setNotifOuvert] = useState(false);
   const [pauseOuverte, setPauseOuverte] = useState(false);
@@ -598,6 +599,29 @@ function DashboardContent() {
             </p>
           </div>
         )}
+
+        {/* Compte & Déconnexion (Accessible sur Mobile) */}
+        <div className="feuille rounded-3xl p-5 shadow-xs border border-parchemin-300 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-or-100 font-serif font-bold text-or-800 text-base">
+              {(user.displayName || user.email || 'D')[0]?.toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-serif text-sm font-bold text-encre-950 truncate">
+                {user.displayName || 'Compte Disciple'}
+              </p>
+              <p className="text-2xs text-encre-500 truncate">{user.email || 'Mode connecté'}</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => void logout()}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100 px-4 py-2.5 text-xs font-bold text-rose-700 transition-colors shadow-xs active:scale-95"
+          >
+            <LogOut className="h-4 w-4" />
+            Se déconnecter
+          </button>
+        </div>
       </div>
     </div>
   );
