@@ -461,11 +461,11 @@
 
 /* ─── La bulle posée sous un passage ───────────────────────── */
 .bulle-papier {
-  position: relative;
   background: #fffdf5;
+  border: 1px solid rgba(210, 185, 145, 0.7);
   box-shadow:
-    0 2px 4px rgba(11, 29, 56, 0.08),
-    0 22px 40px -18px rgba(11, 29, 56, 0.45);
+    0 4px 6px -1px rgba(11, 29, 56, 0.1),
+    0 25px 50px -12px rgba(11, 29, 56, 0.35);
 }
 
 /* La petite pointe qui la rattache au mot cliqué. */
