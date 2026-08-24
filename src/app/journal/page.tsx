@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
-import { getJournalEntries, addJournalEntry, deleteJournalEntry, timestampToDate } from '@/lib/firestore';
+import { getCachedJournalEntries, getJournalEntries, addJournalEntry, deleteJournalEntry, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
 import Image from 'next/image';
 import { PenLine, Plus, Trash2, Calendar } from 'lucide-react';
@@ -12,7 +12,7 @@ import ParcoursGate from '@/components/ParcoursGate';
 function Journal() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [entries, setEntries] = useState<JournalEntry[]>(() => (user ? getCachedJournalEntries(user.uid) : []));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [newContent, setNewContent] = useState('');
   

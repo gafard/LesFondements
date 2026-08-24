@@ -125,7 +125,7 @@ function estRefus(erreur: unknown): boolean {
  * les `catch` existants traitent comme n'importe quel échec : repli sur le
  * stockage local, et signalement.
  */
-const DELAI_DISTANT_MS = 5000;
+const DELAI_DISTANT_MS = 2500;
 
 function avecDelai<T>(promesse: Promise<T>, operation: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -330,12 +330,20 @@ const makeId = (prefix: string) =>
 // Profils
 // ─────────────────────────────────────────────────────────────
 
+export function getCachedProfile(uid: string): UserProfile | null {
+  return lsGet<UserProfile | null>(KEY.profile(uid), null);
+}
+
 export async function getProfile(uid: string): Promise<UserProfile | null> {
   const client = await getClient();
   if (client) {
     try {
       const snap = await client.f.getDoc(client.f.doc(client.db, 'profiles', uid));
-      if (snap.exists()) return snap.data() as UserProfile;
+      if (snap.exists()) {
+        const data = snap.data() as UserProfile;
+        lsSet(KEY.profile(uid), data);
+        return data;
+      }
       return null;
     } catch (error) {
       noterEchec('Lecture du profil', error);
@@ -434,12 +442,24 @@ async function writeGroup(group: ParcoursGroup): Promise<void> {
   emit(`group:${group.id}`, 'groups');
 }
 
+export function getCachedGroup(groupId: string): ParcoursGroup | null {
+  return lsGet<ParcoursGroup[]>(KEY.groups, []).find((g) => g.id === groupId) ?? null;
+}
+
 export async function getGroup(groupId: string): Promise<ParcoursGroup | null> {
   const client = await getClient();
   if (client) {
     try {
       const snap = await client.f.getDoc(client.f.doc(client.db, 'groups', groupId));
-      if (snap.exists()) return snap.data() as ParcoursGroup;
+      if (snap.exists()) {
+        const group = snap.data() as ParcoursGroup;
+        const all = lsGet<ParcoursGroup[]>(KEY.groups, []);
+        const idx = all.findIndex((g) => g.id === group.id);
+        if (idx >= 0) all[idx] = group;
+        else all.push(group);
+        lsSet(KEY.groups, all);
+        return group;
+      }
     } catch (error) {
       noterEchec('Lecture du groupe', error);
     }
@@ -665,6 +685,10 @@ async function writeMember(member: GroupMember): Promise<void> {
   emit(`members:${member.groupId}`);
 }
 
+export function getCachedMembers(groupId: string): GroupMember[] {
+  return lsGet<GroupMember[]>(KEY.members(groupId), []);
+}
+
 export async function getMembers(groupId: string): Promise<GroupMember[]> {
   const client = await getClient();
   if (client) {
@@ -672,7 +696,9 @@ export async function getMembers(groupId: string): Promise<GroupMember[]> {
       const snap = await client.f.getDocs(
         client.f.collection(client.db, 'groups', groupId, 'members')
       );
-      return snap.docs.map((d) => d.data() as GroupMember);
+      const members = snap.docs.map((d) => d.data() as GroupMember);
+      lsSet(KEY.members(groupId), members);
+      return members;
     } catch (error) {
       noterEchec('Lecture des membres', error);
     }
@@ -962,6 +988,11 @@ async function writeSession(session: GroupSession): Promise<void> {
   emit(`sessions:${session.groupId}`);
 }
 
+export function getCachedSession(groupId: string): GroupSession | null {
+  const all = lsGet<GroupSession[]>(KEY.sessions(groupId), []);
+  return all[0] ?? null;
+}
+
 export async function getSessions(groupId: string): Promise<GroupSession[]> {
   const client = await getClient();
   if (client) {
@@ -969,7 +1000,9 @@ export async function getSessions(groupId: string): Promise<GroupSession[]> {
       const snap = await client.f.getDocs(
         client.f.collection(client.db, 'groups', groupId, 'sessions')
       );
-      return snap.docs.map((d) => d.data() as GroupSession).sort((a, b) => a.step - b.step);
+      const sessions = snap.docs.map((d) => d.data() as GroupSession).sort((a, b) => a.step - b.step);
+      lsSet(KEY.sessions(groupId), sessions);
+      return sessions;
     } catch (error) {
       noterEchec('Lecture des rencontres', error);
     }
@@ -1111,6 +1144,10 @@ export async function closeMeeting(
 // Mur du groupe
 // ─────────────────────────────────────────────────────────────
 
+export function getCachedPosts(groupId: string): GroupPost[] {
+  return lsGet<GroupPost[]>(KEY.posts(groupId), []).sort((a, b) => b.createdAt - a.createdAt);
+}
+
 export async function getPosts(groupId: string): Promise<GroupPost[]> {
   const client = await getClient();
   if (client) {
@@ -1118,7 +1155,9 @@ export async function getPosts(groupId: string): Promise<GroupPost[]> {
       const snap = await client.f.getDocs(
         client.f.collection(client.db, 'groups', groupId, 'posts')
       );
-      return snap.docs.map((d) => d.data() as GroupPost).sort((a, b) => b.createdAt - a.createdAt);
+      const posts = snap.docs.map((d) => d.data() as GroupPost).sort((a, b) => b.createdAt - a.createdAt);
+      lsSet(KEY.posts(groupId), posts);
+      return posts;
     } catch (error) {
       noterEchec('Lecture du mur', error);
     }

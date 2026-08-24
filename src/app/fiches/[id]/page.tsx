@@ -25,7 +25,7 @@ import ParcoursGate from '@/components/ParcoursGate';
 import Immersion, { ChargementImmersion } from '@/components/Immersion';
 import LettreDuPere from '@/components/LettreDuPere';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
-import { getAnswers, markFicheCompleted, saveAnswers } from '@/lib/firestore';
+import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswers } from '@/lib/firestore';
 import {
   chargerFiche,
   type Bloc,
@@ -50,7 +50,9 @@ function FicheContent() {
   const { group, membership, unlockedStep, refresh } = useParcours();
 
   const [fiche, setFiche] = useState<FicheLivret | null | undefined>(undefined);
-  const [reponses, setReponses] = useState<Record<string, string>>({});
+  const [reponses, setReponses] = useState<Record<string, string>>(() =>
+    user && Number.isFinite(ficheId) ? getCachedAnswers(user.uid, ficheId) : {}
+  );
   const [onglet, setOnglet] = useState<Onglet>('expose');
   const [immersion, setImmersion] = useState(searchParams.get('immersion') === '1');
   const [enregistre, setEnregistre] = useState(false);

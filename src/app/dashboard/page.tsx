@@ -25,9 +25,9 @@ import ParcoursGate from '@/components/ParcoursGate';
 import ProgressBar from '@/components/ProgressBar';
 import YearHeatmap from '@/components/YearHeatmap';
 import ModernIcon from '@/components/ModernIcon';
-import { getJournalEntries, timestampToDate } from '@/lib/firestore';
+import { getCachedJournalEntries, getJournalEntries, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
-import { getPosts, nextMeetingDate, subscribe } from '@/lib/parcoursStore';
+import { getCachedPosts, getPosts, nextMeetingDate, subscribe } from '@/lib/parcoursStore';
 import { FICHES_META } from '@/data/fichesMeta';
 import Illumination from '@/components/Illumination';
 import { Etincelle, MotFantome, Pastille } from '@/components/decor';
@@ -40,8 +40,12 @@ const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 's
 function DashboardContent() {
   const { user } = useAuth();
   const { group, members, membership, session, isLeader } = useParcours();
-  const [journal, setJournal] = useState<JournalEntry[]>([]);
-  const [posts, setPosts] = useState<GroupPost[]>([]);
+  const [journal, setJournal] = useState<JournalEntry[]>(() =>
+    user ? getCachedJournalEntries(user.uid).slice(0, 3) : []
+  );
+  const [posts, setPosts] = useState<GroupPost[]>(() =>
+    group ? getCachedPosts(group.id) : []
+  );
   const [ancre, setAncre] = useState<{ reference: string; texte: string | null } | null>(null);
   const [maintenant] = useState(() => Date.now());
 

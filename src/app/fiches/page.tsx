@@ -17,7 +17,7 @@ import {
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
-import { getUserProgress } from '@/lib/firestore';
+import { getCachedUserProgress, getUserProgress } from '@/lib/firestore';
 import { nextMeetingDate } from '@/lib/parcoursStore';
 import { FICHES_META } from '@/data/fichesMeta';
 import Illumination from '@/components/Illumination';
@@ -65,7 +65,9 @@ type Etat = 'close' | 'ouverte' | 'preparee' | 'terminee';
 function SentierContent() {
   const { user } = useAuth();
   const { group, membership, unlockedStep, isLeader } = useParcours();
-  const [validees, setValidees] = useState<number[]>([]);
+  const [validees, setValidees] = useState<number[]>(() =>
+    user ? getCachedUserProgress(user.uid).completedFiches ?? [] : []
+  );
   const [recherche, setRecherche] = useState('');
   const [vue, setVue] = useState<'sentier' | 'grille'>('sentier');
 

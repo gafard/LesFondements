@@ -6,6 +6,10 @@ import {
   approveMember,
   computeGate,
   ensureProfile,
+  getCachedGroup,
+  getCachedMembers,
+  getCachedProfile,
+  getCachedSession,
   getCurrentSession,
   getGroup,
   getMembers,
@@ -38,12 +42,23 @@ const ParcoursContext = createContext<ParcoursContextValue | undefined>(undefine
 
 export function ParcoursProvider({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [group, setGroup] = useState<ParcoursGroup | null>(null);
-  const [members, setMembers] = useState<GroupMember[]>([]);
-  const [session, setSession] = useState<GroupSession | null>(null);
+
+  // Initialisation optimiste immédiate (0ms) depuis le cache local
+  const [profile, setProfile] = useState<UserProfile | null>(() => (user ? getCachedProfile(user.uid) : null));
+  const [group, setGroup] = useState<ParcoursGroup | null>(() => {
+    const cachedProf = user ? getCachedProfile(user.uid) : null;
+    return cachedProf?.groupId ? getCachedGroup(cachedProf.groupId) : null;
+  });
+  const [members, setMembers] = useState<GroupMember[]>(() => {
+    const cachedProf = user ? getCachedProfile(user.uid) : null;
+    return cachedProf?.groupId ? getCachedMembers(cachedProf.groupId) : [];
+  });
+  const [session, setSession] = useState<GroupSession | null>(() => {
+    const cachedProf = user ? getCachedProfile(user.uid) : null;
+    return cachedProf?.groupId ? getCachedSession(cachedProf.groupId) : null;
+  });
   /** Identité dont le parcours a fini de charger : pilote l'état `loading`. */
-  const [loadedUid, setLoadedUid] = useState<string | null>(null);
+  const [loadedUid, setLoadedUid] = useState<string | null>(() => (user && profile ? user.uid : null));
 
   const load = useCallback(async () => {
     if (!user) {

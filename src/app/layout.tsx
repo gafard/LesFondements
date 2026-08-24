@@ -5,12 +5,9 @@ import { AuthProvider } from '@/lib/AuthContext';
 import { ParcoursProvider } from '@/lib/ParcoursContext';
 import Navbar from '@/components/Navbar';
 import AppShell from '@/components/AppShell';
-import BoutonEtude from '@/components/BoutonEtude';
-import PanneauEtude from '@/components/PanneauEtude';
-import BulleVerset from '@/components/BulleVerset';
-import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+import ClientTools from '@/components/ClientTools';
 
-const inter = Inter({ subsets: ['latin'], variable: '--police-ui' });
+const inter = Inter({ subsets: ['latin'], variable: '--police-ui', display: 'swap' });
 
 /**
  * L'écriture à la main du parcours : les annotations, les post-it, les
@@ -21,6 +18,7 @@ const caveat = Caveat({
   subsets: ['latin', 'latin-ext'],
   weight: ['400', '600', '700'],
   variable: '--police-main',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -91,10 +89,7 @@ export default function RootLayout({
           <ParcoursProvider>
             <Navbar />
             <AppShell>{children}</AppShell>
-            <BoutonEtude />
-            <BulleVerset />
-            <PanneauEtude />
-            <PWAInstallPrompt />
+            <ClientTools />
           </ParcoursProvider>
         </AuthProvider>
       </body>

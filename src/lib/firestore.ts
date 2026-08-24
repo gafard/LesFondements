@@ -77,6 +77,30 @@ function ecrireLocal(cle: string, valeur: string): void {
 
 // ============ User Progress ============
 
+export const getCachedUserProgress = (userId: string) => {
+  try {
+    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
+    const data: Record<number, FicheProgressData> = raw ? JSON.parse(raw) : {};
+    const completedFiches: number[] = [];
+    let currentFicheId = 1;
+
+    Object.entries(data).forEach(([idStr, val]) => {
+      if (val.completed) completedFiches.push(Number(idStr));
+    });
+
+    for (let i = 1; i <= 20; i++) {
+      if (!completedFiches.includes(i)) {
+        currentFicheId = i;
+        break;
+      }
+    }
+
+    return { completedFiches, currentFicheId };
+  } catch {
+    return { completedFiches: [], currentFicheId: 1 };
+  }
+};
+
 export const getUserProgress = async (userId: string) => {
   const client = await getFirestoreClient();
   
@@ -111,27 +135,7 @@ export const getUserProgress = async (userId: string) => {
   }
 
   // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
-    const data: Record<number, FicheProgressData> = raw ? JSON.parse(raw) : {};
-    const completedFiches: number[] = [];
-    let currentFicheId = 1;
-
-    Object.entries(data).forEach(([idStr, val]) => {
-      if (val.completed) completedFiches.push(Number(idStr));
-    });
-
-    for (let i = 1; i <= 20; i++) {
-      if (!completedFiches.includes(i)) {
-        currentFicheId = i;
-        break;
-      }
-    }
-
-    return { completedFiches, currentFicheId };
-  } catch {
-    return { completedFiches: [], currentFicheId: 1 };
-  }
+  return getCachedUserProgress(userId);
 };
 
 export const saveFicheProgress = async (
@@ -202,6 +206,16 @@ export const markFicheCompleted = async (userId: string, ficheId: number) => {
 
 // ============ Answers ============
 
+export const getCachedAnswers = (userId: string, ficheId: number): Record<string, string> => {
+  try {
+    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
+    const all = raw ? JSON.parse(raw) : {};
+    return all[ficheId]?.answers || {};
+  } catch {
+    return {};
+  }
+};
+
 export const getAnswers = async (userId: string, ficheId: number) => {
   const client = await getFirestoreClient();
   if (client) {
@@ -211,7 +225,16 @@ export const getAnswers = async (userId: string, ficheId: number) => {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        return data.answers || {};
+        const answers = data.answers || {};
+        try {
+          const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
+          const all = raw ? JSON.parse(raw) : {};
+          all[ficheId] = { ...(all[ficheId] || {}), answers };
+          ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
+        } catch {
+          /* ignorer */
+        }
+        return answers;
       }
       return {};
     } catch (e) {
@@ -220,13 +243,7 @@ export const getAnswers = async (userId: string, ficheId: number) => {
   }
 
   // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
-    const all = raw ? JSON.parse(raw) : {};
-    return all[ficheId]?.answers || {};
-  } catch {
-    return {};
-  }
+  return getCachedAnswers(userId, ficheId);
 };
 
 export const saveAnswer = async (
@@ -272,6 +289,16 @@ export const saveAnswers = async (
   ficheId: number,
   answers: Record<string, string>
 ) => {
+  // Mise à jour synchrone immédiate du cache local (0ms)
+  try {
+    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
+    const all = raw ? JSON.parse(raw) : {};
+    all[ficheId] = { ...(all[ficheId] || { completed: false }), answers, lastUpdated: Date.now() };
+    ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
+  } catch (e) {
+    console.error(e);
+  }
+
   const client = await getFirestoreClient();
   if (client) {
     try {
@@ -285,20 +312,9 @@ export const saveAnswers = async (
         },
         { merge: true }
       );
-      return;
     } catch (e) {
       console.warn('Firestore saveAnswers error:', e);
     }
-  }
-
-  // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
-    const all = raw ? JSON.parse(raw) : {};
-    all[ficheId] = { ...(all[ficheId] || { completed: false }), answers, lastUpdated: Date.now() };
-    ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
-  } catch (e) {
-    console.error(e);
   }
 };
 
@@ -314,6 +330,15 @@ export function timestampToDate(timestamp: DateStockage | null | undefined): Dat
 
 // ============ Journal ============
 
+export const getCachedJournalEntries = (userId: string): JournalEntry[] => {
+  try {
+    const raw = lireLocal(LOCAL_JOURNAL_KEY(userId));
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
 export const getJournalEntries = async (userId: string): Promise<JournalEntry[]> => {
   const client = await getFirestoreClient();
   if (client) {
@@ -323,22 +348,19 @@ export const getJournalEntries = async (userId: string): Promise<JournalEntry[]>
       const q = query(journalRef, orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
 
-      return snapshot.docs.map((docSnap) => ({
+      const entries = snapshot.docs.map((docSnap) => ({
         id: docSnap.id,
         ...(docSnap.data() as JournalEntryData),
       }));
+      ecrireLocal(LOCAL_JOURNAL_KEY(userId), JSON.stringify(entries));
+      return entries;
     } catch (e) {
       console.warn('Firestore getJournal error:', e);
     }
   }
 
   // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_JOURNAL_KEY(userId));
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  return getCachedJournalEntries(userId);
 };
 
 export const addJournalEntry = async (userId: string, content: string) => {
