@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -39,7 +39,7 @@ import {
   getComparaisonVerset,
   getAudioChapitre,
 } from '@/lib/bibleVersions';
-import { useRef } from 'react';
+import { arreterLecture, lireAVoixHaute } from '@/lib/ambiance';
 
 type Onglet = 'texte' | 'comparer' | 'renvois' | 'themes' | 'commentaire';
 
@@ -55,6 +55,7 @@ export default function PanneauEtude() {
   const [audioVersion, setAudioVersion] = useState<'lsg' | 'semeur'>('semeur');
   const [audioEnCours, setAudioEnCours] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lectureIdRef = useRef(0);
   const [referencePrecedente, setReferencePrecedente] = useState(reference);
 
   // ── Chargement du passage ───────────────────────────────────
@@ -85,10 +86,21 @@ export default function PanneauEtude() {
     return () => window.removeEventListener('keydown', auClavier);
   }, [reference]);
 
-  useEffect(() => () => {
+  const arreterAudio = useCallback(() => {
+    lectureIdRef.current += 1;
     audioRef.current?.pause();
+    arreterLecture();
     setAudioEnCours(false);
   }, []);
+
+  useEffect(
+    () => () => {
+      lectureIdRef.current += 1;
+      audioRef.current?.pause();
+      arreterLecture();
+    },
+    [reference]
+  );
 
   const ouvrirStrong = useCallback(
     async (code: number) => {
@@ -128,31 +140,57 @@ export default function PanneauEtude() {
   const basculerAudio = (version: 'lsg' | 'semeur') => {
     if (!passage) return;
     if (audioEnCours && audioVersion === version) {
-      audioRef.current?.pause();
-      setAudioEnCours(false);
+      arreterAudio();
       return;
     }
-    const url = getAudioChapitre(
-      passage.reference.livre.numero,
-      passage.reference.livre.nom,
-      passage.reference.chapitre,
-      version
-    );
-    if (audioRef.current) {
+
+    arreterAudio();
+    setAudioVersion(version);
+
+    // Le flux studio est un chapitre complet. On ne l'utilise que lorsque la
+    // référence vise réellement tout le chapitre ; une plage de versets est
+    // lue depuis son premier verset et s'arrête à sa dernière ligne.
+    const url = passage.chapitreEntier
+      ? getAudioChapitre(
+          passage.reference.livre.numero,
+          passage.reference.livre.nom,
+          passage.reference.chapitre,
+          version
+        )
+      : '';
+
+    if (url && audioRef.current) {
       if (audioRef.current.src !== url) {
         audioRef.current.src = url;
       }
       audioRef.current
         .play()
         .then(() => {
-          setAudioVersion(version);
           setAudioEnCours(true);
         })
         .catch((err) => {
           console.warn('PanneauEtude audio playback error:', err);
           setAudioEnCours(false);
         });
+      return;
     }
+
+    const comparaison =
+      getComparaisonVerset(passage.reference.brut) ?? getComparaisonVerset(passage.titre);
+    const texteExact =
+      version === 'semeur' && comparaison?.bds
+        ? comparaison.bds
+        : texteSeul(passage.versets);
+    const lectureId = ++lectureIdRef.current;
+    const lectureDemarree = lireAVoixHaute(`${passage.titre}. ${texteExact}`, {
+      onFin: () => {
+        if (lectureId === lectureIdRef.current) setAudioEnCours(false);
+      },
+      onErreur: () => {
+        if (lectureId === lectureIdRef.current) setAudioEnCours(false);
+      },
+    });
+    setAudioEnCours(lectureDemarree);
   };
 
   if (!reference) return null;
@@ -178,8 +216,7 @@ export default function PanneauEtude() {
       <button
         type="button"
         onClick={() => {
-          audioRef.current?.pause();
-          setAudioEnCours(false);
+          arreterAudio();
           fermerEtude();
         }}
         aria-label="Fermer le panneau d’étude"
@@ -200,8 +237,7 @@ export default function PanneauEtude() {
             </div>
             <button
               onClick={() => {
-                audioRef.current?.pause();
-                setAudioEnCours(false);
+                arreterAudio();
                 fermerEtude();
               }}
               className="shrink-0 rounded-full bg-white/10 p-2 text-parchemin-100/70 transition-colors hover:bg-white/20 hover:text-parchemin-100"
@@ -243,34 +279,51 @@ export default function PanneauEtude() {
               <Languages className="h-3 w-3" /> Strong
             </button>
 
-            {/* Audio réel (Semeur par défaut & LSG) */}
+            {/* Lecture exacte du passage, ou chapitre studio si demandé en entier */}
             {passage && (
               <div className="flex items-center gap-1 rounded-full bg-white/10 p-0.5">
-                <button
-                  onClick={() => basculerAudio('semeur')}
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
-                    audioVersion === 'semeur' && audioEnCours
-                      ? 'bg-amber-400 text-slate-950 shadow-xs'
-                      : 'text-amber-200/90 hover:bg-white/10'
-                  }`}
-                  title="Écouter en Bible du Semeur (Audio réel studio)"
-                >
-                  <Volume2 className="h-3 w-3" />
-                  <span>{audioVersion === 'semeur' && audioEnCours ? 'Pause Semeur' : 'Audio Semeur'}</span>
-                </button>
+                {passage.chapitreEntier ? (
+                  <>
+                    <button
+                      onClick={() => basculerAudio('semeur')}
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
+                        audioVersion === 'semeur' && audioEnCours
+                          ? 'bg-amber-400 text-slate-950 shadow-xs'
+                          : 'text-amber-200/90 hover:bg-white/10'
+                      }`}
+                      title="Écouter le chapitre en Bible du Semeur"
+                    >
+                      <Volume2 className="h-3 w-3" />
+                      <span>{audioVersion === 'semeur' && audioEnCours ? 'Arrêter' : 'Audio Semeur'}</span>
+                    </button>
 
-                <button
-                  onClick={() => basculerAudio('lsg')}
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
-                    audioVersion === 'lsg' && audioEnCours
-                      ? 'bg-amber-400 text-slate-950 shadow-xs'
-                      : 'text-amber-200/90 hover:bg-white/10'
-                  }`}
-                  title="Écouter en Louis Segond (Audio réel)"
-                >
-                  <Volume2 className="h-3 w-3" />
-                  <span>{audioVersion === 'lsg' && audioEnCours ? 'Pause LSG' : 'LSG'}</span>
-                </button>
+                    <button
+                      onClick={() => basculerAudio('lsg')}
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
+                        audioVersion === 'lsg' && audioEnCours
+                          ? 'bg-amber-400 text-slate-950 shadow-xs'
+                          : 'text-amber-200/90 hover:bg-white/10'
+                      }`}
+                      title="Écouter le chapitre en Louis Segond"
+                    >
+                      <Volume2 className="h-3 w-3" />
+                      <span>{audioVersion === 'lsg' && audioEnCours ? 'Arrêter' : 'LSG'}</span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => basculerAudio('lsg')}
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
+                      audioVersion === 'lsg' && audioEnCours
+                        ? 'bg-amber-400 text-slate-950 shadow-xs'
+                        : 'text-amber-200/90 hover:bg-white/10'
+                    }`}
+                    title="Écouter uniquement les versets affichés"
+                  >
+                    <Volume2 className="h-3 w-3" />
+                    <span>{audioVersion === 'lsg' && audioEnCours ? 'Arrêter' : 'Écouter ce passage'}</span>
+                  </button>
+                )}
               </div>
             )}
 

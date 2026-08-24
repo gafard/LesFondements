@@ -74,6 +74,7 @@ export default function BulleVerset() {
   const [position, setPosition] = useState<PositionBulle | null>(null);
   const boite = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lectureIdRef = useRef(0);
   const [bullePrecedente, setBullePrecedente] = useState(bulle);
 
   // ── Réinitialisation synchrone au changement de bulle ──
@@ -124,12 +125,26 @@ export default function BulleVerset() {
   }, [repositionner, passage, versionChoisie]);
 
   // ── Fermeture & événements ──
-  const fermer = useCallback(() => {
+  const arreterAudio = useCallback(() => {
+    lectureIdRef.current += 1;
     audioRef.current?.pause();
     setAudioEnCours(false);
     arreterLecture();
-    fermerBulle();
   }, []);
+
+  const fermer = useCallback(() => {
+    arreterAudio();
+    fermerBulle();
+  }, [arreterAudio]);
+
+  useEffect(
+    () => () => {
+      lectureIdRef.current += 1;
+      audioRef.current?.pause();
+      arreterLecture();
+    },
+    [bulle]
+  );
 
   useEffect(() => {
     if (!bulle) return;
@@ -168,27 +183,46 @@ export default function BulleVerset() {
   // Texte à afficher selon la version (BDS par défaut si disponible)
   const texteSemeur = comparaison?.bds;
   const texteSegond = passage ? texteSeul(passage.versets) : texteConnuSegond || comparaison?.lsg || '';
-  
-  const texteAffiche = versionChoisie === 'bds' && texteSemeur ? texteSemeur : texteSegond;
+
+  const versionEffective = versionChoisie === 'bds' && texteSemeur ? 'bds' : 'lsg';
+  const texteAffiche = versionEffective === 'bds' ? texteSemeur! : texteSegond;
   const tropLong = texteAffiche.length > 360;
 
-  // Audio narrateur officiel
-  const audioUrl = getAudioChapitre(
-    bulle.reference.livre.numero,
-    bulle.reference.livre.nom,
-    bulle.reference.chapitre,
-    versionChoisie
-  );
+  // Les enregistrements disponibles couvrent un chapitre complet. Pour une
+  // référence précise, on lit donc le texte affiché afin de commencer au bon
+  // verset et de s'arrêter exactement à la fin du passage.
+  const audioUrl = passage?.chapitreEntier
+    ? getAudioChapitre(
+        bulle.reference.livre.numero,
+        bulle.reference.livre.nom,
+        bulle.reference.chapitre,
+        versionEffective
+      )
+    : '';
+  const lectureChapitreEnStudio = Boolean(audioUrl);
+
+  const lirePassageExact = () => {
+    const lectureId = ++lectureIdRef.current;
+    const lectureDemarree = lireAVoixHaute(`${titre}. ${texteAffiche}`, {
+      onFin: () => {
+        if (lectureId === lectureIdRef.current) setAudioEnCours(false);
+      },
+      onErreur: () => {
+        if (lectureId === lectureIdRef.current) setAudioEnCours(false);
+      },
+    });
+    setAudioEnCours(lectureDemarree);
+  };
 
   const jouerAudio = () => {
     if (audioEnCours) {
-      audioRef.current?.pause();
-      setAudioEnCours(false);
-      arreterLecture();
+      arreterAudio();
       return;
     }
 
     if (audioUrl && audioRef.current) {
+      lectureIdRef.current += 1;
+      arreterLecture();
       if (audioRef.current.src !== audioUrl) {
         audioRef.current.src = audioUrl;
       }
@@ -198,10 +232,10 @@ export default function BulleVerset() {
         .catch((err) => {
           console.warn('Audio playback error, falling back to vocal synthesis:', err);
           setAudioEnCours(false);
-          lireAVoixHaute(`${titre}. ${texteAffiche}`);
+          lirePassageExact();
         });
     } else {
-      lireAVoixHaute(`${titre}. ${texteAffiche}`);
+      lirePassageExact();
     }
   };
 
@@ -358,18 +392,24 @@ export default function BulleVerset() {
                   ? 'bg-or-500 text-encre-950 shadow-xs'
                   : 'bg-parchemin-200/70 text-encre-700 hover:bg-or-100 hover:text-or-900'
               }`}
-              title={audioEnCours ? 'Mettre en pause' : 'Écouter en Bible du Semeur (Audio studio)'}
+              title={
+                audioEnCours
+                  ? 'Arrêter la lecture'
+                  : lectureChapitreEnStudio
+                    ? 'Écouter le chapitre en audio studio'
+                    : 'Écouter uniquement ce passage'
+              }
               aria-label="Écouter le passage"
             >
               {audioEnCours ? (
                 <>
                   <Pause className="h-3.5 w-3.5 text-encre-950" />
-                  <span>Pause {versionChoisie === 'bds' ? 'Semeur' : 'LSG'}</span>
+                  <span>Arrêter</span>
                 </>
               ) : (
                 <>
                   <Volume2 className="h-3.5 w-3.5 text-or-700" />
-                  <span>Écouter {versionChoisie === 'bds' ? 'Semeur' : 'LSG'}</span>
+                  <span>{lectureChapitreEnStudio ? 'Écouter le chapitre' : 'Écouter ce passage'}</span>
                 </>
               )}
             </button>

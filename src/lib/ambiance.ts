@@ -235,9 +235,9 @@ export function lectureDisponible(): boolean {
 /** Lit un texte à voix haute. Résout quand la lecture est terminée. */
 export function lireAVoixHaute(
   texte: string,
-  options: { vitesse?: number; onFin?: () => void } = {}
-): void {
-  if (!lectureDisponible()) return;
+  options: { vitesse?: number; onFin?: () => void; onErreur?: () => void } = {}
+): boolean {
+  if (!lectureDisponible()) return false;
   window.speechSynthesis.cancel();
 
   // Le texte du livret est écrit pour l'œil : « (Rm 3:23) » s'y lit d'un
@@ -267,8 +267,11 @@ export function lireAVoixHaute(
     const voix = choisirVoix();
     if (voix) enonce.voice = voix;
     if (index === morceaux.length - 1 && options.onFin) enonce.onend = options.onFin;
+    if (options.onErreur) enonce.onerror = options.onErreur;
     window.speechSynthesis.speak(enonce);
   });
+
+  return true;
 }
 
 export function arreterLecture(): void {
