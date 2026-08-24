@@ -317,22 +317,149 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     audioLsg: 'https://audio.emcitv.com/bible/lsg/45_romains/45_12.mp3',
     audioBds: 'https://audio.topchretien.com/bible/semeur/45_romains_12.mp3',
   },
+  'Ps 90': {
+    reference: 'Psaume 90',
+    lsg: 'Prière de Moïse, homme de Dieu. Seigneur ! tu as été pour nous un refuge, de génération en génération. Avant que les montagnes fussent nées, et que tu eusses créé la terre et le monde, d\'éternité en éternité tu es Dieu.',
+    bds: 'Prière de Moïse, homme de Dieu. Seigneur, d\'âge en âge, tu as été notre refuge. Avant que soient nées les montagnes, et que tu aies créé la terre et l\'univers, depuis toujours et pour toujours, tu es Dieu.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/19_psaumes/19_90.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/19_psaumes_090.mp3',
+  },
+  'Es 6:1': {
+    reference: 'Ésaïe 6:1',
+    lsg: 'L\'année de la mort du roi Ozias, je vis le Seigneur assis sur un trône très élevé, et les pans de sa robe remplissaient le temple.',
+    bds: 'L\'année de la mort du roi Ozias, je vis le Seigneur siégeant sur un trône très élevé. Les pans de sa robe remplissaient le temple.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/23_esaie/23_06.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/23_esaie_06.mp3',
+  },
+  'Ps 93': {
+    reference: 'Psaume 93',
+    lsg: 'L\'Éternel règne, il est revêtu de majesté, l\'Éternel est revêtu, il est ceint de force. Aussi le monde est ferme, il ne chancelle pas.',
+    bds: 'L\'Éternel est roi, il est revêtu de majesté ; l\'Éternel est revêtu, il est armé de puissance. Aussi le monde est ferme, il ne vacille pas.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/19_psaumes/19_93.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/19_psaumes_093.mp3',
+  },
+  'Jn 17:3': {
+    reference: 'Jean 17:3',
+    lsg: 'Or, la vie éternelle, c\'est qu\'ils te connaissent, toi, le seul vrai Dieu, et celui que tu as envoyé, Jésus-Christ.',
+    bds: 'Or, la vie éternelle consiste à te connaître, toi le seul vrai Dieu, et à connaître celui que tu as envoyé, Jésus-Christ.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/43_jean/43_17.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/43_jean_17.mp3',
+  },
+  'Ep 1:17': {
+    reference: 'Éphésiens 1:17',
+    lsg: 'afin que le Dieu de notre Seigneur Jésus-Christ, le Père de gloire, vous donne un esprit de sagesse et de révélation, dans sa connaissance,',
+    bds: 'Je demande au Dieu de notre Seigneur Jésus-Christ, au Père glorieux, de vous donner un esprit de sagesse qui vous le révèle et vous le fasse vraiment connaître.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/49_ephesiens/49_01.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/49_ephesiens_01.mp3',
+  },
+  'Gn 1': {
+    reference: 'Genèse 1',
+    lsg: 'Au commencement, Dieu créa les cieux et la terre. La terre était informe et vide; il y avait des ténèbres à la surface de l\'abîme, et l\'esprit de Dieu se mouvait au-dessus des eaux.',
+    bds: 'Au commencement, Dieu créa le ciel et la terre. La terre était chaotique et vide. Il y avait des ténèbres au-dessus de l\'abîme, et l\'Esprit de Dieu planait au-dessus des eaux.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/01_genese/01_01.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/01_genese_01.mp3',
+  },
+  'Es 53:4-5': {
+    reference: 'Ésaïe 53:4-5',
+    lsg: 'Cependant, ce sont nos souffrances qu\'il a portées, c\'est de nos douleurs qu\'il s\'est chargé; et nous l\'avons considéré comme puni, frappé de Dieu, et humilié. Mais il était blessé pour nos péchés, brisé pour nos iniquités; le châtiment qui nous donne la paix est tombé sur lui, et c\'est par ses meurtrissures que nous sommes guéris.',
+    bds: 'Pourtant, ce sont nos souffrances qu\'il a portées, c\'est de nos douleurs qu\'il s\'est chargé. Et nous, nous pensions que Dieu l\'avait frappé, puni et humilié. Mais il était blessé pour nos péchés, brisé pour nos fautes. La punition qui nous donne la paix est tombée sur lui, et c\'est par ses meurtrissures que nous sommes guéris.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/23_esaie/23_53.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/23_esaie_53.mp3',
+  },
+  'Ph 2:6-11': {
+    reference: 'Philippiens 2:6-11',
+    lsg: 'lequel, existant en forme de Dieu, n\'a point regardé comme une proie à arracher d\'être égal avec Dieu, mais s\'est dépouillé lui-même, en prenant une forme de serviteur... C\'est pourquoi aussi Dieu l\'a souverainement élevé, et lui a donné le nom qui est au-dessus de tout nom,',
+    bds: 'Lui qui, dès l\'origine, était de condition divine, il n\'a pas cherché à profiter de l\'égalité avec Dieu, mais il s\'est dépouillé lui-même : il a pris la condition de serviteur et est devenu semblable aux êtres humains... C\'est pourquoi Dieu l\'a souverainement élevé et lui a donné le nom qui est au-dessus de tout nom.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/50_philippiens/50_02.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/50_philippiens_02.mp3',
+  },
+  'He 11:1': {
+    reference: 'Hébreux 11:1',
+    lsg: 'Or la foi est une ferme assurance des choses qu\'on espère, une démonstration de celles qu\'on ne voit pas.',
+    bds: 'La foi est une façon de posséder déjà ce qu\'on espère, un moyen d\'être sûr des réalités qu\'on ne voit pas.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/58_hebreux/58_11.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/58_hebreux_11.mp3',
+  },
+  'He 11:6': {
+    reference: 'Hébreux 11:6',
+    lsg: 'Or sans la foi il est impossible de lui être agréable; car il faut que celui qui s\'approche de Dieu croie que Dieu existe, et qu\'il est le rémunérateur de ceux qui le cherchent.',
+    bds: 'Or, sans la foi, il est impossible de lui être agréable. Car celui qui s\'approche de Dieu doit croire que Dieu existe et qu\'il récompense ceux qui le cherchent.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/58_hebreux/58_11.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/58_hebreux_11.mp3',
+  },
+  '1 Jn 1:9': {
+    reference: '1 Jean 1:9',
+    lsg: 'Si nous confessons nos péchés, il est fidèle et juste pour nous les pardonner, et pour nous purifier de toute iniquité.',
+    bds: 'Si nous confessons nos péchés, il est fidèle et juste pour nous les pardonner et pour nous purifier de tout mal.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/62_1_jean/62_01.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/62_1jean_01.mp3',
+  },
+  'Ga 5:22-23': {
+    reference: 'Galates 5:22-23',
+    lsg: 'Mais le fruit de l\'Esprit, c\'est l\'amour, la joie, la paix, la patience, la bonté, la bénignité, la fidélité, la douceur, la tempérance; la loi n\'est pas contre ces choses.',
+    bds: 'Mais le fruit de l\'Esprit, c\'est l\'amour, la joie, la paix, la patience, la bonté, la bienveillance, la fidélité, la douceur, la maîtrise de soi. La Loi ne s\'oppose pas à de telles choses.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/48_galates/48_05.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/48_galates_05.mp3',
+  },
+  'Ac 1:8': {
+    reference: 'Actes 1:8',
+    lsg: 'Mais vous recevrez une puissance, le Saint-Esprit survenant sur vous, et vous serez mes témoins à Jérusalem, dans toute la Judée, dans la Samarie, et jusqu\'aux extrémités de la terre.',
+    bds: 'Mais le Saint-Esprit descendra sur vous : vous recevrez sa puissance et vous serez mes témoins à Jérusalem, dans toute la Judée et la Samarie, et jusqu\'au bout du monde.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/44_actes/44_01.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/44_actes_01.mp3',
+  },
+  'Ac 2:38': {
+    reference: 'Actes 2:38',
+    lsg: 'Pierre leur dit : Repentez-vous, et que chacun de vous soit baptisé au nom de Jésus-Christ, pour le pardon de vos péchés; et vous recevrez le don du Saint-Esprit.',
+    bds: 'Pierre leur répondit : — Changez, et que chacun de vous se fasse baptiser au nom de Jésus-Christ pour obtenir le pardon de ses péchés ; et vous recevrez le don du Saint-Esprit.',
+    audioLsg: 'https://audio.emcitv.com/bible/lsg/44_actes/44_02.mp3',
+    audioBds: 'https://audio.topchretien.com/bible/semeur/44_actes_02.mp3',
+  },
 };
 
-/** Normalise « 1 Jn 4 :16 » → « 1 Jn 4:16 » pour la recherche. */
+/**
+ * Normalise les références et alias (ex: « Psaumes 90 » → « Ps 90 »)
+ */
 export function normaliserRef(ref: string): string {
-  return ref.replace(/\s*:\s*/g, ':').replace(/\s+/g, ' ').trim();
+  let r = ref.replace(/\s*:\s*/g, ':').replace(/\s+/g, ' ').trim();
+  // Alias de livres courants
+  r = r.replace(/^Psaumes?\s+/i, 'Ps ')
+       .replace(/^Ésaïe\s+/i, 'Es ')
+       .replace(/^Esaie\s+/i, 'Es ')
+       .replace(/^Jean\s+/i, 'Jn ')
+       .replace(/^Romains?\s+/i, 'Rm ')
+       .replace(/^Éphésiens?\s+/i, 'Ep ')
+       .replace(/^Ephesiens?\s+/i, 'Ep ')
+       .replace(/^Galates?\s+/i, 'Ga ')
+       .replace(/^Philippiens?\s+/i, 'Ph ')
+       .replace(/^Colossiens?\s+/i, 'Col ')
+       .replace(/^Hébreux\s+/i, 'He ')
+       .replace(/^Hebreux\s+/i, 'He ')
+       .replace(/^Actes?\s+/i, 'Ac ')
+       .replace(/^1\s*Corinthiens?\s+/i, '1 Co ')
+       .replace(/^2\s*Corinthiens?\s+/i, '2 Co ')
+       .replace(/^1\s*Jean\s+/i, '1 Jn ')
+       .replace(/^2\s*Jean\s+/i, '2 Jn ')
+       .replace(/^3\s*Jean\s+/i, '3 Jn ')
+       .replace(/^1\s*Pierre\s+/i, '1 P ')
+       .replace(/^2\s*Pierre\s+/i, '2 P ')
+       .replace(/^1\s*Timothée\s+/i, '1 Tm ')
+       .replace(/^2\s*Timothée\s+/i, '2 Tm ')
+       .replace(/^Apocalypse\s+/i, 'Ap ')
+       .replace(/^Genèse\s+/i, 'Gn ')
+       .replace(/^Genese\s+/i, 'Gn ')
+       .replace(/^Proverbes?\s+/i, 'Pr ');
+  return r;
 }
 
 /**
  * Retrouve la comparaison multi-versions pour un verset donné.
  */
 export function getComparaisonVerset(reference: string): ComparaisonVerset | null {
+  if (!reference) return null;
   const norm = normaliserRef(reference);
-  const entree = VERSETS_MULTI_VERSIONS[norm];
+  const entree = VERSETS_MULTI_VERSIONS[norm] || VERSETS_MULTI_VERSIONS[reference];
   if (!entree) return null;
-  // Le texte Louis Segond est versionné une seule fois dans `versets.ts`
-  // (VERSETS_CONNUS) : on le privilégie ici pour éviter toute divergence.
   return { ...entree, lsg: VERSETS_CONNUS[norm] ?? entree.lsg };
 }
 
@@ -343,18 +470,20 @@ export function getAudioChapitre(
   livreNumero: number,
   nomLivre: string,
   chapitre: number,
-  version: 'lsg' | 'semeur' = 'lsg'
+  version: 'lsg' | 'semeur' = 'semeur'
 ): string {
-  const numPad = String(chapitre).padStart(2, '0');
+  // Psaumes (livre 19) a 150 chapitres et requiert 3 chiffres (090, 046, etc.)
+  const numPad = livreNumero === 19 ? String(chapitre).padStart(3, '0') : String(chapitre).padStart(2, '0');
   const livrePad = String(livreNumero).padStart(2, '0');
 
   if (version === 'semeur') {
-    // Audio Bible du Semeur
+    // Audio Bible du Semeur (TopChrétien)
     const slug = nomLivre.toLowerCase().replace(/\s+/g, '').replace(/é|è|ê/g, 'e').replace(/ï|î/g, 'i');
     return `https://audio.topchretien.com/bible/semeur/${livrePad}_${slug}_${numPad}.mp3`;
   }
 
-  // Audio Louis Segond
+  // Audio Louis Segond (EMCITV)
+  const numPadLsg = String(chapitre).padStart(2, '0');
   const slugLsg = nomLivre.toLowerCase().replace(/\s+/g, '_').replace(/é|è|ê/g, 'e').replace(/ï|î/g, 'i');
-  return `https://audio.emcitv.com/bible/lsg/${livrePad}_${slugLsg}/${livrePad}_${numPad}.mp3`;
+  return `https://audio.emcitv.com/bible/lsg/${livrePad}_${slugLsg}/${livrePad}_${numPadLsg}.mp3`;
 }

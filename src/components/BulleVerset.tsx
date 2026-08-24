@@ -254,9 +254,19 @@ export default function BulleVerset() {
         <div className="flex items-center justify-between gap-2 border-b border-parchemin-300/80 pb-2">
           <div>
             <p className="manuscrit text-2xl font-bold leading-none text-or-700">{titre}</p>
-            <span className="text-3xs font-bold uppercase tracking-wider text-encre-400">
-              {versionChoisie === 'bds' && texteSemeur ? 'Bible du Semeur (BDS)' : 'Louis Segond 1910'}
-            </span>
+            <div className="mt-0.5 flex items-center gap-1.5 text-3xs font-medium text-encre-500">
+              {texteSemeur ? (
+                <span className="inline-flex items-center gap-1 font-bold text-or-700">
+                  📖 {versionChoisie === 'bds' ? 'Bible du Semeur (BDS)' : 'Louis Segond 1910'}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-encre-500">
+                  <span>📖 Segond 1910</span>
+                  <span>•</span>
+                  <span className="font-semibold text-or-700">🎧 Audio Semeur (BDS)</span>
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -267,10 +277,10 @@ export default function BulleVerset() {
                   onClick={() => setVersionChoisie('bds')}
                   className={`rounded px-1.5 py-0.5 transition-all ${
                     versionChoisie === 'bds'
-                      ? 'bg-encre-950 text-white shadow-2xs'
+                      ? 'bg-or-600 text-white shadow-2xs'
                       : 'text-encre-600 hover:text-encre-950'
                   }`}
-                  title="La Bible du Semeur"
+                  title="La Bible du Semeur (Traduction du livret)"
                 >
                   Semeur
                 </button>
@@ -279,7 +289,7 @@ export default function BulleVerset() {
                   onClick={() => setVersionChoisie('lsg')}
                   className={`rounded px-1.5 py-0.5 transition-all ${
                     versionChoisie === 'lsg'
-                      ? 'bg-encre-950 text-white shadow-2xs'
+                      ? 'bg-or-600 text-white shadow-2xs'
                       : 'text-encre-600 hover:text-encre-950'
                   }`}
                   title="Louis Segond 1910"
@@ -339,18 +349,18 @@ export default function BulleVerset() {
                   ? 'bg-or-500 text-encre-950 shadow-xs'
                   : 'bg-parchemin-200/70 text-encre-700 hover:bg-or-100 hover:text-or-900'
               }`}
-              title={audioEnCours ? 'Mettre en pause' : 'Écouter (Audio Bible du Semeur)'}
+              title={audioEnCours ? 'Mettre en pause' : 'Écouter en Bible du Semeur (Audio studio)'}
               aria-label="Écouter le passage"
             >
               {audioEnCours ? (
                 <>
                   <Pause className="h-3.5 w-3.5 text-encre-950" />
-                  <span>Pause</span>
+                  <span>Pause {versionChoisie === 'bds' ? 'Semeur' : 'LSG'}</span>
                 </>
               ) : (
                 <>
                   <Volume2 className="h-3.5 w-3.5 text-or-700" />
-                  <span>Écouter {versionChoisie === 'bds' && texteSemeur ? 'Semeur' : ''}</span>
+                  <span>Écouter {versionChoisie === 'bds' ? 'Semeur' : 'LSG'}</span>
                 </>
               )}
             </button>
