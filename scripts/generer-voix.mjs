@@ -355,12 +355,13 @@ async function main() {
       continue;
     }
 
-    // 2. Déjà générée, texte inchangé : on passe.
+    // 2. Déjà générée avec la MÊME voix et texte inchangé : on passe.
     const existante = sortie[piste.id];
     const chemin = path.join(DOSSIER_ELEVEN, `${piste.id}.mp3`);
     if (
       !options.force &&
       existante?.source === 'eleven' &&
+      existante?.voix === config.voix &&
       existante.empreinte === empreinte &&
       existsSync(chemin)
     ) {
