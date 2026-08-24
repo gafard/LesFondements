@@ -22,6 +22,7 @@ import {
   PlayCircle,
   ShieldCheck,
   Bookmark,
+  ClipboardList,
   Star,
   UserPlus,
   Users,
@@ -37,6 +38,7 @@ import {
   approveMember,
   deletePost,
   getPosts,
+  getSessions,
   markPrayerAnswered,
   nextMeetingDate,
   openMeeting,
@@ -47,7 +49,7 @@ import {
   togglePrayed,
 } from '@/lib/parcoursStore';
 import { FICHES_META } from '@/data/fichesMeta';
-import type { AttendanceMode, GroupPost, GroupPostKind } from '@/lib/types';
+import type { AttendanceMode, GroupPost, GroupPostKind, GroupSession } from '@/lib/types';
 
 const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
@@ -67,6 +69,7 @@ function CelluleContent() {
   const { group, members, membership, session, isLeader, gate, refresh } = useParcours();
   const [onglet, setOnglet] = useState<Onglet>('rencontre');
   const [posts, setPosts] = useState<GroupPost[]>([]);
+  const [sessions, setSessions] = useState<GroupSession[]>([]);
   const [codeCopie, setCodeCopie] = useState(false);
   const [inviteOuvert, setInviteOuvert] = useState(false);
 
@@ -80,6 +83,17 @@ function CelluleContent() {
     if (!group) return;
     return subscribe(`posts:${group.id}`, chargerPosts);
   }, [group, chargerPosts]);
+
+  const chargerSessions = useCallback(() => {
+    if (!group) return;
+    void getSessions(group.id).then(setSessions);
+  }, [group]);
+
+  useEffect(() => {
+    chargerSessions();
+    if (!group) return;
+    return subscribe(`sessions:${group.id}`, chargerSessions);
+  }, [group, chargerSessions]);
 
   const actifs = useMemo(() => members.filter((m) => m.status === 'actif'), [members]);
   const enAttente = useMemo(() => members.filter((m) => m.status === 'en_attente'), [members]);
@@ -332,6 +346,9 @@ function CelluleContent() {
             enRencontre={enRencontre}
             onDeclarer={declarerPresence}
             monMode={session?.attendance[user.uid] ?? membership?.nextAttendance}
+            dernierRecap={[...sessions]
+              .filter((item) => item.status === 'terminee' && item.recap)
+              .sort((a, b) => (b.closedAt ?? 0) - (a.closedAt ?? 0))[0]}
           />
         )}
 
@@ -384,10 +401,12 @@ function OngletRencontre({
   enRencontre,
   onDeclarer,
   monMode,
+  dernierRecap,
 }: {
   enRencontre: boolean;
   onDeclarer: (mode: AttendanceMode) => Promise<void>;
   monMode?: AttendanceMode;
+  dernierRecap?: GroupSession;
 }) {
   const { group, members, session, isLeader } = useParcours();
   if (!group) return null;
@@ -421,6 +440,43 @@ function OngletRencontre({
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-6 lg:col-span-2">
+        {dernierRecap?.recap && (
+          <article className="fiche-bristol relative rounded-3xl border border-parchemin-400 p-6 shadow-md">
+            <span className="ruban -top-2.5 left-10 -rotate-2" />
+            <div className="flex items-center gap-2 text-2xs font-black uppercase tracking-[0.16em] text-or-700">
+              <ClipboardList className="h-4 w-4" />
+              Si vous étiez absent · fiche {dernierRecap.step}
+            </div>
+            <h3 className="manuscrit mt-3 text-2xl font-bold text-encre-950">Ce que la cellule retient</h3>
+            <p className="mt-3 text-sm leading-relaxed text-encre-700">{dernierRecap.recap.summary}</p>
+            {(dernierRecap.recap.highlights.length > 0 || dernierRecap.recap.prayerFocus.length > 0) && (
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {dernierRecap.recap.highlights.length > 0 && (
+                  <div className="post-it-jaune -rotate-[0.4deg] p-4">
+                    <p className="text-2xs font-black uppercase tracking-[0.12em] text-encre-600">Pépites</p>
+                    <ul className="mt-2 space-y-1 text-xs leading-relaxed text-encre-800">
+                      {dernierRecap.recap.highlights.map((item) => <li key={item}>• {item}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {dernierRecap.recap.prayerFocus.length > 0 && (
+                  <div className="post-it-rose rotate-[0.5deg] p-4">
+                    <p className="text-2xs font-black uppercase tracking-[0.12em] text-encre-600">À porter dans la prière</p>
+                    <ul className="mt-2 space-y-1 text-xs leading-relaxed text-encre-800">
+                      {dernierRecap.recap.prayerFocus.map((item) => <li key={item}>• {item}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+            {dernierRecap.recap.nextStep && (
+              <p className="mt-4 border-l-2 border-or-400 pl-3 text-xs font-semibold text-encre-700">
+                Prochain pas : {dernierRecap.recap.nextStep}
+              </p>
+            )}
+          </article>
+        )}
+
         {enRencontre && (
           <Link
             href="/groupes/rencontre"
@@ -1077,7 +1133,7 @@ function OngletGuide() {
 
 export default function Page() {
   return (
-    <ParcoursGate allowPending>
+    <ParcoursGate acces="attente">
       <CelluleContent />
     </ParcoursGate>
   );

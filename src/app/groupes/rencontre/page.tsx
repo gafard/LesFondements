@@ -19,6 +19,7 @@ import {
   Pause,
   Play,
   RotateCcw,
+  StickyNote,
   Video,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
@@ -47,6 +48,9 @@ function RencontreContent() {
   const [posts, setPosts] = useState<GroupPost[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [notes, setNotes] = useState('');
+  const [pepitesRecap, setPepitesRecap] = useState('');
+  const [prieresRecap, setPrieresRecap] = useState('');
+  const [prochainPas, setProchainPas] = useState('');
   const [confirmerCloture, setConfirmerCloture] = useState(false);
   const [cloture, setCloture] = useState(false);
   const [saisie, setSaisie] = useState('');
@@ -107,7 +111,25 @@ function RencontreContent() {
 
   const terminer = async () => {
     const suivants = group.currentStep + 1;
-    await closeMeeting(group.id, user.uid, { notes: notes.trim() || undefined });
+    const lignes = (texte: string) =>
+      texte
+        .split(/\n|;/)
+        .map((ligne) => ligne.trim())
+        .filter(Boolean);
+    const resume = notes.trim();
+    await closeMeeting(group.id, user.uid, {
+      notes: resume || undefined,
+      prayerFocus: lignes(prieresRecap),
+      recap: resume
+        ? {
+            summary: resume,
+            highlights: lignes(pepitesRecap),
+            prayerFocus: lignes(prieresRecap),
+            nextStep: prochainPas.trim() || undefined,
+            createdAt: Date.now(),
+          }
+        : undefined,
+    });
     await refresh();
     setCloture(true);
     setConfirmerCloture(false);
@@ -601,13 +623,46 @@ function RencontreContent() {
                 : `La fiche ${group.currentStep + 1} s'ouvrira pour tous les membres, et celle-ci se refermera. C'est irréversible.`}
             </p>
 
+            <label className="mt-4 block text-2xs font-bold uppercase tracking-[0.14em] text-or-200" htmlFor="recap-resume">
+              Le récapitulatif de l’absent
+            </label>
             <textarea
+              id="recap-resume"
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               rows={3}
-              placeholder="Une note pour le groupe : ce qui s’est dit, ce qu’on retient…"
+              placeholder="En quelques phrases : ce que le groupe a compris et vécu…"
               className="verre mt-4 w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
             />
+
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <textarea
+                value={pepitesRecap}
+                onChange={(event) => setPepitesRecap(event.target.value)}
+                rows={3}
+                placeholder={'Pépites retenues\nUne idée par ligne'}
+                aria-label="Pépites retenues"
+                className="verre w-full resize-none rounded-2xl px-4 py-3 text-xs leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+              />
+              <textarea
+                value={prieresRecap}
+                onChange={(event) => setPrieresRecap(event.target.value)}
+                rows={3}
+                placeholder={'Sujets de prière\nUn sujet par ligne'}
+                aria-label="Sujets de prière"
+                className="verre w-full resize-none rounded-2xl px-4 py-3 text-xs leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+              />
+            </div>
+            <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3.5">
+              <StickyNote className="h-4 w-4 shrink-0 text-or-300" />
+              <input
+                value={prochainPas}
+                onChange={(event) => setProchainPas(event.target.value)}
+                placeholder="Le prochain pas concret du groupe"
+                aria-label="Prochain pas concret"
+                className="min-w-0 flex-1 bg-transparent py-3 text-xs text-parchemin-100 outline-none placeholder:text-parchemin-100/35"
+              />
+            </div>
 
             <div className="mt-5 flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
               <button

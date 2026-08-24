@@ -1,3 +1,5 @@
+import versetsLivret from './versetsLivret.json';
+
 // Textes bibliques déjà présents dans l'application (version Louis Segond,
 // domaine public). Le livret, lui, laisse volontairement la place vide :
 // « Versets (écrire et méditer) ». Quand le texte n'est pas connu ici,
@@ -6,7 +8,7 @@
 // Ce fichier est la source de référence pour le texte Louis Segond 1910 :
 // `src/lib/bibleVersions.ts` s'y réfère pour ne pas dupliquer le texte.
 
-export const VERSETS_CONNUS: Record<string, string> = {
+const VERSETS_SELECTIONNES: Record<string, string> = {
   "1 Co 1:18": "Car la prédication de la croix est une folie pour ceux qui périssent; mais pour nous qui sommes sauvés, elle est une puissance de Dieu.",
   "1 Jn 3:1a": "Voyez quel amour le Père nous a témoigné, pour que nous soyons appelés enfants de Dieu !",
   "1 Jn 4:16": "Et nous, nous avons connu l'amour que Dieu a pour nous, et nous y avons cru. Dieu est amour; et celui qui demeure dans l'amour demeure en Dieu, et Dieu demeure en lui.",
@@ -35,6 +37,16 @@ export const VERSETS_CONNUS: Record<string, string> = {
   "Rm 5:8": "Mais Dieu prouve son amour envers nous, en ce que, lorsque nous étions encore des pécheurs, Christ est mort pour nous.",
   "Rm 6:23": "Car le salaire du péché, c'est la mort; mais le don gratuit de Dieu, c'est la vie éternelle en Jésus-Christ notre Seigneur.",
   "Rm 8:1": "Il n'y a donc maintenant aucune condamnation pour ceux qui sont en Jésus-Christ.",
+};
+
+/**
+ * Source unique utilisée par les fiches, l'immersion et la mémorisation.
+ * Le corpus généré couvre les 53 références du livret ; la sélection historique
+ * conserve les versets supplémentaires proposés ailleurs dans l'application.
+ */
+export const VERSETS_CONNUS: Record<string, string> = {
+  ...VERSETS_SELECTIONNES,
+  ...(versetsLivret as Record<string, string>),
 };
 
 /** Normalise « 1 Jn 4 :16 » → « 1 Jn 4:16 » pour la recherche. */

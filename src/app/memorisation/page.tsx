@@ -7,10 +7,9 @@ import {
   ArrowLeft,
   ArrowRight,
   BookOpen,
-  Check,
   PenLine,
   RotateCw,
-  Bookmark,
+  CalendarClock,
   Volume2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
@@ -23,6 +22,14 @@ import { getComparaisonVerset, getAudioChapitre } from '@/lib/bibleVersions';
 import { analyserReference } from '@/lib/reference';
 import { lectureDisponible, lireAVoixHaute } from '@/lib/ambiance';
 import { FICHES_META } from '@/data/fichesMeta';
+import {
+  chargerMemoire,
+  cleMemoire,
+  enregistrerRevision,
+  revisionsDues,
+  type EtatMemoire,
+  type QualiteRappel,
+} from '@/lib/memorisation';
 
 import RecitationVocale from '@/components/RecitationVocale';
 import { Mic } from 'lucide-react';
@@ -38,8 +45,6 @@ interface Carte {
   copie: string;
 }
 
-const CLE_MAITRISEES = 'lf.versetsMaitrises';
-
 function MemorisationContent() {
   const { user } = useAuth();
   const { unlockedStep } = useParcours();
@@ -48,18 +53,11 @@ function MemorisationContent() {
   const [index, setIndex] = useState(0);
   const [retournee, setRetournee] = useState(false);
   const [modeRecitation, setModeRecitation] = useState(false);
-  const [filtre, setFiltre] = useState<number | 'toutes'>('toutes');
+  const [filtre, setFiltre] = useState<number | 'toutes' | 'dues'>('dues');
   const [audioEnCours, setAudioEnCours] = useState(false);
+  const [memoire, setMemoire] = useState<EtatMemoire>({});
+  const [scoreVocal, setScoreVocal] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [maitrisees, setMaitrisees] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const brut = window.localStorage.getItem(CLE_MAITRISEES);
-      return brut ? (JSON.parse(brut) as string[]) : [];
-    } catch {
-      return [];
-    }
-  });
 
   useEffect(() => {
     if (!user) return;
@@ -89,7 +87,10 @@ function MemorisationContent() {
         }))
       );
 
-      if (!annule) setCartes(construites);
+      if (!annule) {
+        setCartes(construites);
+        setMemoire(await chargerMemoire(user.uid, construites.map((carte) => carte.reference)));
+      }
     })();
 
     return () => {
@@ -99,22 +100,15 @@ function MemorisationContent() {
 
   const paquet = useMemo(() => {
     if (!cartes) return [];
-    return filtre === 'toutes' ? cartes : cartes.filter((carte) => carte.ficheId === filtre);
-  }, [cartes, filtre]);
+    if (filtre === 'toutes') return cartes;
+    if (filtre === 'dues') {
+      const dues = new Set(revisionsDues(memoire).map((record) => record.reference));
+      return cartes.filter((carte) => dues.has(carte.reference));
+    }
+    return cartes.filter((carte) => carte.ficheId === filtre);
+  }, [cartes, filtre, memoire]);
 
   const carte = paquet[Math.min(index, Math.max(0, paquet.length - 1))];
-
-  const basculerMaitrise = (cle: string) => {
-    const suivantes = maitrisees.includes(cle)
-      ? maitrisees.filter((valeur) => valeur !== cle)
-      : [...maitrisees, cle];
-    setMaitrisees(suivantes);
-    try {
-      localStorage.setItem(CLE_MAITRISEES, JSON.stringify(suivantes));
-    } catch {
-      /* stockage indisponible */
-    }
-  };
 
   const aller = (delta: number) => {
     setRetournee(false);
@@ -122,7 +116,17 @@ function MemorisationContent() {
   };
 
   const fichesDisponibles = FICHES_META.filter((meta) => meta.id <= Math.max(1, unlockedStep));
-  const acquis = paquet.filter((c) => maitrisees.includes(c.cle)).length;
+  const acquis = (cartes ?? []).filter((c) => memoire[cleMemoire(c.reference)]?.masteredAt).length;
+  const dues = revisionsDues(memoire).length;
+
+  const noter = async (quality: QualiteRappel) => {
+    if (!user || !carte) return;
+    const record = await enregistrerRevision(user.uid, carte.reference, quality, scoreVocal);
+    setMemoire((current) => ({ ...current, [cleMemoire(carte.reference)]: record }));
+    setScoreVocal(0);
+    setModeRecitation(false);
+    window.setTimeout(() => aller(1), 260);
+  };
 
   if (cartes === null) {
     return (
@@ -168,6 +172,20 @@ function MemorisationContent() {
         <div className="mb-6 flex gap-1.5 overflow-x-auto pb-1">
           <button
             onClick={() => {
+              setFiltre('dues');
+              setIndex(0);
+              setRetournee(false);
+            }}
+            className={`shrink-0 rounded-full px-4 py-2 text-2xs font-bold transition-colors ${
+              filtre === 'dues'
+                ? 'bg-or-500 text-encre-950'
+                : 'bg-white text-encre-600 hover:bg-parchemin-200'
+            }`}
+          >
+            À revoir aujourd’hui · {dues}
+          </button>
+          <button
+            onClick={() => {
               setFiltre('toutes');
               setIndex(0);
               setRetournee(false);
@@ -200,13 +218,16 @@ function MemorisationContent() {
         </div>
 
         {paquet.length === 0 || !carte ? (
-          <div className="feuille rounded-4xl border border-dashed border-parchemin-400 py-16 text-center shadow-xs">
-            <BookOpen className="mx-auto h-8 w-8 text-encre-200" strokeWidth={1.5} />
+          <div className="feuille relative rounded-4xl border border-dashed border-parchemin-400 py-16 text-center shadow-xs">
+            <span className="ruban -top-3 left-1/2 -translate-x-1/2 rotate-1 rounded-[2px]" />
+            <CalendarClock className="mx-auto h-8 w-8 text-encre-300" strokeWidth={1.5} />
             <p className="mt-4 font-serif text-sm font-bold text-encre-800">
-              Aucun verset pour l&apos;instant
+              {filtre === 'dues' ? 'La boîte du jour est terminée' : 'Aucun verset pour l’instant'}
             </p>
             <p className="mx-auto mt-1 max-w-xs text-2xs leading-relaxed text-encre-400">
-              Les versets apparaissent au fur et à mesure que les fiches s&apos;ouvrent.
+              {filtre === 'dues'
+                ? 'Revenez demain : le carnet rapprochera les versets hésitants et espacera ceux qui tiennent.'
+                : 'Les versets apparaissent au fur et à mesure que les fiches s’ouvrent.'}
             </p>
           </div>
         ) : (
@@ -352,11 +373,7 @@ function MemorisationContent() {
                 <RecitationVocale
                   reference={carte.reference}
                   texteCible={carte.texte || carte.copie}
-                  onSucces={() => {
-                    if (!maitrisees.includes(carte.cle)) {
-                      basculerMaitrise(carte.cle);
-                    }
-                  }}
+                  onScore={setScoreVocal}
                 />
               </div>
             )}
@@ -390,36 +407,44 @@ function MemorisationContent() {
               </button>
             </div>
 
-            <button
-              onClick={() => basculerMaitrise(carte.cle)}
-              className={`mt-4 flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-xs font-bold transition-all ${
-                maitrisees.includes(carte.cle)
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'bouton-or'
-              }`}
-            >
-              {maitrisees.includes(carte.cle) ? (
-                <>
-                  <Check className="h-4 w-4" /> Je le connais par cœur
-                </>
-              ) : (
-                <>
-                  <Bookmark className="h-4 w-4" /> Marquer comme retenu
-                </>
-              )}
-            </button>
+            {retournee && (
+              <div className="fiche-bristol mt-5 rounded-3xl p-5 shadow-sm">
+                <p className="manuscrit text-center text-xl font-bold text-encre-950">
+                  Comment ce verset vous est-il revenu ?
+                </p>
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {[
+                    { quality: 0 as const, label: 'Oublié', tone: 'bg-rose-100 text-rose-800' },
+                    { quality: 1 as const, label: 'Difficile', tone: 'bg-orange-100 text-orange-800' },
+                    { quality: 2 as const, label: 'Bien', tone: 'bg-emerald-100 text-emerald-800' },
+                    { quality: 3 as const, label: 'Évident', tone: 'bg-indigo-100 text-indigo-800' },
+                  ].map((option) => (
+                    <button
+                      key={option.quality}
+                      onClick={() => void noter(option.quality)}
+                      className={`rounded-2xl px-3 py-3 text-xs font-bold transition-transform hover:-translate-y-0.5 ${option.tone}`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-3 text-center text-2xs text-encre-500">
+                  Score vocal actuel : {scoreVocal}% · la prochaine date s’adapte à votre rappel.
+                </p>
+              </div>
+            )}
 
             <div className="mt-6 rounded-3xl border border-parchemin-400 bg-white p-5">
               <div className="mb-2 flex items-center justify-between text-2xs font-bold">
                 <span className="text-encre-500">Versets retenus</span>
                 <span className="text-or-700">
-                  {acquis} / {paquet.length}
+                  {acquis} / {cartes.length}
                 </span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-parchemin-200">
                 <span
                   className="block h-full rounded-full bg-gradient-to-r from-or-400 to-or-600 transition-all duration-500"
-                  style={{ width: `${paquet.length ? (acquis / paquet.length) * 100 : 0}%` }}
+                  style={{ width: `${cartes.length ? (acquis / cartes.length) * 100 : 0}%` }}
                 />
               </div>
             </div>
@@ -432,7 +457,7 @@ function MemorisationContent() {
 
 export default function Page() {
   return (
-    <ParcoursGate allowPending>
+    <ParcoursGate acces="personnel">
       <MemorisationContent />
     </ParcoursGate>
   );

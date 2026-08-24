@@ -1,5 +1,27 @@
 import type { FieldValue, Timestamp } from 'firebase/firestore';
 import { hasRemoteBackend } from './parcoursStore';
+import { marquerPending, marquerSynchronisation } from './syncState';
+
+const DELAI_FIRESTORE_MS = 5000;
+
+function avecDelai<T>(promesse: Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(Object.assign(new Error("Firestore n'a pas répondu"), { code: 'deadline-exceeded' })),
+      DELAI_FIRESTORE_MS
+    );
+    promesse.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+}
 
 /**
  * Détection du backend partagée avec `parcoursStore` : une seule source de
@@ -54,6 +76,12 @@ export interface JournalEntry extends JournalEntryData {
 // ============ Local Storage Fallback Keys ============
 const LOCAL_PROGRESS_KEY = (userId: string) => `lesfondements_prog_${userId}`;
 const LOCAL_JOURNAL_KEY = (userId: string) => `lesfondements_journal_${userId}`;
+const LOCAL_PENDING_KEY = (userId: string) => `lesfondements_pending_${userId}`;
+
+type PendingOperation =
+  | { id: string; kind: 'progress'; ficheId: number }
+  | { id: string; kind: 'journal_upsert'; entryId: string }
+  | { id: string; kind: 'journal_delete'; entryId: string };
 
 // Accès au stockage local avec garde : ce module peut être importé dans un
 // arbre rendu côté serveur, où `window` n'existe pas.
@@ -73,6 +101,33 @@ function ecrireLocal(cle: string, valeur: string): void {
   } catch {
     /* stockage indisponible (quota, mode privé) — sans conséquence */
   }
+}
+
+function operationsEnAttente(userId: string): PendingOperation[] {
+  try {
+    const raw = lireLocal(LOCAL_PENDING_KEY(userId));
+    return raw ? (JSON.parse(raw) as PendingOperation[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function enregistrerOperations(userId: string, operations: PendingOperation[]): void {
+  ecrireLocal(LOCAL_PENDING_KEY(userId), JSON.stringify(operations));
+  marquerPending(operations.length);
+}
+
+function ajouterOperation(userId: string, operation: PendingOperation): void {
+  const operations = operationsEnAttente(userId).filter((item) => item.id !== operation.id);
+  operations.push(operation);
+  enregistrerOperations(userId, operations);
+}
+
+function terminerOperation(userId: string, id: string): void {
+  enregistrerOperations(
+    userId,
+    operationsEnAttente(userId).filter((item) => item.id !== id)
+  );
 }
 
 // ============ User Progress ============
@@ -108,7 +163,7 @@ export const getUserProgress = async (userId: string) => {
     try {
       const { db, firestore: { collection, getDocs } } = client;
       const progressRef = collection(db, 'users', userId, 'progress');
-      const snapshot = await getDocs(progressRef);
+      const snapshot = await avecDelai(getDocs(progressRef));
 
       const completedFiches: number[] = [];
       let currentFicheId = 1;
@@ -143,65 +198,63 @@ export const saveFicheProgress = async (
   ficheId: number,
   data: Omit<FicheProgressData, 'lastUpdated'>
 ) => {
+  const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
+  const all = raw ? JSON.parse(raw) : {};
+  all[ficheId] = { ...all[ficheId], ...data, lastUpdated: Date.now() };
+  ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
+  const operationId = `progress:${ficheId}`;
+  ajouterOperation(userId, { id: operationId, kind: 'progress', ficheId });
+
   const client = await getFirestoreClient();
   if (client) {
     try {
       const { db, firestore: { doc, setDoc, serverTimestamp } } = client;
       const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
-      await setDoc(
+      await avecDelai(setDoc(
         docRef,
         {
           ...data,
           lastUpdated: serverTimestamp(),
         },
         { merge: true }
-      );
+      ));
+      terminerOperation(userId, operationId);
       return;
     } catch (e) {
       console.warn('Firestore save progress error:', e);
     }
   }
 
-  // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
-    const all = raw ? JSON.parse(raw) : {};
-    all[ficheId] = { ...all[ficheId], ...data, lastUpdated: Date.now() };
-    ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
-  } catch (e) {
-    console.error(e);
-  }
 };
 
 export const markFicheCompleted = async (userId: string, ficheId: number) => {
+  const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
+  const all = raw ? JSON.parse(raw) : {};
+  all[ficheId] = { ...(all[ficheId] || { answers: {} }), completed: true, lastUpdated: Date.now() };
+  ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
+  const operationId = `progress:${ficheId}`;
+  ajouterOperation(userId, { id: operationId, kind: 'progress', ficheId });
+
   const client = await getFirestoreClient();
   if (client) {
     try {
       const { db, firestore: { doc, setDoc, serverTimestamp } } = client;
       const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
-      await setDoc(
+      await avecDelai(setDoc(
         docRef,
         {
           completed: true,
           lastUpdated: serverTimestamp(),
         },
         { merge: true }
-      );
+      ));
+      terminerOperation(userId, operationId);
       return;
     } catch (e) {
       console.warn('Firestore mark completed error:', e);
     }
   }
 
-  // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
-    const all = raw ? JSON.parse(raw) : {};
-    all[ficheId] = { ...(all[ficheId] || { answers: {} }), completed: true, lastUpdated: Date.now() };
-    ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
-  } catch (e) {
-    console.error(e);
-  }
 };
 
 // ============ Answers ============
@@ -222,7 +275,7 @@ export const getAnswers = async (userId: string, ficheId: number) => {
     try {
       const { db, firestore: { doc, getDoc } } = client;
       const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
-      const docSnap = await getDoc(docRef);
+      const docSnap = await avecDelai(getDoc(docRef));
       if (docSnap.exists()) {
         const data = docSnap.data();
         const answers = data.answers || {};
@@ -252,36 +305,35 @@ export const saveAnswer = async (
   questionId: string,
   answer: string
 ) => {
+  const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
+  const all = raw ? JSON.parse(raw) : {};
+  const currAnswers = all[ficheId]?.answers || {};
+  currAnswers[questionId] = answer;
+  all[ficheId] = { ...(all[ficheId] || { completed: false }), answers: currAnswers, lastUpdated: Date.now() };
+  ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
+  const operationId = `progress:${ficheId}`;
+  ajouterOperation(userId, { id: operationId, kind: 'progress', ficheId });
+
   const client = await getFirestoreClient();
   if (client) {
     try {
       const { db, firestore: { doc, setDoc, serverTimestamp } } = client;
       const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
-      await setDoc(
+      await avecDelai(setDoc(
         docRef,
         {
           answers: { [questionId]: answer },
           lastUpdated: serverTimestamp(),
         },
         { merge: true }
-      );
+      ));
+      terminerOperation(userId, operationId);
       return;
     } catch (e) {
       console.warn('Firestore saveAnswer error:', e);
     }
   }
 
-  // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_PROGRESS_KEY(userId));
-    const all = raw ? JSON.parse(raw) : {};
-    const currAnswers = all[ficheId]?.answers || {};
-    currAnswers[questionId] = answer;
-    all[ficheId] = { ...(all[ficheId] || { completed: false }), answers: currAnswers, lastUpdated: Date.now() };
-    ecrireLocal(LOCAL_PROGRESS_KEY(userId), JSON.stringify(all));
-  } catch (e) {
-    console.error(e);
-  }
 };
 
 export const saveAnswers = async (
@@ -298,20 +350,23 @@ export const saveAnswers = async (
   } catch (e) {
     console.error(e);
   }
+  const operationId = `progress:${ficheId}`;
+  ajouterOperation(userId, { id: operationId, kind: 'progress', ficheId });
 
   const client = await getFirestoreClient();
   if (client) {
     try {
       const { db, firestore: { doc, setDoc, serverTimestamp } } = client;
       const docRef = doc(db, 'users', userId, 'progress', ficheId.toString());
-      await setDoc(
+      await avecDelai(setDoc(
         docRef,
         {
           answers,
           lastUpdated: serverTimestamp(),
         },
         { merge: true }
-      );
+      ));
+      terminerOperation(userId, operationId);
     } catch (e) {
       console.warn('Firestore saveAnswers error:', e);
     }
@@ -346,7 +401,7 @@ export const getJournalEntries = async (userId: string): Promise<JournalEntry[]>
       const { db, firestore: { collection, query, orderBy, getDocs } } = client;
       const journalRef = collection(db, 'users', userId, 'journal');
       const q = query(journalRef, orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
+      const snapshot = await avecDelai(getDocs(q));
 
       const entries = snapshot.docs.map((docSnap) => ({
         id: docSnap.id,
@@ -364,11 +419,24 @@ export const getJournalEntries = async (userId: string): Promise<JournalEntry[]>
 };
 
 export const addJournalEntry = async (userId: string, content: string) => {
+  const id = `entry_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const localEntry: JournalEntry = {
+    id,
+    title: '',
+    content,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  const localList = getCachedJournalEntries(userId);
+  ecrireLocal(LOCAL_JOURNAL_KEY(userId), JSON.stringify([localEntry, ...localList]));
+  const operationId = `journal:${id}`;
+  ajouterOperation(userId, { id: operationId, kind: 'journal_upsert', entryId: id });
+
   const client = await getFirestoreClient();
   if (client) {
     try {
-      const { db, firestore: { collection, doc, setDoc, serverTimestamp } } = client;
-      const journalRef = doc(collection(db, 'users', userId, 'journal'));
+      const { db, firestore: { doc, setDoc, serverTimestamp } } = client;
+      const journalRef = doc(db, 'users', userId, 'journal', id);
       const newEntry = {
         title: '',
         content,
@@ -376,53 +444,95 @@ export const addJournalEntry = async (userId: string, content: string) => {
         updatedAt: serverTimestamp(),
       };
 
-      await setDoc(journalRef, newEntry);
+      await avecDelai(setDoc(journalRef, newEntry));
+      terminerOperation(userId, operationId);
       return journalRef.id;
     } catch (e) {
       console.warn('Firestore addJournal error:', e);
     }
   }
 
-  // Local fallback
-  try {
-    const id = 'entry_' + Date.now();
-    const raw = lireLocal(LOCAL_JOURNAL_KEY(userId));
-    const list: JournalEntry[] = raw ? JSON.parse(raw) : [];
-    const newEntry: JournalEntry = {
-      id,
-      title: '',
-      content,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    list.unshift(newEntry);
-    ecrireLocal(LOCAL_JOURNAL_KEY(userId), JSON.stringify(list));
-    return id;
-  } catch {
-    return 'local_entry';
-  }
+  return id;
 };
 
 export const deleteJournalEntry = async (userId: string, entryId: string) => {
+  const list = getCachedJournalEntries(userId).filter((entry) => entry.id !== entryId);
+  ecrireLocal(LOCAL_JOURNAL_KEY(userId), JSON.stringify(list));
+  const operationId = `journal-delete:${entryId}`;
+  ajouterOperation(userId, { id: operationId, kind: 'journal_delete', entryId });
+
   const client = await getFirestoreClient();
   if (client) {
     try {
       const { db, firestore: { doc, deleteDoc } } = client;
       const entryRef = doc(db, 'users', userId, 'journal', entryId);
-      await deleteDoc(entryRef);
+      await avecDelai(deleteDoc(entryRef));
+      terminerOperation(userId, operationId);
       return;
     } catch (e) {
       console.warn('Firestore deleteJournal error:', e);
     }
   }
 
-  // Local fallback
-  try {
-    const raw = lireLocal(LOCAL_JOURNAL_KEY(userId));
-    let list: JournalEntry[] = raw ? JSON.parse(raw) : [];
-    list = list.filter((e) => e.id !== entryId);
-    ecrireLocal(LOCAL_JOURNAL_KEY(userId), JSON.stringify(list));
-  } catch (e) {
-    console.error(e);
-  }
 };
+
+/** Rejoue les écritures conservées localement après le retour du réseau. */
+export async function flushPendingWrites(userId: string): Promise<void> {
+  const operations = operationsEnAttente(userId);
+  if (!operations.length) {
+    marquerPending(0);
+    return;
+  }
+  const client = await getFirestoreClient();
+  if (!client) {
+    marquerSynchronisation('hors_ligne', 'Conservé sur cet appareil', operations.length);
+    return;
+  }
+
+  marquerSynchronisation('en_cours', 'Synchronisation du carnet…', operations.length);
+  const { db, firestore: { doc, setDoc, deleteDoc, serverTimestamp } } = client;
+  const progress = (() => {
+    try {
+      return JSON.parse(lireLocal(LOCAL_PROGRESS_KEY(userId)) || '{}') as Record<string, FicheProgressData>;
+    } catch {
+      return {};
+    }
+  })();
+  const journal = new Map(getCachedJournalEntries(userId).map((entry) => [entry.id, entry]));
+
+  for (const operation of [...operations]) {
+    try {
+      if (operation.kind === 'progress') {
+        const data = progress[String(operation.ficheId)];
+        if (data) {
+          await avecDelai(
+            setDoc(
+              doc(db, 'users', userId, 'progress', String(operation.ficheId)),
+              { ...data, lastUpdated: serverTimestamp() },
+              { merge: true }
+            )
+          );
+        }
+      } else if (operation.kind === 'journal_upsert') {
+        const entry = journal.get(operation.entryId);
+        if (entry) {
+          await avecDelai(
+            setDoc(
+              doc(db, 'users', userId, 'journal', operation.entryId),
+              { title: entry.title ?? '', content: entry.content, createdAt: entry.createdAt, updatedAt: serverTimestamp() },
+              { merge: true }
+            )
+          );
+        }
+      } else {
+        await avecDelai(deleteDoc(doc(db, 'users', userId, 'journal', operation.entryId)));
+      }
+      terminerOperation(userId, operation.id);
+    } catch (error) {
+      console.warn('Synchronisation différée', error);
+      marquerSynchronisation('en_attente', 'Conservé, en attente du réseau', operationsEnAttente(userId).length);
+      return;
+    }
+  }
+  marquerPending(0);
+}

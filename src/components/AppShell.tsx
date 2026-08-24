@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
@@ -16,12 +16,16 @@ import {
   MessageCircle,
   PenLine,
   Printer,
+  Search,
   Tag,
+  TrendingUp,
   Users,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import NotificationCenter from '@/components/NotificationCenter';
+import SyncStatusBadge from '@/components/SyncStatusBadge';
+import { flushPendingWrites } from '@/lib/firestore';
 
 /**
  * La coque de l'application.
@@ -60,6 +64,8 @@ const PRINCIPALES: Destination[] = [
 ];
 
 const SECONDAIRES: Destination[] = [
+  { href: '/recherche', label: 'Retrouver mes écrits', court: 'Recherche', icon: Search },
+  { href: '/transformation', label: 'Mon chemin parcouru', court: 'Chemin', icon: TrendingUp },
   { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
   { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
   { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Tag },
@@ -75,6 +81,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
   const [notifOuvert, setNotifOuvert] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const synchroniser = () => void flushPendingWrites(user.uid);
+    synchroniser();
+    window.addEventListener('online', synchroniser);
+    return () => window.removeEventListener('online', synchroniser);
+  }, [user]);
 
   const sansCoque = useMemo(
     () =>
@@ -177,6 +191,10 @@ function ColonneLaterale({
         Rappels & Notifications
       </button>
 
+      <div className="mt-3 px-1">
+        <SyncStatusBadge />
+      </div>
+
       <button
         onClick={() => void logout()}
         className="mt-auto flex items-center gap-3 rounded-xl px-3 py-2.5 text-2xs font-bold text-parchemin-100/45 transition-colors hover:bg-white/8 hover:text-rose-300"
@@ -223,6 +241,9 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
       <div className="flex items-center justify-between gap-3">
         <h1 className="truncate font-serif text-lg font-bold text-encre-950">{titre}</h1>
         <div className="flex items-center gap-2">
+          <div className="hidden sm:block">
+            <SyncStatusBadge />
+          </div>
           <button
             onClick={onOuvrirNotifs}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-parchemin-300"

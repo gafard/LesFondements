@@ -1,18 +1,16 @@
 import webpush from 'web-push';
 
 export const VAPID_PUBLIC_KEY =
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
-  'BPGEh8GjnZpEJ6s1XY8EyJKDv5aWSGvczjZ_1h7fM-oL9astw7vbOrxseeaj-rYneRn3E9Wd2-RXb198qIWwQmI';
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
-export const VAPID_PRIVATE_KEY =
-  process.env.VAPID_PRIVATE_KEY ||
-  'XhzF0ioyLhSaCTeJmfZ1mgday0XoL4fmCgX8TqdDC6M';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
 
 export const VAPID_SUBJECT =
   process.env.VAPID_SUBJECT || 'mailto:contact@lesfondements.org';
 
-// Initialisation globale de web-push
-webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+}
 
 export interface PushPayload {
   title: string;
@@ -39,6 +37,9 @@ export async function sendWebPush(
   subscription: PushSubscriptionData,
   payload: PushPayload
 ): Promise<{ success: boolean; error?: string }> {
+  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+    return { success: false, error: 'Notifications distantes non configurées' };
+  }
   try {
     const payloadString = JSON.stringify({
       title: payload.title || 'Les Fondements',

@@ -64,7 +64,7 @@ type Etat = 'close' | 'ouverte' | 'preparee' | 'terminee';
 
 function SentierContent() {
   const { user } = useAuth();
-  const { group, membership, unlockedStep, isLeader } = useParcours();
+  const { group, membership, unlockedStep, preparationStep, isLeader } = useParcours();
   const [validees, setValidees] = useState<number[]>(() =>
     user ? getCachedUserProgress(user.uid).completedFiches ?? [] : []
   );
@@ -76,7 +76,8 @@ function SentierContent() {
     void getUserProgress(user.uid).then((prog) => setValidees(prog.completedFiches ?? []));
   }, [user]);
 
-  const maxAccessible = Math.min(20, Math.max(1, (unlockedStep || 1) + 1));
+  // La fiche du groupe, plus la suivante qu'on prépare seul.
+  const maxAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
   const etatDe = (id: number): Etat => {
     if (!group) return 'close';
     if (group.closedSteps.includes(id)) return 'terminee';
@@ -415,7 +416,7 @@ function EtapeSentier({
       <div className="flex items-center justify-between border-t border-parchemin-300 pt-3">
         {fermee ? (
           <span className="text-2xs leading-relaxed text-encre-400">
-            {fiche.id === etapeGroupe + 1
+            {fiche.id === etapeGroupe + 2
               ? isLeader
                 ? 'S’ouvrira dès que vous aurez clos la rencontre en cours.'
                 : 'S’ouvrira après la prochaine rencontre du groupe.'
@@ -424,7 +425,8 @@ function EtapeSentier({
         ) : (
           <>
             <span className="inline-flex items-center gap-1 text-2xs font-bold text-encre-700">
-              Ouvrir la fiche <ArrowRight className="h-3.5 w-3.5" />
+              {fiche.id === etapeGroupe + 1 ? 'Préparer en avance' : 'Ouvrir la fiche'}
+              <ArrowRight className="h-3.5 w-3.5" />
             </span>
             <span className="text-2xs text-encre-300">~45 min</span>
           </>

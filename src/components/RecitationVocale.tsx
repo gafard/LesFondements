@@ -1,13 +1,36 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, RotateCcw, Sparkles, Check, Volume2 } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Mic, MicOff, RotateCcw, Sparkles } from 'lucide-react';
 
 interface RecitationVocaleProps {
   reference: string;
   texteCible: string;
   onSucces?: () => void;
+  onScore?: (score: number) => void;
 }
+
+interface SpeechResultEvent {
+  results: ArrayLike<{ 0: { transcript: string } }>;
+}
+
+interface SpeechRecognitionLike {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechResultEvent) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+type WindowAvecReconnaissance = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
 
 function normaliserMot(mot: string): string {
   return mot
@@ -21,32 +44,34 @@ export default function RecitationVocale({
   reference,
   texteCible,
   onSucces,
+  onScore,
 }: RecitationVocaleProps) {
   const [enEcoute, setEnEcoute] = useState(false);
   const [motsReconnus, setMotsReconnus] = useState<number>(0);
   const [transcriptionBrute, setTranscriptionBrute] = useState<string>('');
   const [termine, setTermine] = useState(false);
-  const [supporte, setSupporte] = useState(true);
-  const recognitionRef = useRef<any>(null);
+  const [supporte] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    const vocal = window as WindowAvecReconnaissance;
+    return Boolean(vocal.SpeechRecognition || vocal.webkitSpeechRecognition);
+  });
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
-  const motsCibles = texteCible.split(/\s+/).filter(Boolean);
+  const motsCibles = useMemo(() => texteCible.split(/\s+/).filter(Boolean), [texteCible]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const vocal = window as WindowAvecReconnaissance;
+    const SpeechRecognition = vocal.SpeechRecognition || vocal.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      setSupporte(false);
-      return;
-    }
+    if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'fr-FR';
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechResultEvent) => {
       let texteTotal = '';
       for (let i = 0; i < event.results.length; i++) {
         texteTotal += event.results[i][0].transcript + ' ';
@@ -70,6 +95,7 @@ export default function RecitationVocale({
       }
 
       setMotsReconnus(indexCible);
+      onScore?.(Math.min(100, Math.round((indexCible / Math.max(1, motsCibles.length)) * 100)));
 
       if (indexCible >= motsCibles.length && !termine) {
         setTermine(true);
@@ -96,7 +122,7 @@ export default function RecitationVocale({
         /* ignorer */
       }
     };
-  }, [texteCible, motsCibles.length, onSucces, termine]);
+  }, [motsCibles, onScore, onSucces, termine]);
 
   const basculerEcoute = () => {
     if (!recognitionRef.current) return;
@@ -144,7 +170,7 @@ export default function RecitationVocale({
             <Mic className="h-3.5 w-3.5" />
           </span>
           <span className="text-2xs font-bold uppercase tracking-wider text-encre-600">
-            Récitation vocale en direct
+            Récitation vocale · {reference}
           </span>
         </div>
         <span className="rounded-full bg-or-50 px-2.5 py-0.5 text-2xs font-bold text-or-800 border border-or-200">

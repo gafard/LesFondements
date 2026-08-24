@@ -30,6 +30,7 @@ import {
   type UserProfile,
 } from './types';
 import { distanceKm, nearestPlace } from './geo';
+import { marquerSynchronisation } from './syncState';
 
 // ─────────────────────────────────────────────────────────────
 // Détection du backend
@@ -140,6 +141,7 @@ function avecDelai<T>(promesse: Promise<T>, operation: string): Promise<T> {
     promesse.then(
       (valeur) => {
         clearTimeout(minuteur);
+        marquerSynchronisation('synchronise', 'Carnet synchronisé', 0);
         resolve(valeur);
       },
       (erreur) => {
@@ -157,6 +159,10 @@ function estRefusOuSilence(erreur: unknown): boolean {
 
 function noterEchec(operation: string, erreur: unknown): void {
   if (!estRefus(erreur) && !estRefusOuSilence(erreur)) {
+    marquerSynchronisation(
+      typeof navigator !== 'undefined' && !navigator.onLine ? 'hors_ligne' : 'en_attente',
+      'Conservé sur cet appareil'
+    );
     console.warn(`${operation} — repli sur le stockage local`, erreur);
     return;
   }
@@ -169,6 +175,7 @@ function noterEchec(operation: string, erreur: unknown): void {
     );
   }
   refusPersistant = operation;
+  marquerSynchronisation('erreur', 'Synchronisation à vérifier');
   observateursRefus.forEach((callback) => callback());
 }
 
@@ -1092,7 +1099,11 @@ export async function setSessionAttendance(
 export async function closeMeeting(
   groupId: string,
   uid: string,
-  payload: { notes?: string; prayerFocus?: string[] } = {}
+  payload: {
+    notes?: string;
+    prayerFocus?: string[];
+    recap?: GroupSession['recap'];
+  } = {}
 ): Promise<ParcoursGroup | null> {
   const [group, session] = await Promise.all([getGroup(groupId), getCurrentSession(groupId)]);
   if (!group || !session) return null;
@@ -1104,6 +1115,7 @@ export async function closeMeeting(
     closedBy: uid,
     notes: payload.notes ?? session.notes,
     prayerFocus: payload.prayerFocus ?? session.prayerFocus,
+    recap: payload.recap ?? session.recap,
   });
 
   const closedSteps = group.closedSteps.includes(group.currentStep)
@@ -1268,12 +1280,20 @@ export type ParcoursGate =
   | { state: 'sans_groupe' }
   | { state: 'en_attente'; group: ParcoursGroup }
   | { state: 'refuse' }
-  | { state: 'ouvert'; group: ParcoursGroup; unlockedStep: number }
+  | {
+      state: 'ouvert';
+      group: ParcoursGroup;
+      /** La fiche que le groupe vit en ce moment : celle qui se partage. */
+      unlockedStep: number;
+      /** La fiche qu'on peut déjà préparer seul, en avance. */
+      preparationStep: number;
+    }
   | { state: 'termine'; group: ParcoursGroup };
 
 /**
- * Le parcours n'ouvre qu'une fois l'adhésion active, et une seule fiche à la
- * fois : celle du groupe. Les fiches déjà clôturées restent consultables.
+ * Le parcours n'ouvre qu'une fois l'adhésion active. Deux rythmes ensuite,
+ * délibérément distincts : la fiche du groupe, celle qui se partage, et la
+ * suivante, qu'on peut déjà préparer seul.
  */
 export function computeGate(
   profile: UserProfile | null,
@@ -1285,11 +1305,42 @@ export function computeGate(
   if (membership?.status === 'refuse' || membership?.status === 'parti') return { state: 'refuse' };
   if (!membership || membership.status !== 'actif') return { state: 'en_attente', group };
   if (group.completedAt) return { state: 'termine', group };
-  return { state: 'ouvert', group, unlockedStep: group.currentStep };
+  return {
+    state: 'ouvert',
+    group,
+    unlockedStep: group.currentStep,
+    preparationStep: etapeDePreparation(group),
+  };
 }
 
+/**
+ * La fiche du groupe : celle dont on partage les réponses à la rencontre.
+ */
 export function isStepUnlocked(group: ParcoursGroup, step: number): boolean {
   return step <= group.currentStep;
+}
+
+/**
+ * Jusqu'où l'on peut lire seul, sans attendre personne.
+ *
+ * Le livret demande que chacun ait travaillé le cours chez lui avant la
+ * rencontre. Si la fiche suivante n'ouvrait qu'à la seconde où l'animateur
+ * clôture la précédente, la fenêtre de préparation serait écrasée — et
+ * l'application empêcherait d'obéir au livret dont elle est tirée. On ouvre
+ * donc la fiche suivante en lecture, une seule : de quoi toujours préparer
+ * la prochaine rencontre, jamais de quoi dévorer les vingt d'un trait.
+ *
+ * Ce qui reste fermé jusqu'à la rencontre, c'est le partage — les réponses
+ * déposées au groupe, les pépites, le mur. La fraîcheur du moment commun ne
+ * se prépare pas, elle se vit ensemble.
+ */
+export function etapeDePreparation(group: ParcoursGroup): number {
+  return Math.min(group.currentStep + 1, PARCOURS_TOTAL_STEPS);
+}
+
+/** Lisible seul : la fiche du groupe, ou celle qu'on prépare. */
+export function estEtapeLisible(group: ParcoursGroup, step: number): boolean {
+  return step <= etapeDePreparation(group);
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendWebPush, PushSubscriptionData, PushPayload } from '@/lib/push';
+import { verifierFirebaseToken } from '@/lib/firebaseToken';
 
 export async function POST(req: NextRequest) {
   try {
+    await verifierFirebaseToken(req);
     const body = await req.json();
-    const { subscription, payload } = body as {
+    const { subscription } = body as {
       subscription?: PushSubscriptionData;
-      payload?: PushPayload;
     };
 
     if (!subscription || !subscription.endpoint || !subscription.keys) {
@@ -16,11 +17,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Cet endpoint ne sert qu'au test de l'appareil. Le contenu reste borné
+    // côté serveur : il ne peut pas devenir un relais push arbitraire.
     const notificationPayload: PushPayload = {
-      title: payload?.title || 'Les Fondements · Parole du jour',
-      body: payload?.body || '« Arrêtez, et sachez que je suis Dieu. » (Ps 46:11)',
-      url: payload?.url || '/dashboard',
-      tag: payload?.tag || 'test-notification',
+      title: 'Les Fondements · Test du rappel',
+      body: 'Votre carnet peut maintenant vous rappeler de revenir à la Parole.',
+      url: '/dashboard',
+      tag: 'test-notification',
       icon: '/icon-192.png',
       badge: '/icon-192.png',
     };
@@ -41,6 +44,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: errorMsg }, { status: 500 });
+    const status = errorMsg === 'UNAUTHENTICATED' ? 401 : 500;
+    return NextResponse.json({ error: status === 401 ? 'Authentification requise' : errorMsg }, { status });
   }
 }

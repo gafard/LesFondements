@@ -155,6 +155,14 @@ export interface GroupSession {
   notes?: string;
   /** Sujets de prière relevés pendant la rencontre. */
   prayerFocus?: string[];
+  /** Compte rendu pastoral bref, destiné en particulier aux absents. */
+  recap?: {
+    summary: string;
+    highlights: string[];
+    prayerFocus: string[];
+    nextStep?: string;
+    createdAt: number;
+  };
 }
 
 // ─────────────────────────────────────────────────────────────

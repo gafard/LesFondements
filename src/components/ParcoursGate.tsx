@@ -8,20 +8,31 @@ import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import { useDeclarerFondSombre } from '@/lib/fondSombre';
 
+/**
+ * Ce qu'une page exige pour s'ouvrir.
+ *
+ * - `groupe`    — il faut un groupe actif. Les fiches, le tableau de bord,
+ *                 la rencontre : tout ce que le parcours porte à cinq.
+ * - `attente`   — consultable dès la demande envoyée, avant validation :
+ *                 l'espace du groupe, pour voir qui l'on rejoint.
+ * - `personnel` — n'a jamais eu besoin d'un groupe. Le journal, la
+ *                 mémorisation, les témoignages : des pratiques qui
+ *                 appartiennent à la personne. Les fermer au visiteur qui
+ *                 attend son groupe, c'était appliquer la règle du parcours
+ *                 à ce qui n'en relève pas.
+ */
+export type NiveauAcces = 'groupe' | 'attente' | 'personnel';
+
 interface ParcoursGateProps {
   children: React.ReactNode;
-  /**
-   * Les pages consultables en salle d'attente (l'espace du groupe, par
-   * exemple) passent `allowPending`. Les fiches, elles, restent fermées.
-   */
-  allowPending?: boolean;
+  acces?: NiveauAcces;
 }
 
 /**
  * Garde d'accès du parcours. La règle : pas de groupe, pas de fiches.
  * Le contenu n'est pas seulement masqué visuellement — il n'est pas rendu.
  */
-export default function ParcoursGate({ children, allowPending = false }: ParcoursGateProps) {
+export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGateProps) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { gate, group } = useParcours();
@@ -43,6 +54,9 @@ export default function ParcoursGate({ children, allowPending = false }: Parcour
 
   if (!user) return null;
 
+  // Une pratique personnelle n'attend personne : être connecté suffit.
+  if (acces === 'personnel') return <>{children}</>;
+
   if (gate.state === 'sans_groupe' || gate.state === 'refuse') {
     return (
       <EcranFerme
@@ -62,7 +76,7 @@ export default function ParcoursGate({ children, allowPending = false }: Parcour
     );
   }
 
-  if (gate.state === 'en_attente' && !allowPending) {
+  if (gate.state === 'en_attente' && acces !== 'attente') {
     return (
       <EcranFerme
         icone={Hourglass}

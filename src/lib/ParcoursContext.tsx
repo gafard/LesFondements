@@ -32,6 +32,11 @@ interface ParcoursContextValue {
   isLeader: boolean;
   /** Fiche ouverte pour tout le groupe, 0 si le parcours est fermé. */
   unlockedStep: number;
+  /**
+   * Jusqu'où l'on peut lire seul : la fiche du groupe, plus la suivante,
+   * qu'on prépare en avance. Le partage, lui, reste sur `unlockedStep`.
+   */
+  preparationStep: number;
   refresh: () => Promise<void>;
   updateProfile: (patch: Partial<UserProfile>) => Promise<void>;
   /** Mode local sans backend : les groupes d'annuaire sont des exemples. */
@@ -176,6 +181,8 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
         membership?.role === 'animateur' ||
         membership?.role === 'co_animateur'),
     unlockedStep: gate.state === 'ouvert' ? gate.unlockedStep : gate.state === 'termine' ? 20 : 0,
+    preparationStep:
+      gate.state === 'ouvert' ? gate.preparationStep : gate.state === 'termine' ? 20 : 0,
     refresh: load,
     updateProfile,
     isLocalMode: !hasRemoteBackend(),

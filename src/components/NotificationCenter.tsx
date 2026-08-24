@@ -65,7 +65,7 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
       const res = await activerNotifications(user?.uid, prefs);
       if (res.success) {
         setActive(true);
-        setMessageSucces('Notifications activées avec succès via Cloudflare Workers !');
+        setMessageSucces('Cet appareil est prêt. Vos préférences sont conservées dans votre carnet.');
       } else {
         setMessageErreur(res.error || 'Impossible d’activer les notifications.');
       }
@@ -149,7 +149,7 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
                     {active ? 'Notifications actives' : 'Recevoir les rappels spirituels'}
                   </p>
                   <p className="text-2xs text-encre-500">
-                    Propulsé par Cloudflare Workers & Service Worker PWA
+                    Rappels de l’appareil · envoi distant seulement quand le service est configuré
                   </p>
                 </div>
                 <button

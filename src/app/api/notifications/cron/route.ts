@@ -34,8 +34,9 @@ export async function GET() {
   const meditation = MEDITATIONS_QUOTIDIENNES[index];
 
   return NextResponse.json({
-    active: true,
+    active: false,
     currentTime: new Date().toISOString(),
     dailyMeditation: meditation,
+    message: 'Ordonnanceur distant non activé : aucun envoi automatique n’est simulé.',
   });
 }

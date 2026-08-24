@@ -168,7 +168,7 @@ function Journal() {
 
 export default function Page() {
   return (
-    <ParcoursGate allowPending>
+    <ParcoursGate acces="personnel">
       <Journal />
     </ParcoursGate>
   );

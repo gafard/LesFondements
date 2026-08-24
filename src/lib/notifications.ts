@@ -19,6 +19,16 @@ export const PREFERENCES_DEFAUT: NotificationPreferences = {
 const CLE_STOCKAGE_PREFS = 'lf.notifPreferences';
 const CLE_STOCKAGE_SUB = 'lf.pushSubscription';
 
+async function jetonFirebase(): Promise<string | null> {
+  try {
+    const { getFirebaseAuth } = await import('./firebase');
+    const auth = await getFirebaseAuth();
+    return (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -86,13 +96,11 @@ export async function activerNotifications(
     }
 
     // 2. Récupération de la clé publique VAPID du Worker
-    let clePublique = '';
-    try {
-      const resVapid = await fetch('/api/notifications/vapid-key');
-      const dataVapid = await resVapid.json();
-      clePublique = dataVapid.publicKey;
-    } catch {
-      clePublique = 'BPGEh8GjnZpEJ6s1XY8EyJKDv5aWSGvczjZ_1h7fM-oL9astw7vbOrxseeaj-rYneRn3E9Wd2-RXb198qIWwQmI';
+    const resVapid = await fetch('/api/notifications/vapid-key');
+    const dataVapid = (await resVapid.json()) as { publicKey?: string };
+    const clePublique = dataVapid.publicKey ?? '';
+    if (!resVapid.ok || !clePublique) {
+      return { success: false, error: 'Les rappels distants ne sont pas encore configurés.' };
     }
 
     // 3. Enregistrement / récupération du Service Worker
@@ -109,15 +117,18 @@ export async function activerNotifications(
 
     // 4. Transmission de l'abonnement à l'API Worker
     const subJson = subscription.toJSON();
-    await fetch('/api/notifications/subscribe', {
+    const token = await jetonFirebase();
+    if (!token) return { success: false, error: 'Reconnectez-vous pour activer cet appareil.' };
+    const response = await fetch('/api/notifications/subscribe', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         subscription: subJson,
         userId: userId || 'anonyme',
         preferences,
       }),
     });
+    if (!response.ok) throw new Error('L’appareil n’a pas pu être vérifié.');
 
     // 5. Sauvegarde locale
     sauvegarderPreferencesLocales(preferences);
@@ -167,10 +178,11 @@ export async function envoyerNotificationTest(options?: {
     const subscription = await reg.pushManager.getSubscription();
 
     if (subscription) {
-      // Envoi sécurisé via le Cloudflare Worker
+      const token = await jetonFirebase();
+      if (!token) throw new Error('Reconnectez-vous pour tester le rappel.');
       const res = await fetch('/api/notifications/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           subscription: subscription.toJSON(),
           payload: {

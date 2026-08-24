@@ -436,7 +436,9 @@ export default function Immersion({
             <button
               onClick={() => aller(-1)}
               disabled={index === 0}
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/8 px-4 py-3 text-2xs font-bold text-parchemin-100/70 backdrop-blur-md transition-colors hover:bg-white/16 hover:text-parchemin-100 disabled:opacity-25"
+              className={`inline-flex items-center gap-1.5 rounded-full bg-white/8 px-4 py-3 text-2xs font-bold text-parchemin-100/70 backdrop-blur-md transition-colors hover:bg-white/16 hover:text-parchemin-100 disabled:opacity-25 ${
+                index === 0 ? 'invisible pointer-events-none' : ''
+              }`}
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Précédent</span>
@@ -449,15 +451,23 @@ export default function Immersion({
             {scene.type === 'cloture' ? (
               <button
                 onClick={() => void terminer()}
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold"
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold shadow-md"
               >
                 {dejaPreparee ? 'Terminer' : 'J’ai préparé la fiche'}
                 <Check className="h-4 w-4" strokeWidth={2.5} />
               </button>
+            ) : scene.type === 'seuil' ? (
+              <button
+                onClick={() => aller(1)}
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold shadow-md"
+              >
+                Entrer dans la fiche
+                <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
             ) : (
               <button
                 onClick={() => aller(1)}
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold"
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold shadow-md"
               >
                 Continuer
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
@@ -493,7 +503,7 @@ function RenduScene({
 }) {
   switch (scene.type) {
     case 'seuil':
-      return <SceneSeuil fiche={fiche} onSuivant={onSuivant} />;
+      return <SceneSeuil fiche={fiche} />;
 
     case 'ouverture-section':
       return (
@@ -629,13 +639,6 @@ function RenduScene({
               ? 'Vos réponses sont enregistrées. Vous pourrez les relire avant la rencontre.'
               : 'En validant, votre groupe verra que vous êtes prêt pour la rencontre. Vos réponses, elles, restent les vôtres.'}
           </p>
-          <button
-            onClick={() => void onTerminer()}
-            className="bouton-or mt-9 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
-          >
-            {dejaPreparee ? 'Refermer la fiche' : 'J’ai préparé la fiche'}
-            <Check className="h-4 w-4" strokeWidth={2.5} />
-          </button>
         </div>
       );
   }
@@ -643,7 +646,7 @@ function RenduScene({
 
 // ─────────────────────────────────────────────────────────────
 
-function SceneSeuil({ fiche, onSuivant }: { fiche: FicheLivret; onSuivant: () => void }) {
+function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
   return (
     <div className="relative py-8 text-center sm:py-12">
       <MotFantome
@@ -688,14 +691,6 @@ function SceneSeuil({ fiche, onSuivant }: { fiche: FicheLivret; onSuivant: () =>
           </p>
         ))}
       </div>
-
-      <button
-        onClick={onSuivant}
-        className="bouton-or mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
-      >
-        Entrer
-        <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-      </button>
     </div>
   );
 }

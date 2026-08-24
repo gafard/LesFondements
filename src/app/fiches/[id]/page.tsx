@@ -52,7 +52,7 @@ function FicheContent() {
   const ficheId = Number.parseInt(String(params.id), 10);
 
   const { user } = useAuth();
-  const { group, membership, unlockedStep, refresh } = useParcours();
+  const { group, membership, unlockedStep, preparationStep, refresh } = useParcours();
 
   const [fiche, setFiche] = useState<FicheLivret | null | undefined>(undefined);
   const [reponses, setReponses] = useState<Record<string, string>>(() =>
@@ -71,8 +71,13 @@ function FicheContent() {
   const meta = FICHES_META.find((m) => m.id === ficheId);
   const preparee = membership?.preparedSteps.includes(ficheId) ?? false;
   // Découplage : l'utilisateur peut toujours préparer la fiche en cours ET la suivante chez lui
-  const maxFicheAccessible = Math.min(20, Math.max(1, (unlockedStep || 1) + 1));
+  // Lisible seul : la fiche du groupe, plus la suivante — de quoi toujours
+  // préparer la prochaine rencontre sans attendre que l'animateur clôture.
+  const maxFicheAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
   const fermee = !!group && ficheId > maxFicheAccessible;
+  // Lue en avance, mais pas encore vécue ensemble : on peut tout travailler,
+  // rien déposer au groupe. La fraîcheur de la rencontre ne se prépare pas.
+  const enPreparation = !!group && ficheId > unlockedStep;
 
   useEffect(() => {
     if (!Number.isFinite(ficheId)) return;
@@ -343,6 +348,21 @@ function FicheContent() {
         {/* ══ Résumé et partage ══ */}
         {onglet === 'partage' && (
           <div className="mt-8 space-y-8">
+            {enPreparation && (
+              <div className="postit postit-bleu pose-3 relative rounded-3xl p-5 shadow-md">
+                <span className="ruban -top-3 left-10 -rotate-2 rounded-[2px]" />
+                <p className="manuscrit pt-1 text-2xl font-bold text-encre-950">
+                  Vous prenez de l&apos;avance
+                </p>
+                <p className="mt-1 font-serif text-xs italic leading-relaxed text-encre-800">
+                  Travaillez tout ce que vous voulez ici : vos réponses sont enregistrées et vous
+                  attendront. Le dépôt au groupe s&apos;ouvrira quand la fiche {unlockedStep} sera
+                  clôturée — ce que vous découvrez maintenant garde ainsi toute sa fraîcheur pour
+                  la rencontre.
+                </p>
+              </div>
+            )}
+
             <div className="rounded-3xl border border-or-200 bg-or-50 p-5">
               <p className="text-xs leading-relaxed text-or-900/85">
                 C&apos;est cette partie qui sert de support à la rencontre. Le livret ne demande pas
@@ -420,7 +440,7 @@ function FicheContent() {
                           enregistrer(`q:${fiche.id}_${indexSection}_${i}`, valeur)
                         }
                         onPartager={
-                          group
+                          group && !enPreparation
                             ? async (texte) => {
                                 await addPost({
                                   groupId: group.id,
