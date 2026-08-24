@@ -466,6 +466,9 @@ function separateur(avant: string, apres: string): string {
   const commence = apres[0];
   // Pas d'espace avant une ponctuation faible, ni après une apostrophe.
   if (/[,.;:!?…»)\]]/.test(commence)) return '';
+  // Ni devant un trait d'union : les numéros Strong coupent « regarderais »
+  // de « -tu », et une espace ici rendrait « regarderais -tu ».
+  if (commence === '-') return '';
   if (/[’'(\[«]/.test(finit)) return '';
   // Le français met une espace avant « ; : ! ? » — l'espace fine insécable.
   if (/[;:!?»]/.test(commence)) return '\u202f';
@@ -479,7 +482,9 @@ function VersetAnnote({
   verset: Verset;
   onStrong: (code: number) => void;
 }) {
-  const fragments = verset.s.filter((segment) => segment.t);
+  // Un verset rétabli après coup peut n'avoir aucune annotation Strong :
+  // la supposer présente faisait tomber tout le panneau.
+  const fragments = (verset.s ?? []).filter((segment) => segment.t);
 
   return (
     <>
