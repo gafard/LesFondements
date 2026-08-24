@@ -171,25 +171,31 @@ export default function BulleVerset() {
   const texteAffiche = versionChoisie === 'bds' && texteSemeur ? texteSemeur : texteSegond;
   const tropLong = texteAffiche.length > 360;
 
-  // Audio réel (Bible du Semeur par défaut)
-  const audioUrl = versionChoisie === 'bds'
-    ? (comparaison?.audioBds || getAudioChapitre(bulle.reference.livre.numero, bulle.reference.livre.nom, bulle.reference.chapitre, 'semeur'))
-    : (comparaison?.audioLsg || getAudioChapitre(bulle.reference.livre.numero, bulle.reference.livre.nom, bulle.reference.chapitre, 'lsg'));
+  // Audio narrateur officiel
+  const audioUrl = getAudioChapitre(
+    bulle.reference.livre.numero,
+    bulle.reference.livre.nom,
+    bulle.reference.chapitre,
+    versionChoisie
+  );
 
   const jouerAudio = () => {
     if (audioEnCours) {
       audioRef.current?.pause();
       setAudioEnCours(false);
+      arreterLecture();
       return;
     }
 
     if (audioUrl && audioRef.current) {
-      audioRef.current.src = audioUrl;
+      if (audioRef.current.src !== audioUrl) {
+        audioRef.current.src = audioUrl;
+      }
       audioRef.current
         .play()
         .then(() => setAudioEnCours(true))
-        .catch(() => {
-          // Fallback vocal si le streaming échoue
+        .catch((err) => {
+          console.warn('Audio playback error, falling back to vocal synthesis:', err);
           setAudioEnCours(false);
           lireAVoixHaute(`${titre}. ${texteAffiche}`);
         });
@@ -218,6 +224,8 @@ export default function BulleVerset() {
     <>
       <audio
         ref={audioRef}
+        onPlay={() => setAudioEnCours(true)}
+        onPause={() => setAudioEnCours(false)}
         onEnded={() => setAudioEnCours(false)}
         onError={() => setAudioEnCours(false)}
       />

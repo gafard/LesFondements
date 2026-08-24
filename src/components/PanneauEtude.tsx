@@ -139,14 +139,17 @@ export default function PanneauEtude() {
       version
     );
     if (audioRef.current) {
-      audioRef.current.src = url;
+      if (audioRef.current.src !== url) {
+        audioRef.current.src = url;
+      }
       audioRef.current
         .play()
         .then(() => {
           setAudioVersion(version);
           setAudioEnCours(true);
         })
-        .catch(() => {
+        .catch((err) => {
+          console.warn('PanneauEtude audio playback error:', err);
           setAudioEnCours(false);
         });
     }
@@ -166,6 +169,8 @@ export default function PanneauEtude() {
     <div className="fixed inset-0 z-[70] flex justify-end">
       <audio
         ref={audioRef}
+        onPlay={() => setAudioEnCours(true)}
+        onPause={() => setAudioEnCours(false)}
         onEnded={() => setAudioEnCours(false)}
         onError={() => setAudioEnCours(false)}
       />

@@ -19,7 +19,8 @@ import ParcoursGate from '@/components/ParcoursGate';
 import { getAnswers } from '@/lib/firestore';
 import { chargerLivret, versetsDe } from '@/lib/livret';
 import { texteDuVerset } from '@/data/versets';
-import { getComparaisonVerset } from '@/lib/bibleVersions';
+import { getComparaisonVerset, getAudioChapitre } from '@/lib/bibleVersions';
+import { analyserReference } from '@/lib/reference';
 import { lectureDisponible, lireAVoixHaute } from '@/lib/ambiance';
 import { FICHES_META } from '@/data/fichesMeta';
 
@@ -277,25 +278,32 @@ function MemorisationContent() {
                         </Link>
                       </div>
                     )}
-                  </div>
-
-                  {(carte.texte || carte.copie) && (
+                    {(carte.texte || carte.copie) && (
                     <button
                       onClick={(event) => {
                         event.stopPropagation();
                         const comp = getComparaisonVerset(carte.reference);
-                        const audioUrl = comp?.audioBds || comp?.audioLsg;
+                        const parsed = analyserReference(carte.reference);
+                        const audioUrl =
+                          comp?.audioBds ||
+                          (parsed
+                            ? getAudioChapitre(parsed.livre.numero, parsed.livre.nom, parsed.chapitre)
+                            : null);
+
                         if (audioEnCours) {
                           audioRef.current?.pause();
                           setAudioEnCours(false);
                           return;
                         }
                         if (audioUrl && audioRef.current) {
-                          audioRef.current.src = audioUrl;
+                          if (audioRef.current.src !== audioUrl) {
+                            audioRef.current.src = audioUrl;
+                          }
                           audioRef.current
                             .play()
                             .then(() => setAudioEnCours(true))
-                            .catch(() => {
+                            .catch((err) => {
+                              console.warn('Audio play error, falling back to vocal synthesis:', err);
                               setAudioEnCours(false);
                               lireAVoixHaute(`${carte.reference}. ${comp?.bds ?? carte.texte ?? carte.copie}`);
                             });
@@ -310,15 +318,18 @@ function MemorisationContent() {
                       }`}
                     >
                       <Volume2 className="h-3.5 w-3.5" />
-                      {audioEnCours ? 'Pause' : 'Écouter (Semeur)'}
+                      {audioEnCours ? 'Pause' : 'Écouter (Audio)'}
                     </button>
                   )}
+                  </div>
                 </div>
               </div>
             </button>
 
             <audio
               ref={audioRef}
+              onPlay={() => setAudioEnCours(true)}
+              onPause={() => setAudioEnCours(false)}
               onEnded={() => setAudioEnCours(false)}
               onError={() => setAudioEnCours(false)}
             />

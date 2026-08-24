@@ -3,7 +3,9 @@
 import { useState, useRef } from 'react';
 import { Book, Copy, Check, ImageIcon, Volume2, Pause } from 'lucide-react';
 import ShareableVerseCard from './ShareableVerseCard';
-import { getComparaisonVerset } from '@/lib/bibleVersions';
+import { getComparaisonVerset, getAudioChapitre } from '@/lib/bibleVersions';
+import { analyserReference } from '@/lib/reference';
+import { lectureDisponible, lireAVoixHaute, arreterLecture } from '@/lib/ambiance';
 
 interface VersetCardProps {
   reference: string;
@@ -37,28 +39,37 @@ export default function VersetCard({ reference, text, type = 'quote' }: VersetCa
   };
 
   const jouerAudio = (source: 'lsg' | 'bds') => {
-    const url = source === 'bds' ? comparaison?.audioBds : comparaison?.audioLsg;
-    if (!url) return;
+    const parsed = analyserReference(reference);
+    const url =
+      (source === 'bds' ? comparaison?.audioBds : comparaison?.audioLsg) ||
+      (parsed ? getAudioChapitre(parsed.livre.numero, parsed.livre.nom, parsed.chapitre, source) : null);
 
     if (audioEnCours && audioJoue === source) {
       audioRef.current?.pause();
       setAudioEnCours(false);
       setAudioJoue(null);
+      arreterLecture();
       return;
     }
 
-    if (audioRef.current) {
-      audioRef.current.src = url;
+    if (url && audioRef.current) {
+      if (audioRef.current.src !== url) {
+        audioRef.current.src = url;
+      }
       audioRef.current
         .play()
         .then(() => {
           setAudioEnCours(true);
           setAudioJoue(source);
         })
-        .catch(() => {
+        .catch((err) => {
+          console.warn('Audio play error, falling back to vocal synthesis:', err);
           setAudioEnCours(false);
           setAudioJoue(null);
+          lireAVoixHaute(`${reference}. ${texteAffiche}`);
         });
+    } else if (lectureDisponible()) {
+      lireAVoixHaute(`${reference}. ${texteAffiche}`);
     }
   };
 
@@ -80,6 +91,11 @@ export default function VersetCard({ reference, text, type = 'quote' }: VersetCa
     <>
       <audio
         ref={audioRef}
+        onPlay={() => setAudioEnCours(true)}
+        onPause={() => {
+          setAudioEnCours(false);
+          setAudioJoue(null);
+        }}
         onEnded={() => {
           setAudioEnCours(false);
           setAudioJoue(null);
