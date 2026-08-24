@@ -3,13 +3,38 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Printer, ArrowLeft, BookOpen, Award, CheckCircle, PenLine } from 'lucide-react';
+import { Printer, ArrowLeft, Award, CheckCircle, PenLine } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import { FICHES_META } from '@/data/fichesMeta';
 import { getCachedJournalEntries, getCachedAnswers, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
 import { etatMemoireLocal } from '@/lib/memorisation';
+import { lireAnnotations } from '@/lib/annotations';
+
+interface EcritExportable {
+  id: string;
+  contenu: string;
+  postIt?: boolean;
+}
+
+function ecritsExportables(
+  reponses: Record<string, string>,
+  ficheId: number
+): EcritExportable[] {
+  const classiques = Object.entries(reponses)
+    .filter(([cle, contenu]) =>
+      !cle.startsWith('annotations:') && typeof contenu === 'string' && contenu.trim()
+    )
+    .map(([cle, contenu]) => ({ id: cle, contenu }));
+  const annotations = lireAnnotations(reponses[`annotations:${ficheId}`]);
+  return [
+    ...classiques,
+    ...annotations.notes
+      .filter((note) => note.texte.trim())
+      .map((note) => ({ id: `postit-${note.id}`, contenu: note.texte, postIt: true })),
+  ];
+}
 
 export default function CarnetExportPage() {
   const { user } = useAuth();
@@ -113,7 +138,7 @@ export default function CarnetExportPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             {FICHES_META.map((meta) => {
               const estCloturee = group?.closedSteps.includes(meta.id);
-              const repCount = Object.keys(reponsesParFiche[meta.id] || {}).length;
+              const repCount = ecritsExportables(reponsesParFiche[meta.id] || {}, meta.id).length;
 
               return (
                 <div
@@ -141,11 +166,13 @@ export default function CarnetExportPage() {
             2. Mes Réponses & Écritures Personnelles
           </h2>
 
-          {Object.entries(reponsesParFiche).some(([, rep]) => Object.keys(rep).length > 0) ? (
+          {Object.entries(reponsesParFiche).some(([ficheId, rep]) =>
+            ecritsExportables(rep, Number(ficheId)).length > 0
+          ) ? (
             Object.entries(reponsesParFiche).map(([ficheIdStr, reponses]) => {
               const ficheId = Number(ficheIdStr);
-              const clesReponses = Object.keys(reponses);
-              if (clesReponses.length === 0) return null;
+              const ecrits = ecritsExportables(reponses, ficheId);
+              if (ecrits.length === 0) return null;
               const meta = FICHES_META.find((f) => f.id === ficheId);
 
               return (
@@ -156,10 +183,15 @@ export default function CarnetExportPage() {
                   </h3>
 
                   <div className="space-y-3 pt-2">
-                    {clesReponses.map((cle) => (
-                      <div key={cle} className="border-l-2 border-or-400 pl-3">
+                    {ecrits.map((ecrit) => (
+                      <div key={ecrit.id} className="border-l-2 border-or-400 pl-3">
+                        {ecrit.postIt && (
+                          <p className="mb-1 text-3xs font-black uppercase tracking-[0.14em] text-or-700">
+                            Post-it personnel
+                          </p>
+                        )}
                         <p className="manuscrit text-base text-encre-950 whitespace-pre-wrap">
-                          « {reponses[cle]} »
+                          « {ecrit.contenu} »
                         </p>
                       </div>
                     ))}

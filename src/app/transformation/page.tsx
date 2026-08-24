@@ -9,6 +9,7 @@ import { useParcours } from '@/lib/ParcoursContext';
 import { FICHES_META } from '@/data/fichesMeta';
 import { getAnswers, getJournalEntries } from '@/lib/firestore';
 import { etatMemoireLocal } from '@/lib/memorisation';
+import { lireAnnotations } from '@/lib/annotations';
 
 interface TraceFiche {
   id: number;
@@ -35,9 +36,17 @@ function TransformationContent() {
       const details = await Promise.all(
         metas.map(async (fiche) => {
           const answers = await getAnswers(user.uid, fiche.id);
-          const contenus = Object.values(answers).filter(
-            (valeur): valeur is string => typeof valeur === 'string' && valeur.trim().length > 0
-          );
+          const annotations = lireAnnotations(answers[`annotations:${fiche.id}`]);
+          const contenus = [
+            ...Object.entries(answers)
+              .filter(([cle, valeur]) =>
+                !cle.startsWith('annotations:') &&
+                typeof valeur === 'string' &&
+                valeur.trim().length > 0
+              )
+              .map(([, valeur]) => String(valeur)),
+            ...annotations.notes.map((note) => note.texte).filter(Boolean),
+          ];
           return {
             id: fiche.id,
             titre: fiche.titre,

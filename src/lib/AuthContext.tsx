@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useSyncExternalStore } from 'react';
 
 export interface AppUser {
   uid: string;
@@ -21,6 +21,8 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const souscrireHydratation = () => () => {};
 
 const LOCAL_STORAGE_USER_KEY = 'lesfondements_local_user';
 
@@ -48,6 +50,10 @@ const FIREBASE_CONFIGURE = (() => {
 })();
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // Le serveur et le tout premier rendu navigateur voient tous les deux une
+  // session vide. La session locale n'est exposée qu'après hydratation, ce qui
+  // évite que la coque complète remplace brutalement l'écran d'ouverture.
+  const hydrate = useSyncExternalStore(souscrireHydratation, () => true, () => false);
   // La session invitée est relue dès le premier rendu : pas d'écran de
   // chargement inutile en mode local. En mode Firebase, on attend l'auth.
   const [user, setUser] = useState<AppUser | null>(() => lireUtilisateurLocal());
@@ -209,7 +215,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signInAsGuest, logout, isFirebaseConfigured }}>
+    <AuthContext.Provider value={{
+      user: hydrate ? user : null,
+      loading: !hydrate || loading,
+      signInWithGoogle,
+      signInWithEmail,
+      signUpWithEmail,
+      signInAsGuest,
+      logout,
+      isFirebaseConfigured,
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -37,6 +37,8 @@
 
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1.15rem;
+  --text-3xs: 0.625rem;
+  --text-3xs--line-height: 0.9rem;
 
   --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
 

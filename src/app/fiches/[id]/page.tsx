@@ -48,7 +48,7 @@ import {
   type CouleurSurlignage,
   type DocumentAnnotations,
 } from '@/lib/annotations';
-import { memoriserPassage } from '@/lib/marquePage';
+import { lireDernierPassage, memoriserPassage } from '@/lib/marquePage';
 
 type Onglet = 'expose' | 'partage' | 'annexes';
 
@@ -142,6 +142,12 @@ function FicheContent() {
 
   useEffect(() => {
     if (!fiche || immersion) return;
+    const dernier = lireDernierPassage();
+    if (
+      dernier &&
+      dernier.type !== 'fiche' &&
+      dernier.url.startsWith(`/fiches/${ficheId}?`)
+    ) return;
     memoriserPassage({
       url: `/fiches/${ficheId}`,
       titre: `Fiche ${ficheId} — ${fiche.titre}`,
