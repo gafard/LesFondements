@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -26,6 +28,9 @@ import {
   Star,
   UserPlus,
   Users,
+  UserMinus,
+  MoreHorizontal,
+  LogOut,
   Video,
   X,
 } from 'lucide-react';
@@ -35,7 +40,9 @@ import ParcoursGate from '@/components/ParcoursGate';
 import InvitePanel from '@/components/InvitePanel';
 import {
   addPost,
+  addReply,
   approveMember,
+  leaveGroup,
   deletePost,
   getPosts,
   getSessions,
@@ -43,13 +50,25 @@ import {
   nextMeetingDate,
   openMeeting,
   rejectMember,
+  removeMember,
+  setMemberRole,
   setSessionAttendance,
   subscribe,
   toggleAmen,
   togglePrayed,
 } from '@/lib/parcoursStore';
 import { FICHES_META } from '@/data/fichesMeta';
-import type { AttendanceMode, GroupPost, GroupPostKind, GroupSession } from '@/lib/types';
+import {
+  LONGUEUR_REPONSE,
+  REPONSES_MAX,
+} from '@/lib/types';
+import type {
+  AttendanceMode,
+  GroupMember,
+  GroupPost,
+  GroupPostKind,
+  GroupSession,
+} from '@/lib/types';
 
 const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
@@ -712,15 +731,20 @@ function OngletMembres({
                 </div>
               </div>
 
-              <span
-                className={`shrink-0 rounded-full px-2.5 py-1 text-2xs font-bold ${
-                  membre.preparedSteps.includes(group.currentStep)
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'bg-or-50 text-or-700'
-                }`}
-              >
-                {membre.preparedSteps.includes(group.currentStep) ? 'Prêt' : 'En cours'}
-              </span>
+              <div className="flex shrink-0 items-center gap-2">
+                <span
+                  className={`rounded-full px-2.5 py-1 text-2xs font-bold ${
+                    membre.preparedSteps.includes(group.currentStep)
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'bg-or-50 text-or-700'
+                  }`}
+                >
+                  {membre.preparedSteps.includes(group.currentStep) ? 'Prêt' : 'En cours'}
+                </span>
+                {isLeader && membre.uid !== user.uid && (
+                  <ActionsMembre membre={membre} groupId={group.id} />
+                )}
+              </div>
             </li>
           ))}
 
@@ -747,6 +771,179 @@ function OngletMembres({
         <p className="rounded-2xl bg-parchemin-200/60 px-4 py-3 text-2xs leading-relaxed text-encre-500">
           Tout membre peut inviter : le groupe grandit par les relations, pas par un annuaire.
         </p>
+      )}
+
+      <QuitterLeGroupe />
+    </div>
+  );
+}
+
+/**
+ * Ce que l'animateur peut faire d'un membre : le nommer adjoint, ou le
+ * retirer du groupe.
+ *
+ * Retirer quelqu'un demande une confirmation nommée. C'est délibéré : sur un
+ * parcours où l'on se confie, l'exclusion ne doit jamais être le résultat
+ * d'un doigt qui glisse.
+ */
+function ActionsMembre({ membre, groupId }: { membre: GroupMember; groupId: string }) {
+  const { refresh } = useParcours();
+  const [ouvert, setOuvert] = useState(false);
+  const [confirme, setConfirme] = useState(false);
+  const [occupe, setOccupe] = useState(false);
+
+  const adjoint = membre.role === 'co_animateur';
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => {
+          setOuvert((v) => !v);
+          setConfirme(false);
+        }}
+        aria-label={`Gérer ${membre.displayName}`}
+        className="grid h-7 w-7 place-items-center rounded-full text-encre-300 transition-colors hover:bg-parchemin-200 hover:text-encre-700"
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+
+      {ouvert && (
+        <>
+          <button
+            type="button"
+            aria-label="Fermer"
+            onClick={() => setOuvert(false)}
+            className="fixed inset-0 z-40 cursor-default"
+          />
+          <div className="absolute right-0 top-8 z-50 w-60 overflow-hidden rounded-2xl border border-parchemin-400 bg-white p-1 shadow-xl">
+            <button
+              disabled={occupe}
+              onClick={async () => {
+                setOccupe(true);
+                await setMemberRole(groupId, membre.uid, adjoint ? 'membre' : 'co_animateur');
+                await refresh();
+                setOccupe(false);
+                setOuvert(false);
+              }}
+              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-encre-800 transition-colors hover:bg-parchemin-100 disabled:opacity-40"
+            >
+              <Crown className="h-3.5 w-3.5 text-or-600" />
+              {adjoint ? 'Retirer le rôle d’adjoint' : 'Nommer adjoint'}
+            </button>
+
+            {!adjoint && (
+              <p className="px-3 pb-1.5 pt-0.5 text-3xs leading-relaxed text-encre-400">
+                Un adjoint peut clôturer une rencontre à votre place.
+              </p>
+            )}
+
+            <div className="my-1 border-t border-parchemin-300" />
+
+            {confirme ? (
+              <div className="px-3 py-2">
+                <p className="text-3xs leading-relaxed text-encre-600">
+                  Retirer <strong>{membre.displayName}</strong> du groupe ? Ses écrits personnels
+                  lui restent.
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    disabled={occupe}
+                    onClick={async () => {
+                      setOccupe(true);
+                      await removeMember(groupId, membre.uid);
+                      await refresh();
+                      setOccupe(false);
+                      setOuvert(false);
+                    }}
+                    className="rounded-full bg-rose-600 px-3 py-1.5 text-3xs font-bold text-white transition-colors hover:bg-rose-700 disabled:opacity-40"
+                  >
+                    Retirer
+                  </button>
+                  <button
+                    onClick={() => setConfirme(false)}
+                    className="rounded-full px-3 py-1.5 text-3xs font-bold text-encre-500 hover:text-encre-800"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirme(true)}
+                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-rose-700 transition-colors hover:bg-rose-50"
+              >
+                <UserMinus className="h-3.5 w-3.5" />
+                Retirer du groupe
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Partir de soi-même.
+ *
+ * Deux clics, sans justification ni approbation : la porte de sortie doit
+ * être plus large que la trappe. Le seul refus possible est celui d'un
+ * animateur unique, qui laisserait le groupe sans personne pour clôturer.
+ */
+function QuitterLeGroupe() {
+  const { user } = useAuth();
+  const { group, refresh } = useParcours();
+  const router = useRouter();
+  const [demande, setDemande] = useState(false);
+  const [refus, setRefus] = useState<string | null>(null);
+  const [occupe, setOccupe] = useState(false);
+
+  if (!group || !user) return null;
+
+  return (
+    <div className="rounded-2xl border border-parchemin-400 bg-parchemin-100/60 px-4 py-3.5">
+      {refus ? (
+        <p className="text-2xs leading-relaxed text-amber-800">{refus}</p>
+      ) : demande ? (
+        <>
+          <p className="text-2xs leading-relaxed text-encre-700">
+            Quitter <strong>{group.name}</strong> ? Votre journal, vos réponses et vos versets
+            restent à vous. Vous pourrez rejoindre un autre groupe.
+          </p>
+          <div className="mt-2.5 flex gap-2">
+            <button
+              disabled={occupe}
+              onClick={async () => {
+                setOccupe(true);
+                const issue = await leaveGroup(group.id, user.uid);
+                setOccupe(false);
+                if (issue.parti) {
+                  await refresh();
+                  router.push('/onboarding');
+                } else {
+                  setRefus(issue.raison);
+                }
+              }}
+              className="rounded-full bg-encre-950 px-4 py-2 text-2xs font-bold text-parchemin-100 transition-colors hover:bg-encre-800 disabled:opacity-40"
+            >
+              {occupe ? 'Un instant…' : 'Quitter le groupe'}
+            </button>
+            <button
+              onClick={() => setDemande(false)}
+              className="rounded-full px-3 py-2 text-2xs font-bold text-encre-500 hover:text-encre-800"
+            >
+              Rester
+            </button>
+          </div>
+        </>
+      ) : (
+        <button
+          onClick={() => setDemande(true)}
+          className="flex items-center gap-2 text-2xs font-bold text-encre-400 transition-colors hover:text-encre-700"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+          Quitter ce groupe
+        </button>
       )}
     </div>
   );
@@ -1021,7 +1218,100 @@ function CartePost({
           </button>
         )}
       </div>
+
+      <FilDeReponses post={post} onChange={onChange} />
     </article>
+  );
+}
+
+/**
+ * Les réponses à un message du mur.
+ *
+ * Brèves par construction — deux cents caractères. Le mur n'est pas un salon :
+ * ce qui se dit longuement se dit à la rencontre, où l'on s'entend et où l'on
+ * se voit. Ici on porte, on acquiesce, on dit qu'on a compris.
+ */
+function FilDeReponses({ post, onChange }: { post: GroupPost; onChange: () => void }) {
+  const { user } = useAuth();
+  const { group } = useParcours();
+  const [texte, setTexte] = useState('');
+  const [ouvert, setOuvert] = useState(false);
+  const [occupe, setOccupe] = useState(false);
+
+  if (!group || !user) return null;
+
+  const reponses = post.replies ?? [];
+  const complet = reponses.length >= REPONSES_MAX;
+  const restant = LONGUEUR_REPONSE - texte.length;
+
+  const envoyer = async () => {
+    const propre = texte.trim();
+    if (!propre || occupe) return;
+    setOccupe(true);
+    await addReply(group.id, post.id, { uid: user.uid, nom: user.displayName || 'Un membre' }, propre);
+    setTexte('');
+    setOuvert(false);
+    setOccupe(false);
+    onChange();
+  };
+
+  return (
+    <div className="border-t border-parchemin-300 px-4 pb-3 pt-2.5 sm:px-5">
+      {reponses.length > 0 && (
+        <ul className="mb-2 space-y-1.5">
+          {reponses.map((reponse) => (
+            <li key={reponse.id} className="flex gap-2 text-2xs leading-relaxed">
+              <span className="shrink-0 font-bold text-encre-700">{reponse.authorName}</span>
+              <span className="text-encre-600">{reponse.content}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {complet ? (
+        <p className="text-3xs italic text-encre-400">
+          Le fil est plein — la suite se dira à la rencontre.
+        </p>
+      ) : ouvert ? (
+        <div className="flex items-end gap-2">
+          <div className="min-w-0 flex-1">
+            <textarea
+              autoFocus
+              rows={2}
+              value={texte}
+              maxLength={LONGUEUR_REPONSE}
+              onChange={(event) => setTexte(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  void envoyer();
+                }
+                if (event.key === 'Escape') setOuvert(false);
+              }}
+              placeholder="Quelques mots…"
+              className="w-full resize-none rounded-xl border border-parchemin-400 bg-parchemin-100/50 px-3 py-2 text-2xs text-encre-800 outline-none focus:border-or-400"
+            />
+            <p className="mt-0.5 text-3xs text-encre-300">
+              {restant} caractère{restant > 1 ? 's' : ''} — Entrée pour envoyer
+            </p>
+          </div>
+          <button
+            onClick={envoyer}
+            disabled={!texte.trim() || occupe}
+            className="mb-4 shrink-0 rounded-full bg-encre-950 px-3.5 py-1.5 text-2xs font-bold text-parchemin-100 transition-colors hover:bg-encre-800 disabled:opacity-30"
+          >
+            Envoyer
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setOuvert(true)}
+          className="text-2xs font-bold text-encre-400 transition-colors hover:text-encre-800"
+        >
+          {reponses.length ? 'Répondre' : 'Répondre en quelques mots'}
+        </button>
+      )}
+    </div>
   );
 }
 

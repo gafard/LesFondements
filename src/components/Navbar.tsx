@@ -204,6 +204,8 @@ export default function Navbar() {
                   { href: '/fiches', label: 'Le parcours' },
                   { href: '/index-thematique', label: 'Thèmes' },
                   { href: '/ressources', label: 'Bibliographie' },
+                  // Public sans compte : c'est la vitrine du parcours.
+                  { href: '/temoignages', label: 'Témoignages' },
                 ].map((lien) => (
                   <Link
                     key={lien.href}

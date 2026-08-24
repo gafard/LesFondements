@@ -175,6 +175,19 @@ export default function EcranLancement() {
           )}
         </div>
 
+        {/* Les témoignages sont publics depuis toujours — mais aucun chemin
+            n'y menait sans compte. C'est le seul contenu qui donne envie
+            sans rien verrouiller : il mérite sa porte. */}
+        {!passage && (
+          <Link
+            href="/temoignages"
+            className="mt-3 flex items-center justify-center gap-1.5 text-2xs font-bold text-encre-500 transition-colors hover:text-or-700"
+          >
+            Lire ce que Dieu a fait chez d&apos;autres
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        )}
+
         {/* ── Verset du jour ── */}
         {verset && (
           <div className="postit postit-jaune pose-3 relative mt-5 rounded-2xl px-5 py-4">

@@ -14,7 +14,9 @@
 
 import {
   GROUP_DEFAULT_CAPACITY,
+  LONGUEUR_REPONSE,
   PARCOURS_TOTAL_STEPS,
+  REPONSES_MAX,
   type AttendanceMode,
   type GroupInvite,
   type GroupMatch,
@@ -812,6 +814,51 @@ export async function removeMember(groupId: string, uid: string): Promise<void> 
   }
 }
 
+/**
+ * Quitter un groupe de son propre chef.
+ *
+ * Jusqu'ici, seul l'animateur pouvait poser le statut « parti » : pour
+ * s'en aller, il fallait demander à être exclu. Sur un parcours qui touche
+ * à la confession et aux blessures, c'était une impasse.
+ *
+ * La porte de sortie est plus large que la trappe : partir ne demande ni
+ * justification ni approbation, et les écrits personnels restent. Un seul
+ * refus — l'animateur unique ne peut pas laisser le groupe sans personne
+ * pour clôturer les rencontres. Il doit d'abord nommer un adjoint.
+ */
+export async function leaveGroup(
+  groupId: string,
+  uid: string
+): Promise<{ parti: true } | { parti: false; raison: string }> {
+  const [group, member, membres] = await Promise.all([
+    getGroup(groupId),
+    getMembership(groupId, uid),
+    getMembers(groupId),
+  ]);
+  if (!group || !member) return { parti: false, raison: 'Groupe introuvable.' };
+
+  if (member.role === 'animateur') {
+    const actifs = membres.filter((m) => m.status === 'actif' && m.uid !== uid);
+    const releve = actifs.some((m) => m.role === 'animateur' || m.role === 'co_animateur');
+    if (actifs.length && !releve) {
+      return {
+        parti: false,
+        raison:
+          'Vous animez ce groupe et personne ne peut prendre la suite. Nommez d’abord un adjoint : sans animateur, plus aucune rencontre ne pourrait être clôturée.',
+      };
+    }
+  }
+
+  // L'ordre compte : les règles Firestore n'autorisent le décompte qu'à un
+  // membre actif. Se déclarer « parti » d'abord ferait rejeter la seconde
+  // écriture, et le groupe afficherait une place occupée par personne.
+  if (member.status === 'actif') {
+    await writeGroup({ ...group, membersCount: Math.max(0, group.membersCount - 1) });
+  }
+  await writeMember({ ...member, status: 'parti' });
+  return { parti: true };
+}
+
 export async function setMemberRole(
   groupId: string,
   uid: string,
@@ -1230,6 +1277,46 @@ export async function getPosts(groupId: string): Promise<GroupPost[]> {
     }
   }
   return lsGet<GroupPost[]>(KEY.posts(groupId), []).sort((a, b) => b.createdAt - a.createdAt);
+}
+
+/**
+ * Ajoute une réponse brève à un message du mur.
+ *
+ * Les réponses vivent dans le document du message plutôt que dans une
+ * sous-collection : elles sont peu nombreuses et courtes par construction,
+ * et les garder ensemble évite une requête par message à l'affichage.
+ */
+export async function addReply(
+  groupId: string,
+  postId: string,
+  auteur: { uid: string; nom: string },
+  contenu: string
+): Promise<GroupPost | null> {
+  const posts = await getPosts(groupId);
+  const post = posts.find((p) => p.id === postId);
+  if (!post) return null;
+
+  const propre = contenu.trim().slice(0, LONGUEUR_REPONSE);
+  if (!propre) return post;
+
+  const reponses = post.replies ?? [];
+  if (reponses.length >= REPONSES_MAX) return post;
+
+  const suivant: GroupPost = {
+    ...post,
+    replies: [
+      ...reponses,
+      {
+        id: `r${Date.now().toString(36)}`,
+        authorId: auteur.uid,
+        authorName: auteur.nom,
+        content: propre,
+        createdAt: Date.now(),
+      },
+    ],
+  };
+  await writePost(suivant);
+  return suivant;
 }
 
 async function writePost(post: GroupPost): Promise<void> {

@@ -192,6 +192,29 @@ export interface UserProfile {
 
 export type GroupPostKind = 'priere' | 'partage' | 'pepite' | 'annonce' | 'louange';
 
+/**
+ * Une réponse à un message du mur.
+ *
+ * Volontairement brève : « je prie pour toi », « ça m'a parlé aussi ». Le mur
+ * n'est pas un salon de discussion — ce qui se dit longuement se dit à la
+ * rencontre, où l'on s'entend et se voit. La limite n'est pas une contrainte
+ * technique, c'est le sens de l'endroit.
+ */
+export interface GroupReply {
+  id: string;
+  authorId: string;
+  authorName: string;
+  /** Au plus `LONGUEUR_REPONSE` caractères. */
+  content: string;
+  createdAt: number;
+}
+
+/** Ce qu'une réponse au mur peut contenir, au plus. */
+export const LONGUEUR_REPONSE = 200;
+
+/** Au-delà, le fil devient une conversation : elle a sa place ailleurs. */
+export const REPONSES_MAX = 20;
+
 export interface GroupPost {
   id: string;
   groupId: string;
@@ -207,6 +230,8 @@ export interface GroupPost {
   amenBy: string[];
   answered?: boolean;
   answeredAt?: number;
+  /** Réponses brèves des autres membres. */
+  replies?: GroupReply[];
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -53,7 +53,13 @@ service cloud.firestore {
       allow create: if connecte()
         && request.resource.data.leaderId == moi()
         && request.resource.data.membersCount == 1;
-      allow update, delete: if estAnimateur(groupId);
+      allow update: if estAnimateur(groupId)
+        // Un membre qui s'en va décrémente le compteur. Il ne peut toucher
+        // qu'à ce champ, et seulement pour le faire baisser.
+        || (estMembre(groupId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['membersCount'])
+          && request.resource.data.membersCount < resource.data.membersCount);
+      allow delete: if estAnimateur(groupId);
 
       match /members/{memberId} {
         allow read: if connecte() && (moi() == memberId || estMembre(groupId));
@@ -72,7 +78,13 @@ service cloud.firestore {
           || (connecte()
             && moi() == memberId
             && request.resource.data.diff(resource.data).affectedKeys()
-              .hasOnly(['preparedSteps', 'personalStep', 'nextAttendance', 'lastSeenAt']));
+              .hasOnly(['preparedSteps', 'personalStep', 'nextAttendance', 'lastSeenAt']))
+          // Partir de son propre chef. Uniquement vers « parti » : se poser
+          // soi-même en « actif » reviendrait à s'auto-approuver.
+          || (connecte()
+            && moi() == memberId
+            && request.resource.data.status == 'parti'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']));
         allow delete: if estAnimateur(groupId);
       }
 
@@ -98,6 +110,10 @@ service cloud.firestore {
           && request.resource.data.groupId == groupId;
         allow update: if estMembre(groupId) && (
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['prayedBy', 'amenBy'])
+          // Répondre brièvement. Seul ce champ bouge : le message d'origine
+          // ne peut pas être réécrit au passage.
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['replies'])
+            && request.resource.data.replies.size() <= 20)
           || ((resource.data.authorId == moi() || estAnimateur(groupId))
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answered', 'answeredAt']))
         );
