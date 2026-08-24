@@ -108,7 +108,10 @@ graph TD
 
 ## ⚙️ 6. Guide de Déploiement & Maintenance
 
-### 1. Variables d'Environnement (`.env.local`)
+### 1. Variables d'Environnement
+
+Configuration publique de l'application dans `.env.local` :
+
 ```env
 # Configuration Firebase (Spark - Gratuit)
 NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
@@ -117,9 +120,16 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=les-fondements
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=les-fondements.firebasestorage.app
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 NEXT_PUBLIC_FIREBASE_APP_ID=1:...
+```
 
-# Clé ElevenLabs (Optionnelle, uniquement pour scripts de génération audio en local)
+Les identifiants ElevenLabs ne servent qu'aux scripts locaux. Placez-les dans
+un fichier séparé `.env.voice.local` afin qu'ils ne soient jamais chargés par
+le build de production :
+
+```dotenv
 ELEVENLABS_API_KEY=sk_...
+ELEVENLABS_VOICE_ID=...
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2
 ```
 
 ### 2. Déploiement sur Cloudflare Workers (Production)
@@ -143,7 +153,7 @@ npx firebase-tools deploy --only firestore:rules,firestore:indexes
 npm run voix:estimation
 
 # Générer la voix pour une fiche spécifique (ex: fiche 1)
-node --env-file=.env.local scripts/generer-voix.mjs --fiches 1
+node --env-file=.env.voice.local scripts/generer-voix.mjs --fiches 1
 
 # Régénérer le manifeste après ajout de voix humaines réelles dans public/voix/humaine/
 npm run voix:manifeste
