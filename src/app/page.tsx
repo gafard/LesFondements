@@ -70,10 +70,10 @@ const rhythms = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#f8f3e9] text-slate-900 selection:bg-amber-300 selection:text-slate-950 relative overflow-hidden">
+    <div className="table-travail min-h-screen text-encre-900 selection:bg-amber-300 selection:text-slate-950 relative overflow-hidden">
       
       {/* Subtle Background Watermark Typography */}
-      <div className="watermark-text absolute right-6 top-32 text-[15vw] opacity-35 select-none">
+      <div className="watermark-text absolute right-6 top-32 text-[15vw] opacity-30 select-none">
         FONDEMENTS
       </div>
 
@@ -98,57 +98,35 @@ export default function Home() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full py-12">
           <div className="max-w-2xl">
-            
-            {/* Top Subtitle */}
-            <p className="mb-4 font-serif italic text-amber-300/90 text-sm sm:text-base tracking-wide">
-              Parcours de formation de disciples • 20 étapes
-            </p>
+            <span className="timbre rounded-md px-3.5 py-1 text-2xs font-bold text-or-300 border-or-400/40">
+              LE PARCOURS DES 20 FONDEMENTS
+            </span>
 
-            {/* Main Headline */}
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold leading-[1.04] tracking-tight text-[#fff8e8]">
-              Une foi <span className="text-amber-300 italic">enracinée.</span><br />
-              Une vie transformée.
+            <h1 className="mt-5 font-serif text-4xl font-bold leading-[1.08] text-parchemin-100 sm:text-6xl lg:text-7xl">
+              Ancrer sa foi.<br />
+              <span className="italic text-or-400">Grandir ensemble.</span>
             </h1>
 
-            {/* Subtitle */}
-            <p className="mt-6 text-base sm:text-lg leading-relaxed text-slate-200 max-w-xl">
-              Vingt fiches préparées chez soi, vingt rencontres à cinq ou six. Rejoignez un
-              groupe près de chez vous, ou rassemblez le vôtre : c&apos;est lui qui ouvre le
-              parcours.
+            <p className="mt-6 text-base leading-relaxed text-parchemin-100/80 sm:text-lg">
+              Un parcours interactif de 20 fiches pour plonger dans les fondements de la vie chrétienne,
+              seul dans le secret et chaque semaine en cellule de communion.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-400 hover:bg-amber-300 px-8 py-4 text-sm font-bold text-[#07162b] shadow-lg shadow-amber-400/20 transition-all hover:-translate-y-0.5"
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-xs font-bold shadow-lg"
               >
-                Trouver mon groupe <ArrowRight className="h-4 w-4" />
+                Rejoindre ou créer une cellule
+                <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/ressources"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 hover:bg-white/15 px-7 py-4 text-sm font-semibold text-white backdrop-blur-md transition-colors"
+                href="/fiches"
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3.5 text-xs font-bold text-white backdrop-blur-xs transition-colors hover:bg-white/20"
               >
-                Comment ça se vit
+                Découvrir le sentier
               </Link>
             </div>
-
-            {/* 3 Trust Pillars */}
-            <div className="mt-12 grid grid-cols-3 gap-4 border-t border-white/10 pt-6 max-w-lg">
-              <div>
-                <span className="font-serif text-2xl sm:text-3xl font-bold text-amber-300">20</span>
-                <p className="text-2xs sm:text-xs text-slate-300 mt-0.5">Fiches illustrées</p>
-              </div>
-              <div>
-                <span className="font-serif text-2xl sm:text-3xl font-bold text-amber-300">~5</span>
-                <p className="text-2xs sm:text-xs text-slate-300 mt-0.5">Mois de cheminement</p>
-              </div>
-              <div>
-                <span className="font-serif text-2xl sm:text-3xl font-bold text-amber-300">5-6</span>
-                <p className="text-2xs sm:text-xs text-slate-300 mt-0.5">Personnes par cellule</p>
-              </div>
-            </div>
-
           </div>
         </div>
       </section>
@@ -158,39 +136,40 @@ export default function Home() {
       {/* ==================================================================== */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <p className="mb-2 font-serif italic text-amber-800 text-xs sm:text-sm">
+          <p className="manuscrit mb-2 text-xl text-or-800">
             Avant la première fiche
           </p>
           <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
             Le parcours ne
             <span className="italic text-or-600"> s&apos;ouvre pas seul.</span>
           </h2>
-          <p className="mt-4 text-sm leading-relaxed text-encre-600 sm:text-base">
+          <p className="mt-4 text-xs sm:text-sm leading-relaxed text-encre-700">
             Tant qu&apos;il n&apos;y a pas de groupe, les fiches restent fermées. C&apos;est la
             règle du livret, et c&apos;est ce qui fait tenir les cinq mois.
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <div className="parchment-card rounded-4xl p-7">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-or-50 text-or-700">
+          <div className="feuille pose-1 relative rounded-3xl border border-parchemin-300 p-7 shadow-sm transition-all hover:shadow-md">
+            <span className="punaise -top-2.5 left-8" />
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-or-50 text-or-700 shadow-xs">
               <Search className="h-5 w-5" />
             </span>
             <h3 className="mt-5 font-serif text-2xl font-bold text-encre-950">
               Rejoindre un groupe
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-encre-600">
+            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-encre-600">
               Vous indiquez votre ville — ou vous laissez l&apos;application vous situer. Les
               groupes vous sont proposés du plus proche au plus lointain, avec les places qui
               restent et le jour où ils se retrouvent.
             </p>
-            <ul className="mt-5 space-y-2 border-t border-parchemin-300 pt-4">
+            <ul className="mt-5 space-y-2 border-t border-parchemin-300/80 pt-4">
               {[
                 'Seuls les groupes non complets sont proposés',
                 'Vous envoyez une demande, l’animateur vous accueille',
                 'Aucun groupe autour de vous ? Il en existe un 100 % en ligne',
               ].map((ligne) => (
-                <li key={ligne} className="flex gap-2.5 text-2xs leading-relaxed text-encre-600">
+                <li key={ligne} className="flex gap-2.5 text-2xs leading-relaxed text-encre-700">
                   <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-or-600" />
                   {ligne}
                 </li>
@@ -198,24 +177,25 @@ export default function Home() {
             </ul>
           </div>
 
-          <div className="parchment-card rounded-4xl p-7">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-or-50 text-or-700">
+          <div className="feuille pose-2 relative rounded-3xl border border-parchemin-300 p-7 shadow-sm transition-all hover:shadow-md">
+            <span className="ruban -top-2.5 left-8 -rotate-1 rounded-[2px]" />
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-or-50 text-or-700 shadow-xs">
               <Flame className="h-5 w-5" />
             </span>
             <h3 className="mt-5 font-serif text-2xl font-bold text-encre-950">
               Créer le vôtre
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-encre-600">
+            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-encre-600">
               Vous avez déjà quelques personnes en tête. Vous fixez le jour, l&apos;heure et le
               lieu, puis vous les invitez par e-mail ou en partageant un code.
             </p>
-            <ul className="mt-5 space-y-2 border-t border-parchemin-300 pt-4">
+            <ul className="mt-5 space-y-2 border-t border-parchemin-300/80 pt-4">
               {[
                 'Présentiel, visio, ou les deux à la fois',
                 'Chacun annonce s’il vient sur place ou se connecte',
                 'Le déroulé de la rencontre est guidé, étape par étape',
               ].map((ligne) => (
-                <li key={ligne} className="flex gap-2.5 text-2xs leading-relaxed text-encre-600">
+                <li key={ligne} className="flex gap-2.5 text-2xs leading-relaxed text-encre-700">
                   <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-or-600" />
                   {ligne}
                 </li>
@@ -267,132 +247,123 @@ export default function Home() {
       {/* ==================================================================== */}
       {/* SECTION 2 : LE RYTHME HEBDOMADAIRE                                   */}
       {/* ==================================================================== */}
-      <section id="experience" className="px-4 py-20 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section id="experience" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <p className="font-serif italic text-amber-800 text-xs sm:text-sm mb-2">
+        <div className="mx-auto mb-16 max-w-3xl text-center">
+          <p className="manuscrit mb-2 text-xl text-or-800">
             Le rythme d&apos;apprentissage
           </p>
-          <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#07162b] leading-tight">
+          <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
             Trois temps forts.<br />
-            <span className="italic text-amber-700">Une seule transformation.</span>
+            <span className="italic text-or-600">Une seule transformation.</span>
           </h2>
-          <p className="mt-4 text-slate-600 text-sm sm:text-base leading-relaxed">
+          <p className="mt-4 text-xs sm:text-sm leading-relaxed text-encre-600">
             Le livret a été pensé pour que chaque semaine s’articule autour de 3 piliers complémentaires :
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {rhythms.map((rhythm, index) => (
-            <div
-              key={rhythm.title}
-              className="parchment-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
-            >
-              <div>
-                {/* Warm Photo Header */}
-                <div className="relative h-44 w-full rounded-2xl overflow-hidden mb-6 shadow-xs">
-                  <Image
-                    src={rhythm.image}
-                    alt={rhythm.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <span className="absolute bottom-3 left-3 font-serif text-3xl text-white font-bold drop-shadow-md">
-                    0{index + 1}
+        <div className="grid gap-8 md:grid-cols-3">
+          {rhythms.map((rhythm, index) => {
+            const poses = ['pose-1', 'pose-2', 'pose-3'];
+            const pose = poses[index % poses.length];
+
+            return (
+              <div
+                key={rhythm.title}
+                className={`feuille ${pose} relative flex flex-col justify-between overflow-hidden rounded-3xl border border-parchemin-300 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:p-7`}
+              >
+                <span className="ruban -top-2.5 left-8 -rotate-1 rounded-[2px]" />
+                <div>
+                  {/* Warm Photo Header */}
+                  <div className="relative mb-6 h-44 w-full overflow-hidden rounded-2xl shadow-2xs">
+                    <Image
+                      src={rhythm.image}
+                      alt={rhythm.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover object-center transition-transform duration-500 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <span className="absolute bottom-3 left-3 font-serif text-3xl font-bold text-white drop-shadow-md">
+                      0{index + 1}
+                    </span>
+                  </div>
+                  
+                  <span className="timbre rounded-md px-3 py-1 text-2xs font-bold text-or-800">
+                    {rhythm.eyebrow}
                   </span>
+
+                  <h3 className="mb-2 mt-3 font-serif text-xl font-bold text-encre-950 sm:text-2xl">{rhythm.title}</h3>
+                  <p className="text-xs sm:text-sm leading-relaxed text-encre-600">{rhythm.text}</p>
                 </div>
-                
-                <span className={`text-2xs font-bold px-3 py-1 rounded-full border ${rhythm.badgeColor}`}>
-                  {rhythm.eyebrow}
-                </span>
 
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#07162b] mt-3 mb-2">{rhythm.title}</h3>
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{rhythm.text}</p>
+                <div className="mt-6 flex items-center gap-2 border-t border-parchemin-300/80 pt-4 text-2xs font-semibold text-or-800">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-or-600" /> Engagement fraternel
+                </div>
               </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-2xs font-semibold text-amber-800">
-                <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" /> Engagement fraternel
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
       {/* ==================================================================== */}
       {/* SECTION 3 : LA FEUILLE DE ROUTE (ROADMAP 4 CHAPITRES)                 */}
       {/* ==================================================================== */}
-      <section className="editorial-paper px-4 py-24 sm:px-6 lg:px-8 border-y border-[#ded6c8] relative">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
           
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <p className="font-serif italic text-amber-800 text-xs sm:text-sm mb-2">
+          <div className="mx-auto mb-16 max-w-3xl text-center">
+            <p className="manuscrit mb-2 text-xl text-or-800">
               La feuille de route
             </p>
-            <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#07162b] leading-tight">
-              20 étapes.<br /><span className="italic text-amber-800">Un sentier qui vous déplace.</span>
+            <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
+              20 étapes.<br /><span className="italic text-or-600">Un sentier qui vous déplace.</span>
             </h2>
-            <p className="mt-4 text-slate-600 text-sm sm:text-base">
+            <p className="mt-4 text-xs sm:text-sm leading-relaxed text-encre-600">
               Le parcours avance comme une histoire vivante : recevoir, être transformé, devenir disciple, puis demeurer et transmettre.
             </p>
           </div>
 
           {/* 4 Grand Chapters Cards */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {chapters.map((chapter, index) => (
-              <div
-                key={chapter.range}
-                className={`relative z-10 rounded-3xl p-7 shadow-md border transition-all hover:-translate-y-1 ${
-                  index % 2 === 0
-                    ? 'bg-[#fffaf0] border-amber-200/90 text-slate-900'
-                    : 'bg-[#07162b] border-[#0b2447] text-white'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`text-2xs font-bold uppercase tracking-wider ${index % 2 === 0 ? 'text-amber-800' : 'text-amber-300'}`}>
-                    Chapitre {index + 1}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {chapters.map((chapter, index) => {
+              const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
+              const pose = poses[index % poses.length];
+
+              return (
+                <div
+                  key={chapter.range}
+                  className={`feuille ${pose} relative z-10 rounded-3xl border border-parchemin-300 p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md`}
+                >
+                  <span className="punaise -top-2.5 left-6" />
+                  <span className="timbre block w-fit rounded px-2.5 py-0.5 text-2xs font-bold text-or-800">
+                    {chapter.badge}
                   </span>
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-serif text-xs font-bold ${
-                    index % 2 === 0 ? 'bg-amber-300 text-slate-900 shadow-xs' : 'bg-white/10 text-amber-300'
-                  }`}>
-                    {index + 1}
+                  <span className="mt-4 block font-mono text-xs font-bold tracking-widest text-encre-400">
+                    FICHES {chapter.range}
                   </span>
+                  <h3 className="mt-1 font-serif text-2xl font-bold text-encre-950">
+                    {chapter.title}
+                  </h3>
+                  <p className="mt-2.5 text-xs leading-relaxed text-encre-600">
+                    {chapter.detail}
+                  </p>
                 </div>
-
-                <p className={`font-serif text-3xl font-bold mb-1 ${index % 2 === 0 ? 'text-amber-800' : 'text-amber-300'}`}>
-                  {chapter.range}
-                </p>
-
-                <h3 className="font-serif text-xl font-bold mb-2">{chapter.title}</h3>
-                <p className={`text-xs leading-relaxed ${index % 2 === 0 ? 'text-slate-600' : 'text-slate-300'}`}>
-                  {chapter.detail}
-                </p>
-
-                <div className="mt-6 pt-4 border-t border-slate-200/40 flex items-center justify-between">
-                  <span className={`text-2xs font-bold ${index % 2 === 0 ? 'text-amber-800' : 'text-amber-300'}`}>
-                    5 semaines
-                  </span>
-                  <span className={`text-2xs font-bold ${index % 2 === 0 ? 'text-slate-400' : 'text-slate-400'}`}>
-                    Fiches {chapter.range}
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-14 text-center">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full bg-[#07162b] hover:bg-indigo-950 text-white px-8 py-4 text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95"
+              className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-xs font-bold shadow-lg"
             >
-              Trouver un groupe et ouvrir la fiche 1 <ArrowRight className="h-4 w-4 text-amber-300" />
+              Trouver un groupe et ouvrir la fiche 1 <ArrowRight className="h-4 w-4" />
             </Link>
-            <p className="mx-auto mt-3 max-w-sm text-2xs leading-relaxed text-slate-500">
+            <p className="mx-auto mt-3 max-w-sm text-2xs leading-relaxed text-encre-500">
               Les fiches s&apos;ouvrent une à une, au rythme de votre groupe.
             </p>
           </div>
-
         </div>
       </section>
 

@@ -99,15 +99,15 @@ function SentierContent() {
   const prochaine = group ? nextMeetingDate(group.meeting, group.stepOpenedAt) : null;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-parchemin-100 pb-10 pt-6 text-encre-900">
-      <div className="watermark-text absolute right-4 top-24 select-none text-[12vw] opacity-40">
+    <div className="table-travail min-h-screen pb-16 pt-6 text-encre-900">
+      <div className="watermark-text absolute right-4 top-24 select-none text-[12vw] opacity-35">
         PARCOURS
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* ── En-tête ── */}
         <div className="mx-auto mb-10 max-w-3xl text-center">
-          <p className="mb-2 font-serif italic text-amber-800 text-xs sm:text-sm">
+          <p className="manuscrit mb-2 text-xl text-or-800">
             Vingt fiches • Environ cinq mois de marche partagée
           </p>
 
@@ -115,7 +115,7 @@ function SentierContent() {
             Le sentier des <span className="italic text-or-600">20 fondements</span>
           </h1>
 
-          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-encre-600">
+          <p className="mx-auto max-w-2xl text-xs sm:text-sm leading-relaxed text-encre-700">
             Une fiche s&apos;ouvre quand la précédente a été partagée en groupe. Vous la préparez
             chez vous, puis vous la vivez ensemble.
           </p>
@@ -123,20 +123,23 @@ function SentierContent() {
 
         {/* ── Bandeau du groupe ── */}
         {group && (
-          <div className="mb-8 overflow-hidden rounded-3xl border border-parchemin-400 bg-white shadow-sm">
-            <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="feuille relative mb-8 overflow-hidden rounded-3xl border border-parchemin-400 p-5 sm:p-6 shadow-md">
+            <span className="punaise -top-2.5 left-8" />
+            <span className="ruban -top-3 right-10 rotate-2 rounded-[2px]" />
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-encre-950 text-or-300">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-encre-950 text-or-300 shadow-xs">
                   <Flag className="h-6 w-6" strokeWidth={1.75} />
                 </span>
                 <div>
                   <p className="flex flex-wrap items-center gap-2 text-2xs font-bold uppercase tracking-[0.16em] text-encre-400">
                     {group.name}
-                    <span className="rounded-full bg-or-100 px-2 py-0.5 text-or-700">
+                    <span className="timbre rounded-md px-2.5 py-0.5 text-2xs font-bold text-or-800">
                       Fiche {group.currentStep} sur 20
                     </span>
                   </p>
-                  <p className="mt-1 font-serif text-sm font-bold text-encre-950">
+                  <p className="mt-1 font-serif text-base font-bold text-encre-950">
                     {terminees} fiche{terminees > 1 ? 's' : ''} partagée
                     {terminees > 1 ? 's' : ''} en groupe ({pourcentage} %)
                   </p>
@@ -206,7 +209,9 @@ function SentierContent() {
                 <section key={chapitre.id} className="relative">
                   {/* Le seuil du chapitre : un chiffre romain démesuré, un
                       ruban qui traverse, et le titre posé dessus. */}
-                  <div className="relative mb-12 overflow-hidden rounded-4xl border border-parchemin-400 bg-white/70 px-6 py-10 text-center sm:px-10 sm:py-14">
+                  <div className="feuille relative mb-12 overflow-hidden rounded-3xl border border-parchemin-400 px-6 py-10 text-center shadow-md sm:px-10 sm:py-14">
+                    <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
+                    <span className="ruban -top-3 right-12 rotate-2 rounded-[2px]" />
                     {/* Le mot du chapitre, en très grand derrière le titre.
                         Un chiffre romain seul rendait comme un simple fût. */}
                     <MotFantome
@@ -434,20 +439,22 @@ function EtapeSentier({
     >
       <div className="w-full pl-14 md:w-1/2 md:pl-0">
         {fermee ? (
-          <div className="cursor-not-allowed rounded-3xl border border-dashed border-parchemin-400 bg-parchemin-50/70 p-6 sm:p-7">
+          <div className="cursor-not-allowed rounded-3xl border border-dashed border-parchemin-400 bg-parchemin-50/50 p-6 opacity-60 sm:p-7">
             {carte}
           </div>
         ) : (
           <Link
             href={`/fiches/${fiche.id}`}
-            className={`parchment-card group relative block overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 sm:p-7 ${
+            className={`feuille group relative block overflow-hidden rounded-3xl p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:p-7 ${
               etat === 'terminee'
-                ? 'border-emerald-200'
+                ? 'border-emerald-300'
                 : courante
-                  ? 'border-or-400 bg-gradient-to-br from-or-50/60 to-white ring-4 ring-or-200/40'
-                  : ''
+                  ? 'border-2 border-or-500 shadow-md ring-2 ring-or-300/50'
+                  : 'border border-parchemin-300'
             }`}
           >
+            {courante && <span className="punaise punaise-rouge -top-2.5 right-6" />}
+            <span className="ruban -top-2.5 left-8 -rotate-1 rounded-[2px]" />
             {carte}
           </Link>
         )}

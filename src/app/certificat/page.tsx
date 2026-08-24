@@ -25,33 +25,34 @@ function CertificatPage() {
   // groupe est allé au bout des vingt fiches, ensemble.
   if (!acheve) {
     return (
-      <div className="min-h-screen bg-parchemin-100 px-4 pb-10 pt-6">
-        <div className="mx-auto max-w-lg text-center">
+      <div className="table-travail min-h-screen px-4 pb-16 pt-6">
+        <div className="feuille relative mx-auto max-w-lg rounded-3xl border border-parchemin-300 p-8 text-center shadow-lg sm:p-10">
+          <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
           <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-parchemin-200 text-encre-400">
             <Lock className="h-7 w-7" strokeWidth={1.5} />
           </span>
           <h1 className="mt-6 font-serif text-3xl font-bold text-encre-950">
             L&apos;attestation vous attend au bout
           </h1>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-encre-600">
+          <p className="mx-auto mt-4 max-w-md text-xs sm:text-sm leading-relaxed text-encre-600">
             {group
               ? `${group.name} a partagé ${achevees} fiche${achevees > 1 ? 's' : ''} sur 20. L'attestation se délivre quand la vingtième est refermée.`
               : "Elle se délivre quand les vingt fiches ont été partagées avec votre groupe."}
           </p>
 
           <div className="mx-auto mt-8 max-w-sm">
-            <div className="h-2 overflow-hidden rounded-full bg-parchemin-300">
+            <div className="h-2.5 overflow-hidden rounded-full bg-parchemin-300">
               <span
                 className="block h-full rounded-full bg-gradient-to-r from-or-400 to-or-600 transition-all duration-700"
                 style={{ width: `${(achevees / 20) * 100}%` }}
               />
             </div>
-            <p className="mt-2 text-2xs font-bold text-or-700">{achevees} / 20</p>
+            <p className="manuscrit mt-2 text-base font-bold text-or-800">{achevees} / 20 fiches complétées</p>
           </div>
 
           <Link
             href="/fiches"
-            className="bouton-or mt-8 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold"
+            className="bouton-or mt-8 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-xs font-bold shadow-md"
           >
             Reprendre le sentier
           </Link>
@@ -61,46 +62,45 @@ function CertificatPage() {
   }
 
   return (
-    <div className="min-h-screen pb-10 pt-6 bg-slate-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+    <div className="table-travail min-h-screen pb-16 pt-6">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
 
         {/* Top Controls */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 print:hidden">
+        <div className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row print:hidden">
           <Link
             href="/dashboard"
-            className="text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-1.5"
+            className="flex items-center gap-1.5 text-xs font-semibold text-encre-600 hover:text-encre-950"
           >
-            <ArrowLeft className="w-4 h-4" /> Retour au tableau de bord
+            <ArrowLeft className="h-4 w-4" /> Retour à la table de travail
           </Link>
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 font-medium">Nom affiché :</span>
+              <span className="text-xs font-medium text-encre-500">Nom affiché :</span>
               <input
                 type="text"
                 value={recipientName}
                 onChange={(e) => setRecipientName(e.target.value)}
-                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 font-semibold focus:ring-2 focus:ring-amber-500"
+                className="rounded-xl border border-parchemin-400 bg-white px-3 py-1.5 text-xs font-bold text-encre-900 shadow-2xs outline-none focus:border-or-400"
               />
             </div>
 
             <button
               onClick={handlePrint}
-              className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors"
+              className="bouton-or flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold shadow-sm"
             >
-              <Printer className="w-4 h-4" /> Imprimer / PDF
+              <Printer className="h-4 w-4" /> Imprimer / PDF
             </button>
           </div>
         </div>
 
         {/* CERTIFICATE CANVAS */}
-        <div className="bg-white p-8 sm:p-12 md:p-16 rounded-3xl border-8 border-double border-amber-300/80 shadow-xl relative overflow-hidden text-center">
-          
-          {/* Subtle Background Pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
+        <div className="feuille feuille-dechiree relative overflow-hidden rounded-4xl border-4 border-or-400/70 p-8 text-center shadow-2xl sm:p-12 md:p-16">
+          <span className="ruban -top-3 left-12 -rotate-2 rounded-[2px]" />
+          <span className="ruban -top-3 right-12 rotate-2 rounded-[2px]" />
 
           {/* Top Logo / Seal */}
-          <div className="w-20 h-20 relative mx-auto mb-6 drop-shadow-md">
+          <div className="relative mx-auto mb-6 h-20 w-20 drop-shadow-md">
             <Image
               src="/logo.png"
               alt="Sceau officiel Les Fondements"
@@ -111,55 +111,56 @@ function CertificatPage() {
             />
           </div>
 
-          <p className="font-serif italic text-amber-800 text-xs sm:text-sm mb-3">
+          <p className="manuscrit mb-2 text-2xl text-or-800">
             Attestation d&apos;achèvement du parcours
           </p>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-2">
+          <h1 className="mb-2 font-serif text-3xl font-bold text-encre-950 sm:text-4xl md:text-5xl">
             Le Parcours des Fondements
           </h1>
           
-          <p className="text-sm sm:text-base text-slate-500 italic mb-8">
+          <p className="mb-8 font-serif text-sm italic text-encre-600 sm:text-base">
             Formation chrétienne & maturité spirituelle en 20 modules
           </p>
 
-          <p className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">
-            Ce certificat atteste avec joie que
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-encre-400">
+            Ce parchemin atteste avec joie que
           </p>
 
-          <div className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-indigo-950 border-b-2 border-amber-300 inline-block px-8 py-2 mb-6">
+          <div className="manuscrit mb-6 inline-block border-b-2 border-or-400 px-8 py-2 text-3xl font-bold text-or-900 sm:text-4xl md:text-5xl">
             {recipientName}
           </div>
 
-          <p className="text-sm text-slate-700 max-w-xl mx-auto leading-relaxed mb-8">
+          <p className="mx-auto mb-8 max-w-xl text-sm leading-relaxed text-encre-800">
             a parcouru les 20 fiches d&apos;enseignement, de méditation biblique, de prière et de
             partage{group ? ` au sein du groupe « ${group.name} »` : ''}, jusqu&apos;au bout.
           </p>
 
           {/* Key Verse Quote (From booklet cover) */}
-          <div className="bg-amber-50/80 rounded-2xl p-5 border border-amber-200/80 max-w-2xl mx-auto mb-10 text-amber-900">
-            <p className="font-serif italic text-xs sm:text-sm leading-relaxed mb-1">
-              &quot;Notre but est de placer tout homme en présence de Dieu et d&apos;amener les chrétiens à leur pleine maturité spirituelle par une communion vivante avec le Christ.&quot;
+          <div className="mx-auto mb-10 max-w-2xl rounded-2xl border border-or-300 bg-amber-50/60 p-5 text-encre-900 shadow-xs">
+            <p className="font-serif text-sm italic leading-relaxed">
+              « Que tout homme soit placé en présence de Dieu et amené à sa pleine maturité spirituelle par une communion vivante avec le Christ. »
             </p>
-            <span className="text-xs font-bold text-amber-800">
-              — Colossiens 1:28 (Parole Vivante)
-            </span>
+            <p className="manuscrit mt-1 text-base text-or-800 font-bold">Colossiens 1:28</p>
           </div>
 
-          {/* Signatures & Validation Footer */}
-          <div className="grid grid-cols-2 gap-8 pt-6 border-t border-slate-200 text-left">
-            <div>
-              <span className="text-2xs text-slate-400 uppercase font-semibold block mb-1">Délivré le</span>
-              <p className="text-xs font-bold text-slate-800">{completionDate}</p>
-              <p className="text-2xs text-slate-500">moneglisepreferee.net</p>
+          {/* Footer signatures & date */}
+          <div className="mt-8 flex flex-col items-center justify-between gap-6 border-t border-parchemin-300/80 pt-8 sm:flex-row">
+            <div className="text-left">
+              <span className="block text-2xs uppercase tracking-wider text-encre-400">Délivré le</span>
+              <span className="manuscrit text-xl font-bold text-encre-900">{completionDate}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="timbre rounded-md px-3 py-1.5 text-xs font-bold text-or-800">
+                SCEAU DE CELLULE VALIDÉ
+              </span>
             </div>
 
             <div className="text-right">
-              <span className="text-2xs text-slate-400 uppercase font-semibold block mb-1">Attestation</span>
-              <p className="text-xs font-bold text-indigo-700 flex items-center justify-end gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Validé & Confirmé
-              </p>
-              <p className="text-2xs text-slate-500 font-mono">ID: FOND-{user?.uid?.substring(0, 8).toUpperCase() || 'COMPLETED'}</p>
+              <span className="block text-2xs uppercase tracking-wider text-encre-400">Pour la cellule</span>
+              <span className="manuscrit text-xl font-bold text-encre-950">{group?.name || 'Groupe des Fondements'}</span>
+              <p className="text-2xs font-mono text-encre-400">ID: FOND-{user?.uid?.substring(0, 8).toUpperCase() || 'COMPLETED'}</p>
             </div>
           </div>
 

@@ -61,16 +61,16 @@ function TemoignagesContent() {
   };
 
   return (
-    <div className="min-h-screen bg-parchemin-100 pb-10 pt-6">
+    <div className="table-travail min-h-screen pb-16 pt-6">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="mb-8 text-center">
-          <p className="mb-2 font-serif italic text-amber-800 text-xs sm:text-sm">
+        <div className="mx-auto mb-8 max-w-2xl text-center">
+          <p className="manuscrit mb-2 text-xl text-or-800">
             Mémoire & témoignages de la cellule « {group.name} »
           </p>
           <h1 className="font-serif text-3xl font-bold text-encre-950 sm:text-4xl">
             Ce que Dieu a fait
           </h1>
-          <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-encre-600">
+          <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-encre-600 sm:text-sm">
             Les témoignages restent dans votre groupe. On y revient souvent : c&apos;est la mémoire
             de ce qui a changé pendant ces mois.
           </p>
@@ -79,7 +79,7 @@ function TemoignagesContent() {
         {!formulaire ? (
           <button
             onClick={() => setFormulaire(true)}
-            className="bouton-or mx-auto mb-8 flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold"
+            className="bouton-or mx-auto mb-8 flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold shadow-md"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             Déposer un témoignage
@@ -87,8 +87,9 @@ function TemoignagesContent() {
         ) : (
           <form
             onSubmit={publier}
-            className="mb-8 rounded-4xl border border-parchemin-400 bg-white p-5 shadow-sm sm:p-6"
+            className="feuille relative mb-8 rounded-3xl border border-parchemin-300 p-6 shadow-md"
           >
+            <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-serif text-lg font-bold text-encre-950">Votre témoignage</h2>
               <button
@@ -101,32 +102,38 @@ function TemoignagesContent() {
               </button>
             </div>
 
-            <label className="mb-2 block text-2xs font-bold uppercase tracking-[0.16em] text-encre-400">
-              À propos de quelle fiche ?
-            </label>
-            <select
-              value={ficheChoisie}
-              onChange={(event) => setFicheChoisie(Number(event.target.value))}
-              className="mb-4 w-full rounded-2xl border border-parchemin-400 bg-parchemin-50 px-4 py-3 text-sm text-encre-800 outline-none focus:border-or-400"
-            >
-              {fichesOuvertes.map((meta) => (
-                <option key={meta.id} value={meta.id}>
-                  Fiche {meta.id} — {meta.titre}
-                </option>
-              ))}
-            </select>
+            <div className="mb-4">
+              <label className="mb-1 block text-2xs font-bold uppercase tracking-wider text-encre-400">
+                Lié à la fiche
+              </label>
+              <select
+                value={ficheChoisie}
+                onChange={(event) => setFicheChoisie(Number(event.target.value))}
+                className="w-full rounded-xl border border-parchemin-300 bg-parchemin-50 px-3 py-2 text-xs font-medium text-encre-800 outline-none focus:border-or-400"
+              >
+                {fichesOuvertes.map((meta) => (
+                  <option key={meta.id} value={meta.id}>
+                    Fiche {meta.id} — {meta.titre}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <textarea
-              value={texte}
-              onChange={(event) => setTexte(event.target.value)}
-              rows={5}
-              placeholder="Ce qui a changé, concrètement. Une phrase suffit si c’est la bonne."
-              className="w-full resize-none rounded-2xl border border-parchemin-400 bg-parchemin-50 px-4 py-3 text-sm leading-relaxed text-encre-800 outline-none placeholder:text-encre-300 focus:border-or-400"
-            />
+            <div className="mb-4">
+              <textarea
+                value={texte}
+                onChange={(event) => setTexte(event.target.value)}
+                placeholder="Racontez ce qui a changé : une réconciliation, un fardeau déposé, une prière exaucée, un verset devenu vivant…"
+                rows={4}
+                className="manuscrit w-full resize-none rounded-2xl border border-parchemin-300 bg-parchemin-50 px-4 py-3 text-base leading-relaxed text-encre-950 outline-none placeholder:font-sans placeholder:text-xs placeholder:text-encre-300 focus:border-or-400"
+              />
+            </div>
 
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-2xs text-encre-300">
-                {texte.trim().length < 20 ? 'Encore quelques mots…' : ''}
+            <div className="flex items-center justify-between">
+              <span className="text-2xs text-encre-400">
+                {texte.trim().length < 20
+                  ? `Encore ${20 - texte.trim().length} caractères minimum`
+                  : 'Prêt à être déposé'}
               </span>
               <button
                 type="submit"
@@ -140,33 +147,37 @@ function TemoignagesContent() {
         )}
 
         {temoignages.length === 0 ? (
-          <div className="rounded-4xl border border-dashed border-parchemin-400 bg-white/60 py-16 text-center">
-            <MessageCircle className="mx-auto h-8 w-8 text-encre-200" strokeWidth={1.5} />
+          <div className="feuille rounded-3xl border border-dashed border-parchemin-400 py-16 text-center">
+            <MessageCircle className="mx-auto h-8 w-8 text-encre-300" strokeWidth={1.5} />
             <p className="mt-4 font-serif text-sm font-bold text-encre-800">
               Aucun témoignage pour l&apos;instant
             </p>
-            <p className="mx-auto mt-1 max-w-xs text-2xs leading-relaxed text-encre-400">
+            <p className="mx-auto mt-1 max-w-xs text-2xs leading-relaxed text-encre-500">
               Le premier ouvre souvent la porte aux autres. Même une petite chose compte.
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {temoignages.map((post) => {
+          <div className="space-y-6">
+            {temoignages.map((post, index) => {
               const meta = FICHES_META.find((m) => m.id === post.step);
               const aAmen = post.amenBy.includes(user.uid);
+              const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
+              const pose = poses[index % poses.length];
+
               return (
                 <article
                   key={post.id}
-                  className="rounded-4xl border border-parchemin-400 bg-white p-5 shadow-2xs sm:p-6"
+                  className={`feuille ${pose} relative rounded-3xl border border-parchemin-300 p-6 shadow-sm transition-all hover:shadow-md`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <span className="ruban -top-2.5 left-6 -rotate-1 rounded-[2px]" />
+                  <div className="flex items-start justify-between gap-3 pt-1">
                     <div className="flex items-center gap-3">
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-or-300 to-or-500 text-xs font-bold text-encre-950">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-or-300 to-or-500 text-xs font-bold text-encre-950 shadow-2xs">
                         {post.authorName.charAt(0).toUpperCase()}
                       </span>
                       <div>
-                        <p className="text-sm font-bold text-encre-950">{post.authorName}</p>
-                        <p className="text-2xs text-encre-300">
+                        <p className="font-serif text-sm font-bold text-encre-950">{post.authorName}</p>
+                        <p className="text-2xs text-encre-400">
                           {new Date(post.createdAt).toLocaleDateString('fr-FR', {
                             day: 'numeric',
                             month: 'long',
@@ -178,14 +189,14 @@ function TemoignagesContent() {
                     {meta && (
                       <Link
                         href={`/fiches/${meta.id}`}
-                        className="shrink-0 rounded-full bg-or-50 px-2.5 py-1 text-2xs font-bold text-or-700 transition-colors hover:bg-or-100"
+                        className="timbre shrink-0 rounded px-2.5 py-1 text-2xs font-bold text-or-800 hover:bg-or-100"
                       >
                         Fiche {meta.id}
                       </Link>
                     )}
                   </div>
 
-                  <p className="mt-4 whitespace-pre-wrap font-serif text-base leading-relaxed text-encre-800">
+                  <p className="manuscrit mt-4 text-xl leading-relaxed text-encre-950 whitespace-pre-wrap">
                     {post.content}
                   </p>
 

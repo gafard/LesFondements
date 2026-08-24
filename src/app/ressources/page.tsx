@@ -53,10 +53,10 @@ export default function RessourcesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-parchemin-100 pb-10 pt-6">
+    <div className="table-travail min-h-screen pb-16 pt-6">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="mb-10 text-center">
-          <p className="mb-2 font-serif italic text-amber-800 text-xs sm:text-sm">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <p className="manuscrit mb-2 text-xl text-or-800">
             Documentation & ressources complémentaires
           </p>
           <h1 className="font-serif text-3xl font-bold text-encre-950 sm:text-4xl">
@@ -90,15 +90,18 @@ export default function RessourcesPage() {
             Ouverture du livret…
           </p>
         ) : onglet === 'presentation' ? (
-          <div className="space-y-8">
-            <blockquote className="rounded-4xl border border-encre-200 bg-encre-50 p-6 text-center">
-              <Quote className="mx-auto h-5 w-5 text-or-500" strokeWidth={1.5} />
-              <p className="mt-3 font-serif text-base italic leading-relaxed text-encre-800">
+          <div className="feuille relative space-y-8 rounded-3xl border border-parchemin-300 p-6 sm:p-8 shadow-md">
+            <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
+            <span className="ruban -top-2.5 right-8 rotate-1 rounded-[2px]" />
+
+            <blockquote className="rounded-3xl border border-or-300 bg-amber-50/50 p-6 text-center shadow-xs">
+              <Quote className="mx-auto h-5 w-5 text-or-600" strokeWidth={1.5} />
+              <p className="mt-3 font-serif text-base italic leading-relaxed text-encre-900">
                 Notre but est de placer tout homme en présence de Dieu et d&apos;amener les
                 chrétiens à leur pleine maturité spirituelle par une communion vivante avec le
                 Christ.
               </p>
-              <span className="mt-2 block text-2xs text-encre-400">Colossiens 1:28</span>
+              <span className="manuscrit mt-2 block text-base text-or-800">Colossiens 1:28</span>
             </blockquote>
 
             {livret.presentation.map((section, index) => (
@@ -118,9 +121,12 @@ export default function RessourcesPage() {
             ))}
           </div>
         ) : onglet === 'prendre-soin' ? (
-          <div className="space-y-8">
-            <div className="rounded-3xl border border-or-200 bg-or-50 p-5">
-              <p className="text-xs leading-relaxed text-or-900/85">
+          <div className="feuille relative space-y-8 rounded-3xl border border-parchemin-300 p-6 sm:p-8 shadow-md">
+            <span className="punaise -top-2.5 left-8" />
+            <span className="ruban -top-2.5 right-8 -rotate-1 rounded-[2px]" />
+
+            <div className="rounded-2xl border border-or-300 bg-or-50/70 p-5">
+              <p className="text-xs leading-relaxed text-or-950">
                 Cette annexe accompagne les fiches 7, 8 et 15. Le livret la donne aux responsables
                 avant les temps de prière personnels — mais elle concerne tout le groupe.
               </p>
@@ -129,7 +135,7 @@ export default function RessourcesPage() {
                   <Link
                     key={id}
                     href={`/fiches/${id}`}
-                    className="rounded-full bg-white px-3 py-1.5 text-2xs font-bold text-or-700 transition-colors hover:bg-or-100"
+                    className="timbre rounded-md px-3 py-1 text-2xs font-bold text-or-800 transition-colors hover:bg-or-100"
                   >
                     Fiche {id}
                   </Link>
@@ -154,44 +160,50 @@ export default function RessourcesPage() {
             ))}
           </div>
         ) : (
-          <div className="space-y-3">
-            {livret.bibliographie.map((reference, index) => (
-              <article
-                key={index}
-                className="rounded-3xl border border-parchemin-400 bg-white p-5 shadow-2xs"
-              >
-                {reference.auteur && (
-                  <h2 className="font-serif text-base font-bold text-encre-950">
-                    {reference.auteur}
-                  </h2>
-                )}
-                <p className="mt-1 text-sm leading-relaxed text-encre-700">{reference.ouvrages}</p>
+          <div className="space-y-4">
+            {livret.bibliographie.map((reference, index) => {
+              const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
+              const pose = poses[index % poses.length];
 
-                {reference.auteur && NOTES_LECTURE[reference.auteur] && (
-                  <p className="mt-2 text-2xs leading-relaxed text-encre-500">
-                    {NOTES_LECTURE[reference.auteur]}
-                  </p>
-                )}
+              return (
+                <article
+                  key={index}
+                  className={`feuille ${pose} relative rounded-2xl border border-parchemin-300 p-5 shadow-sm transition-all hover:shadow-md`}
+                >
+                  <span className="ruban -top-2.5 left-6 -rotate-1 rounded-[2px]" />
+                  {reference.auteur && (
+                    <h2 className="pt-1 font-serif text-base font-bold text-encre-950">
+                      {reference.auteur}
+                    </h2>
+                  )}
+                  <p className="mt-1 text-sm leading-relaxed text-encre-800">{reference.ouvrages}</p>
 
-                {reference.fiches.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5 border-t border-parchemin-300 pt-3">
-                    {reference.fiches.map((id) => (
-                      <Link
-                        key={id}
-                        href={`/fiches/${id}`}
-                        className="rounded-full bg-parchemin-100 px-2.5 py-1 text-2xs font-bold text-encre-600 transition-colors hover:bg-or-100 hover:text-or-700"
-                      >
-                        Fiche {id}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </article>
-            ))}
+                  {reference.auteur && NOTES_LECTURE[reference.auteur] && (
+                    <p className="mt-2 text-xs leading-relaxed text-encre-600">
+                      {NOTES_LECTURE[reference.auteur]}
+                    </p>
+                  )}
 
-            <p className="rounded-3xl bg-parchemin-200/60 px-5 py-4 text-2xs leading-relaxed text-encre-500">
+                  {reference.fiches.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5 border-t border-parchemin-300/80 pt-3">
+                      {reference.fiches.map((id) => (
+                        <Link
+                          key={id}
+                          href={`/fiches/${id}`}
+                          className="timbre rounded px-2 py-0.5 text-2xs font-bold text-or-800 hover:bg-or-100"
+                        >
+                          Fiche {id}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+
+            <p className="rounded-2xl border border-parchemin-300/80 bg-parchemin-200/40 px-5 py-4 text-2xs leading-relaxed text-encre-600">
               Le livret est librement téléchargeable sur{' '}
-              <span className="font-bold text-encre-700">moneglisepreferee.net</span>. Les versets
+              <span className="font-bold text-encre-800">moneglisepreferee.net</span>. Les versets
               y sont tirés de la Bible du Semeur, sauf mention contraire.
             </p>
           </div>

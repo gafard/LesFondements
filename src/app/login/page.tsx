@@ -203,18 +203,19 @@ function LoginContent() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-white/15 bg-white/[0.06] backdrop-blur-xl p-6 sm:p-8 shadow-2xl">
+            <div className="feuille relative rounded-3xl border border-parchemin-300 p-6 sm:p-8 shadow-2xl text-encre-950">
+              <span className="ruban -top-3 left-1/2 -translate-x-1/2 -rotate-1 rounded-[2px]" />
               
               <div className="hidden lg:block mb-6">
-                <h3 className="font-serif text-2xl font-bold text-white">
+                <h3 className="font-serif text-2xl font-bold text-encre-950">
                   {isLogin ? 'Bon retour' : 'Commencer le parcours'}
                 </h3>
-                <p className="text-xs text-parchemin-100/65 mt-1">
+                <p className="text-xs text-encre-600 mt-1">
                   {isLogin ? 'Retrouvez votre progression et votre groupe.' : 'Créez votre profil disciple en 30 secondes.'}
                 </p>
               </div>
 
-              <div className="mb-6 flex gap-1 rounded-2xl bg-white/[0.06] p-1">
+              <div className="mb-6 flex gap-1 rounded-2xl bg-parchemin-200/80 p-1">
                 {[
                   { value: true, label: 'Connexion' },
                   { value: false, label: 'Créer un compte' },
@@ -225,8 +226,8 @@ function LoginContent() {
                     onClick={() => setIsLogin(tab.value)}
                     className={`flex-1 rounded-xl py-2.5 text-2xs font-bold transition-all ${
                       isLogin === tab.value
-                        ? 'bg-or-400 text-encre-950 shadow-md'
-                        : 'text-parchemin-100/60 hover:text-parchemin-100'
+                        ? 'bg-encre-950 text-white shadow-md'
+                        : 'text-encre-600 hover:text-encre-950'
                     }`}
                   >
                     {tab.label}
@@ -235,7 +236,7 @@ function LoginContent() {
               </div>
 
           {error && (
-            <p className="mb-4 rounded-xl bg-rose-500/12 px-3.5 py-2.5 text-2xs leading-relaxed text-rose-200">
+            <p className="mb-4 rounded-xl bg-rose-50 border border-rose-200 px-3.5 py-2.5 text-2xs leading-relaxed text-rose-700">
               {error}
             </p>
           )}
@@ -243,40 +244,40 @@ function LoginContent() {
           <form className="space-y-3.5" onSubmit={handleSubmit}>
             {!isLogin && (
               <div className="relative">
-                <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-parchemin-100/40" />
+                <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-encre-400" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Votre prénom"
-                  className={champ}
+                  className="w-full rounded-2xl border border-parchemin-300 bg-white py-3.5 pl-11 pr-4 text-sm text-encre-950 outline-none placeholder:text-encre-300 shadow-2xs focus:border-or-400"
                 />
               </div>
             )}
 
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-parchemin-100/40" />
+              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-encre-400" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="votre adresse e-mail"
-                className={champ}
+                className="w-full rounded-2xl border border-parchemin-300 bg-white py-3.5 pl-11 pr-4 text-sm text-encre-950 outline-none placeholder:text-encre-300 shadow-2xs focus:border-or-400"
                 autoComplete="email"
               />
             </div>
 
             <div className="relative">
-              <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-parchemin-100/40" />
+              <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-encre-400" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="mot de passe"
-                className={champ}
+                className="w-full rounded-2xl border border-parchemin-300 bg-white py-3.5 pl-11 pr-4 text-sm text-encre-950 outline-none placeholder:text-encre-300 shadow-2xs focus:border-or-400"
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
               />
             </div>

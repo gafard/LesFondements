@@ -81,10 +81,10 @@ export default function IndexThematiquePage() {
   }, [entrees, recherche]);
 
   return (
-    <div className="min-h-screen bg-parchemin-100 pb-10 pt-6">
+    <div className="table-travail min-h-screen pb-16 pt-6">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
-        <div className="mb-10 text-center">
-          <p className="mb-2 font-serif italic text-amber-800 text-xs sm:text-sm">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <p className="manuscrit mb-2 text-xl text-or-800">
             Index thématique • Livret p. 163
           </p>
           <h1 className="font-serif text-3xl font-bold text-encre-950 sm:text-4xl">
@@ -102,7 +102,7 @@ export default function IndexThematiquePage() {
             value={recherche}
             onChange={(event) => setRecherche(event.target.value)}
             placeholder="Chercher : jeûne, forteresses, légalisme…"
-            className="w-full rounded-full border border-parchemin-400 bg-white py-3.5 pl-12 pr-4 text-sm text-encre-800 outline-none transition-colors placeholder:text-encre-300 focus:border-or-400"
+            className="w-full rounded-full border border-parchemin-400 bg-white py-3.5 pl-12 pr-4 text-sm text-encre-800 shadow-sm outline-none transition-colors placeholder:text-encre-300 focus:border-or-400"
           />
         </div>
 
@@ -111,12 +111,16 @@ export default function IndexThematiquePage() {
             Ouverture de l&apos;index…
           </p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {filtrees.map((entree) => {
+          <div className="grid gap-4 sm:grid-cols-2">
+            {filtrees.map((entree, index) => {
               const ouverte = !group || (entree.ficheId ?? 21) <= unlockedStep;
+              const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
+              const pose = poses[index % poses.length];
+
               const contenu = (
                 <>
-                  <div className="flex items-start justify-between gap-3">
+                  <span className="ruban -top-2.5 left-6 -rotate-1 rounded-[2px]" />
+                  <div className="flex items-start justify-between gap-3 pt-1">
                     <h2 className="font-serif text-base font-bold leading-snug text-encre-950">
                       {entree.theme}
                     </h2>
@@ -124,20 +128,20 @@ export default function IndexThematiquePage() {
                   </div>
 
                   {entree.eclairage && (
-                    <p className="mt-1.5 text-2xs leading-relaxed text-encre-500">
+                    <p className="mt-1.5 text-xs leading-relaxed text-encre-600">
                       {entree.eclairage}
                     </p>
                   )}
 
-                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-parchemin-300 pt-3">
+                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-parchemin-300/80 pt-3">
                     <span className="inline-flex items-center gap-1.5 text-2xs text-encre-400">
-                      <BookOpen className="h-3 w-3 text-or-500" />
+                      <BookOpen className="h-3 w-3 text-or-600" />
                       {entree.reference}
                     </span>
                     {entree.ficheId && (
                       <span
                         className={`inline-flex items-center gap-1 text-2xs font-bold ${
-                          ouverte ? 'text-or-700' : 'text-encre-300'
+                          ouverte ? 'timbre rounded px-2 py-0.5 text-or-800' : 'text-encre-300'
                         }`}
                       >
                         Fiche {entree.ficheId}
@@ -152,14 +156,14 @@ export default function IndexThematiquePage() {
                 <Link
                   key={entree.theme}
                   href={`/fiches/${entree.ficheId}`}
-                  className="parchment-card rounded-3xl p-5 transition-all hover:-translate-y-0.5"
+                  className={`feuille ${pose} relative rounded-2xl p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5`}
                 >
                   {contenu}
                 </Link>
               ) : (
                 <div
                   key={entree.theme}
-                  className="rounded-3xl border border-parchemin-300 bg-parchemin-50/70 p-5 opacity-70"
+                  className={`feuille ${pose} relative rounded-2xl p-5 opacity-60`}
                 >
                   {contenu}
                 </div>

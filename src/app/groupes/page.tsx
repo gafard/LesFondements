@@ -112,7 +112,7 @@ function CelluleContent() {
   };
 
   return (
-    <div className="min-h-screen bg-parchemin-100 pb-10 pt-6">
+    <div className="table-travail min-h-screen pb-16 pt-6">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* ══ En-tête du groupe ══ */}
         <header className="nuit nuit-grain relative mb-8 overflow-hidden rounded-4xl p-6 text-parchemin-100 shadow-lg sm:p-8">
@@ -778,20 +778,21 @@ function OngletMur({
   };
 
   return (
-    <div className="space-y-5">
-      <form onSubmit={publier} className="rounded-3xl border border-parchemin-400 bg-white p-5 shadow-sm">
+    <div className="space-y-6">
+      <form onSubmit={publier} className="feuille relative rounded-3xl border border-parchemin-400 p-6 shadow-md">
+        <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
         <h3 className="flex items-center gap-2 font-serif text-lg font-bold text-encre-950">
           <config.icone className="h-5 w-5 text-or-600" strokeWidth={1.75} />
           {config.titre}
         </h3>
-        <p className="mt-1 text-2xs text-encre-400">{config.intro}</p>
+        <p className="mt-1 text-2xs text-encre-500">{config.intro}</p>
 
         {kind === 'pepite' && (
           <input
             value={reference}
             onChange={(event) => setReference(event.target.value)}
             placeholder="Référence (facultatif) — ex : Ep 2:8"
-            className="mt-3.5 w-full rounded-xl border border-parchemin-400 bg-parchemin-50 px-3.5 py-2.5 font-serif text-xs text-encre-800 outline-none focus:border-or-400"
+            className="manuscrit mt-3.5 w-full rounded-xl border border-parchemin-400 bg-parchemin-50 px-3.5 py-2.5 text-base text-encre-900 outline-none focus:border-or-400"
           />
         )}
 
@@ -800,7 +801,7 @@ function OngletMur({
           onChange={(event) => setTexte(event.target.value)}
           placeholder={config.placeholder}
           rows={3}
-          className="mt-3 w-full resize-none rounded-2xl border border-parchemin-400 bg-parchemin-50 px-4 py-3 text-sm leading-relaxed text-encre-800 outline-none placeholder:text-encre-300 focus:border-or-400"
+          className="manuscrit mt-3 w-full resize-none rounded-2xl border border-parchemin-400 bg-parchemin-50 px-4 py-3 text-base leading-relaxed text-encre-950 outline-none placeholder:font-sans placeholder:text-xs placeholder:text-encre-300 focus:border-or-400"
         />
 
         <div className="mt-3 flex justify-end">
@@ -815,17 +816,17 @@ function OngletMur({
       </form>
 
       {liste.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-parchemin-400 bg-parchemin-50/60 py-14 text-center">
-          <config.icone className="mx-auto h-8 w-8 text-encre-200" strokeWidth={1.5} />
-          <p className="mt-3 font-serif text-sm font-bold text-encre-700">Rien encore ici</p>
-          <p className="mt-1 text-2xs text-encre-400">
+        <div className="feuille rounded-3xl border border-dashed border-parchemin-400 py-14 text-center">
+          <config.icone className="mx-auto h-8 w-8 text-encre-300" strokeWidth={1.5} />
+          <p className="mt-3 font-serif text-sm font-bold text-encre-800">Rien encore ici</p>
+          <p className="mt-1 text-2xs text-encre-500">
             Le premier message donne souvent le ton pour tout le groupe.
           </p>
         </div>
       ) : (
-        <div className="space-y-3.5">
-          {liste.map((post) => (
-            <CartePost key={post.id} post={post} kind={kind} onChange={onChange} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {liste.map((post, idx) => (
+            <CartePost key={post.id} post={post} kind={kind} index={idx} onChange={onChange} />
           ))}
         </div>
       )}
@@ -836,10 +837,12 @@ function OngletMur({
 function CartePost({
   post,
   kind,
+  index = 0,
   onChange,
 }: {
   post: GroupPost;
   kind: GroupPostKind;
+  index?: number;
   onChange: () => void;
 }) {
   const { user } = useAuth();
@@ -855,36 +858,50 @@ function CartePost({
     minute: '2-digit',
   });
 
+  const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
+  const pose = poses[index % poses.length];
+
+  const stylePapier =
+    kind === 'priere'
+      ? `postit-rose ${pose} border border-rose-200/80 shadow-md`
+      : kind === 'pepite'
+        ? `postit-vert ${pose} border border-emerald-200/80 shadow-md`
+        : `feuille ${pose} border border-parchemin-300 shadow-sm`;
+
   return (
-    <article
-      className={`rounded-3xl border bg-white p-5 shadow-2xs transition-colors ${
-        post.answered ? 'border-emerald-200 bg-emerald-50/25' : 'border-parchemin-400'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3">
+    <article className={`relative rounded-3xl p-5 transition-all hover:shadow-lg ${stylePapier}`}>
+      {kind === 'priere' ? (
+        <span className="punaise punaise-rouge -top-2.5 left-6" />
+      ) : kind === 'pepite' ? (
+        <span className="ruban -top-2.5 left-6 -rotate-1 rounded-[2px]" />
+      ) : (
+        <span className="trombone -top-3 right-6" />
+      )}
+
+      <div className="flex items-start justify-between gap-3 pt-1">
         <div className="min-w-0">
-          <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-encre-950">
+          <p className="flex flex-wrap items-center gap-2 font-serif text-sm font-bold text-encre-950">
             {post.authorName}
             {post.step && (
-              <span className="rounded-full bg-or-50 px-2 py-0.5 text-2xs font-bold text-or-700">
+              <span className="timbre rounded px-2 py-0.5 text-2xs font-bold text-or-800">
                 Fiche {post.step}
               </span>
             )}
           </p>
-          <p className="text-2xs text-encre-300">{quand}</p>
+          <p className="text-2xs text-encre-400">{quand}</p>
         </div>
         {post.answered && (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-2xs font-bold text-emerald-700">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-2xs font-bold text-emerald-800 shadow-xs">
             <CheckCircle2 className="h-3.5 w-3.5" /> Exaucée
           </span>
         )}
       </div>
 
       {post.reference && (
-        <p className="mt-3 font-serif text-sm font-bold italic text-or-700">{post.reference}</p>
+        <p className="manuscrit mt-2 text-base font-bold text-or-800">{post.reference}</p>
       )}
 
-      <p className="mt-2.5 whitespace-pre-wrap text-sm leading-relaxed text-encre-700">
+      <p className="manuscrit mt-2 text-lg leading-relaxed text-encre-950 whitespace-pre-wrap">
         {post.content}
       </p>
 
