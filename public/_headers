@@ -1,2 +1,17 @@
+# En-têtes appliqués par Cloudflare aux fichiers servis directement, sans
+# passer par le rendu Next.js.
+
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
+
+# Le corpus d'étude et les voix off ne changent qu'en cas de régénération.
+# Sans ces règles, le navigateur revalide 35 Mo de JSON à chaque visite.
+/etudes/*
+  Cache-Control: public,max-age=604800,stale-while-revalidate=2592000
+
+/voix/*
+  Cache-Control: public,max-age=2592000,immutable
+
+# Le manifeste, lui, doit refléter rapidement un nouvel enregistrement.
+/voix/manifeste.json
+  Cache-Control: public,max-age=300,stale-while-revalidate=3600

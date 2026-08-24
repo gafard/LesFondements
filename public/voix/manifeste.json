@@ -1,0 +1,923 @@
+{
+ "genereLe": "2026-08-24T01:51:47.866Z",
+ "voixParDefaut": "6aRkp7Pz4MBOSpUyJCTO",
+ "pistes": {
+  "f1.seuil": {
+   "id": "f1.seuil",
+   "url": "/voix/eleven/f1.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "2240bc4e0111",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s0": {
+   "id": "f1.s0",
+   "url": "/voix/eleven/f1.s0.mp3",
+   "source": "eleven",
+   "empreinte": "583466353891",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s0.b0": {
+   "id": "f1.s0.b0",
+   "url": "/voix/eleven/f1.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "b1cee80c59f8",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s0.b2": {
+   "id": "f1.s0.b2",
+   "url": "/voix/eleven/f1.s0.b2.mp3",
+   "source": "eleven",
+   "empreinte": "e11fb65a1f30",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s0.b3": {
+   "id": "f1.s0.b3",
+   "url": "/voix/eleven/f1.s0.b3.mp3",
+   "source": "eleven",
+   "empreinte": "aa9b94301f64",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s0.b4": {
+   "id": "f1.s0.b4",
+   "url": "/voix/eleven/f1.s0.b4.mp3",
+   "source": "eleven",
+   "empreinte": "87a51b3d7f31",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1": {
+   "id": "f1.s1",
+   "url": "/voix/eleven/f1.s1.mp3",
+   "source": "eleven",
+   "empreinte": "60dfb9e998e5",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b1": {
+   "id": "f1.s1.b1",
+   "url": "/voix/eleven/f1.s1.b1.mp3",
+   "source": "eleven",
+   "empreinte": "f6263f71b441",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b2": {
+   "id": "f1.s1.b2",
+   "url": "/voix/eleven/f1.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "2c93475547da",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b3": {
+   "id": "f1.s1.b3",
+   "url": "/voix/eleven/f1.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "534026c4bedc",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b4": {
+   "id": "f1.s1.b4",
+   "url": "/voix/eleven/f1.s1.b4.mp3",
+   "source": "eleven",
+   "empreinte": "2277b9c64ed7",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b5": {
+   "id": "f1.s1.b5",
+   "url": "/voix/eleven/f1.s1.b5.mp3",
+   "source": "eleven",
+   "empreinte": "db82d2105755",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b6": {
+   "id": "f1.s1.b6",
+   "url": "/voix/eleven/f1.s1.b6.mp3",
+   "source": "eleven",
+   "empreinte": "484c47345715",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b7": {
+   "id": "f1.s1.b7",
+   "url": "/voix/eleven/f1.s1.b7.mp3",
+   "source": "eleven",
+   "empreinte": "5037985c2835",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b9": {
+   "id": "f1.s1.b9",
+   "url": "/voix/eleven/f1.s1.b9.mp3",
+   "source": "eleven",
+   "empreinte": "b5f923091c4a",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b10": {
+   "id": "f1.s1.b10",
+   "url": "/voix/eleven/f1.s1.b10.mp3",
+   "source": "eleven",
+   "empreinte": "e8119f93a070",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b11": {
+   "id": "f1.s1.b11",
+   "url": "/voix/eleven/f1.s1.b11.mp3",
+   "source": "eleven",
+   "empreinte": "288d9e22283b",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b12": {
+   "id": "f1.s1.b12",
+   "url": "/voix/eleven/f1.s1.b12.mp3",
+   "source": "eleven",
+   "empreinte": "ec7ced5b85bb",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s1.b13": {
+   "id": "f1.s1.b13",
+   "url": "/voix/eleven/f1.s1.b13.mp3",
+   "source": "eleven",
+   "empreinte": "00d949c0849c",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2": {
+   "id": "f1.s2",
+   "url": "/voix/eleven/f1.s2.mp3",
+   "source": "eleven",
+   "empreinte": "25559f719bab",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b0": {
+   "id": "f1.s2.b0",
+   "url": "/voix/eleven/f1.s2.b0.mp3",
+   "source": "eleven",
+   "empreinte": "54e7b1ea01a9",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b1": {
+   "id": "f1.s2.b1",
+   "url": "/voix/eleven/f1.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "c6996c6896e1",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b2": {
+   "id": "f1.s2.b2",
+   "url": "/voix/eleven/f1.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "47a6e53e3cb6",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b3": {
+   "id": "f1.s2.b3",
+   "url": "/voix/eleven/f1.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "ae4e949fb217",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b4": {
+   "id": "f1.s2.b4",
+   "url": "/voix/eleven/f1.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "b688a812a6d4",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b5": {
+   "id": "f1.s2.b5",
+   "url": "/voix/eleven/f1.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "f3547242504f",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b6": {
+   "id": "f1.s2.b6",
+   "url": "/voix/eleven/f1.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "b7cbbff4faa9",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b8": {
+   "id": "f1.s2.b8",
+   "url": "/voix/eleven/f1.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "aa43bdafbc84",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b9": {
+   "id": "f1.s2.b9",
+   "url": "/voix/eleven/f1.s2.b9.mp3",
+   "source": "eleven",
+   "empreinte": "a682f48a87a0",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b11": {
+   "id": "f1.s2.b11",
+   "url": "/voix/eleven/f1.s2.b11.mp3",
+   "source": "eleven",
+   "empreinte": "e1932a3fc186",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b12": {
+   "id": "f1.s2.b12",
+   "url": "/voix/eleven/f1.s2.b12.mp3",
+   "source": "eleven",
+   "empreinte": "6d1063221573",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b13": {
+   "id": "f1.s2.b13",
+   "url": "/voix/eleven/f1.s2.b13.mp3",
+   "source": "eleven",
+   "empreinte": "efc42d581ff8",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b14": {
+   "id": "f1.s2.b14",
+   "url": "/voix/eleven/f1.s2.b14.mp3",
+   "source": "eleven",
+   "empreinte": "ffb654f9c342",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.s2.b16": {
+   "id": "f1.s2.b16",
+   "url": "/voix/eleven/f1.s2.b16.mp3",
+   "source": "eleven",
+   "empreinte": "dc593cb7d00b",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.r0": {
+   "id": "f1.r0",
+   "url": "/voix/eleven/f1.r0.mp3",
+   "source": "eleven",
+   "empreinte": "493df054c395",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.r1": {
+   "id": "f1.r1",
+   "url": "/voix/eleven/f1.r1.mp3",
+   "source": "eleven",
+   "empreinte": "55ed6c6ec5da",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.r2": {
+   "id": "f1.r2",
+   "url": "/voix/eleven/f1.r2.mp3",
+   "source": "eleven",
+   "empreinte": "4f187ea66111",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.q0": {
+   "id": "f1.q0",
+   "url": "/voix/eleven/f1.q0.mp3",
+   "source": "eleven",
+   "empreinte": "a49659f00419",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.q1": {
+   "id": "f1.q1",
+   "url": "/voix/eleven/f1.q1.mp3",
+   "source": "eleven",
+   "empreinte": "ab2995583dce",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.q2": {
+   "id": "f1.q2",
+   "url": "/voix/eleven/f1.q2.mp3",
+   "source": "eleven",
+   "empreinte": "afefdb42cc54",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.q3": {
+   "id": "f1.q3",
+   "url": "/voix/eleven/f1.q3.mp3",
+   "source": "eleven",
+   "empreinte": "c6f41838b031",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.q4": {
+   "id": "f1.q4",
+   "url": "/voix/eleven/f1.q4.mp3",
+   "source": "eleven",
+   "empreinte": "b1cad825e20a",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.q5": {
+   "id": "f1.q5",
+   "url": "/voix/eleven/f1.q5.mp3",
+   "source": "eleven",
+   "empreinte": "2455fdbfa22d",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f1.q6": {
+   "id": "f1.q6",
+   "url": "/voix/eleven/f1.q6.mp3",
+   "source": "eleven",
+   "empreinte": "bb2371ee05c1",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p0": {
+   "id": "lettre.p0",
+   "url": "/voix/eleven/lettre.p0.mp3",
+   "source": "eleven",
+   "empreinte": "ce18d6583ef2",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p1": {
+   "id": "lettre.p1",
+   "url": "/voix/eleven/lettre.p1.mp3",
+   "source": "eleven",
+   "empreinte": "876abc310c60",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p2": {
+   "id": "lettre.p2",
+   "url": "/voix/eleven/lettre.p2.mp3",
+   "source": "eleven",
+   "empreinte": "ee95e5762b75",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p3": {
+   "id": "lettre.p3",
+   "url": "/voix/eleven/lettre.p3.mp3",
+   "source": "eleven",
+   "empreinte": "aaf5667a7972",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p4": {
+   "id": "lettre.p4",
+   "url": "/voix/eleven/lettre.p4.mp3",
+   "source": "eleven",
+   "empreinte": "f0f923b650d9",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p5": {
+   "id": "lettre.p5",
+   "url": "/voix/eleven/lettre.p5.mp3",
+   "source": "eleven",
+   "empreinte": "ae15fc50811d",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p6": {
+   "id": "lettre.p6",
+   "url": "/voix/eleven/lettre.p6.mp3",
+   "source": "eleven",
+   "empreinte": "76dbbd520f5d",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p7": {
+   "id": "lettre.p7",
+   "url": "/voix/eleven/lettre.p7.mp3",
+   "source": "eleven",
+   "empreinte": "2287673bc16d",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p8": {
+   "id": "lettre.p8",
+   "url": "/voix/eleven/lettre.p8.mp3",
+   "source": "eleven",
+   "empreinte": "6ece6517dee7",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p9": {
+   "id": "lettre.p9",
+   "url": "/voix/eleven/lettre.p9.mp3",
+   "source": "eleven",
+   "empreinte": "f0c3a075d2df",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p10": {
+   "id": "lettre.p10",
+   "url": "/voix/eleven/lettre.p10.mp3",
+   "source": "eleven",
+   "empreinte": "0a04d247ce07",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p11": {
+   "id": "lettre.p11",
+   "url": "/voix/eleven/lettre.p11.mp3",
+   "source": "eleven",
+   "empreinte": "7cdcfcf826df",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p12": {
+   "id": "lettre.p12",
+   "url": "/voix/eleven/lettre.p12.mp3",
+   "source": "eleven",
+   "empreinte": "0574a867af5a",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p13": {
+   "id": "lettre.p13",
+   "url": "/voix/eleven/lettre.p13.mp3",
+   "source": "eleven",
+   "empreinte": "8b2461e5d222",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p14": {
+   "id": "lettre.p14",
+   "url": "/voix/eleven/lettre.p14.mp3",
+   "source": "eleven",
+   "empreinte": "c39bfcfe2494",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p15": {
+   "id": "lettre.p15",
+   "url": "/voix/eleven/lettre.p15.mp3",
+   "source": "eleven",
+   "empreinte": "dc3af0344130",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p16": {
+   "id": "lettre.p16",
+   "url": "/voix/eleven/lettre.p16.mp3",
+   "source": "eleven",
+   "empreinte": "4d8653edddea",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p17": {
+   "id": "lettre.p17",
+   "url": "/voix/eleven/lettre.p17.mp3",
+   "source": "eleven",
+   "empreinte": "37fa1c662435",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p18": {
+   "id": "lettre.p18",
+   "url": "/voix/eleven/lettre.p18.mp3",
+   "source": "eleven",
+   "empreinte": "382b75b5cb09",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p19": {
+   "id": "lettre.p19",
+   "url": "/voix/eleven/lettre.p19.mp3",
+   "source": "eleven",
+   "empreinte": "a53b81bc735d",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p20": {
+   "id": "lettre.p20",
+   "url": "/voix/eleven/lettre.p20.mp3",
+   "source": "eleven",
+   "empreinte": "d57d6dde1023",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p21": {
+   "id": "lettre.p21",
+   "url": "/voix/eleven/lettre.p21.mp3",
+   "source": "eleven",
+   "empreinte": "7d9b432058fd",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p22": {
+   "id": "lettre.p22",
+   "url": "/voix/eleven/lettre.p22.mp3",
+   "source": "eleven",
+   "empreinte": "ec0c53ba91ab",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p23": {
+   "id": "lettre.p23",
+   "url": "/voix/eleven/lettre.p23.mp3",
+   "source": "eleven",
+   "empreinte": "23c4768b38bb",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p24": {
+   "id": "lettre.p24",
+   "url": "/voix/eleven/lettre.p24.mp3",
+   "source": "eleven",
+   "empreinte": "c76680bfcdf1",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p25": {
+   "id": "lettre.p25",
+   "url": "/voix/eleven/lettre.p25.mp3",
+   "source": "eleven",
+   "empreinte": "7a18b0834a43",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p26": {
+   "id": "lettre.p26",
+   "url": "/voix/eleven/lettre.p26.mp3",
+   "source": "eleven",
+   "empreinte": "70b41eb12a33",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p27": {
+   "id": "lettre.p27",
+   "url": "/voix/eleven/lettre.p27.mp3",
+   "source": "eleven",
+   "empreinte": "deef73a1daea",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p28": {
+   "id": "lettre.p28",
+   "url": "/voix/eleven/lettre.p28.mp3",
+   "source": "eleven",
+   "empreinte": "3654aa5bad12",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p29": {
+   "id": "lettre.p29",
+   "url": "/voix/eleven/lettre.p29.mp3",
+   "source": "eleven",
+   "empreinte": "961d49c166a5",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p30": {
+   "id": "lettre.p30",
+   "url": "/voix/eleven/lettre.p30.mp3",
+   "source": "eleven",
+   "empreinte": "9532e61e8a1c",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p31": {
+   "id": "lettre.p31",
+   "url": "/voix/eleven/lettre.p31.mp3",
+   "source": "eleven",
+   "empreinte": "7db86cd318f6",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p32": {
+   "id": "lettre.p32",
+   "url": "/voix/eleven/lettre.p32.mp3",
+   "source": "eleven",
+   "empreinte": "247b5a8af410",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p33": {
+   "id": "lettre.p33",
+   "url": "/voix/eleven/lettre.p33.mp3",
+   "source": "eleven",
+   "empreinte": "5958c0d612fb",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p34": {
+   "id": "lettre.p34",
+   "url": "/voix/eleven/lettre.p34.mp3",
+   "source": "eleven",
+   "empreinte": "1654eda877f0",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p35": {
+   "id": "lettre.p35",
+   "url": "/voix/eleven/lettre.p35.mp3",
+   "source": "eleven",
+   "empreinte": "d73d597ce621",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p36": {
+   "id": "lettre.p36",
+   "url": "/voix/eleven/lettre.p36.mp3",
+   "source": "eleven",
+   "empreinte": "3403a7c2a24c",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p37": {
+   "id": "lettre.p37",
+   "url": "/voix/eleven/lettre.p37.mp3",
+   "source": "eleven",
+   "empreinte": "294c7d176423",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p38": {
+   "id": "lettre.p38",
+   "url": "/voix/eleven/lettre.p38.mp3",
+   "source": "eleven",
+   "empreinte": "74a0f7430084",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p39": {
+   "id": "lettre.p39",
+   "url": "/voix/eleven/lettre.p39.mp3",
+   "source": "eleven",
+   "empreinte": "15a504292ba0",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p40": {
+   "id": "lettre.p40",
+   "url": "/voix/eleven/lettre.p40.mp3",
+   "source": "eleven",
+   "empreinte": "90fef8bf5d19",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p41": {
+   "id": "lettre.p41",
+   "url": "/voix/eleven/lettre.p41.mp3",
+   "source": "eleven",
+   "empreinte": "2371181daed8",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p42": {
+   "id": "lettre.p42",
+   "url": "/voix/eleven/lettre.p42.mp3",
+   "source": "eleven",
+   "empreinte": "a8ffc12925c4",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p43": {
+   "id": "lettre.p43",
+   "url": "/voix/eleven/lettre.p43.mp3",
+   "source": "eleven",
+   "empreinte": "419178abd0ba",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p44": {
+   "id": "lettre.p44",
+   "url": "/voix/eleven/lettre.p44.mp3",
+   "source": "eleven",
+   "empreinte": "e14ad8ed1fd8",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p45": {
+   "id": "lettre.p45",
+   "url": "/voix/eleven/lettre.p45.mp3",
+   "source": "eleven",
+   "empreinte": "87281f357cb5",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p46": {
+   "id": "lettre.p46",
+   "url": "/voix/eleven/lettre.p46.mp3",
+   "source": "eleven",
+   "empreinte": "c129bea60eb2",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p47": {
+   "id": "lettre.p47",
+   "url": "/voix/eleven/lettre.p47.mp3",
+   "source": "eleven",
+   "empreinte": "656367444b08",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p48": {
+   "id": "lettre.p48",
+   "url": "/voix/eleven/lettre.p48.mp3",
+   "source": "eleven",
+   "empreinte": "8f0454185785",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p49": {
+   "id": "lettre.p49",
+   "url": "/voix/eleven/lettre.p49.mp3",
+   "source": "eleven",
+   "empreinte": "5fe55e4859f1",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p50": {
+   "id": "lettre.p50",
+   "url": "/voix/eleven/lettre.p50.mp3",
+   "source": "eleven",
+   "empreinte": "d8524379f336",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p51": {
+   "id": "lettre.p51",
+   "url": "/voix/eleven/lettre.p51.mp3",
+   "source": "eleven",
+   "empreinte": "26bb9e4aec94",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p52": {
+   "id": "lettre.p52",
+   "url": "/voix/eleven/lettre.p52.mp3",
+   "source": "eleven",
+   "empreinte": "829570b62215",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "lettre.p53": {
+   "id": "lettre.p53",
+   "url": "/voix/eleven/lettre.p53.mp3",
+   "source": "eleven",
+   "empreinte": "33f2fb445100",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.seuil": {
+   "id": "f2.seuil",
+   "url": "/voix/eleven/f2.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "d39497146a50",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s0": {
+   "id": "f2.s0",
+   "url": "/voix/eleven/f2.s0.mp3",
+   "source": "eleven",
+   "empreinte": "a228013b957a",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s0.b0": {
+   "id": "f2.s0.b0",
+   "url": "/voix/eleven/f2.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "dbad633faf77",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s0.b1": {
+   "id": "f2.s0.b1",
+   "url": "/voix/eleven/f2.s0.b1.mp3",
+   "source": "eleven",
+   "empreinte": "03d2a2e9b8d4",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s0.b2": {
+   "id": "f2.s0.b2",
+   "url": "/voix/eleven/f2.s0.b2.mp3",
+   "source": "eleven",
+   "empreinte": "686c9730fe5e",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s1": {
+   "id": "f2.s1",
+   "url": "/voix/eleven/f2.s1.mp3",
+   "source": "eleven",
+   "empreinte": "c82420c20c20",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s1.b0": {
+   "id": "f2.s1.b0",
+   "url": "/voix/eleven/f2.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "25e3b63633a0",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s1.b1": {
+   "id": "f2.s1.b1",
+   "url": "/voix/eleven/f2.s1.b1.mp3",
+   "source": "eleven",
+   "empreinte": "ba1890f867ce",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s1.b2": {
+   "id": "f2.s1.b2",
+   "url": "/voix/eleven/f2.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "33d6f9885171",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2": {
+   "id": "f2.s2",
+   "url": "/voix/eleven/f2.s2.mp3",
+   "source": "eleven",
+   "empreinte": "17791097402d",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b1": {
+   "id": "f2.s2.b1",
+   "url": "/voix/eleven/f2.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "30176ac3c2f2",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b2": {
+   "id": "f2.s2.b2",
+   "url": "/voix/eleven/f2.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "5ad8fde7f9ca",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b3": {
+   "id": "f2.s2.b3",
+   "url": "/voix/eleven/f2.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "6abe5380fcd0",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b4": {
+   "id": "f2.s2.b4",
+   "url": "/voix/eleven/f2.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "bfeff8488b62",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b5": {
+   "id": "f2.s2.b5",
+   "url": "/voix/eleven/f2.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "b48b496c6165",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b7": {
+   "id": "f2.s2.b7",
+   "url": "/voix/eleven/f2.s2.b7.mp3",
+   "source": "eleven",
+   "empreinte": "a55c2bfb2184",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b8": {
+   "id": "f2.s2.b8",
+   "url": "/voix/eleven/f2.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "3a280d04642f",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b9": {
+   "id": "f2.s2.b9",
+   "url": "/voix/eleven/f2.s2.b9.mp3",
+   "source": "eleven",
+   "empreinte": "6355eff3ff19",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b10": {
+   "id": "f2.s2.b10",
+   "url": "/voix/eleven/f2.s2.b10.mp3",
+   "source": "eleven",
+   "empreinte": "760a2728ab27",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b11": {
+   "id": "f2.s2.b11",
+   "url": "/voix/eleven/f2.s2.b11.mp3",
+   "source": "eleven",
+   "empreinte": "63ef28089c57",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.s2.b12": {
+   "id": "f2.s2.b12",
+   "url": "/voix/eleven/f2.s2.b12.mp3",
+   "source": "eleven",
+   "empreinte": "873e62fe8b84",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.r0": {
+   "id": "f2.r0",
+   "url": "/voix/eleven/f2.r0.mp3",
+   "source": "eleven",
+   "empreinte": "942895755e42",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.r1": {
+   "id": "f2.r1",
+   "url": "/voix/eleven/f2.r1.mp3",
+   "source": "eleven",
+   "empreinte": "533177f2d4b5",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.r2": {
+   "id": "f2.r2",
+   "url": "/voix/eleven/f2.r2.mp3",
+   "source": "eleven",
+   "empreinte": "d365313f8e05",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.r3": {
+   "id": "f2.r3",
+   "url": "/voix/eleven/f2.r3.mp3",
+   "source": "eleven",
+   "empreinte": "f9ae0f4c5046",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q0": {
+   "id": "f2.q0",
+   "url": "/voix/eleven/f2.q0.mp3",
+   "source": "eleven",
+   "empreinte": "436afc78a7da",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q1": {
+   "id": "f2.q1",
+   "url": "/voix/eleven/f2.q1.mp3",
+   "source": "eleven",
+   "empreinte": "bc859f8099de",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q2": {
+   "id": "f2.q2",
+   "url": "/voix/eleven/f2.q2.mp3",
+   "source": "eleven",
+   "empreinte": "cf40121b5a73",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q3": {
+   "id": "f2.q3",
+   "url": "/voix/eleven/f2.q3.mp3",
+   "source": "eleven",
+   "empreinte": "7bfd3b81cfb0",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q4": {
+   "id": "f2.q4",
+   "url": "/voix/eleven/f2.q4.mp3",
+   "source": "eleven",
+   "empreinte": "de06f66d302a",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q5": {
+   "id": "f2.q5",
+   "url": "/voix/eleven/f2.q5.mp3",
+   "source": "eleven",
+   "empreinte": "a7f45bf17620",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q6": {
+   "id": "f2.q6",
+   "url": "/voix/eleven/f2.q6.mp3",
+   "source": "eleven",
+   "empreinte": "d9d434f1f56d",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  },
+  "f2.q7": {
+   "id": "f2.q7",
+   "url": "/voix/eleven/f2.q7.mp3",
+   "source": "eleven",
+   "empreinte": "91ced60b9d5a",
+   "voix": "6aRkp7Pz4MBOSpUyJCTO"
+  }
+ }
+}

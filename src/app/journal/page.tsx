@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { getJournalEntries, addJournalEntry, deleteJournalEntry, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
+import Image from 'next/image';
 import { PenLine, Plus, Trash2, Calendar } from 'lucide-react';
+import ParcoursGate from '@/components/ParcoursGate';
 
-export default function Journal() {
+function Journal() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -53,64 +55,121 @@ export default function Journal() {
     }
   };
 
-  if (loading) return <div className="min-h-screen pt-24 text-center">Chargement...</div>;
+  if (loading) return <div className="min-h-screen pt-10 text-center">Chargement...</div>;
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 bg-slate-50 px-4 sm:px-6 lg:px-8">
+    <div className="table-travail min-h-screen pb-16 pt-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold font-serif text-slate-800 flex items-center gap-3">
-              <PenLine className="text-amber-500" /> Journal Spirituel
-            </h1>
-            <p className="text-slate-600 mt-2">Notez vos réflexions, prières et ce que Dieu vous enseigne.</p>
+        
+        {/* ── En-tête Illustré ── */}
+        <div className="nuit nuit-grain relative mb-8 overflow-hidden rounded-4xl p-6 sm:p-8 text-parchemin-100 shadow-lg">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/journal-sanctuary-hero.jpg"
+              alt="Écriture dans le journal spirituel"
+              fill
+              sizes="100vw"
+              className="object-cover object-[center_45%] opacity-35"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#07162b]/95 via-[#07162b]/85 to-[#07162b]/90" />
           </div>
-          <button onClick={() => setIsFormOpen(!isFormOpen)} className="bg-indigo-600 text-white px-4 py-2 rounded-full font-medium hover:bg-indigo-700 flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Nouvelle entrée
-          </button>
+
+          <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <p className="mb-1 font-serif italic text-amber-300/90 text-xs">
+                Sanctuaire de réflexion intime
+              </p>
+              <h1 className="text-3xl font-bold font-serif text-[#fff8e8] flex items-center gap-2 sm:text-4xl">
+                Journal Spirituel
+              </h1>
+              <p className="text-parchemin-100/75 text-xs sm:text-sm mt-1.5 max-w-md">
+                Consignez vos réflexions secrètes, vos prières et ce que le Seigneur vous révèle de votre main.
+              </p>
+            </div>
+            
+            <button
+              onClick={() => setIsFormOpen(!isFormOpen)}
+              className="bouton-or inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold shrink-0 shadow-md"
+            >
+              <Plus className="w-4 h-4" /> Nouvelle note
+            </button>
+          </div>
         </div>
 
         {isFormOpen && (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 animate-fade-in">
+          <div className="feuille feuille-dechiree p-6 sm:p-8 rounded-3xl shadow-lg border border-parchemin-300 mb-8 animate-fade-in relative">
+            <span className="ruban -top-3 left-8 -rotate-2 rounded-[2px]" />
+            <h3 className="manuscrit font-bold text-2xl text-encre-950 mb-2">Nouvelle réflexion manuscrite</h3>
             <textarea
-              className="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[150px] mb-4 bg-slate-50"
-              placeholder="Que souhaitez-vous écrire aujourd'hui ?"
+              className="manuscrit w-full p-4 border border-parchemin-300 rounded-2xl focus:ring-1 focus:ring-or-400 focus:outline-none min-h-[160px] mb-4 bg-parchemin-50/60 text-encre-950 text-base leading-relaxed placeholder:font-sans placeholder:text-xs placeholder:text-encre-300"
+              placeholder="Que souhaitez-vous confier au Seigneur aujourd'hui ?"
               value={newContent}
               onChange={(e) => setNewContent(e.target.value)}
             />
             <div className="flex justify-end gap-3">
-              <button onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg">Annuler</button>
-              <button onClick={handleSave} className="bg-amber-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-amber-600">Enregistrer</button>
+              <button
+                onClick={() => setIsFormOpen(false)}
+                className="px-4 py-2 text-encre-600 text-xs font-bold hover:bg-parchemin-200 rounded-xl"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleSave}
+                className="bouton-or px-6 py-2.5 rounded-full text-xs font-bold shadow-sm"
+              >
+                Épingler au journal
+              </button>
             </div>
           </div>
         )}
 
         <div className="space-y-6">
           {entries.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
-              <PenLine className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-700 mb-2">Votre journal est vide</h3>
-              <p className="text-slate-500">Commencez à noter vos réflexions en créant votre première entrée.</p>
+            <div className="feuille text-center py-16 rounded-3xl border border-dashed border-parchemin-400 p-8">
+              <PenLine className="w-10 h-10 text-encre-300 mx-auto mb-3" />
+              <h3 className="text-lg font-bold font-serif text-encre-950 mb-1">Votre table de réflexion est prête</h3>
+              <p className="text-xs text-encre-500 max-w-sm mx-auto">
+                Prenez un temps de silence, ouvrez votre cœur et consignez ce qui résonne dans votre étude.
+              </p>
             </div>
           ) : (
-            entries.map(entry => (
-              <div key={entry.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <div className="flex justify-between items-start mb-4 border-b border-slate-50 pb-3">
-                  <div className="flex items-center gap-2 text-slate-500 text-sm">
-                    <Calendar className="w-4 h-4" />
-                    {timestampToDate(entry.createdAt)?.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) || 'À l’instant'}
+            entries.map((entry, index) => {
+              const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
+              const pose = poses[index % poses.length];
+              return (
+                <div key={entry.id} className={`feuille ${pose} p-6 sm:p-7 rounded-3xl shadow-sm border border-parchemin-300 hover:shadow-md transition-all relative group`}>
+                  <span className="ruban -top-2.5 left-6 -rotate-1 rounded-[2px]" />
+                  <div className="flex justify-between items-start mb-3 border-b border-parchemin-200/80 pb-2.5 pt-1">
+                    <div className="flex items-center gap-2 text-encre-500 text-xs font-semibold">
+                      <Calendar className="w-3.5 h-3.5 text-or-600" />
+                      <span className="manuscrit text-base text-or-700">
+                        {timestampToDate(entry.createdAt)?.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) || 'À l’instant'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(entry.id)}
+                      className="text-encre-300 hover:text-rose-600 p-1 rounded-lg transition-colors"
+                      title="Supprimer l'entrée"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <button onClick={() => handleDelete(entry.id)} className="text-slate-400 hover:text-red-500">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <p className="manuscrit text-encre-950 text-lg whitespace-pre-wrap leading-relaxed">{entry.content}</p>
                 </div>
-                <p className="text-slate-700 whitespace-pre-wrap">{entry.content}</p>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <ParcoursGate allowPending>
+      <Journal />
+    </ParcoursGate>
   );
 }

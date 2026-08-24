@@ -33,7 +33,16 @@ export const getFirebaseAuth = () => {
 
 export const getFirebaseDb = () => {
   dbPromise ??= Promise.all([getFirebaseApp(), import('firebase/firestore')]).then(
-    ([app, { getFirestore }]) => getFirestore(app)
+    ([app, { initializeFirestore }]) =>
+      /**
+       * `ignoreUndefinedProperties` est indispensable ici : le domaine compte
+       * beaucoup de champs optionnels — le lieu d'une rencontre, le lien de
+       * visio, la région d'une ville, le message d'une demande d'adhésion.
+       * Sans cette option, Firestore rejette l'écriture entière dès qu'un
+       * seul de ces champs vaut `undefined`, avec une erreur
+       * `invalid-argument`. Le champ est simplement omis du document.
+       */
+      initializeFirestore(app, { ignoreUndefinedProperties: true })
   );
 
   return dbPromise;

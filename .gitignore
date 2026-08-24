@@ -38,6 +38,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare (état local de wrangler)
+.wrangler/
+
+# outils d'édition locaux (Claude Code / OpenAI Codex)
+.claude/
+.openai/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

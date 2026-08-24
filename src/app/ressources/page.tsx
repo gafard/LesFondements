@@ -1,224 +1,234 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BookMarked, Search, ExternalLink, Bookmark, Sparkles } from 'lucide-react';
+import { BookMarked, HeartHandshake, Quote, ScrollText } from 'lucide-react';
+import { chargerLivret, type Bloc, type Livret } from '@/lib/livret';
 
-interface BookReference {
-  author: string;
-  titles: string[];
-  fiches: number[];
-  description: string;
-}
+type Onglet = 'presentation' | 'prendre-soin' | 'bibliographie';
 
-const BIBLIOGRAPHIE: BookReference[] = [
-  {
-    author: 'Neil Anderson',
-    titles: ['Une Nouvelle identité pour une nouvelle vie'],
-    fiches: [5, 6, 7, 9, 14],
-    description: 'Ouvrage fondamental sur la délivrance des mensonges et la marche concrète dans notre identité d\'enfant de Dieu racheté.'
-  },
-  {
-    author: 'Derek Prince',
-    titles: [
-      'L\'échange divin',
-      'Comment passer de la malédiction à la bénédiction',
-      'Qui est le Saint-Esprit ?',
-      'Le Saint-Esprit, oui mais...',
-      'Les dons de l\'Esprit, le fruit de l\'Esprit'
-    ],
-    fiches: [5, 8, 9, 10, 11],
-    description: 'Enseignements bibliques clairs et pratiques sur la puissance de la croix, la délivrance, les malédictions brisées et le ministère de l\'Esprit.'
-  },
-  {
-    author: 'Watchman Nee',
-    titles: ['Être assis, marcher, tenir ferme'],
-    fiches: [5, 6, 9, 11, 16],
-    description: 'Commentaire classique et spirituellement puissant sur l\'épître aux Éphésiens : notre position en Christ, notre marche et le combat de la foi.'
-  },
-  {
-    author: 'Andrew Wommack',
-    titles: [
-      'La vraie nature de Dieu',
-      'L\'équilibre entre la grâce et la foi',
-      'Esprit, âme et corps'
-    ],
-    fiches: [3, 16, 18, 20],
-    description: 'Comprendre la bonté absolue de Dieu, l\'harmonie entre foi et grâce, et la structure tripartite de l\'être humain régénéré.'
-  },
-  {
-    author: 'Tim Chester & Steve Timmis',
-    titles: ['Total Church'],
-    fiches: [13, 14, 15],
-    description: 'Une vision renouvelée de l\'Église centrée sur l\'Évangile et vécue au quotidien en communauté relationnelle.'
-  },
-  {
-    author: 'Colin Dye',
-    titles: ['Vivre libre'],
-    fiches: [5, 6, 7, 8],
-    description: 'Guide pratique pour expérimenter la libération des blessures du passé, du rejet, et des forteresses de pensées.'
-  },
-  {
-    author: 'Robert Heidler',
-    titles: ['L\'Église messianique se lève'],
-    fiches: [18, 19, 20],
-    description: 'Redécouverte des racines hébraïques de la foi, de l\'alliance d\'Israël et du dessein de Dieu pour les temps de la fin.'
-  },
-  {
-    author: 'Steve McVey',
-    titles: ['Le Règne de la Grâce'],
-    fiches: [4],
-    description: 'Sortir définitivement de la religion légaliste de la culpabilité pour se reposer pleinement dans l\'amour inconditionnel.'
-  },
-  {
-    author: 'John Bevere',
-    titles: ['Briser l\'intimidation', 'Approchez-vous de lui'],
-    fiches: [1, 7, 9, 11],
-    description: 'Vaincre la peur des hommes, récupérer son autorité spirituelle et développer une sainte intimité avec Dieu.'
-  },
-  {
-    author: 'Bill Johnson',
-    titles: ['Quand le ciel envahit la terre'],
-    fiches: [11, 12, 14],
-    description: 'Vivre le surnaturel chrétien au quotidien, les miracles et la manifestation du Royaume de Dieu sur terre.'
-  },
-  {
-    author: 'Nicolas & Lena Venditti',
-    titles: ['INSTE — Institut Théologique'],
-    fiches: [16, 17, 20],
-    description: 'Méthode d\'étude biblique interactive et de formation de disciples en petits groupes.'
-  },
-  {
-    author: 'John Eldredge',
-    titles: ['Les trésors du cœur'],
-    fiches: [4],
-    description: 'Retrouver les désirs profonds de son cœur que Dieu y a placés et vivre une foi passionnée.'
-  },
-  {
-    author: 'Terry Virgo',
-    titles: ['L\'extravagante grâce de Dieu'],
-    fiches: [4],
-    description: 'La révélation libératrice de la grâce qui transforme le devoir religieux en adoration joyeuse.'
-  },
-  {
-    author: 'Kenneth E. Hagin',
-    titles: ['La nouvelle naissance'],
-    fiches: [3],
-    description: 'Ce qui se passe réellement dans l\'esprit humain lors de la régénération et de la rédemption.'
-  },
-  {
-    author: 'Dany Hameau',
-    titles: ['Vue sur l\'enfer'],
-    fiches: [20],
-    description: 'Étude biblique rigoureuse sur les fins dernières, le jugement et l\'espérance éternelle.'
-  }
-];
+/**
+ * Notes de lecture rédigées pour l'application. Le livret se contente de
+ * citer les ouvrages ; ces quelques lignes disent ce qu'on y trouve.
+ */
+const NOTES_LECTURE: Record<string, string> = {
+  'Neil Anderson':
+    "Sur la délivrance des mensonges intérieurs et la marche concrète dans l'identité d'enfant de Dieu.",
+  'Derek Prince':
+    "Des enseignements clairs et pratiques : la puissance de la croix, les malédictions brisées, le ministère de l'Esprit.",
+  'Watchman Nee':
+    "Un commentaire classique de l'épître aux Éphésiens : la position en Christ, la marche, le combat.",
+  'Andrew Wommack':
+    "La bonté de Dieu, l'équilibre entre la foi et la grâce, et la constitution de l'être humain.",
+  'Tm Chester, Steve Timmis':
+    "Une vision de l'Église centrée sur l'Évangile et vécue au quotidien, en communauté.",
+  'Colin Dye':
+    'Un guide pratique pour sortir des blessures du passé, du rejet et des forteresses de pensée.',
+  'Robert Heidler':
+    "Les racines hébraïques de la foi, l'alliance avec Israël et le dessein de Dieu pour la fin.",
+  'Steve McVey':
+    "Sortir de la religion de la culpabilité pour se reposer dans un amour qui ne se mérite pas.",
+  'John Bevere': "Vaincre la peur des hommes et retrouver une sainte intimité avec Dieu.",
+  'Bill Johnson': 'Le surnaturel chrétien au quotidien et la manifestation du Royaume.',
+  'Nicolas et Lena Venditti':
+    "Une méthode d'étude biblique interactive, pensée pour les petits groupes.",
+  'John Eldredge': 'Retrouver les désirs profonds que Dieu a placés dans le cœur.',
+  'Terry Virgo': 'La grâce qui transforme le devoir religieux en adoration.',
+  'Kenneth E. Hagin': "Ce qui se passe réellement dans l'esprit humain à la nouvelle naissance.",
+  'Dany Hameau': 'Une étude rigoureuse sur les fins dernières, le jugement et l’espérance.',
+};
 
 export default function RessourcesPage() {
-  const [search, setSearch] = useState('');
+  const [livret, setLivret] = useState<Livret | null>(null);
+  const [onglet, setOnglet] = useState<Onglet>('presentation');
 
-  const filteredBooks = BIBLIOGRAPHIE.filter(item => {
-    const matchesAuthor = item.author.toLowerCase().includes(search.toLowerCase());
-    const matchesTitle = item.titles.some(t => t.toLowerCase().includes(search.toLowerCase()));
-    const matchesDesc = item.description.toLowerCase().includes(search.toLowerCase());
-    return matchesAuthor || matchesTitle || matchesDesc;
-  });
+  useEffect(() => {
+    void chargerLivret().then(setLivret);
+  }, []);
+
+  const onglets: { id: Onglet; label: string; icon: typeof ScrollText }[] = [
+    { id: 'presentation', label: 'Le mode d’emploi', icon: ScrollText },
+    { id: 'prendre-soin', label: 'Prendre soin les uns des autres', icon: HeartHandshake },
+    { id: 'bibliographie', label: 'Les ouvrages cités', icon: BookMarked },
+  ];
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-slate-50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-800 text-xs uppercase tracking-wider font-semibold px-3 py-1 rounded-full mb-3">
-            <BookMarked className="w-3.5 h-3.5" />
-            Bibliographie du Livret (p. 164)
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold font-serif text-slate-900 mb-3">
-            Ressources & Ouvrages Recommandés
+    <div className="min-h-screen bg-parchemin-100 pb-10 pt-6">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <div className="mb-10 text-center">
+          <p className="mb-2 font-serif italic text-amber-800 text-xs sm:text-sm">
+            Documentation & ressources complémentaires
+          </p>
+          <h1 className="font-serif text-3xl font-bold text-encre-950 sm:text-4xl">
+            Autour du parcours
           </h1>
-          <p className="text-slate-600 max-w-2xl mx-auto">
-            Explorez les livres et auteurs précieux qui ont enrichi la conception de ce parcours pour approfondir votre marche spirituelle.
+          <p className="mx-auto mt-2 max-w-lg text-xs leading-relaxed text-encre-600 sm:text-sm">
+            La présentation qui ouvre le livret, l&apos;annexe sur le soin les uns des autres, et
+            les ouvrages dont il est tiré.
           </p>
         </div>
 
-        {/* Search */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-8 max-w-xl mx-auto relative">
-          <Search className="w-5 h-5 text-slate-400 absolute left-7 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Rechercher un auteur ou un livre (ex: Derek Prince, Watchman Nee...)"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-800 text-sm"
-          />
-        </div>
-
-        {/* Book Cards Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {filteredBooks.map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+        <div className="mb-8 flex gap-1.5 overflow-x-auto border-b border-parchemin-300 pb-px">
+          {onglets.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setOnglet(tab.id)}
+              className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-2xs font-bold transition-colors ${
+                onglet === tab.id
+                  ? 'border-or-500 text-or-700'
+                  : 'border-transparent text-encre-400 hover:text-encre-700'
+              }`}
             >
-              <div>
-                <div className="flex items-center gap-2 text-indigo-600 font-serif font-bold text-lg mb-2">
-                  <Bookmark className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  {item.author}
-                </div>
-
-                <div className="space-y-1 mb-3">
-                  {item.titles.map((title, ti) => (
-                    <h3 key={ti} className="font-semibold text-slate-800 text-base italic">
-                      • {title}
-                    </h3>
-                  ))}
-                </div>
-
-                <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                  {item.description}
-                </p>
-              </div>
-
-              <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs text-slate-400 font-medium">Fiches associées :</span>
-                  {item.fiches.map(fId => (
-                    <Link
-                      key={fId}
-                      href={`/fiches/${fId}`}
-                      className="text-xs bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded hover:bg-amber-100 transition-colors"
-                    >
-                      Fiche {fId}
-                    </Link>
-                  ))}
-                </div>
-
-                <a
-                  href={`https://www.google.com/search?q=${encodeURIComponent(item.author + ' ' + item.titles[0])}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold inline-flex items-center gap-1"
-                >
-                  Rechercher <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            </div>
+              <tab.icon className="h-4 w-4" strokeWidth={1.75} />
+              {tab.label}
+            </button>
           ))}
         </div>
 
-        {/* Source Livret Footer */}
-        <div className="mt-12 text-center p-6 bg-amber-50/60 rounded-2xl border border-amber-200/60 max-w-2xl mx-auto">
-          <Sparkles className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-          <p className="text-sm text-amber-900 font-medium mb-1">
-            Parcours des Fondements — moneglisepreferee.net
+        {!livret ? (
+          <p className="animate-pulse text-center font-serif text-sm text-encre-400">
+            Ouverture du livret…
           </p>
-          <p className="text-xs text-amber-800/80">
-            &quot;Mais aussi et avant tout, le Saint-Esprit, qui nous a inspirés et permis d&apos;aller plus loin dans la compréhension des Écritures et la conception de ce parcours.&quot; (p. 164)
-          </p>
-        </div>
+        ) : onglet === 'presentation' ? (
+          <div className="space-y-8">
+            <blockquote className="rounded-4xl border border-encre-200 bg-encre-50 p-6 text-center">
+              <Quote className="mx-auto h-5 w-5 text-or-500" strokeWidth={1.5} />
+              <p className="mt-3 font-serif text-base italic leading-relaxed text-encre-800">
+                Notre but est de placer tout homme en présence de Dieu et d&apos;amener les
+                chrétiens à leur pleine maturité spirituelle par une communion vivante avec le
+                Christ.
+              </p>
+              <span className="mt-2 block text-2xs text-encre-400">Colossiens 1:28</span>
+            </blockquote>
 
+            {livret.presentation.map((section, index) => (
+              <section key={index}>
+                {section.titre && (
+                  <h2 className="mb-4 flex items-baseline gap-3 font-serif text-xl font-bold text-encre-950">
+                    <span className="text-sm text-or-500">•</span>
+                    {section.titre}
+                  </h2>
+                )}
+                <div className="prose-livret text-sm text-encre-700">
+                  {section.blocs.map((bloc, i) => (
+                    <RenduBloc key={i} bloc={bloc} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        ) : onglet === 'prendre-soin' ? (
+          <div className="space-y-8">
+            <div className="rounded-3xl border border-or-200 bg-or-50 p-5">
+              <p className="text-xs leading-relaxed text-or-900/85">
+                Cette annexe accompagne les fiches 7, 8 et 15. Le livret la donne aux responsables
+                avant les temps de prière personnels — mais elle concerne tout le groupe.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {[7, 8, 15].map((id) => (
+                  <Link
+                    key={id}
+                    href={`/fiches/${id}`}
+                    className="rounded-full bg-white px-3 py-1.5 text-2xs font-bold text-or-700 transition-colors hover:bg-or-100"
+                  >
+                    Fiche {id}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {livret.annexeTransversale.sections.map((section, index) => (
+              <section key={index}>
+                {section.titre && (
+                  <h2 className="mb-4 flex items-baseline gap-3 font-serif text-xl font-bold text-encre-950">
+                    <span className="text-sm text-or-500">•</span>
+                    {section.titre}
+                  </h2>
+                )}
+                <div className="prose-livret text-sm text-encre-700">
+                  {section.blocs.map((bloc, i) => (
+                    <RenduBloc key={i} bloc={bloc} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {livret.bibliographie.map((reference, index) => (
+              <article
+                key={index}
+                className="rounded-3xl border border-parchemin-400 bg-white p-5 shadow-2xs"
+              >
+                {reference.auteur && (
+                  <h2 className="font-serif text-base font-bold text-encre-950">
+                    {reference.auteur}
+                  </h2>
+                )}
+                <p className="mt-1 text-sm leading-relaxed text-encre-700">{reference.ouvrages}</p>
+
+                {reference.auteur && NOTES_LECTURE[reference.auteur] && (
+                  <p className="mt-2 text-2xs leading-relaxed text-encre-500">
+                    {NOTES_LECTURE[reference.auteur]}
+                  </p>
+                )}
+
+                {reference.fiches.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5 border-t border-parchemin-300 pt-3">
+                    {reference.fiches.map((id) => (
+                      <Link
+                        key={id}
+                        href={`/fiches/${id}`}
+                        className="rounded-full bg-parchemin-100 px-2.5 py-1 text-2xs font-bold text-encre-600 transition-colors hover:bg-or-100 hover:text-or-700"
+                      >
+                        Fiche {id}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </article>
+            ))}
+
+            <p className="rounded-3xl bg-parchemin-200/60 px-5 py-4 text-2xs leading-relaxed text-encre-500">
+              Le livret est librement téléchargeable sur{' '}
+              <span className="font-bold text-encre-700">moneglisepreferee.net</span>. Les versets
+              y sont tirés de la Bible du Semeur, sauf mention contraire.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+function RenduBloc({ bloc }: { bloc: Bloc }) {
+  switch (bloc.type) {
+    case 'sous-titre':
+      return <h4>{bloc.texte}</h4>;
+    case 'citation':
+      return <blockquote>{bloc.texte}</blockquote>;
+    case 'encadre':
+      return <div className="encadre my-4 text-sm text-encre-800">{bloc.texte}</div>;
+    case 'liste': {
+      const items = bloc.texte
+        .split(/(?=^|\s)-\s+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+      return (
+        <ul>
+          {items.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      );
+    }
+    case 'aparte':
+      return (
+        <p className="my-3 rounded-xl border border-or-200 bg-or-50 px-4 py-2.5 text-xs italic text-or-800">
+          {bloc.texte.replace(/^>\s*/, '')}
+        </p>
+      );
+    default:
+      return <p>{bloc.texte}</p>;
+  }
 }

@@ -2,16 +2,119 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // User profile and private subcollections
+
+    function connecte() {
+      return request.auth != null;
+    }
+
+    function moi() {
+      return request.auth.uid;
+    }
+
+    /** Membre actif du groupe : la seule porte d'entrée sur sa vie interne. */
+    function estMembre(groupId) {
+      return connecte()
+        && exists(/databases/$(database)/documents/groups/$(groupId)/members/$(moi()))
+        && get(/databases/$(database)/documents/groups/$(groupId)/members/$(moi())).data.status == 'actif';
+    }
+
+    function estAnimateur(groupId) {
+      let membre = get(/databases/$(database)/documents/groups/$(groupId)/members/$(moi())).data;
+      return connecte()
+        && exists(/databases/$(database)/documents/groups/$(groupId)/members/$(moi()))
+        && membre.status == 'actif'
+        && (membre.role == 'animateur' || membre.role == 'co_animateur');
+    }
+
+    // ── Profils ───────────────────────────────────────────────
+    // Chacun ne lit et n'écrit que le sien. Les noms affichés dans un groupe
+    // proviennent des documents « membre », pas des profils.
+    match /profiles/{userId} {
+      allow read, write: if connecte() && moi() == userId;
+    }
+
+    // ── Groupes ───────────────────────────────────────────────
+    match /groups/{groupId} {
+      // L'annuaire doit rester lisible : c'est ce qui permet de trouver un
+      // groupe près de chez soi avant d'en faire partie.
+      allow read: if connecte();
+
+      allow create: if connecte()
+        && request.resource.data.leaderId == moi()
+        && request.resource.data.membersCount == 1;
+
+      // Le compteur de membres bouge aussi quand quelqu'un rejoint un groupe
+      // ouvert : tout membre actif peut donc écrire, l'animateur pilote le reste.
+      allow update: if estMembre(groupId) || estAnimateur(groupId);
+      allow delete: if estAnimateur(groupId);
+
+      // ── Membres ─────────────────────────────────────────────
+      match /members/{memberId} {
+        allow read: if connecte()
+          && (moi() == memberId || estMembre(groupId) || estAnimateur(groupId));
+
+        // On dépose sa propre demande d'adhésion, jamais celle d'un autre,
+        // et jamais en s'attribuant le statut « actif ».
+        allow create: if connecte()
+          && moi() == memberId
+          && request.resource.data.uid == moi()
+          && request.resource.data.status in ['en_attente', 'actif'];
+
+        allow update: if connecte()
+          && (moi() == memberId || estAnimateur(groupId));
+
+        allow delete: if estAnimateur(groupId);
+      }
+
+      // ── Rencontres ──────────────────────────────────────────
+      match /sessions/{sessionId} {
+        allow read: if estMembre(groupId);
+        // Chaque membre annonce sa présence ; l'animateur conduit le déroulé.
+        allow create, update: if estMembre(groupId);
+        allow delete: if estAnimateur(groupId);
+      }
+
+      // ── Mur du groupe ───────────────────────────────────────
+      match /posts/{postId} {
+        allow read: if estMembre(groupId);
+        allow create: if estMembre(groupId) && request.resource.data.authorId == moi();
+        // Les « j'ai prié » et « amen » modifient le message d'un autre :
+        // tout membre peut donc mettre à jour, mais seul l'auteur supprime.
+        allow update: if estMembre(groupId);
+        allow delete: if estMembre(groupId)
+          && (resource.data.authorId == moi() || estAnimateur(groupId));
+      }
+    }
+
+    // ── Invitations ───────────────────────────────────────────
+    // Collection à plat pour qu'une personne puisse retrouver les invitations
+    // envoyées à son adresse, sans avoir accès aux groupes concernés.
+    match /invitations/{inviteId} {
+      allow read: if connecte()
+        && (request.auth.token.email == resource.data.email
+            || estMembre(resource.data.groupId));
+      allow create: if connecte()
+        && request.resource.data.invitedBy == moi()
+        && estMembre(request.resource.data.groupId);
+      // Accepter une invitation la marque comme utilisée.
+      allow update: if connecte()
+        && (request.auth.token.email == resource.data.email
+            || estAnimateur(resource.data.groupId));
+      allow delete: if connecte() && estAnimateur(resource.data.groupId);
+    }
+
+    // ── Progression personnelle (réponses, journal) ────────────
+    // Strictement privée : rien de ce qui est écrit dans une fiche n'est
+    // partagé sans un geste explicite de son auteur.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if connecte() && moi() == userId;
 
       match /progress/{ficheId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if connecte() && moi() == userId;
       }
 
       match /journal/{entryId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if connecte() && moi() == userId;
       }
     }
   }

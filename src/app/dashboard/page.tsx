@@ -1,227 +1,578 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/AuthContext';
-import { getUserProgress, getJournalEntries, timestampToDate } from '@/lib/firestore';
-import type { JournalEntry } from '@/lib/firestore';
-import ProgressBar from '@/components/ProgressBar';
-import { 
-  BookOpen, 
-  PenLine, 
-  ArrowRight, 
-  Users, 
-  Brain, 
-  Tag, 
-  BookMarked, 
+import type { LucideIcon } from 'lucide-react';
+import {
+  ArrowRight,
   Award,
+  BookOpen,
+  Bookmark,
+  Brain,
+  CheckCircle2,
+  Clock,
+  Compass,
+  Heart,
+  Headphones,
+  PenLine,
   Sparkles,
+  Star,
+  Users,
 } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { useParcours } from '@/lib/ParcoursContext';
+import ParcoursGate from '@/components/ParcoursGate';
+import ProgressBar from '@/components/ProgressBar';
+import YearHeatmap from '@/components/YearHeatmap';
+import ModernIcon from '@/components/ModernIcon';
+import { getJournalEntries, timestampToDate } from '@/lib/firestore';
+import type { JournalEntry } from '@/lib/firestore';
+import { getPosts, nextMeetingDate, subscribe } from '@/lib/parcoursStore';
+import { FICHES_META } from '@/data/fichesMeta';
+import Illumination from '@/components/Illumination';
+import { Etincelle, MotFantome, Pastille } from '@/components/decor';
+import { chargerFiche, versetsDe } from '@/lib/livret';
+import { texteDuVerset } from '@/data/versets';
+import type { GroupPost } from '@/lib/types';
 
-export default function Dashboard() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-  const [progress, setProgress] = useState<{completedFiches: number[], currentFicheId: number} | null>(null);
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
-  const [dataLoading, setDataLoading] = useState(true);
+const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+
+function DashboardContent() {
+  const { user } = useAuth();
+  const { group, members, membership, session, isLeader } = useParcours();
+  const [journal, setJournal] = useState<JournalEntry[]>([]);
+  const [posts, setPosts] = useState<GroupPost[]>([]);
+  const [ancre, setAncre] = useState<{ reference: string; texte: string | null } | null>(null);
+  const [maintenant] = useState(() => Date.now());
+
+  const chargerPosts = useCallback(() => {
+    if (!group) return;
+    void getPosts(group.id).then(setPosts);
+  }, [group]);
 
   useEffect(() => {
-    if (!loading && !user) router.push('/login');
-  }, [user, loading, router]);
+    if (!user) return;
+    void getJournalEntries(user.uid).then((entries) => setJournal(entries.slice(0, 3)));
+  }, [user]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (user) {
-        try {
-          const prog = await getUserProgress(user.uid);
-          setProgress(prog);
-          const entries = await getJournalEntries(user.uid);
-          setJournalEntries(entries.slice(0, 3));
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setDataLoading(false);
-        }
-      }
-    };
-    if (user && !loading) {
-      fetchData();
-    }
-  }, [user, loading]);
+    chargerPosts();
+    if (!group) return;
+    return subscribe(`posts:${group.id}`, chargerPosts);
+  }, [group, chargerPosts]);
 
-  if (loading || dataLoading) {
-    return (
-      <div className="min-h-screen pt-24 flex items-center justify-center">
-        <div className="animate-pulse text-slate-400 text-lg">Chargement de votre espace...</div>
-      </div>
-    );
-  }
-  if (!user) return null;
+  // Le premier verset à mémoriser de la fiche en cours.
+  useEffect(() => {
+    if (!group) return;
+    void chargerFiche(group.currentStep).then((contenu) => {
+      const reference = contenu ? versetsDe(contenu)[0] : undefined;
+      setAncre(reference ? { reference, texte: texteDuVerset(reference) } : null);
+    });
+  }, [group]);
 
-  const completedCount = progress?.completedFiches.length || 0;
-  const currentFiche = progress?.currentFicheId || 1;
+  const actifs = useMemo(() => members.filter((m) => m.status === 'actif'), [members]);
+
+  if (!user || !group) return null;
+
+  const fiche = FICHES_META.find((f) => f.id === group.currentStep);
+  const prochaine = nextMeetingDate(group.meeting, group.stepOpenedAt);
+  const jours = Math.max(
+    0,
+    Math.ceil((prochaine.getTime() - maintenant) / (1000 * 60 * 60 * 24))
+  );
+  const jePrepare = membership?.preparedSteps.includes(group.currentStep) ?? false;
+  const prets = actifs.filter((m) => m.preparedSteps.includes(group.currentStep)).length;
+  const enRencontre = group.stepPhase === 'rencontre' && session?.status === 'ouverte';
+
+  const prieres = posts.filter((p) => p.kind === 'priere' && !p.answered);
+  const pepite = posts.find((p) => p.kind === 'pepite');
+  const versetAncre = ancre;
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-slate-50 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="table-travail min-h-screen px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-8">
         
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold font-serif text-slate-900 mb-2">
-            Bonjour, {user.displayName || 'cher disciple'} !
-          </h1>
-          <p className="text-slate-600 text-sm sm:text-base">
-            Bienvenue sur votre plateforme de croissance spirituelle. Voici votre état d&apos;avancement :
-          </p>
-        </div>
+        {/* ══ En-tête : Grande feuille de bureau épinglée ══ */}
+        <div className="feuille relative rounded-3xl p-6 sm:p-8 shadow-md">
+          {/* Punaise dorée en haut à gauche & Washi tape à droite */}
+          <span className="punaise -top-2 left-8" />
+          <span className="ruban -top-3 right-10 rotate-3 rounded-[2px]" />
 
-        {/* Top Grid: Progress & Daily Verse */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          
-          {/* Main Progress Card */}
-          <div className="md:col-span-2 bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold font-serif text-slate-900 flex items-center gap-2">
-                  <BookOpen className="text-indigo-600 w-5 h-5" /> Progression du Parcours
-                </h2>
-                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-                  {completedCount} / 20 fiches
+          <MotFantome haut="-18%" droite="-2%" taille="clamp(6rem, 16vw, 11rem)">
+            {String(group.currentStep).padStart(2, '0')}
+          </MotFantome>
+
+          <div className="relative z-10 flex flex-col sm:flex-row items-start justify-between gap-6">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Pastille>
+                  <Etincelle taille={12} />
+                  {group.name}
+                </Pastille>
+                <span className="timbre rounded-md px-2.5 py-0.5 text-2xs font-bold text-or-800">
+                  Semaine {group.currentStep} / 20
                 </span>
               </div>
-              <div className="mb-6">
-                <ProgressBar current={completedCount} total={20} showLabel size="lg" />
-              </div>
-            </div>
 
-            <div className="bg-gradient-to-r from-amber-500/10 to-indigo-500/10 rounded-2xl p-5 border border-amber-200/60 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div>
-                <span className="text-2xs uppercase tracking-wider text-amber-800 font-bold">Prochaine étape</span>
-                <p className="text-slate-900 font-bold text-lg font-serif">Fiche {currentFiche}</p>
-              </div>
-              <Link
-                href={`/fiches/${currentFiche}`}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-full font-bold text-xs shadow-md transition-transform active:scale-95 inline-flex items-center gap-2"
-              >
-                {completedCount === 0 ? 'Commencer la Fiche 1' : 'Continuer mon étude'} <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
+              <h1 className="mt-3 font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-4xl">
+                Bonjour, {user.displayName?.split(' ')[0] || 'cher disciple'}.
+              </h1>
 
-          {/* Verset du jour */}
-          <div className="bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-3xl p-6 shadow-md text-white flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-1.5 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                Verset à méditer
-              </div>
-              <p className="font-serif italic text-sm sm:text-base leading-relaxed text-indigo-50 mb-4">
-                &quot;Car c&apos;est par la grâce que vous êtes sauvés, par le moyen de la foi. Et cela ne vient pas de vous, c&apos;est le don de Dieu.&quot;
+              <p className="manuscrit mt-2 text-xl sm:text-2xl text-or-800 leading-relaxed max-w-xl">
+                {enRencontre
+                  ? 'La rencontre de votre cellule est ouverte en ce moment même sur la table.'
+                  : jePrepare
+                    ? `Fiche ${group.currentStep} prête ! Rendez-vous ${JOURS[group.meeting.weekday]} avec vos compagnons.`
+                    : `Prenez un temps à part : il vous reste ${jours} jour${jours > 1 ? 's' : ''} pour préparer votre fiche.`}
               </p>
             </div>
-            <div className="flex justify-between items-center pt-3 border-t border-indigo-700/60">
-              <span className="text-xs font-bold text-amber-300">Éphésiens 2:8</span>
-              <Link href="/memorisation" className="text-2xs text-indigo-200 hover:text-white font-medium underline">
-                Mémoriser &rarr;
+
+            {/* Enluminure de la fiche */}
+            <Illumination
+              fiche={group.currentStep}
+              taille={110}
+              tone="clair"
+              className="hidden shrink-0 sm:block drop-shadow-md"
+            />
+          </div>
+        </div>
+
+        {/* ══ Rencontre en direct (si ouverte) ══ */}
+        {enRencontre && (
+          <Link
+            href="/groupes/rencontre"
+            className="nuit nuit-grain animate-reveal relative block overflow-hidden rounded-3xl p-6 text-parchemin-100 shadow-xl transition-transform hover:-translate-y-0.5 sm:p-7 border border-or-400/30"
+          >
+            <span className="punaise punaise-rouge -top-2 left-6" />
+            <span className="vitrail right-[-4rem] top-[-4rem] h-56 w-56 bg-or-400/18" />
+            <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-rose-500/20 px-3 py-1 text-2xs font-bold uppercase tracking-[0.16em] text-rose-200">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-70" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-400" />
+                  </span>
+                  En direct
+                </span>
+                <h2 className="mt-2.5 font-serif text-xl font-bold sm:text-2xl">
+                  Votre cellule est réunie
+                </h2>
+                <p className="mt-1 text-xs text-parchemin-100/70">
+                  Rejoignez vos compagnons de parcours — sur place ou en visio.
+                </p>
+              </div>
+              <span className="bouton-or inline-flex shrink-0 items-center gap-2 self-start rounded-full px-6 py-3 text-xs font-bold sm:self-auto">
+                Prendre place <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+            </div>
+          </Link>
+        )}
+
+        {/* ══ Fiche courante (Feuille d'étude) & Post-it Verset ══ */}
+        <div className="grid gap-6 md:grid-cols-3 items-start">
+          
+          {/* Feuille de travail : La fiche de la semaine */}
+          <div className="feuille pose-1 relative rounded-3xl p-6 sm:p-8 shadow-md md:col-span-2 flex flex-col justify-between">
+            {/* Pince d'attache noire et argentée */}
+            <span className="attache-pince -top-3 left-10" />
+
+            <div>
+              <div className="mb-4 flex items-start justify-between gap-3 pt-1">
+                <div className="flex items-center gap-2.5">
+                  <ModernIcon icon={Compass} variant="amber" size="sm" />
+                  <div>
+                    <span className="text-2xs font-bold uppercase tracking-[0.16em] text-encre-400">
+                      Cahier d&apos;étude de la semaine
+                    </span>
+                    <h2 className="font-serif text-xl font-bold text-encre-950">
+                      {group.currentStep}. {fiche?.titre}
+                    </h2>
+                  </div>
+                </div>
+
+                <span className="timbre px-3 py-1 text-2xs font-bold text-or-800 rounded-lg">
+                  {group.closedSteps.length} / 20 fiches
+                </span>
+              </div>
+
+              <p className="manuscrit mb-4 text-sm text-encre-700 leading-relaxed">
+                {fiche?.sousTitre}
+              </p>
+
+              <ProgressBar current={group.closedSteps.length} total={20} showLabel={false} />
+
+              <div className="mt-5 space-y-2.5 bg-parchemin-50/70 rounded-2xl p-4 border border-encre-950/5">
+                <Etape
+                  faite={jePrepare}
+                  texte="Lire l’exposé et répondre aux questions, chez vous"
+                />
+                <Etape
+                  faite={group.stepPhase !== 'preparation'}
+                  texte={`Partager la fiche avec le groupe, ${JOURS[group.meeting.weekday]} à ${group.meeting.time}`}
+                />
+                <Etape
+                  faite={false}
+                  texte={
+                    group.currentStep >= 20
+                      ? 'Achever le parcours'
+                      : `Ouvrir la fiche ${group.currentStep + 1}`
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 border-t border-encre-950/10 pt-5">
+              <Link
+                href={`/fiches/${group.currentStep}?immersion=1`}
+                className="bouton-or inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-xs font-bold shadow-sm"
+              >
+                <Headphones className="h-4 w-4" strokeWidth={2} />
+                Lancer l&apos;immersion guidée
+              </Link>
+              <Link
+                href={`/fiches/${group.currentStep}`}
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-parchemin-400 bg-white/80 px-5 py-3 text-xs font-bold text-encre-700 transition-colors hover:bg-parchemin-200"
+              >
+                <BookOpen className="h-4 w-4" strokeWidth={2} />
+                Lecture libre & Étude
+              </Link>
+            </div>
+          </div>
+
+          {/* Post-it : Verset à méditer */}
+          <div className="postit pose-2 relative rounded-2xl p-6 shadow-md">
+            {/* Punaise rouge */}
+            <span className="punaise punaise-rouge -top-2.5 right-6" />
+
+            <div className="flex items-center justify-between gap-2 border-b border-encre-950/10 pb-2 mb-3">
+              <span className="manuscrit text-base font-bold text-encre-900 flex items-center gap-1.5">
+                <Bookmark className="h-4 w-4 text-or-700" />
+                Verset à méditer
+              </span>
+              <span className="text-2xs font-semibold text-encre-600">
+                Fiche {group.currentStep}
+              </span>
+            </div>
+
+            <p className="font-serif text-sm italic leading-relaxed text-encre-900 mb-4">
+              {versetAncre?.texte
+                ? `« ${versetAncre.texte} »`
+                : versetAncre
+                  ? 'À recopier de votre main, Bible ouverte — c’est ainsi que le livret le demande.'
+                  : '« Approchez-vous de Dieu, et il s’approchera de vous. »'}
+            </p>
+
+            <div className="flex items-center justify-between border-t border-encre-950/10 pt-3">
+              <span className="manuscrit text-base font-bold text-or-800">
+                {versetAncre?.reference ?? 'Jacques 4:8'}
+              </span>
+              <Link
+                href="/memorisation"
+                className="inline-flex items-center gap-1 text-2xs font-bold text-encre-800 underline hover:text-encre-950"
+              >
+                Flashcards →
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Feature Hub Shortcuts */}
-        <h3 className="text-lg font-bold font-serif text-slate-800 mb-4">Outils & Espaces du Parcours</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-          
-          <Link
-            href="/groupes"
-            className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs hover:shadow-md hover:border-indigo-200 transition-all text-center group flex flex-col items-center justify-center"
-          >
-            <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <Users className="w-6 h-6" />
+        {/* ══ Le pouls de la cellule : Mur de Post-its colorés ══ */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2">
+              <span className="punaise inline-block relative !top-0 !left-0 shrink-0" />
+              <h3 className="font-serif text-xl font-bold text-encre-950">Le pouls de la cellule</h3>
             </div>
-            <h4 className="font-bold text-slate-800 text-xs sm:text-sm">Groupe & Visio</h4>
-            <p className="text-2xs text-slate-400 mt-1">Partage & Mur de prière</p>
-          </Link>
-
-          <Link
-            href="/memorisation"
-            className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs hover:shadow-md hover:border-amber-200 transition-all text-center group flex flex-col items-center justify-center"
-          >
-            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <Brain className="w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-slate-800 text-xs sm:text-sm">Mémorisation</h4>
-            <p className="text-2xs text-slate-400 mt-1">Flashcards 3D</p>
-          </Link>
-
-          <Link
-            href="/index-thematique"
-            className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all text-center group flex flex-col items-center justify-center"
-          >
-            <div className="w-12 h-12 bg-slate-100 text-slate-700 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <Tag className="w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-slate-800 text-xs sm:text-sm">Index Thématique</h4>
-            <p className="text-2xs text-slate-400 mt-1">Index p. 163 du livret</p>
-          </Link>
-
-          <Link
-            href="/ressources"
-            className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all text-center group flex flex-col items-center justify-center"
-          >
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <BookMarked className="w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-slate-800 text-xs sm:text-sm">Bibliographie</h4>
-            <p className="text-2xs text-slate-400 mt-1">Livres p. 164</p>
-          </Link>
-
-          <Link
-            href="/certificat"
-            className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs hover:shadow-md hover:border-amber-300 transition-all text-center group flex flex-col items-center justify-center col-span-2 sm:col-span-1"
-          >
-            <div className="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <Award className="w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-slate-800 text-xs sm:text-sm">Mon Certificat</h4>
-            <p className="text-2xs text-slate-400 mt-1">Attestation officielle</p>
-          </Link>
-
-        </div>
-
-        {/* Recent Journal Entries */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold font-serif flex items-center gap-2 text-slate-900">
-              <PenLine className="text-amber-500 w-5 h-5" /> Journal Spirituel Récent
-            </h2>
-            <Link href="/journal" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
-              Ouvrir le journal <ArrowRight className="w-3.5 h-3.5" />
+            <Link
+              href="/groupes"
+              className="manuscrit text-sm font-bold text-or-800 hover:text-or-950 inline-flex items-center gap-1"
+            >
+              Voir le carnet du groupe <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
-          {journalEntries.length > 0 ? (
-            <div className="space-y-4">
-              {journalEntries.map(entry => (
-                <div key={entry.id} className="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                  <p className="text-2xs text-slate-400 mb-1 font-medium">{timestampToDate(entry.createdAt)?.toLocaleDateString('fr-FR') || 'À l’instant'}</p>
-                  <p className="text-slate-700 text-sm line-clamp-2 leading-relaxed">{entry.content}</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            
+            {/* Post-it Bleu : Prochaine rencontre */}
+            <div className="postit-bleu pose-3 relative rounded-2xl p-5 shadow-md flex flex-col justify-between">
+              <span className="punaise punaise-bleue -top-2.5 left-6" />
+              <div>
+                <span className="text-2xs font-bold uppercase tracking-[0.14em] text-sky-800 block">
+                  Prochaine rencontre
+                </span>
+                <p className="manuscrit mt-1.5 text-xl font-bold text-encre-950">
+                  {JOURS[group.meeting.weekday]} {prochaine.toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'short',
+                  })}
+                </p>
+                <p className="mt-1 text-xs text-sky-900 leading-snug">
+                  {group.meeting.time} · {
+                    group.meeting.mode === 'ligne'
+                      ? 'en visio'
+                      : group.meeting.mode === 'hybride'
+                        ? 'sur place ou en visio'
+                        : 'en présentiel'
+                  }
+                </p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-sky-900/10 text-2xs text-sky-800 font-medium">
+                Cellule {group.name}
+              </div>
+            </div>
+
+            {/* Post-it Jaune : Fiches préparées */}
+            <div className="postit pose-1 relative rounded-2xl p-5 shadow-md flex flex-col justify-between">
+              <span className="ruban -top-2.5 left-1/2 -translate-x-1/2 rotate-1 rounded-[2px]" />
+              <div>
+                <span className="text-2xs font-bold uppercase tracking-[0.14em] text-or-800 block">
+                  Fiches préparées
+                </span>
+                <p className="manuscrit mt-1.5 text-2xl font-bold text-encre-950">
+                  {prets} / {actifs.length} prêts
+                </p>
+                <p className="mt-1 text-xs text-encre-800 leading-snug">
+                  {jePrepare
+                    ? '✓ Vous avez préparé la vôtre'
+                    : '⏳ En attente de votre réponse'}
+                </p>
+              </div>
+              <Link
+                href="/groupes"
+                className="mt-4 pt-2 border-t border-encre-950/10 text-2xs font-bold text-or-900 hover:underline flex items-center justify-between"
+              >
+                <span>Détail du groupe</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+
+            {/* Post-it Rose : Sujets de prière */}
+            <div className="postit-rose pose-4 relative rounded-2xl p-5 shadow-md flex flex-col justify-between">
+              <span className="trombone -top-3 right-5 rotate-6" />
+              <div>
+                <span className="text-2xs font-bold uppercase tracking-[0.14em] text-rose-800 block">
+                  Sujets de prière
+                </span>
+                <p className="manuscrit mt-1.5 text-2xl font-bold text-rose-950">
+                  {prieres.length} en cours
+                </p>
+                <p className="mt-1 text-xs text-rose-900 line-clamp-2 leading-snug">
+                  {prieres[0] ? `Dernier : ${prieres[0].authorName}` : 'Le carnet de prière est paisible'}
+                </p>
+              </div>
+              <Link
+                href="/groupes"
+                className="mt-4 pt-2 border-t border-rose-900/10 text-2xs font-bold text-rose-900 hover:underline flex items-center justify-between"
+              >
+                <span>Prier ensemble</span>
+                <Heart className="h-3 w-3 text-rose-600" />
+              </Link>
+            </div>
+
+            {/* Post-it Vert : Dernière pépite */}
+            <div className="postit-vert pose-2 relative rounded-2xl p-5 shadow-md flex flex-col justify-between">
+              <span className="punaise -top-2.5 right-6" />
+              <div>
+                <span className="text-2xs font-bold uppercase tracking-[0.14em] text-emerald-800 block">
+                  Pépite de la semaine
+                </span>
+                <p className="manuscrit mt-1.5 text-lg font-bold text-emerald-950 truncate">
+                  {pepite?.reference ?? 'Partage fraternel'}
+                </p>
+                <p className="mt-1 text-xs text-emerald-900 line-clamp-2 leading-snug">
+                  {pepite
+                    ? `« ${pepite.content.slice(0, 45)}… »`
+                    : 'Partagez ce qui vous a touché'}
+                </p>
+              </div>
+              <Link
+                href="/groupes"
+                className="mt-4 pt-2 border-t border-emerald-900/10 text-2xs font-bold text-emerald-900 hover:underline flex items-center justify-between"
+              >
+                <span>Déposer une pépite</span>
+                <Star className="h-3 w-3 text-emerald-700" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ Assiduité & Rythme (Feuille de registre) ══ */}
+        <div className="feuille relative rounded-3xl p-6 sm:p-8 shadow-sm">
+          <span className="ruban -top-3 left-12 -rotate-1 rounded-[2px]" />
+          <div className="mb-4">
+            <h3 className="font-serif text-lg font-bold text-encre-950">Registre d&apos;assiduité spirituelle</h3>
+            <p className="manuscrit text-sm text-encre-600">Votre fidélité au fil des jours</p>
+          </div>
+          <YearHeatmap />
+        </div>
+
+        {/* ══ Outils de la table ══ */}
+        <section className="space-y-4">
+          <h3 className="font-serif text-lg font-bold text-encre-950 px-1">Vos outils de disciple</h3>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <CarteOutil
+              href="/groupes"
+              icone={Users}
+              titre="Ma cellule"
+              sous="Prière & échanges"
+              color="border-indigo-200"
+            />
+            <CarteOutil
+              href="/memorisation"
+              icone={Brain}
+              titre="Mémorisation"
+              sous="Versets clés"
+              color="border-amber-200"
+            />
+            <CarteOutil
+              href="/journal"
+              icone={PenLine}
+              titre="Journal"
+              sous="Mes méditations"
+              color="border-emerald-200"
+            />
+            <CarteOutil
+              href="/index-thematique"
+              icone={Bookmark}
+              titre="Index"
+              sous="Thèmes bibliques"
+              color="border-slate-200"
+            />
+            <CarteOutil
+              href="/certificat"
+              icone={Award}
+              titre="Attestation"
+              sous="Fin de parcours"
+              color="border-amber-300"
+            />
+          </div>
+        </section>
+
+        {/* ══ Journal Spirituel Récent (Cahier ouvert) ══ */}
+        <div className="feuille feuille-dechiree relative rounded-3xl p-6 sm:p-8 shadow-md">
+          <span className="punaise -top-2.5 left-10" />
+          <span className="ruban -top-3 right-12 rotate-2 rounded-[2px]" />
+
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <ModernIcon icon={PenLine} variant="amber" size="sm" />
+              <div>
+                <h2 className="font-serif text-lg font-bold text-encre-950">Feuillets du journal récent</h2>
+                <p className="manuscrit text-sm text-encre-600">Vos notes et inspirations personnelles</p>
+              </div>
+            </div>
+            <Link
+              href="/journal"
+              className="manuscrit text-sm font-bold text-or-800 hover:text-or-950 inline-flex items-center gap-1"
+            >
+              Ouvrir le carnet <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {journal.length ? (
+            <div className="space-y-3">
+              {journal.map((entree) => (
+                <div
+                  key={entree.id}
+                  className="rounded-2xl border border-encre-950/10 bg-parchemin-50/70 p-4 transition-colors hover:bg-parchemin-100/80"
+                >
+                  <div className="mb-1 flex items-start justify-between gap-3">
+                    <h4 className="manuscrit text-base font-bold text-encre-900">
+                      {entree.title || 'Note personnelle'}
+                    </h4>
+                    <span className="flex shrink-0 items-center gap-1 text-2xs text-encre-400">
+                      <Clock className="h-3 w-3" />
+                      {timestampToDate(entree.createdAt).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                      })}
+                    </span>
+                  </div>
+                  <p className="font-serif text-xs italic leading-relaxed text-encre-700 line-clamp-2">
+                    « {entree.content} »
+                  </p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-              <PenLine className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-              <p className="text-xs mb-3">Vous n&apos;avez pas encore consigné de notes dans votre journal.</p>
-              <Link href="/journal" className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-full inline-block">
-                Écrire une première prière / note
+            <div className="rounded-2xl border-2 border-dashed border-encre-950/15 py-8 text-center bg-white/40">
+              <ModernIcon icon={PenLine} variant="slate" size="md" className="mx-auto mb-2" />
+              <p className="manuscrit text-base font-bold text-encre-800">Le carnet est encore vierge</p>
+              <p className="mx-auto mt-1 max-w-xs text-2xs leading-relaxed text-encre-600">
+                Ce que vous notez pendant votre préparation personnelle éclaire souvent tout le groupe.
+              </p>
+              <Link
+                href="/journal"
+                className="mt-4 inline-flex items-center gap-1 rounded-full bg-encre-950 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-encre-900"
+              >
+                Écrire dans mon journal
               </Link>
             </div>
           )}
         </div>
 
+        {isLeader && (
+          <div className="feuille relative rounded-2xl p-4 shadow-sm border border-or-300/40 bg-or-50/60">
+            <span className="punaise -top-2 left-6" />
+            <p className="flex items-start gap-2.5 text-xs leading-relaxed text-or-950">
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-or-600" />
+              <span>
+                <strong>Note d&apos;animateur :</strong> C&apos;est vous qui ouvrez et clôturez la rencontre de cellule. La clôture débloque automatiquement l&apos;étape suivante pour tous vos compagnons.
+              </span>
+            </p>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+function Etape({ faite, texte }: { faite: boolean; texte: string }) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <span
+        className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full ${
+          faite ? 'bg-emerald-500 text-white' : 'border border-encre-300'
+        }`}
+      >
+        {faite && <CheckCircle2 className="h-3 w-3" strokeWidth={3} />}
+      </span>
+      <span className={`text-xs leading-relaxed ${faite ? 'text-encre-400 line-through' : 'text-encre-800'}`}>
+        {texte}
+      </span>
+    </div>
+  );
+}
+
+function CarteOutil({
+  href,
+  icone: Icone,
+  titre,
+  sous,
+  color,
+}: {
+  href: string;
+  icone: LucideIcon;
+  titre: string;
+  sous: string;
+  color?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`feuille rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center border ${color || 'border-parchemin-300'}`}
+    >
+      <Icone className="h-5 w-5 text-or-700 mb-2" />
+      <h4 className="manuscrit text-sm font-bold text-encre-900">{titre}</h4>
+      <p className="text-2xs text-encre-500 mt-0.5">{sous}</p>
+    </Link>
+  );
+}
+
+export default function Page() {
+  return (
+    <ParcoursGate>
+      <DashboardContent />
+    </ParcoursGate>
   );
 }

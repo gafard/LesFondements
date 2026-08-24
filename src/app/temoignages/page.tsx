@@ -1,182 +1,236 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { Heart, MessageCircle, Plus, X } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import { Sparkles, Heart, Plus, User } from 'lucide-react';
+import { useParcours } from '@/lib/ParcoursContext';
+import ParcoursGate from '@/components/ParcoursGate';
+import { addPost, deletePost, getPosts, subscribe, toggleAmen } from '@/lib/parcoursStore';
+import { FICHES_META } from '@/data/fichesMeta';
+import type { GroupPost } from '@/lib/types';
 
-interface Testimony {
-  id: string;
-  author: string;
-  ficheTheme: string;
-  text: string;
-  date: string;
-  likes: number;
-}
-
-export default function TemoignagesPage() {
+function TemoignagesContent() {
   const { user } = useAuth();
-  const [testimonies, setTestimonies] = useState<Testimony[]>([
-    {
-      id: '1',
-      author: 'Élodie G.',
-      ficheTheme: 'Fiche 4 — La Grâce',
-      text: 'Pendant des années, je vivais dans la peur de ne pas en faire assez pour Dieu. Méditer sur la Grâce m\'a délivrée du perfectionnisme religieux. Aujourd\'hui je sers par amour et non par devoir !',
-      date: 'Il y a 3 jours',
-      likes: 12
-    },
-    {
-      id: '2',
-      author: 'Jean-Marc D.',
-      ficheTheme: 'Fiche 7 & 8 — Vivre libre',
-      text: 'Le temps de prière et d\'aide personnelle après la fiche 8 a été un tournant. J\'ai pu pardonner de tout mon cœur les abus de mon enfance. La paix qui a inondé mon être est indescriptible.',
-      date: 'La semaine dernière',
-      likes: 19
-    },
-    {
-      id: '3',
-      author: 'Nathalie P.',
-      ficheTheme: 'Fiche 1 — Connaître Dieu',
-      text: 'La lettre d\'Amour du Père m\'a bouleversée aux larmes. J\'avais toujours vu Dieu comme un juge sévère. Découvrir qu\'Il est un Père tendre a guéri mon cœur.',
-      date: 'Il y a 2 semaines',
-      likes: 24
-    }
-  ]);
+  const { group, unlockedStep } = useParcours();
+  const [posts, setPosts] = useState<GroupPost[]>([]);
+  const [formulaire, setFormulaire] = useState(false);
+  const [ficheChoisie, setFicheChoisie] = useState<number>(1);
+  const [texte, setTexte] = useState('');
+  const [envoi, setEnvoi] = useState(false);
+  const [dernierPas, setDernierPas] = useState(unlockedStep);
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [newFicheTheme, setNewFicheTheme] = useState('Fiche 1 — Connaître Dieu');
-  const [newText, setNewText] = useState('');
+  const charger = useCallback(() => {
+    if (!group) return;
+    void getPosts(group.id).then(setPosts);
+  }, [group]);
 
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newText.trim()) return;
-    const item: Testimony = {
-      id: Date.now().toString(),
-      author: user?.displayName || 'Membre du parcours',
-      ficheTheme: newFicheTheme,
-      text: newText,
-      date: 'À l\'instant',
-      likes: 1
-    };
-    setTestimonies([item, ...testimonies]);
-    setNewText('');
-    setIsFormOpen(false);
-  };
+  useEffect(() => {
+    charger();
+    if (!group) return;
+    return subscribe(`posts:${group.id}`, charger);
+  }, [group, charger]);
 
-  const handleLike = (id: string) => {
-    setTestimonies(testimonies.map(t => t.id === id ? { ...t, likes: t.likes + 1 } : t));
+  // Quand une nouvelle fiche s'ouvre, la sélection par défaut la suit.
+  if (unlockedStep !== dernierPas) {
+    setDernierPas(unlockedStep);
+    setFicheChoisie(Math.max(1, unlockedStep));
+  }
+
+  const temoignages = useMemo(() => posts.filter((post) => post.kind === 'louange'), [posts]);
+  const fichesOuvertes = FICHES_META.filter((meta) => meta.id <= Math.max(1, unlockedStep));
+
+  if (!group || !user) return null;
+
+  const publier = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (texte.trim().length < 20) return;
+    setEnvoi(true);
+    await addPost({
+      groupId: group.id,
+      authorId: user.uid,
+      authorName: user.displayName || 'Un membre',
+      kind: 'louange',
+      content: texte,
+      step: ficheChoisie,
+    });
+    setTexte('');
+    setFormulaire(false);
+    setEnvoi(false);
+    charger();
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-slate-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              Témoignages & Victoires
-            </div>
-            <h1 className="text-3xl font-bold font-serif text-slate-900">
-              Ce que Dieu accomplit à travers ce parcours
-            </h1>
-            <p className="text-slate-600 text-xs sm:text-sm mt-1">
-              Encouragez la communauté en partageant comment les fiches transforment votre vie.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setIsFormOpen(!isFormOpen)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-sm flex items-center gap-2 transition-transform active:scale-95"
-          >
-            <Plus className="w-4 h-4" /> Partager mon témoignage
-          </button>
+    <div className="min-h-screen bg-parchemin-100 pb-10 pt-6">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <div className="mb-8 text-center">
+          <p className="mb-2 font-serif italic text-amber-800 text-xs sm:text-sm">
+            Mémoire & témoignages de la cellule « {group.name} »
+          </p>
+          <h1 className="font-serif text-3xl font-bold text-encre-950 sm:text-4xl">
+            Ce que Dieu a fait
+          </h1>
+          <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-encre-600">
+            Les témoignages restent dans votre groupe. On y revient souvent : c&apos;est la mémoire
+            de ce qui a changé pendant ces mois.
+          </p>
         </div>
 
-        {/* New Testimony Form */}
-        {isFormOpen && (
-          <form onSubmit={handleAdd} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8 animate-fade-in">
-            <h3 className="font-serif font-bold text-base text-slate-900 mb-3">Rédiger votre témoignage</h3>
-            <div className="mb-3">
-              <label className="text-xs text-slate-500 font-semibold block mb-1">Fiche ou thème concerné :</label>
-              <select
-                value={newFicheTheme}
-                onChange={(e) => setNewFicheTheme(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800"
-              >
-                <option>Fiche 1 — Connaître Dieu</option>
-                <option>Fiche 2 — Le péché, le salut</option>
-                <option>Fiche 3 — Devenir enfant de Dieu</option>
-                <option>Fiche 4 — La Grâce</option>
-                <option>Fiche 5 — Mon identité en Christ</option>
-                <option>Fiche 7 & 8 — Vivre libre & délivrance</option>
-                <option>Fiche 9-11 — Le Saint-Esprit</option>
-                <option>Fiche 16 — La Prière</option>
-              </select>
-            </div>
-
-            <textarea
-              value={newText}
-              onChange={(e) => setNewText(e.target.value)}
-              placeholder="Racontez comment Dieu a agi dans votre cœur, une révélation reçue, une délivrance..."
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 min-h-[100px] mb-3"
-            />
-
-            <div className="flex justify-end gap-2">
+        {!formulaire ? (
+          <button
+            onClick={() => setFormulaire(true)}
+            className="bouton-or mx-auto mb-8 flex items-center gap-2 rounded-full px-6 py-3 text-xs font-bold"
+          >
+            <Plus className="h-4 w-4" strokeWidth={2.5} />
+            Déposer un témoignage
+          </button>
+        ) : (
+          <form
+            onSubmit={publier}
+            className="mb-8 rounded-4xl border border-parchemin-400 bg-white p-5 shadow-sm sm:p-6"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-serif text-lg font-bold text-encre-950">Votre témoignage</h2>
               <button
                 type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg"
+                onClick={() => setFormulaire(false)}
+                className="rounded-full p-1.5 text-encre-300 transition-colors hover:text-encre-700"
+                aria-label="Fermer"
               >
-                Annuler
+                <X className="h-4 w-4" />
               </button>
+            </div>
+
+            <label className="mb-2 block text-2xs font-bold uppercase tracking-[0.16em] text-encre-400">
+              À propos de quelle fiche ?
+            </label>
+            <select
+              value={ficheChoisie}
+              onChange={(event) => setFicheChoisie(Number(event.target.value))}
+              className="mb-4 w-full rounded-2xl border border-parchemin-400 bg-parchemin-50 px-4 py-3 text-sm text-encre-800 outline-none focus:border-or-400"
+            >
+              {fichesOuvertes.map((meta) => (
+                <option key={meta.id} value={meta.id}>
+                  Fiche {meta.id} — {meta.titre}
+                </option>
+              ))}
+            </select>
+
+            <textarea
+              value={texte}
+              onChange={(event) => setTexte(event.target.value)}
+              rows={5}
+              placeholder="Ce qui a changé, concrètement. Une phrase suffit si c’est la bonne."
+              className="w-full resize-none rounded-2xl border border-parchemin-400 bg-parchemin-50 px-4 py-3 text-sm leading-relaxed text-encre-800 outline-none placeholder:text-encre-300 focus:border-or-400"
+            />
+
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-2xs text-encre-300">
+                {texte.trim().length < 20 ? 'Encore quelques mots…' : ''}
+              </span>
               <button
                 type="submit"
-                className="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm"
+                disabled={envoi || texte.trim().length < 20}
+                className="bouton-or rounded-full px-5 py-2.5 text-2xs font-bold disabled:opacity-40"
               >
-                Publier le témoignage
+                Partager au groupe
               </button>
             </div>
           </form>
         )}
 
-        {/* Testimonies list */}
-        <div className="space-y-4">
-          {testimonies.map((t) => (
-            <div key={t.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900 text-sm">{t.author}</h4>
-                    <span className="text-2xs text-slate-400">{t.date}</span>
-                  </div>
-                </div>
-                <span className="text-2xs font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full">
-                  {t.ficheTheme}
-                </span>
-              </div>
-
-              <p className="text-slate-700 text-sm leading-relaxed mb-4 italic font-serif">
-                &quot;{t.text}&quot;
-              </p>
-
-              <div className="flex justify-end pt-3 border-t border-slate-50">
-                <button
-                  onClick={() => handleLike(t.id)}
-                  className="text-xs font-semibold text-slate-500 hover:text-rose-600 flex items-center gap-1.5 transition-colors"
+        {temoignages.length === 0 ? (
+          <div className="rounded-4xl border border-dashed border-parchemin-400 bg-white/60 py-16 text-center">
+            <MessageCircle className="mx-auto h-8 w-8 text-encre-200" strokeWidth={1.5} />
+            <p className="mt-4 font-serif text-sm font-bold text-encre-800">
+              Aucun témoignage pour l&apos;instant
+            </p>
+            <p className="mx-auto mt-1 max-w-xs text-2xs leading-relaxed text-encre-400">
+              Le premier ouvre souvent la porte aux autres. Même une petite chose compte.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {temoignages.map((post) => {
+              const meta = FICHES_META.find((m) => m.id === post.step);
+              const aAmen = post.amenBy.includes(user.uid);
+              return (
+                <article
+                  key={post.id}
+                  className="rounded-4xl border border-parchemin-400 bg-white p-5 shadow-2xs sm:p-6"
                 >
-                  <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-                  Béni par ce témoignage ({t.likes})
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-or-300 to-or-500 text-xs font-bold text-encre-950">
+                        {post.authorName.charAt(0).toUpperCase()}
+                      </span>
+                      <div>
+                        <p className="text-sm font-bold text-encre-950">{post.authorName}</p>
+                        <p className="text-2xs text-encre-300">
+                          {new Date(post.createdAt).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'long',
+                          })}
+                        </p>
+                      </div>
+                    </div>
 
+                    {meta && (
+                      <Link
+                        href={`/fiches/${meta.id}`}
+                        className="shrink-0 rounded-full bg-or-50 px-2.5 py-1 text-2xs font-bold text-or-700 transition-colors hover:bg-or-100"
+                      >
+                        Fiche {meta.id}
+                      </Link>
+                    )}
+                  </div>
+
+                  <p className="mt-4 whitespace-pre-wrap font-serif text-base leading-relaxed text-encre-800">
+                    {post.content}
+                  </p>
+
+                  <div className="mt-4 flex items-center justify-between border-t border-parchemin-300 pt-3.5">
+                    <button
+                      onClick={async () => {
+                        await toggleAmen(group.id, post.id, user.uid);
+                        charger();
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-2xs font-bold transition-colors ${
+                        aAmen
+                          ? 'bg-rose-100 text-rose-700'
+                          : 'bg-parchemin-100 text-encre-500 hover:bg-rose-50 hover:text-rose-600'
+                      }`}
+                    >
+                      <Heart className={`h-3.5 w-3.5 ${aAmen ? 'fill-rose-500 text-rose-500' : ''}`} />
+                      Amen{post.amenBy.length > 0 && ` (${post.amenBy.length})`}
+                    </button>
+
+                    {post.authorId === user.uid && (
+                      <button
+                        onClick={async () => {
+                          await deletePost(group.id, post.id);
+                          charger();
+                        }}
+                        className="text-2xs text-encre-300 transition-colors hover:text-rose-500"
+                      >
+                        Retirer
+                      </button>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <ParcoursGate allowPending>
+      <TemoignagesContent />
+    </ParcoursGate>
   );
 }

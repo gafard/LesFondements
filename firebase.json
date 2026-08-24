@@ -1,18 +1,5 @@
 {
-  "hosting": {
-    "public": ".next",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
-  },
+  "//": "Le site est déployé sur Cloudflare (OpenNext). Firebase ne sert ici qu'à l'authentification et à Firestore : pas de section « hosting », pour qu'un « firebase deploy » distrait ne publie pas un site cassé.",
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"

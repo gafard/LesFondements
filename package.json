@@ -9,7 +9,13 @@
     "build:sites": "npm run build:cloud && ./scripts/stage-sites-build.sh",
     "preview:cloud": "opennextjs-cloudflare preview",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "etudes:importer": "python3 scripts/importer-etudes.py ../formation-biblique-app/data public/etudes",
+    "livret:construire": "python3 scripts/parse-livret.py livret.txt /tmp/livret.json && python3 scripts/build-livret-data.py /tmp/livret.json src/data",
+    "voix:estimation": "node scripts/generer-voix.mjs --estimation",
+    "voix:generer": "node --env-file=.env.local scripts/generer-voix.mjs",
+    "voix:manifeste": "node scripts/generer-voix.mjs --manifeste-seul",
+    "firebase:verifier": "node scripts/verifier-firebase.mjs"
   },
   "dependencies": {
     "firebase": "^12.18.0",

@@ -1,480 +1,1067 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/AuthContext';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { 
-  Users, 
-  Video, 
-  Clock, 
-  Heart, 
-  MessageSquare, 
-  BookOpen, 
-  CheckCircle2, 
-  Sparkles, 
-  Play, 
-  Pause, 
-  RotateCcw,
-  Share2,
-  ShieldCheck
+import Image from 'next/image';
+import {
+  ArrowRight,
+  BookOpen,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Crown,
+  Flame,
+  Heart,
+  Hourglass,
+  Info,
+  MapPin,
+  MessageSquare,
+  Monitor,
+  PlayCircle,
+  ShieldCheck,
+  Bookmark,
+  Star,
+  UserPlus,
+  Users,
+  Video,
+  X,
 } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { useParcours } from '@/lib/ParcoursContext';
+import ParcoursGate from '@/components/ParcoursGate';
+import InvitePanel from '@/components/InvitePanel';
+import {
+  addPost,
+  approveMember,
+  deletePost,
+  getPosts,
+  markPrayerAnswered,
+  nextMeetingDate,
+  openMeeting,
+  rejectMember,
+  setSessionAttendance,
+  subscribe,
+  toggleAmen,
+  togglePrayed,
+} from '@/lib/parcoursStore';
+import { FICHES_META } from '@/data/fichesMeta';
+import type { AttendanceMode, GroupPost, GroupPostKind } from '@/lib/types';
 
-interface PrayerRequest {
-  id: string;
-  author: string;
-  text: string;
-  date: string;
-  prayedCount: number;
-  isAnswered: boolean;
-}
+const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
-interface GroupDiscussion {
-  id: string;
-  author: string;
-  ficheId: number;
-  question: string;
-  text: string;
-  date: string;
-}
+type Onglet = 'rencontre' | 'membres' | 'priere' | 'partages' | 'pepites' | 'guide';
 
-export default function GroupesPage() {
+const ONGLETS: { id: Onglet; label: string; icon: typeof Users }[] = [
+  { id: 'rencontre', label: 'La rencontre', icon: CalendarDays },
+  { id: 'membres', label: 'Les membres', icon: Users },
+  { id: 'priere', label: 'Mur de prière', icon: Heart },
+  { id: 'partages', label: 'Partages', icon: MessageSquare },
+  { id: 'pepites', label: 'Pépites', icon: Star },
+  { id: 'guide', label: 'Guide animateur', icon: ShieldCheck },
+];
+
+function CelluleContent() {
   const { user } = useAuth();
-  
-  // Tab state
-  const [activeTab, setActiveTab] = useState<'rencontre' | 'priere' | 'partage' | 'guide'>('rencontre');
+  const { group, members, membership, session, isLeader, gate, refresh } = useParcours();
+  const [onglet, setOnglet] = useState<Onglet>('rencontre');
+  const [posts, setPosts] = useState<GroupPost[]>([]);
+  const [codeCopie, setCodeCopie] = useState(false);
+  const [inviteOuvert, setInviteOuvert] = useState(false);
 
-  // Group join/create state
-  const groupName = 'Groupe Disciples - Espérance';
-  const inviteCode = 'FOND-8492';
-  const currentFicheWeek = 2;
-  const [copied, setCopied] = useState(false);
-
-  // Group members
-  const members = [
-    { name: user?.displayName || 'Moi (Animateur)', role: 'Animateur', prepared: true, currentFiche: 2 },
-    { name: 'Sarah M.', role: 'Membre', prepared: true, currentFiche: 2 },
-    { name: 'David K.', role: 'Membre', prepared: false, currentFiche: 1 },
-    { name: 'Esther B.', role: 'Membre', prepared: true, currentFiche: 2 },
-    { name: 'Marc L.', role: 'Membre', prepared: true, currentFiche: 2 },
-  ];
-
-  // Timer state for meeting moderation
-  const [timerSeconds, setTimerSeconds] = useState(180); // 3 min discussion timer
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const chargerPosts = useCallback(() => {
+    if (!group) return;
+    void getPosts(group.id).then(setPosts);
+  }, [group]);
 
   useEffect(() => {
-    if (!isTimerRunning || timerSeconds === 0) return;
-    const timeout = window.setTimeout(() => {
-      setTimerSeconds(Math.max(0, timerSeconds - 1));
-      if (timerSeconds === 1) setIsTimerRunning(false);
-    }, 1000);
-    return () => window.clearTimeout(timeout);
-  }, [isTimerRunning, timerSeconds]);
+    chargerPosts();
+    if (!group) return;
+    return subscribe(`posts:${group.id}`, chargerPosts);
+  }, [group, chargerPosts]);
 
-  // Prayer wall
-  const [prayers, setPrayers] = useState<PrayerRequest[]>([
-    {
-      id: '1',
-      author: 'Sarah M.',
-      text: 'Prière pour mon entretien professionnel mardi et pour que la paix de Dieu garde mon cœur.',
-      date: 'Hier à 18:30',
-      prayedCount: 4,
-      isAnswered: false
-    },
-    {
-      id: '2',
-      author: 'David K.',
-      text: 'Action de grâce ! Réconciliation complète avec mon frère après avoir médité sur la Fiche 7 (le pardon). Gloire à Dieu !',
-      date: 'Il y a 2 jours',
-      prayedCount: 6,
-      isAnswered: true
-    },
-    {
-      id: '3',
-      author: 'Marc L.',
-      text: 'Soutien dans la prière pour la santé de ma mère hospitalisée cette semaine.',
-      date: 'Il y a 3 jours',
-      prayedCount: 5,
-      isAnswered: false
+  const actifs = useMemo(() => members.filter((m) => m.status === 'actif'), [members]);
+  const enAttente = useMemo(() => members.filter((m) => m.status === 'en_attente'), [members]);
+
+  if (!group || !user) return null;
+
+  const fiche = FICHES_META.find((f) => f.id === group.currentStep);
+  const prochaine = nextMeetingDate(group.meeting, group.stepOpenedAt);
+  const enRencontre = group.stepPhase === 'rencontre' && session?.status === 'ouverte';
+  const prets = actifs.filter((m) => m.preparedSteps.includes(group.currentStep)).length;
+
+  const copierCode = async () => {
+    try {
+      await navigator.clipboard.writeText(group.inviteCode);
+      setCodeCopie(true);
+      setTimeout(() => setCodeCopie(false), 2000);
+    } catch {
+      /* presse-papiers indisponible */
     }
-  ]);
-  const [newPrayer, setNewPrayer] = useState('');
-
-  // Discussions
-  const [discussions, setDiscussions] = useState<GroupDiscussion[]>([
-    {
-      id: '1',
-      author: 'Esther B.',
-      ficheId: 2,
-      question: 'Ai-je compris que c\'est Dieu qui prend l\'initiative de venir à moi ?',
-      text: 'Ce qui m\'a le plus touchée dans la Fiche 2, c\'est de réaliser que la grâce n\'a rien à voir avec mes efforts ou ma performance. Ça m\'enlève un fardeau énorme de culpabilité.',
-      date: 'Hier à 20:15'
-    },
-    {
-      id: '2',
-      author: 'Sarah M.',
-      ficheId: 2,
-      question: 'Que représente le péché ?',
-      text: 'Comprendre que pécher signifie d\'abord « manquer le but » et se couper de la communion d\'amour avec Dieu, plutôt qu\'une simple liste d\'interdits moraux, change toute ma perspective.',
-      date: 'Aujourd\'hui à 11:00'
-    }
-  ]);
-  const [newDiscussionText, setNewDiscussionText] = useState('');
-
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(inviteCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleAddPrayer = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPrayer.trim()) return;
-    const prayerItem: PrayerRequest = {
-      id: Date.now().toString(),
-      author: user?.displayName || 'Membre',
-      text: newPrayer,
-      date: 'À l\'instant',
-      prayedCount: 1,
-      isAnswered: false
-    };
-    setPrayers([prayerItem, ...prayers]);
-    setNewPrayer('');
+  const ouvrirRencontre = async () => {
+    await openMeeting(group.id, user.uid);
+    await refresh();
   };
 
-  const handlePray = (id: string) => {
-    setPrayers(prayers.map(p => p.id === id ? { ...p, prayedCount: p.prayedCount + 1 } : p));
-  };
-
-  const handleToggleAnswered = (id: string) => {
-    setPrayers(prayers.map(p => p.id === id ? { ...p, isAnswered: !p.isAnswered } : p));
-  };
-
-  const handleAddDiscussion = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newDiscussionText.trim()) return;
-    const item: GroupDiscussion = {
-      id: Date.now().toString(),
-      author: user?.displayName || 'Moi',
-      ficheId: currentFicheWeek,
-      question: 'Partage libre sur la Fiche ' + currentFicheWeek,
-      text: newDiscussionText,
-      date: 'À l\'instant'
-    };
-    setDiscussions([item, ...discussions]);
-    setNewDiscussionText('');
+  const declarerPresence = async (mode: AttendanceMode) => {
+    await setSessionAttendance(group.id, user.uid, mode);
+    await refresh();
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-slate-50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-parchemin-100 pb-10 pt-6">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        {/* ══ En-tête du groupe ══ */}
+        <header className="nuit nuit-grain relative mb-8 overflow-hidden rounded-4xl p-6 text-parchemin-100 shadow-lg sm:p-8">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/warm-fellowship.jpg"
+              alt="Communion fraternelle et partage dans un salon chaleureux"
+              fill
+              sizes="100vw"
+              className="object-cover object-[center_30%] opacity-45"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#07162b] via-[#07162b]/85 to-[#07162b]/65" />
+          </div>
 
-        {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-amber-900 text-white rounded-3xl p-6 sm:p-8 shadow-md mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-indigo-500/30 text-indigo-200 text-xs font-semibold px-3 py-1 rounded-full mb-2 border border-indigo-400/20">
-                <Users className="w-3.5 h-3.5" />
-                Cellule de 5-6 personnes (Recommandation p. 3 du livret)
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-serif">{groupName}</h1>
-              <p className="text-indigo-200 text-sm mt-1">
-                Fiche de la semaine : <strong className="text-amber-300">Fiche {currentFicheWeek} — Le péché, le salut</strong>
+          <span className="vitrail right-[-6rem] top-[-6rem] h-72 w-72 bg-or-400/14 relative z-1" />
+
+          <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <p className="font-serif italic text-amber-300 text-xs sm:text-sm mb-1">
+                Cellule de communion fraternelle
+              </p>
+              <h1 className="font-serif text-3xl font-bold text-parchemin-100 sm:text-4xl">{group.name}</h1>
+
+              <p className="mt-1.5 text-xs text-parchemin-100/65">
+                {group.meeting.mode === 'ligne'
+                  ? 'Rencontres entièrement en ligne'
+                  : group.meeting.mode === 'hybride'
+                    ? 'Sur place et en visio'
+                    : 'Rencontres en présentiel'}{' '}
+                · {group.place.city} · animé par {group.leaderName}
+              </p>
+
+              <p className="mt-3 text-sm text-parchemin-100/80">
+                Fiche de la semaine :{' '}
+                <strong className="text-or-300">
+                  Fiche {group.currentStep} — {fiche?.titre ?? '…'}
+                </strong>
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="bg-white/10 backdrop-blur-xs border border-white/20 px-4 py-2 rounded-2xl flex items-center gap-2">
-                <span className="text-xs text-indigo-200">Code d&apos;invitation :</span>
-                <strong className="font-mono text-amber-300 tracking-wider">{inviteCode}</strong>
-                <button
-                  onClick={handleCopyCode}
-                  className="p-1 text-xs bg-white/20 hover:bg-white/30 rounded-md transition-colors"
-                  title="Copier le code"
-                >
-                  {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-green-300" /> : <Share2 className="w-3.5 h-3.5" />}
-                </button>
-              </div>
-
-              <a
-                href="https://meet.google.com/new"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-full text-sm shadow-md transition-transform active:scale-95 flex items-center gap-2"
+            <div className="flex shrink-0 flex-wrap items-center gap-2.5">
+              <button
+                onClick={copierCode}
+                className="verre flex items-center gap-2 rounded-2xl px-4 py-2.5 text-2xs transition-colors hover:bg-white/14"
               >
-                <Video className="w-4 h-4" />
-                Lancer la Visio
-              </a>
+                <span className="text-parchemin-100/55">Code</span>
+                <strong className="font-mono tracking-[0.18em] text-or-300">
+                  {group.inviteCode}
+                </strong>
+                {codeCopie ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5 text-parchemin-100/50" />
+                )}
+              </button>
+
+              {group.meeting.callLink && (
+                <a
+                  href={group.meeting.callLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="verre inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-2xs font-bold text-parchemin-100 transition-colors hover:bg-white/14"
+                >
+                  <Video className="h-3.5 w-3.5 text-or-300" />
+                  Lien visio
+                </a>
+              )}
+
+              {enRencontre ? (
+                <Link
+                  href="/groupes/rencontre"
+                  className="bouton-or inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-encre-950 opacity-60" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-encre-950" />
+                  </span>
+                  Rejoindre la rencontre
+                </Link>
+              ) : isLeader ? (
+                <button
+                  onClick={() => void ouvrirRencontre()}
+                  className="bouton-or inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold"
+                >
+                  <PlayCircle className="h-4 w-4" strokeWidth={2} />
+                  Ouvrir la rencontre
+                </button>
+              ) : null}
             </div>
           </div>
-        </div>
 
-        {/* Tab Navigation */}
-        <div className="flex overflow-x-auto border-b border-slate-200 mb-8 pb-px gap-2">
-          {[
-            { id: 'rencontre' as const, label: 'Rencontre & Membres', icon: Users },
-            { id: 'priere' as const, label: 'Mur de Prière', icon: Heart },
-            { id: 'partage' as const, label: 'Partage des Fiches', icon: MessageSquare },
-            { id: 'guide' as const, label: 'Guide & Minuteur Animateur', icon: ShieldCheck },
-          ].map(tab => (
+          {/* Ruban d'état */}
+          <div className="relative z-10 mt-6 grid gap-2.5 border-t border-white/10 pt-5 sm:grid-cols-3">
+            <Statut
+              icone={CalendarDays}
+              titre="Prochaine rencontre"
+              valeur={`${JOURS[group.meeting.weekday]} ${prochaine.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'long',
+              })} · ${group.meeting.time}`}
+            />
+            <Statut
+              icone={CheckCircle2}
+              titre="Fiche préparée par"
+              valeur={`${prets} membre${prets > 1 ? 's' : ''} sur ${actifs.length}`}
+            />
+            <Statut
+              icone={Flame}
+              titre="Progression du groupe"
+              valeur={`${group.closedSteps.length} fiche${
+                group.closedSteps.length > 1 ? 's' : ''
+              } partagée${group.closedSteps.length > 1 ? 's' : ''} sur 20`}
+            />
+          </div>
+        </header>
+
+        {/* Salle d'attente */}
+        {gate.state === 'en_attente' && (
+          <div className="mb-8 flex items-start gap-3.5 rounded-3xl border border-or-300 bg-or-50 p-5">
+            <Hourglass className="mt-0.5 h-5 w-5 shrink-0 text-or-600" strokeWidth={1.75} />
+            <div>
+              <p className="font-serif text-sm font-bold text-encre-950">
+                Votre place est en cours de confirmation
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-encre-600">
+                Vous voyez l&apos;espace du groupe, mais les fiches ne s&apos;ouvriront qu&apos;une
+                fois {group.leaderName} votre demande validée.
+                {group.demo && ' Ce groupe est un exemple : la réponse arrive automatiquement.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Demandes en attente (animateur) */}
+        {isLeader && enAttente.length > 0 && (
+          <div className="mb-8 rounded-3xl border border-or-300 bg-white p-5 shadow-sm sm:p-6">
+            <h2 className="flex items-center gap-2 font-serif text-lg font-bold text-encre-950">
+              <UserPlus className="h-5 w-5 text-or-600" strokeWidth={1.75} />
+              {enAttente.length} personne{enAttente.length > 1 ? 's' : ''} frappe
+              {enAttente.length > 1 ? 'nt' : ''} à la porte
+            </h2>
+            <div className="mt-4 space-y-3">
+              {enAttente.map((demande) => (
+                <div
+                  key={demande.uid}
+                  className="rounded-2xl border border-parchemin-300 bg-parchemin-50 p-4"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-serif text-sm font-bold text-encre-950">
+                        {demande.displayName}
+                      </p>
+                      <p className="mt-0.5 text-2xs text-encre-400">
+                        {demande.email}
+                        {demande.distanceKm !== undefined && ` · à ~${demande.distanceKm} km`}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        onClick={async () => {
+                          await approveMember(group.id, demande.uid);
+                          await refresh();
+                        }}
+                        disabled={actifs.length >= group.capacity}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-2xs font-bold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <Check className="h-3.5 w-3.5" /> Accueillir
+                      </button>
+                      <button
+                        onClick={async () => {
+                          await rejectMember(group.id, demande.uid);
+                          await refresh();
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-parchemin-200 px-3.5 py-2 text-2xs font-bold text-encre-600 transition-colors hover:bg-parchemin-300"
+                      >
+                        <X className="h-3.5 w-3.5" /> Décliner
+                      </button>
+                    </div>
+                  </div>
+                  {demande.requestMessage && (
+                    <p className="mt-3 border-l-2 border-or-300 pl-3 text-xs italic leading-relaxed text-encre-600">
+                      {demande.requestMessage}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+            {actifs.length >= group.capacity && (
+              <p className="mt-3 rounded-xl bg-parchemin-100 px-3.5 py-2.5 text-2xs leading-relaxed text-encre-500">
+                Le groupe a atteint sa taille maximale ({group.capacity}). Augmentez la capacité ou
+                proposez à ces personnes d&apos;ouvrir un second groupe.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ══ Onglets ══ */}
+        <div className="mb-8 flex gap-1.5 overflow-x-auto border-b border-parchemin-300 pb-px">
+          {ONGLETS.filter((tab) => tab.id !== 'guide' || isLeader).map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 font-semibold text-sm whitespace-nowrap border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              onClick={() => setOnglet(tab.id)}
+              className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-2xs font-bold transition-colors ${
+                onglet === tab.id
+                  ? 'border-or-500 text-or-700'
+                  : 'border-transparent text-encre-400 hover:text-encre-700'
               }`}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="h-4 w-4" strokeWidth={1.75} />
               {tab.label}
             </button>
           ))}
         </div>
 
-        {/* TAB 1: RENCONTRE & MEMBRES */}
-        {activeTab === 'rencontre' && (
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-                <h3 className="font-serif font-bold text-lg text-slate-900 mb-4 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-indigo-600" />
-                  Membres du petit groupe ({members.length}/6)
-                </h3>
-                <div className="divide-y divide-slate-100">
-                  {members.map((m, idx) => (
-                    <div key={idx} className="py-3 flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-800 text-sm">{m.name}</span>
-                          <span className={`text-2xs font-bold px-2 py-0.5 rounded-full ${
-                            m.role === 'Animateur' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            {m.role}
-                          </span>
-                        </div>
-                        <span className="text-xs text-slate-400">Progression : Fiche {m.currentFiche}</span>
-                      </div>
-
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
-                        m.prepared ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
-                      }`}>
-                        {m.prepared ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
-                        {m.prepared ? 'Fiche préparée' : 'En cours'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Weekly Meeting Banner */}
-              <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div>
-                  <h4 className="font-serif font-bold text-indigo-900 text-base">Prochaine rencontre hebdomadaire</h4>
-                  <p className="text-xs text-indigo-700 mt-1">Samedi à 15h00 (Visio ou présentiel) • Thème : Fiche 2</p>
-                </div>
-                <Link
-                  href={`/fiches/${currentFicheWeek}`}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors flex items-center gap-1.5"
-                >
-                  <BookOpen className="w-3.5 h-3.5" /> Ouvrir la Fiche {currentFicheWeek}
-                </Link>
-              </div>
-            </div>
-
-            {/* Quick Rules Column */}
-            <div className="space-y-6">
-              <div className="bg-amber-50/60 border border-amber-200/60 rounded-2xl p-5">
-                <h4 className="font-serif font-bold text-amber-900 text-sm mb-3 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-amber-600" />
-                  Principes clés (p. 3 du livret)
-                </h4>
-                <ul className="text-xs text-amber-900/80 space-y-2.5 leading-relaxed">
-                  <li>• <strong>5-6 participants</strong> : idéal pour que chacun puisse s&apos;exprimer librement.</li>
-                  <li>• <strong>Préparation préalable</strong> : chacun étudie la fiche chez soi avant la réunion.</li>
-                  <li>• <strong>Pas de cours magistral</strong> : la rencontre est un échange interactif basé sur le partage.</li>
-                  <li>• <strong>Assiduité</strong> : engagement sur la durée (~5 mois) pour la richesse du groupe.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        {onglet === 'rencontre' && (
+          <OngletRencontre
+            enRencontre={enRencontre}
+            onDeclarer={declarerPresence}
+            monMode={session?.attendance[user.uid] ?? membership?.nextAttendance}
+          />
         )}
 
-        {/* TAB 2: MUR DE PRIÈRE */}
-        {activeTab === 'priere' && (
-          <div className="space-y-6">
-            <form onSubmit={handleAddPrayer} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <h3 className="font-serif font-bold text-lg text-slate-900 mb-2 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-rose-500 fill-rose-500" /> Déposer un sujet de prière
-              </h3>
-              <p className="text-xs text-slate-500 mb-3">Partagez vos requêtes ou actions de grâce en toute confiance avec votre groupe.</p>
-              <textarea
-                value={newPrayer}
-                onChange={(e) => setNewPrayer(e.target.value)}
-                placeholder="Décrivez votre besoin de prière..."
-                className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm min-h-[90px] mb-3"
-              />
-              <div className="flex justify-end">
-                <button type="submit" className="bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2 rounded-full text-xs transition-colors">
-                  Publier sur le mur
-                </button>
-              </div>
-            </form>
-
-            <div className="space-y-4">
-              {prayers.map((prayer) => (
-                <div
-                  key={prayer.id}
-                  className={`bg-white p-5 rounded-2xl border transition-all shadow-2xs ${
-                    prayer.isAnswered ? 'border-green-200 bg-green-50/20' : 'border-slate-100'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-2">
-                      <strong className="text-sm text-slate-900">{prayer.author}</strong>
-                      <span className="text-2xs text-slate-400">{prayer.date}</span>
-                    </div>
-                    {prayer.isAnswered && (
-                      <span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Prière Exaucée !
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-slate-700 leading-relaxed mb-4">{prayer.text}</p>
-                  
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                    <button
-                      onClick={() => handlePray(prayer.id)}
-                      className="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5"
-                    >
-                      <Heart className="w-3.5 h-3.5 fill-rose-500" />
-                      J&apos;ai prié ({prayer.prayedCount})
-                    </button>
-
-                    <button
-                      onClick={() => handleToggleAnswered(prayer.id)}
-                      className="text-xs font-medium text-slate-500 hover:text-green-600 transition-colors"
-                    >
-                      {prayer.isAnswered ? 'Marquer comme en cours' : 'Marquer comme exaucée'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {onglet === 'membres' && (
+          <OngletMembres
+            onInviter={() => setInviteOuvert((open) => !open)}
+            inviteOuvert={inviteOuvert}
+          />
         )}
 
-        {/* TAB 3: PARTAGE DES FICHES */}
-        {activeTab === 'partage' && (
-          <div className="space-y-6">
-            <form onSubmit={handleAddDiscussion} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <h3 className="font-serif font-bold text-lg text-slate-900 mb-2 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-indigo-600" /> Partager une réflexion sur la Fiche {currentFicheWeek}
-              </h3>
-              <p className="text-xs text-slate-500 mb-3">Répondez à l&apos;une des questions de la fiche pour enrichir la discussion du groupe.</p>
-              <textarea
-                value={newDiscussionText}
-                onChange={(e) => setNewDiscussionText(e.target.value)}
-                placeholder="Votre partage ou témoignage..."
-                className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm min-h-[90px] mb-3"
-              />
-              <div className="flex justify-end">
-                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2 rounded-full text-xs transition-colors">
-                  Envoyer au groupe
-                </button>
-              </div>
-            </form>
-
-            <div className="space-y-4">
-              {discussions.map((d) => (
-                <div key={d.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <strong className="text-sm text-slate-900">{d.author}</strong>
-                      <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded ml-2">
-                        Fiche {d.ficheId}
-                      </span>
-                    </div>
-                    <span className="text-2xs text-slate-400">{d.date}</span>
-                  </div>
-                  <p className="text-xs font-semibold text-slate-500 italic mb-2">
-                    &quot;{d.question}&quot;
-                  </p>
-                  <p className="text-sm text-slate-700 leading-relaxed">{d.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+        {(onglet === 'priere' || onglet === 'partages' || onglet === 'pepites') && (
+          <OngletMur
+            kind={onglet === 'priere' ? 'priere' : onglet === 'partages' ? 'partage' : 'pepite'}
+            posts={posts}
+            onChange={chargerPosts}
+          />
         )}
 
-        {/* TAB 4: GUIDE & MINUTEUR ANIMATEUR */}
-        {activeTab === 'guide' && (
-          <div className="grid md:grid-cols-2 gap-6">
-            
-            {/* Animation Guide */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-              <h3 className="font-serif font-bold text-xl text-slate-900 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-amber-600" />
-                Conseils pour l&apos;Animateur (p. 3-4, 160-162)
-              </h3>
-              
-              <div className="text-xs text-slate-700 space-y-3 leading-relaxed">
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200">
-                  <strong className="text-amber-900 block mb-1">1. Rôle de facilitateur</strong>
-                  Ne refaites pas le cours. Assurez-vous que chacun participe et que personne n&apos;accapare la parole.
-                </div>
-
-                <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-200">
-                  <strong className="text-indigo-900 block mb-1">2. Temps de prière ciblés</strong>
-                  • À l&apos;issue des <strong>fiches 7 & 8</strong> (Vivre libre) : proposez un temps individuel pour les blessures, forteresses et le pardon.<br/>
-                  • À la <strong>fiche 10</strong> : priez pour le renouvellement du Saint-Esprit.
-                </div>
-
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                  <strong className="text-slate-900 block mb-1">3. Climat de confiance</strong>
-                  Pas de jugement d&apos;un côté, ni de susceptibilité de l&apos;autre. &quot;Les brebis sont celles du Seigneur, pas les nôtres.&quot; (p. 161)
-                </div>
-              </div>
-            </div>
-
-            {/* Moderation Timer */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-center flex flex-col justify-between">
-              <div>
-                <h3 className="font-serif font-bold text-xl text-slate-900 mb-2 flex items-center justify-center gap-2">
-                  <Clock className="w-5 h-5 text-indigo-600" />
-                  Minuteur de Partage Équitable
-                </h3>
-                <p className="text-xs text-slate-500 mb-6">
-                  Utilisez ce compte à rebours pour accorder un temps de parole équitable à chaque participant (ex: 3 minutes).
-                </p>
-
-                <div className="text-5xl font-mono font-bold text-indigo-600 my-6">
-                  {Math.floor(timerSeconds / 60)}:{(timerSeconds % 60).toString().padStart(2, '0')}
-                </div>
-              </div>
-
-              <div className="flex justify-center items-center gap-3">
-                <button
-                  onClick={() => setIsTimerRunning(!isTimerRunning)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-full text-xs shadow-md transition-colors flex items-center gap-2"
-                >
-                  {isTimerRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  {isTimerRunning ? 'Mettre en pause' : 'Démarrer le tour'}
-                </button>
-                <button
-                  onClick={() => { setIsTimerRunning(false); setTimerSeconds(180); }}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium p-2.5 rounded-full transition-colors"
-                  title="Réinitialiser à 3 min"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-          </div>
-        )}
-
+        {onglet === 'guide' && <OngletGuide />}
       </div>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+
+function Statut({
+  icone: Icone,
+  titre,
+  valeur,
+}: {
+  icone: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  titre: string;
+  valeur: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-white/[0.06] px-4 py-3">
+      <span className="flex items-center gap-1.5 text-2xs font-bold uppercase tracking-[0.14em] text-parchemin-100/45">
+        <Icone className="h-3 w-3" strokeWidth={2} />
+        {titre}
+      </span>
+      <p className="mt-1 text-xs font-semibold text-parchemin-100">{valeur}</p>
+    </div>
+  );
+}
+
+// ══ Onglet : la rencontre ══════════════════════════════════════
+
+function OngletRencontre({
+  enRencontre,
+  onDeclarer,
+  monMode,
+}: {
+  enRencontre: boolean;
+  onDeclarer: (mode: AttendanceMode) => Promise<void>;
+  monMode?: AttendanceMode;
+}) {
+  const { group, members, session, isLeader } = useParcours();
+  if (!group) return null;
+
+  const actifs = members.filter((m) => m.status === 'actif');
+  const fiche = FICHES_META.find((f) => f.id === group.currentStep);
+  const presentiel = actifs.filter(
+    (m) => (session?.attendance[m.uid] ?? m.nextAttendance) === 'presentiel'
+  );
+  const enLigne = actifs.filter(
+    (m) => (session?.attendance[m.uid] ?? m.nextAttendance) === 'ligne'
+  );
+  const absents = actifs.filter(
+    (m) => (session?.attendance[m.uid] ?? m.nextAttendance) === 'absent'
+  );
+  const sansReponse = actifs.length - presentiel.length - enLigne.length - absents.length;
+
+  const options: { value: AttendanceMode; label: string; icon: typeof MapPin; hint: string }[] = [
+    { value: 'presentiel', label: 'Je viens sur place', icon: MapPin, hint: group.meeting.venue || 'Au lieu habituel' },
+    { value: 'ligne', label: 'Je me connecte', icon: Monitor, hint: 'En visio, depuis chez moi' },
+    { value: 'absent', label: 'Je ne peux pas', icon: X, hint: 'Le groupe pourra prier pour vous' },
+  ];
+
+  const disponibles =
+    group.meeting.mode === 'presentiel'
+      ? options.filter((o) => o.value !== 'ligne')
+      : group.meeting.mode === 'ligne'
+        ? options.filter((o) => o.value !== 'presentiel')
+        : options;
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="space-y-6 lg:col-span-2">
+        {enRencontre && (
+          <Link
+            href="/groupes/rencontre"
+            className="nuit block overflow-hidden rounded-3xl p-6 text-parchemin-100 transition-transform hover:-translate-y-0.5"
+          >
+            <span className="inline-flex items-center gap-2 rounded-full bg-or-400/15 px-3 py-1 text-2xs font-bold uppercase tracking-[0.16em] text-or-200">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-or-300 opacity-70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-or-300" />
+              </span>
+              La rencontre est ouverte
+            </span>
+            <h3 className="mt-3 font-serif text-xl font-bold">
+              Rejoignez le groupe, où que vous soyez
+            </h3>
+            <p className="mt-1.5 text-xs text-parchemin-100/70">
+              Le déroulé avance en direct pour tout le monde — sur place comme en visio.
+            </p>
+            <span className="mt-4 inline-flex items-center gap-1.5 text-2xs font-bold text-or-200">
+              Entrer dans la rencontre <ArrowRight className="h-3.5 w-3.5" />
+            </span>
+          </Link>
+        )}
+
+        {/* Fiche en préparation */}
+        <div className="rounded-3xl border border-parchemin-400 bg-white p-6 shadow-sm">
+          <span className="text-2xs font-bold uppercase tracking-[0.18em] text-encre-400">
+            Ce que chacun prépare chez soi
+          </span>
+          <h3 className="mt-2 font-serif text-xl font-bold text-encre-950">
+            Fiche {group.currentStep} — {fiche?.titre}
+          </h3>
+          <p className="mt-1.5 text-xs leading-relaxed text-encre-600">{fiche?.sousTitre}</p>
+
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            <Link
+              href={`/fiches/${group.currentStep}`}
+              className="bouton-or inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold"
+            >
+              <BookOpen className="h-4 w-4" strokeWidth={2} />
+              Travailler la fiche
+            </Link>
+            <Link
+              href={`/fiches/${group.currentStep}#resume`}
+              className="inline-flex items-center gap-2 rounded-full bg-parchemin-100 px-5 py-2.5 text-xs font-bold text-encre-700 transition-colors hover:bg-parchemin-200"
+            >
+              Résumé et partage
+            </Link>
+          </div>
+
+          <div className="mt-5 border-t border-parchemin-300 pt-4">
+            <p className="mb-2.5 text-2xs font-bold uppercase tracking-[0.14em] text-encre-400">
+              Qui a préparé la fiche
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {actifs.map((membre) => {
+                const pret = membre.preparedSteps.includes(group.currentStep);
+                return (
+                  <span
+                    key={membre.uid}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-2xs font-semibold ${
+                      pret
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-parchemin-100 text-encre-400'
+                    }`}
+                  >
+                    {pret ? (
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                    ) : (
+                      <Clock className="h-3.5 w-3.5" />
+                    )}
+                    {membre.displayName}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Présence */}
+        <div className="rounded-3xl border border-parchemin-400 bg-white p-6 shadow-sm">
+          <h3 className="font-serif text-lg font-bold text-encre-950">
+            Comment serez-vous là, cette fois ?
+          </h3>
+          <p className="mt-1 text-xs leading-relaxed text-encre-500">
+            {group.meeting.mode === 'hybride'
+              ? 'Ceux qui peuvent se déplacent, les autres se connectent. La rencontre est la même.'
+              : group.meeting.mode === 'ligne'
+                ? 'Ce groupe se retrouve en visio.'
+                : 'Ce groupe se retrouve sur place.'}
+          </p>
+
+          <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
+            {disponibles.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => void onDeclarer(option.value)}
+                className={`rounded-2xl border p-4 text-left transition-all ${
+                  monMode === option.value
+                    ? 'border-or-400 bg-or-50 ring-2 ring-or-200'
+                    : 'border-parchemin-300 bg-parchemin-50 hover:border-parchemin-500'
+                }`}
+              >
+                <option.icon
+                  className={`h-4 w-4 ${monMode === option.value ? 'text-or-600' : 'text-encre-400'}`}
+                  strokeWidth={2}
+                />
+                <p
+                  className={`mt-2 text-xs font-bold ${
+                    monMode === option.value ? 'text-or-700' : 'text-encre-800'
+                  }`}
+                >
+                  {option.label}
+                </p>
+                <p className="mt-0.5 text-2xs leading-snug text-encre-400">{option.hint}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Colonne latérale */}
+      <div className="space-y-5">
+        <div className="rounded-3xl border border-parchemin-400 bg-white p-5 shadow-sm">
+          <h4 className="font-serif text-sm font-bold text-encre-950">Présences annoncées</h4>
+          <dl className="mt-3 space-y-2.5 text-2xs">
+            <Ligne label="Sur place" valeur={presentiel.length} couleur="text-emerald-600" />
+            <Ligne label="En visio" valeur={enLigne.length} couleur="text-sky-600" />
+            <Ligne label="Absents" valeur={absents.length} couleur="text-encre-400" />
+            <Ligne label="Sans réponse" valeur={sansReponse} couleur="text-or-600" />
+          </dl>
+        </div>
+
+        {group.meeting.venue && (
+          <div className="rounded-3xl border border-parchemin-400 bg-white p-5 shadow-sm">
+            <h4 className="flex items-center gap-1.5 font-serif text-sm font-bold text-encre-950">
+              <MapPin className="h-4 w-4 text-or-600" /> Le lieu
+            </h4>
+            <p className="mt-2 text-xs leading-relaxed text-encre-600">{group.meeting.venue}</p>
+            <p className="mt-2 text-2xs text-encre-400">
+              Visible uniquement des membres du groupe.
+            </p>
+          </div>
+        )}
+
+        <div className="rounded-3xl border border-or-200 bg-or-50 p-5">
+          <h4 className="flex items-center gap-1.5 font-serif text-sm font-bold text-or-800">
+            <Info className="h-4 w-4" /> Le rythme du livret
+          </h4>
+          <p className="mt-2 text-2xs leading-relaxed text-or-900/80">
+            Une fiche par rencontre. La fiche suivante ne s&apos;ouvre qu&apos;une fois celle-ci
+            partagée{isLeader ? ' — c’est vous qui clôturez la rencontre.' : ' par le groupe.'}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Ligne({ label, valeur, couleur }: { label: string; valeur: number; couleur: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <dt className="text-encre-500">{label}</dt>
+      <dd className={`font-bold ${couleur}`}>{valeur}</dd>
+    </div>
+  );
+}
+
+// ══ Onglet : les membres ═══════════════════════════════════════
+
+function OngletMembres({
+  onInviter,
+  inviteOuvert,
+}: {
+  onInviter: () => void;
+  inviteOuvert: boolean;
+}) {
+  const { user } = useAuth();
+  const { group, members, isLeader } = useParcours();
+  if (!group || !user) return null;
+
+  const actifs = members.filter((m) => m.status === 'actif');
+  const places = group.capacity - actifs.length;
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-3xl border border-parchemin-400 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="flex items-center gap-2 font-serif text-lg font-bold text-encre-950">
+            <Users className="h-5 w-5 text-or-600" strokeWidth={1.75} />
+            {actifs.length} membre{actifs.length > 1 ? 's' : ''}
+            <span className="text-sm font-normal text-encre-400">/ {group.capacity}</span>
+          </h3>
+          {places > 0 && (
+            <button
+              onClick={onInviter}
+              className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-4 py-2 text-2xs font-bold text-parchemin-100 transition-colors hover:bg-encre-800"
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              {inviteOuvert ? 'Masquer les invitations' : `Inviter (${places} place${places > 1 ? 's' : ''})`}
+            </button>
+          )}
+        </div>
+
+        <ul className="mt-4 divide-y divide-parchemin-300">
+          {actifs.map((membre) => (
+            <li key={membre.uid} className="flex items-center justify-between gap-3 py-3.5">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-or-300 to-or-500 text-xs font-bold text-encre-950">
+                  {membre.displayName.charAt(0).toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <p className="flex items-center gap-1.5 truncate text-sm font-bold text-encre-900">
+                    {membre.displayName}
+                    {membre.uid === user.uid && (
+                      <span className="text-2xs font-normal text-encre-300">(vous)</span>
+                    )}
+                    {membre.role === 'animateur' && (
+                      <Crown className="h-3.5 w-3.5 shrink-0 text-or-500" />
+                    )}
+                  </p>
+                  <p className="text-2xs text-encre-400">
+                    {membre.role === 'animateur'
+                      ? 'Animateur'
+                      : membre.role === 'co_animateur'
+                        ? 'Co-animateur'
+                        : 'Membre'}
+                    {' · '}
+                    {membre.preparedSteps.length} fiche
+                    {membre.preparedSteps.length > 1 ? 's' : ''} préparée
+                    {membre.preparedSteps.length > 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-2xs font-bold ${
+                  membre.preparedSteps.includes(group.currentStep)
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'bg-or-50 text-or-700'
+                }`}
+              >
+                {membre.preparedSteps.includes(group.currentStep) ? 'Prêt' : 'En cours'}
+              </span>
+            </li>
+          ))}
+
+          {Array.from({ length: Math.max(0, places) }).map((_, index) => (
+            <li key={`libre-${index}`} className="flex items-center gap-3 py-3.5 opacity-50">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-dashed border-parchemin-500 text-encre-300">
+                <UserPlus className="h-4 w-4" />
+              </span>
+              <p className="text-xs italic text-encre-400">Place libre</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {inviteOuvert && (
+        <InvitePanel
+          group={group}
+          inviter={{ uid: user.uid, displayName: user.displayName || 'Un membre' }}
+          tone="clair"
+        />
+      )}
+
+      {!isLeader && (
+        <p className="rounded-2xl bg-parchemin-200/60 px-4 py-3 text-2xs leading-relaxed text-encre-500">
+          Tout membre peut inviter : le groupe grandit par les relations, pas par un annuaire.
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ══ Onglet : mur (prière / partages / pépites) ═════════════════
+
+const MUR_CONFIG: Record<
+  GroupPostKind,
+  { titre: string; intro: string; placeholder: string; bouton: string; icone: typeof Heart }
+> = {
+  priere: {
+    titre: 'Déposer un sujet de prière',
+    intro: 'Ce que vous confiez ici reste dans le groupe.',
+    placeholder: 'Ce pour quoi vous avez besoin d’être porté cette semaine…',
+    bouton: 'Déposer sur le mur',
+    icone: Heart,
+  },
+  partage: {
+    titre: 'Partager une réflexion sur la fiche',
+    intro: 'Ce qui vous a arrêté, ce que vous n’avez pas compris, ce qui vous a remué.',
+    placeholder: 'Ce qui m’a marqué dans cette fiche…',
+    bouton: 'Envoyer au groupe',
+    icone: MessageSquare,
+  },
+  pepite: {
+    titre: 'Noter une pépite',
+    intro: 'Un verset, une phrase, une lumière reçue. Le groupe en vit aussi.',
+    placeholder: 'La pépite du jour…',
+    bouton: 'Ajouter la pépite',
+    icone: Star,
+  },
+  annonce: {
+    titre: 'Annonce',
+    intro: '',
+    placeholder: '',
+    bouton: 'Publier',
+    icone: Bookmark,
+  },
+  louange: {
+    titre: 'Action de grâce',
+    intro: '',
+    placeholder: '',
+    bouton: 'Publier',
+    icone: Heart,
+  },
+};
+
+function OngletMur({
+  kind,
+  posts,
+  onChange,
+}: {
+  kind: GroupPostKind;
+  posts: GroupPost[];
+  onChange: () => void;
+}) {
+  const { user } = useAuth();
+  const { group } = useParcours();
+  const [texte, setTexte] = useState('');
+  const [reference, setReference] = useState('');
+  const [envoi, setEnvoi] = useState(false);
+
+  if (!group || !user) return null;
+  const config = MUR_CONFIG[kind];
+  const liste = posts.filter((post) => post.kind === kind);
+
+  const publier = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!texte.trim()) return;
+    setEnvoi(true);
+    await addPost({
+      groupId: group.id,
+      authorId: user.uid,
+      authorName: user.displayName || 'Un membre',
+      kind,
+      content: texte,
+      step: group.currentStep,
+      reference: kind === 'pepite' ? reference.trim() || undefined : undefined,
+    });
+    setTexte('');
+    setReference('');
+    setEnvoi(false);
+    onChange();
+  };
+
+  return (
+    <div className="space-y-5">
+      <form onSubmit={publier} className="rounded-3xl border border-parchemin-400 bg-white p-5 shadow-sm">
+        <h3 className="flex items-center gap-2 font-serif text-lg font-bold text-encre-950">
+          <config.icone className="h-5 w-5 text-or-600" strokeWidth={1.75} />
+          {config.titre}
+        </h3>
+        <p className="mt-1 text-2xs text-encre-400">{config.intro}</p>
+
+        {kind === 'pepite' && (
+          <input
+            value={reference}
+            onChange={(event) => setReference(event.target.value)}
+            placeholder="Référence (facultatif) — ex : Ep 2:8"
+            className="mt-3.5 w-full rounded-xl border border-parchemin-400 bg-parchemin-50 px-3.5 py-2.5 font-serif text-xs text-encre-800 outline-none focus:border-or-400"
+          />
+        )}
+
+        <textarea
+          value={texte}
+          onChange={(event) => setTexte(event.target.value)}
+          placeholder={config.placeholder}
+          rows={3}
+          className="mt-3 w-full resize-none rounded-2xl border border-parchemin-400 bg-parchemin-50 px-4 py-3 text-sm leading-relaxed text-encre-800 outline-none placeholder:text-encre-300 focus:border-or-400"
+        />
+
+        <div className="mt-3 flex justify-end">
+          <button
+            type="submit"
+            disabled={envoi || !texte.trim()}
+            className="bouton-or rounded-full px-5 py-2.5 text-2xs font-bold disabled:opacity-40"
+          >
+            {config.bouton}
+          </button>
+        </div>
+      </form>
+
+      {liste.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-parchemin-400 bg-parchemin-50/60 py-14 text-center">
+          <config.icone className="mx-auto h-8 w-8 text-encre-200" strokeWidth={1.5} />
+          <p className="mt-3 font-serif text-sm font-bold text-encre-700">Rien encore ici</p>
+          <p className="mt-1 text-2xs text-encre-400">
+            Le premier message donne souvent le ton pour tout le groupe.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3.5">
+          {liste.map((post) => (
+            <CartePost key={post.id} post={post} kind={kind} onChange={onChange} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CartePost({
+  post,
+  kind,
+  onChange,
+}: {
+  post: GroupPost;
+  kind: GroupPostKind;
+  onChange: () => void;
+}) {
+  const { user } = useAuth();
+  const { group } = useParcours();
+  if (!group || !user) return null;
+
+  const aPrie = post.prayedBy.includes(user.uid);
+  const aAmen = post.amenBy.includes(user.uid);
+  const quand = new Date(post.createdAt).toLocaleString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  return (
+    <article
+      className={`rounded-3xl border bg-white p-5 shadow-2xs transition-colors ${
+        post.answered ? 'border-emerald-200 bg-emerald-50/25' : 'border-parchemin-400'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-encre-950">
+            {post.authorName}
+            {post.step && (
+              <span className="rounded-full bg-or-50 px-2 py-0.5 text-2xs font-bold text-or-700">
+                Fiche {post.step}
+              </span>
+            )}
+          </p>
+          <p className="text-2xs text-encre-300">{quand}</p>
+        </div>
+        {post.answered && (
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-2xs font-bold text-emerald-700">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Exaucée
+          </span>
+        )}
+      </div>
+
+      {post.reference && (
+        <p className="mt-3 font-serif text-sm font-bold italic text-or-700">{post.reference}</p>
+      )}
+
+      <p className="mt-2.5 whitespace-pre-wrap text-sm leading-relaxed text-encre-700">
+        {post.content}
+      </p>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-parchemin-300 pt-3.5">
+        <div className="flex flex-wrap gap-2">
+          {kind === 'priere' ? (
+            <button
+              onClick={async () => {
+                await togglePrayed(group.id, post.id, user.uid);
+                onChange();
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-2xs font-bold transition-colors ${
+                aPrie
+                  ? 'bg-rose-100 text-rose-700'
+                  : 'bg-parchemin-100 text-encre-500 hover:bg-rose-50 hover:text-rose-600'
+              }`}
+            >
+              <Heart className={`h-3.5 w-3.5 ${aPrie ? 'fill-rose-500 text-rose-500' : ''}`} />
+              J&apos;ai prié
+              {post.prayedBy.length > 0 && ` (${post.prayedBy.length})`}
+            </button>
+          ) : (
+            <button
+              onClick={async () => {
+                await toggleAmen(group.id, post.id, user.uid);
+                onChange();
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-2xs font-bold transition-colors ${
+                aAmen
+                  ? 'bg-or-100 text-or-700'
+                  : 'bg-parchemin-100 text-encre-500 hover:bg-or-50 hover:text-or-700'
+              }`}
+            >
+              <Heart className="h-3.5 w-3.5 fill-current" />
+              Amen{post.amenBy.length > 0 && ` (${post.amenBy.length})`}
+            </button>
+          )}
+
+          {kind === 'priere' && post.authorId === user.uid && (
+            <button
+              onClick={async () => {
+                await markPrayerAnswered(group.id, post.id, !post.answered);
+                onChange();
+              }}
+              className="rounded-full px-3 py-1.5 text-2xs font-medium text-encre-400 transition-colors hover:text-emerald-600"
+            >
+              {post.answered ? 'Remettre en cours' : 'Marquer comme exaucée'}
+            </button>
+          )}
+        </div>
+
+        {post.authorId === user.uid && (
+          <button
+            onClick={async () => {
+              await deletePost(group.id, post.id);
+              onChange();
+            }}
+            className="text-2xs text-encre-300 transition-colors hover:text-rose-500"
+          >
+            Supprimer
+          </button>
+        )}
+      </div>
+    </article>
+  );
+}
+
+// ══ Onglet : guide de l'animateur ══════════════════════════════
+
+function OngletGuide() {
+  const { group } = useParcours();
+  const [secondes, setSecondes] = useState(180);
+  const [tourne, setTourne] = useState(false);
+
+  useEffect(() => {
+    if (!tourne || secondes === 0) return;
+    const timer = window.setTimeout(() => {
+      setSecondes((value) => Math.max(0, value - 1));
+      if (secondes === 1) setTourne(false);
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [tourne, secondes]);
+
+  const etape = group?.currentStep ?? 1;
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <div className="space-y-4 rounded-3xl border border-parchemin-400 bg-white p-6 shadow-sm">
+        <h3 className="flex items-center gap-2 font-serif text-xl font-bold text-encre-950">
+          <ShieldCheck className="h-5 w-5 text-or-600" strokeWidth={1.75} />
+          Animer sans enseigner
+        </h3>
+
+        <div className="space-y-3 text-xs leading-relaxed text-encre-700">
+          <div className="rounded-2xl border border-or-200 bg-or-50 p-4">
+            <strong className="mb-1 block text-or-800">Vous facilitez, vous n&apos;exposez pas</strong>
+            Chacun a déjà travaillé la fiche chez lui. Votre travail est de faire circuler la
+            parole, de préciser les points restés flous, et de veiller à ce que personne
+            n&apos;accapare le temps. (p. 3)
+          </div>
+
+          <div className="rounded-2xl border border-encre-200 bg-encre-50 p-4">
+            <strong className="mb-1 block text-encre-800">Les temps de prière ciblés</strong>
+            À l&apos;issue des <strong>fiches 7 et 8</strong>, proposez à chacun un temps personnel
+            de prière : blessures, liens, non-pardons, forteresses. À la <strong>fiche 10</strong>,
+            priez pour chaque personne individuellement, pour qu&apos;elle soit remplie et
+            renouvelée du Saint-Esprit. (p. 4, annexes p. 160-162)
+            {(etape === 7 || etape === 8 || etape === 10) && (
+              <span className="mt-2 block rounded-lg bg-or-100 px-2.5 py-1.5 font-bold text-or-800">
+                C&apos;est le cas cette semaine : prévoyez ce temps à part.
+              </span>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-parchemin-400 bg-parchemin-50 p-4">
+            <strong className="mb-1 block text-encre-900">Le climat</strong>
+            Pas de jugement d&apos;un côté, pas de susceptibilité de l&apos;autre. Chacun doit
+            pouvoir parler librement, sans qu&apos;on lui impose un point de vue.
+          </div>
+
+          <div className="rounded-2xl border border-parchemin-400 bg-parchemin-50 p-4">
+            <strong className="mb-1 block text-encre-900">Faites-vous aider</strong>
+            Le livret conseille qu&apos;une seconde personne assiste l&apos;animateur. Nommez un
+            co-animateur dans le groupe : il prend le relais quand vous ne pouvez pas.
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col justify-between rounded-3xl border border-parchemin-400 bg-white p-6 text-center shadow-sm">
+        <div>
+          <h3 className="flex items-center justify-center gap-2 font-serif text-xl font-bold text-encre-950">
+            <Clock className="h-5 w-5 text-or-600" strokeWidth={1.75} />
+            Minuteur du tour de parole
+          </h3>
+          <p className="mx-auto mt-2 max-w-xs text-2xs leading-relaxed text-encre-500">
+            Un temps égal pour chacun évite que les plus à l&apos;aise prennent toute la place.
+          </p>
+
+          <div className="my-8 font-mono text-5xl font-bold text-encre-900">
+            {Math.floor(secondes / 60)}:{(secondes % 60).toString().padStart(2, '0')}
+          </div>
+
+          <div className="mb-6 flex justify-center gap-1.5">
+            {[120, 180, 300].map((valeur) => (
+              <button
+                key={valeur}
+                onClick={() => {
+                  setTourne(false);
+                  setSecondes(valeur);
+                }}
+                className={`rounded-full px-3 py-1.5 text-2xs font-bold transition-colors ${
+                  secondes === valeur
+                    ? 'bg-or-100 text-or-700'
+                    : 'bg-parchemin-100 text-encre-500 hover:bg-parchemin-200'
+                }`}
+              >
+                {valeur / 60} min
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={() => setTourne((value) => !value)}
+          className="bouton-or mx-auto inline-flex items-center gap-2 rounded-full px-7 py-3 text-xs font-bold"
+        >
+          {tourne ? 'Mettre en pause' : 'Démarrer le tour'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <ParcoursGate allowPending>
+      <CelluleContent />
+    </ParcoursGate>
   );
 }

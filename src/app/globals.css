@@ -1,105 +1,546 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 240 10% 98%;
-    --foreground: 240 10% 10%;
-  }
+/* ════════════════════════════════════════════════════════════
+   Les Fondements — système visuel
+   Encre (bleu nuit) · Parchemin (papier du livret) · Or (la lampe)
+   ════════════════════════════════════════════════════════════ */
+
+@theme {
+  --color-encre-50: #f2f5fa;
+  --color-encre-100: #e2e9f4;
+  --color-encre-200: #c3d0e6;
+  --color-encre-300: #94a9cd;
+  --color-encre-400: #5f7cae;
+  --color-encre-500: #3d5b8f;
+  --color-encre-600: #2a4472;
+  --color-encre-700: #1c3159;
+  --color-encre-800: #112340;
+  --color-encre-900: #0b1d38;
+  --color-encre-950: #07162b;
+
+  --color-parchemin-50: #fdfbf6;
+  --color-parchemin-100: #f8f3e9;
+  --color-parchemin-200: #f4ede0;
+  --color-parchemin-300: #e5dcce;
+  --color-parchemin-400: #ded6c8;
+  --color-parchemin-500: #c9bda6;
+  --color-parchemin-600: #a4967c;
+
+  --color-or-50: #fffaeb;
+  --color-or-100: #fef0c7;
+  --color-or-200: #fde28a;
+  --color-or-300: #fcd34d;
+  --color-or-400: #f6c453;
+  --color-or-500: #f0a92a;
+  --color-or-600: #d18410;
+  --color-or-700: #a75f0f;
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.15rem;
+
+  --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+
+  --radius-4xl: 2rem;
+  --radius-5xl: 2.75rem;
+
+  --ease-doux: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-ressort: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-fade-up: fade-up 0.6s var(--ease-doux) both;
+  --animate-reveal: reveal 0.8s var(--ease-doux) both;
+  --animate-souffle: souffle 5.5s ease-in-out infinite;
+  --animate-halo: halo 4s ease-in-out infinite;
+  --animate-derive: derive 22s linear infinite;
+  --animate-scintille: scintille 2.4s ease-in-out infinite;
 }
 
-html {
-  scroll-behavior: smooth;
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
 }
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #faf9f6;
-  color: #1a1a1a;
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(24px) scale(0.985); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
 }
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Georgia', serif;
+@keyframes souffle {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.045); opacity: 1; }
 }
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+@keyframes halo {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(246, 196, 83, 0.35); }
+  50% { box-shadow: 0 0 42px 8px rgba(246, 196, 83, 0.22); }
 }
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+@keyframes derive {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-60px, -40px, 0); }
 }
-
-::-webkit-scrollbar-thumb {
-  background: #d4b58e; 
-  border-radius: 4px;
+@keyframes scintille {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.9; }
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: #c3a175; 
-}
-
-/* Verse highlight styling */
-.verse-highlight {
-  background-color: rgba(212, 181, 142, 0.2);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-/* Fade in animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
 
-.hero-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: linear-gradient(to bottom, black, transparent 92%);
-}
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f8f3e9;
+    color: #0b1d38;
+    margin: 0;
+    padding: 0;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+    position: relative;
+    touch-action: manipulation;
+  }
 
-.editorial-paper {
-  background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 85% 70%, rgba(11, 29, 56, 0.07) 0 1px, transparent 1.5px);
-  background-size: 24px 24px, 31px 31px;
-}
+  /* Évite le zoom automatique agressif sur iPhone/Android qui fait déborder la page */
+  @media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="number"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
 
-.roadmap-track::before {
-  content: '';
-  position: absolute;
-  left: 3%;
-  right: 3%;
-  top: 46%;
-  height: 74px;
-  border-radius: 999px;
-  background: #f6c453;
-  transform: rotate(-2deg);
-  box-shadow: 0 12px 30px rgba(146, 93, 14, 0.12);
-}
+  h1, h2, h3, h4, h5, h6 {
+    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+  }
 
-@media (max-width: 1023px) {
-  .roadmap-track::before {
-    left: 32px;
-    right: auto;
-    top: 2%;
-    bottom: 2%;
-    width: 64px;
-    height: auto;
-    transform: rotate(1deg);
+  /* Respect du réglage système : on coupe les mouvements décoratifs. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-::selection {
-  background: #fcd34d;
-  color: #08172d;
+/* ─── Barre de défilement ──────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f8f3e9; }
+::-webkit-scrollbar-thumb { background: #d4b58e; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #c3a175; }
+::selection { background: #fcd34d; color: #07162b; }
+
+/* ─── Textures éditoriales ─────────────────────────────────── */
+.editorial-paper {
+  background-color: #f4ede0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.8) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 85% 70%, rgba(11, 29, 56, 0.05) 0 1px, transparent 1.5px);
+  background-size: 24px 24px, 32px 32px;
+}
+
+.parchment-card {
+  background: #ffffff;
+  border: 1px solid #e5dcce;
+  box-shadow: 0 10px 30px -5px rgba(11, 29, 56, 0.05);
+}
+.parchment-card:hover {
+  border-color: #f6c453;
+  box-shadow: 0 20px 40px -10px rgba(11, 29, 56, 0.1);
+}
+
+.sticky-note {
+  background: #fef08a;
+  border: 1px solid #fde047;
+  box-shadow: 2px 6px 15px rgba(0, 0, 0, 0.06);
+  transform: rotate(-1.5deg);
+  transition: transform 0.2s ease;
+}
+.sticky-note:hover { transform: rotate(0deg) scale(1.02); }
+
+.watermark-text {
+  font-family: Georgia, serif;
+  font-weight: 900;
+  color: rgba(11, 29, 56, 0.035);
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: -0.05em;
+  line-height: 0.85;
+}
+
+.verse-highlight {
+  background-color: rgba(212, 181, 142, 0.25);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+
+/* ─── Le sentier doré ──────────────────────────────────────── */
+.roadmap-track::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #f59e0b, #fbbf24, #d97706, #f59e0b);
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.35);
+}
+@media (max-width: 768px) {
+  .roadmap-track::before { left: 28px; transform: none; }
+}
+
+/* ─── Surfaces nocturnes (immersion, onboarding, rencontre) ── */
+.nuit {
+  background:
+    radial-gradient(1200px 600px at 12% -10%, rgba(246, 196, 83, 0.16), transparent 62%),
+    radial-gradient(900px 520px at 88% 8%, rgba(61, 91, 143, 0.35), transparent 60%),
+    linear-gradient(170deg, #07162b 0%, #0b1d38 48%, #050f1f 100%);
+}
+
+.nuit-grain::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.06) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.045) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 45% 85%, rgba(246, 196, 83, 0.07) 0 1px, transparent 2px);
+  background-size: 120px 120px, 170px 170px, 210px 210px;
+  animation: derive 22s linear infinite alternate;
+}
+
+.vitrail {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.verre {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.verre-clair {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Texte doré des titres d'immersion */
+.titre-or {
+  background: linear-gradient(120deg, #fef0c7 0%, #f6c453 42%, #fde28a 70%, #f0a92a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Barre de progression fine en haut d'une immersion */
+.rail {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.rail > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #f0a92a, #fcd34d, #f6c453);
+  box-shadow: 0 0 14px rgba(246, 196, 83, 0.6);
+  transition: width 700ms var(--ease-doux);
+}
+
+/* Cadre « encadré » du livret : une phrase mise en relief */
+.encadre {
+  border: 1px solid rgba(11, 29, 56, 0.18);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  font-family: Georgia, serif;
+  text-align: center;
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.6);
+}
+.encadre-nuit {
+  border: 1px solid rgba(246, 196, 83, 0.32);
+  background: rgba(246, 196, 83, 0.07);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  font-family: Georgia, serif;
+  text-align: center;
+  color: #fef0c7;
+}
+
+/* Champ d'écriture manuscrite (versets à recopier) */
+.ligne-manuscrite {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    rgba(11, 29, 56, 0.14) 31px,
+    rgba(11, 29, 56, 0.14) 32px
+  );
+  line-height: 32px;
+  font-family: Georgia, serif;
+  resize: none;
+}
+
+/* Bouton principal doré */
+.bouton-or {
+  background: linear-gradient(135deg, #fcd34d 0%, #f6c453 45%, #f0a92a 100%);
+  color: #07162b;
+  box-shadow: 0 10px 26px -10px rgba(240, 169, 42, 0.8);
+  transition: transform 180ms var(--ease-ressort), box-shadow 180ms ease;
+}
+.bouton-or:hover { transform: translateY(-1px); box-shadow: 0 16px 34px -12px rgba(240, 169, 42, 0.9); }
+.bouton-or:active { transform: translateY(0) scale(0.985); }
+
+/* Apparition en cascade des enfants d'une liste */
+.cascade > * { animation: fade-up 0.55s var(--ease-doux) both; }
+.cascade > *:nth-child(1) { animation-delay: 0.04s; }
+.cascade > *:nth-child(2) { animation-delay: 0.10s; }
+.cascade > *:nth-child(3) { animation-delay: 0.16s; }
+.cascade > *:nth-child(4) { animation-delay: 0.22s; }
+.cascade > *:nth-child(5) { animation-delay: 0.28s; }
+.cascade > *:nth-child(6) { animation-delay: 0.34s; }
+.cascade > *:nth-child(7) { animation-delay: 0.40s; }
+.cascade > *:nth-child(8) { animation-delay: 0.46s; }
+
+/* Contenu HTML des fiches (exposés du livret) */
+.prose-livret p { margin-bottom: 1rem; line-height: 1.85; }
+.prose-livret strong { font-weight: 700; color: #07162b; }
+.prose-livret em { font-style: italic; }
+.prose-livret h4 {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 1.02rem;
+  margin: 1.6rem 0 0.6rem;
+  color: #112340;
+}
+.prose-livret blockquote {
+  margin: 1.1rem 0;
+  padding: 0.15rem 0 0.15rem 1.1rem;
+  border-left: 3px solid #f6c453;
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #1c3159;
+}
+.prose-livret ul { margin: 0.6rem 0 1.1rem 1.1rem; list-style: disc; }
+.prose-livret li { margin-bottom: 0.45rem; line-height: 1.7; }
+
+.prose-livret-nuit p { color: rgba(248, 243, 233, 0.82); }
+.prose-livret-nuit strong { color: #fef0c7; }
+.prose-livret-nuit h4 { color: #f6c453; }
+.prose-livret-nuit blockquote { border-left-color: #f6c453; color: #fde28a; }
+.prose-livret-nuit li { color: rgba(248, 243, 233, 0.8); }
+
+/* ════════════════════════════════════════════════════════════
+   La table de travail
+   Le livret est un objet de papier : un cahier qu'on annote, des
+   versets recopiés à la main, des bouts de papier posés çà et là.
+   Ce qui suit donne cette matière, sans une seule image.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── L'écriture à la main ─────────────────────────────────── */
+.manuscrit {
+  font-family: var(--police-main), 'Segoe Script', cursive;
+  letter-spacing: 0.01em;
+}
+
+/* ─── Le plan de travail ───────────────────────────────────── */
+.table-travail {
+  background-color: #efe7d8;
+  background-image:
+    /* la trame du feutre */
+    repeating-linear-gradient(
+      52deg,
+      rgba(11, 29, 56, 0.018) 0 2px,
+      transparent 2px 5px
+    ),
+    repeating-linear-gradient(
+      -38deg,
+      rgba(11, 29, 56, 0.014) 0 2px,
+      transparent 2px 5px
+    ),
+    radial-gradient(1100px 700px at 20% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(900px 600px at 90% 100%, rgba(164, 150, 124, 0.18), transparent 55%);
+}
+
+/* ─── Une feuille posée sur la table ───────────────────────── */
+.feuille {
+  position: relative;
+  background: #fffdf7;
+  box-shadow:
+    0 1px 2px rgba(11, 29, 56, 0.06),
+    0 10px 24px -12px rgba(11, 29, 56, 0.18);
+}
+
+/* Le bord déchiré, en bas de la feuille. */
+.feuille-dechiree::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -7px;
+  height: 8px;
+  background: inherit;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='8' viewBox='0 0 120 8'%3E%3Cpath d='M0 0h120v3c-6 0-6 2.4-12 2.4S102 3 96 3s-6 3.2-12 3.2S78 3.4 72 3.4 66 6 60 6 54 3 48 3s-6 2.8-12 2.8S30 3.2 24 3.2 18 6 12 6 6 3.2 0 3.2Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='8' viewBox='0 0 120 8'%3E%3Cpath d='M0 0h120v3c-6 0-6 2.4-12 2.4S102 3 96 3s-6 3.2-12 3.2S78 3.4 72 3.4 66 6 60 6 54 3 48 3s-6 2.8-12 2.8S30 3.2 24 3.2 18 6 12 6 6 3.2 0 3.2Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 120px 8px;
+  mask-size: 120px 8px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+
+/* ─── Le post-it ───────────────────────────────────────────── */
+.postit {
+  position: relative;
+  background: linear-gradient(168deg, #fdf3b8 0%, #fce98d 62%, #f7dd72 100%);
+  box-shadow:
+    0 1px 1px rgba(11, 29, 56, 0.07),
+    0 14px 22px -14px rgba(11, 29, 56, 0.42);
+}
+
+/* Le coin qui se décolle, en bas à droite. */
+.postit::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, transparent 50%, rgba(11, 29, 56, 0.10) 50%);
+}
+
+.postit-rose { background: linear-gradient(168deg, #ffe0e4 0%, #ffc9d0 64%, #ffb6c0 100%); }
+.postit-bleu { background: linear-gradient(168deg, #dcecfb 0%, #c2ddf6 64%, #abd0f2 100%); }
+.postit-vert { background: linear-gradient(168deg, #ddf5e0 0%, #c2ebc9 64%, #a9e0b4 100%); }
+
+/* ─── Le ruban adhésif ─────────────────────────────────────── */
+.ruban {
+  position: absolute;
+  width: 78px;
+  height: 22px;
+  background: rgba(246, 196, 83, 0.34);
+  border-inline: 1px dashed rgba(255, 255, 255, 0.45);
+  box-shadow: 0 1px 2px rgba(11, 29, 56, 0.08);
+  backdrop-filter: blur(1px);
+}
+
+/* ─── Les inclinaisons ─────────────────────────────────────── */
+/* Rien n'est jamais parfaitement droit sur une table. */
+.pose-1 { transform: rotate(-1.6deg); }
+.pose-2 { transform: rotate(1.1deg); }
+.pose-3 { transform: rotate(-0.7deg); }
+.pose-4 { transform: rotate(2.1deg); }
+
+.pose-1:hover, .pose-2:hover, .pose-3:hover, .pose-4:hover {
+  transform: rotate(0deg) translateY(-2px);
+  transition: transform 260ms var(--ease-ressort);
+}
+
+/* ─── La bulle posée sous un passage ───────────────────────── */
+.bulle-papier {
+  position: relative;
+  background: #fffdf5;
+  box-shadow:
+    0 2px 4px rgba(11, 29, 56, 0.08),
+    0 22px 40px -18px rgba(11, 29, 56, 0.45);
+}
+
+/* La petite pointe qui la rattache au mot cliqué. */
+.bulle-papier::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: var(--pointe, 28px);
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+/* ─── Accessoires de bureau (punaises, trombones, pinces) ─── */
+.punaise {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fef08a, #f59e0b 65%, #92400e 100%);
+  box-shadow:
+    0 3px 6px rgba(11, 29, 56, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  z-index: 15;
+}
+
+.punaise-rouge {
+  background: radial-gradient(circle at 35% 35%, #fca5a5, #ef4444 65%, #991b1b 100%);
+}
+
+.punaise-bleue {
+  background: radial-gradient(circle at 35% 35%, #93c5fd, #3b82f6 65%, #1e40af 100%);
+}
+
+.trombone {
+  position: absolute;
+  width: 14px;
+  height: 38px;
+  border: 3px solid #94a3b8;
+  border-radius: 8px 8px 6px 6px;
+  border-bottom: none;
+  background: transparent;
+  box-shadow: 1px 2px 4px rgba(11, 29, 56, 0.2);
+  z-index: 15;
+}
+
+.attache-pince {
+  position: absolute;
+  width: 36px;
+  height: 16px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 3px;
+  box-shadow: 0 3px 6px rgba(11, 29, 56, 0.4);
+  z-index: 15;
+}
+.attache-pince::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 6px;
+  width: 24px;
+  height: 14px;
+  border: 2px solid #cbd5e1;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+}
+
+.timbre {
+  border: 2px dashed rgba(167, 95, 15, 0.4);
+  background: rgba(255, 250, 235, 0.8);
+  box-shadow: inset 0 0 8px rgba(246, 196, 83, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pose-1, .pose-2, .pose-3, .pose-4 { transform: none; }
 }

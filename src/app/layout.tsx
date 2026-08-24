@@ -1,20 +1,50 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Caveat, Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/AuthContext';
+import { ParcoursProvider } from '@/lib/ParcoursContext';
 import Navbar from '@/components/Navbar';
-import BibleReader from '@/components/BibleReader';
+import AppShell from '@/components/AppShell';
+import BoutonEtude from '@/components/BoutonEtude';
+import PanneauEtude from '@/components/PanneauEtude';
+import BulleVerset from '@/components/BulleVerset';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--police-ui' });
+
+/**
+ * L'écriture à la main du parcours : les annotations, les post-it, les
+ * versets recopiés. Caveat couvre les accents français, ce que la plupart
+ * des fontes manuscrites ne font pas.
+ */
+const caveat = Caveat({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '600', '700'],
+  variable: '--police-main',
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://les-fondements-parcours.digi-team-8068.chatgpt.site'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://les-fondements.workers.dev'),
   title: {
     default: 'Les Fondements — Une foi enracinée',
     template: '%s | Les Fondements',
   },
   description: 'Un parcours de discipleship numérique en 20 étapes, vécu personnellement et en petit groupe.',
   applicationName: 'Les Fondements',
+  icons: {
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [{ url: '/icon-512.png', sizes: '180x180', type: 'image/png' }],
+  },
+  // Installée sur iOS, l'application s'ouvre sans la barre de Safari.
+  appleWebApp: {
+    capable: true,
+    title: 'Les Fondements',
+    statusBarStyle: 'black-translucent',
+  },
+  formatDetection: { telephone: false },
   keywords: ['discipleship', 'formation chrétienne', 'petits groupes', 'parcours biblique'],
   openGraph: {
     title: 'Les Fondements — Une foi enracinée. Une vie transformée.',
@@ -31,6 +61,24 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * `viewportFit: 'cover'` laisse le contenu passer sous l'encoche et la barre
+ * d'accueil ; les marges de sécurité sont reprises dans la coque, via
+ * `env(safe-area-inset-*)`. Sans cela, une application installée sur iPhone
+ * affiche deux bandes noires et trahit immédiatement la page web.
+ */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8f3e9' },
+    { media: '(prefers-color-scheme: dark)', color: '#07162b' },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -38,13 +86,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${caveat.variable} ${inter.className}`}>
         <AuthProvider>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <BibleReader />
+          <ParcoursProvider>
+            <Navbar />
+            <AppShell>{children}</AppShell>
+            <BoutonEtude />
+            <BulleVerset />
+            <PanneauEtude />
+            <PWAInstallPrompt />
+          </ParcoursProvider>
         </AuthProvider>
       </body>
     </html>

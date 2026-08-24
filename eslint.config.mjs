@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // État local de wrangler (déploiements temporaires) :
+    ".wrangler/**",
   ]),
 ]);
 

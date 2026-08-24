@@ -1,172 +1,299 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/lib/AuthContext';
-import { 
-  LogOut, 
-  User, 
-  Menu, 
-  X, 
-  BookOpen, 
-  PenLine, 
-  LayoutDashboard, 
-  Users, 
-  Brain, 
-  Tag, 
-  BookMarked, 
+import {
   Award,
-  MessageCircle
+  BookOpen,
+  Bookmark,
+  Brain,
+  Compass,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  MessageCircle,
+  PenLine,
+  User,
+  Users,
+  X,
 } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { useParcours } from '@/lib/ParcoursContext';
+import { useFondSombre } from '@/lib/fondSombre';
+
+/** Routes vécues en plein écran : la barre y devient un simple filigrane. */
+const ROUTES_IMMERSIVES = ['/onboarding', '/rejoindre', '/login', '/groupes/rencontre'];
+
+const LIENS_PRINCIPAUX = [
+  { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { href: '/fiches', label: 'Le parcours', icon: Compass },
+  { href: '/groupes', label: 'Ma cellule', icon: Users },
+  { href: '/memorisation', label: 'Mémorisation', icon: Brain },
+  { href: '/journal', label: 'Journal', icon: PenLine },
+];
+
+const LIENS_SECONDAIRES = [
+  { href: '/index-thematique', label: 'Index thématique', icon: Bookmark },
+  { href: '/temoignages', label: 'Témoignages', icon: MessageCircle },
+  { href: '/certificat', label: 'Mon attestation', icon: Award },
+];
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { group, gate } = useParcours();
   const pathname = usePathname();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOuvert, setMenuOuvert] = useState(false);
+  const [cheminPrecedent, setCheminPrecedent] = useState(pathname);
 
-  const isLanding = pathname === '/';
-  const isTransparentLanding = isLanding && !isScrolled;
+  const fondSombre = useFondSombre();
+  const estAccueil = pathname === '/';
+  const estImmersive = ROUTES_IMMERSIVES.some((route) => pathname.startsWith(route));
+  const surFondSombre = (estAccueil && !scrolled) || estImmersive || fondSombre;
+
+  /**
+   * Une fois la personne connectée, c'est la coque de l'application qui
+   * porte la navigation : colonne latérale sur grand écran, barre d'onglets
+   * sur mobile. Cette barre-ci ne sert plus qu'aux pages publiques et aux
+   * écrans plein écran, où elle se réduit à un filigrane.
+   */
+  const remplaceeParLaCoque = !!user && !estAccueil && !estImmersive;
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error("Logout error", error);
-    }
-  };
+  // Le menu mobile se referme quand on change de page.
+  if (pathname !== cheminPrecedent) {
+    setCheminPrecedent(pathname);
+    setMenuOuvert(false);
+  }
 
-  const navClass = `fixed w-full z-50 transition-all duration-300 ${
-    isScrolled || !isLanding ? 'bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-100 text-slate-800' : 'bg-[#08172d]/65 backdrop-blur-md border-b border-white/10 text-white'
+  if (remplaceeParLaCoque) return null;
+
+  // ── Mode filigrane : logo seul, fond transparent ─────────────
+  if (estImmersive) {
+    return (
+      <nav className="pointer-events-none fixed inset-x-0 top-0 z-50">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
+          <Link href="/" className="pointer-events-auto flex items-center gap-2.5">
+            <span className="grid h-9 w-9 place-items-center rounded-xl border border-or-300/25 bg-encre-950/60 text-or-300 backdrop-blur-sm">
+              <BookOpen className="h-4 w-4" strokeWidth={1.75} />
+            </span>
+            <span className="font-serif text-sm font-bold tracking-tight text-parchemin-100">
+              Les Fondements
+            </span>
+          </Link>
+
+          {user && (
+            <button
+              onClick={() => void logout()}
+              className="pointer-events-auto rounded-full bg-white/8 px-3.5 py-1.5 text-2xs font-bold text-parchemin-100/70 backdrop-blur-sm transition-colors hover:bg-white/16 hover:text-parchemin-100"
+            >
+              Se déconnecter
+            </button>
+          )}
+        </div>
+      </nav>
+    );
+  }
+
+  const classeNav = `fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+    surFondSombre
+      ? 'border-b border-white/10 bg-encre-950/70 backdrop-blur-xl'
+      : 'border-b border-parchemin-400/60 bg-white/90 backdrop-blur-xl'
   }`;
 
-  return (
-    <nav className={navClass}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          
-          {/* Brand Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0 flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-sm">
-                <BookOpen className="h-5 w-5 text-white" />
-              </div>
-              <span className={`font-serif font-bold text-xl tracking-tight ${isTransparentLanding ? 'text-white' : 'text-slate-900'}`}>
-                Les Fondements
-              </span>
-            </Link>
-          </div>
+  const lienClasse = (actif: boolean) =>
+    `flex items-center gap-1.5 rounded-xl px-3 py-2 text-2xs font-bold transition-all ${
+      actif
+        ? 'bg-or-100 text-or-700'
+        : surFondSombre
+          ? 'text-parchemin-100/70 hover:bg-white/10 hover:text-or-200'
+          : 'text-encre-600 hover:bg-parchemin-100 hover:text-encre-900'
+    }`;
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center space-x-6 text-sm font-medium">
+  return (
+    <nav className={classeNav}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <Link href="/" className="group flex items-center gap-2.5">
+            <Image
+              src="/logo.png"
+              alt="Les Fondements Logo"
+              width={32}
+              height={32}
+              className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              priority
+            />
+            <span
+              className={`font-serif text-lg font-bold tracking-tight ${
+                surFondSombre ? 'text-parchemin-100' : 'text-encre-950'
+              }`}
+            >
+              Les Fondements
+            </span>
+          </Link>
+
+          {/* ── Desktop ── */}
+          <div className="hidden items-center gap-1 lg:flex">
             {user ? (
               <>
-                <Link href="/dashboard" className={`hover:text-indigo-600 transition-colors flex items-center gap-1 ${pathname === '/dashboard' ? 'text-indigo-600 font-bold' : 'text-slate-700'}`}>
-                  <LayoutDashboard className="w-4 h-4" /> Tableau de bord
-                </Link>
-                <Link href="/fiches" className={`hover:text-indigo-600 transition-colors flex items-center gap-1 ${pathname.startsWith('/fiches') ? 'text-indigo-600 font-bold' : 'text-slate-700'}`}>
-                  <BookOpen className="w-4 h-4" /> Les 20 Fiches
-                </Link>
-                <Link href="/groupes" className={`hover:text-indigo-600 transition-colors flex items-center gap-1 ${pathname.startsWith('/groupes') ? 'text-indigo-600 font-bold' : 'text-slate-700'}`}>
-                  <Users className="w-4 h-4" /> Groupe & Prière
-                </Link>
-                <Link href="/memorisation" className={`hover:text-indigo-600 transition-colors flex items-center gap-1 ${pathname === '/memorisation' ? 'text-indigo-600 font-bold' : 'text-slate-700'}`}>
-                  <Brain className="w-4 h-4" /> Mémorisation
-                </Link>
-                <Link href="/index-thematique" className={`hover:text-indigo-600 transition-colors flex items-center gap-1 ${pathname === '/index-thematique' ? 'text-indigo-600 font-bold' : 'text-slate-700'}`}>
-                  <Tag className="w-4 h-4" /> Thèmes
-                </Link>
-                <Link href="/journal" className={`hover:text-indigo-600 transition-colors flex items-center gap-1 ${pathname === '/journal' ? 'text-indigo-600 font-bold' : 'text-slate-700'}`}>
-                  <PenLine className="w-4 h-4" /> Journal
-                </Link>
+                {LIENS_PRINCIPAUX.map((lien) => (
+                  <Link
+                    key={lien.href}
+                    href={lien.href}
+                    className={lienClasse(
+                      lien.href === '/dashboard'
+                        ? pathname === '/dashboard'
+                        : pathname.startsWith(lien.href)
+                    )}
+                  >
+                    <lien.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    {lien.label}
+                  </Link>
+                ))}
 
-                <div className="flex items-center gap-3 ml-2 pl-4 border-l border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-800 font-semibold text-xs shadow-2xs">
-                      {user.displayName ? user.displayName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
-                    </div>
-                  </div>
-                  <button onClick={handleLogout} className="text-slate-400 hover:text-red-500 transition-colors" title="Déconnexion">
-                    <LogOut className="w-4 h-4" />
+                <div
+                  className={`ml-2 flex items-center gap-2.5 border-l pl-3 ${
+                    surFondSombre ? 'border-white/15' : 'border-parchemin-400/70'
+                  }`}
+                >
+                  {group && gate.state === 'ouvert' && (
+                    <span className="hidden rounded-full border border-or-300/40 bg-or-50 px-2.5 py-1 text-2xs font-bold text-or-700 xl:inline">
+                      Fiche {group.currentStep}/20
+                    </span>
+                  )}
+                  <span className="grid h-8 w-8 place-items-center rounded-xl bg-or-400 text-2xs font-bold text-encre-950">
+                    {user.displayName ? (
+                      user.displayName.charAt(0).toUpperCase()
+                    ) : (
+                      <User className="h-4 w-4" />
+                    )}
+                  </span>
+                  <button
+                    onClick={() => void logout()}
+                    title="Se déconnecter"
+                    className={`rounded-lg p-1.5 transition-colors ${
+                      surFondSombre
+                        ? 'text-parchemin-100/50 hover:text-rose-300'
+                        : 'text-encre-300 hover:text-rose-500'
+                    }`}
+                  >
+                    <LogOut className="h-4 w-4" strokeWidth={1.75} />
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <Link href="/fiches" className={isTransparentLanding ? 'text-slate-200 hover:text-amber-300' : 'text-slate-700 hover:text-indigo-600'}>Le Parcours</Link>
-                <Link href="/index-thematique" className={isTransparentLanding ? 'text-slate-200 hover:text-amber-300' : 'text-slate-700 hover:text-indigo-600'}>Index Thématique</Link>
-                <Link href="/ressources" className={isTransparentLanding ? 'text-slate-200 hover:text-amber-300' : 'text-slate-700 hover:text-indigo-600'}>Bibliographie</Link>
-                <Link href="/login" className={`${isTransparentLanding ? 'bg-amber-300 text-[#08172d] hover:bg-amber-200' : 'bg-indigo-600 text-white hover:bg-indigo-700'} px-5 py-2 rounded-full font-semibold transition-colors shadow-sm`}>
-                  Connexion Gratuite
+                {[
+                  { href: '/fiches', label: 'Le parcours' },
+                  { href: '/index-thematique', label: 'Thèmes' },
+                  { href: '/ressources', label: 'Bibliographie' },
+                ].map((lien) => (
+                  <Link
+                    key={lien.href}
+                    href={lien.href}
+                    className={`rounded-xl px-3 py-2 text-2xs font-bold transition-colors ${
+                      surFondSombre
+                        ? 'text-parchemin-100/75 hover:text-or-200'
+                        : 'text-encre-600 hover:text-encre-950'
+                    }`}
+                  >
+                    {lien.label}
+                  </Link>
+                ))}
+                <Link
+                  href="/login"
+                  className="bouton-or ml-2 rounded-full px-5 py-2.5 text-2xs font-bold"
+                >
+                  Commencer
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="flex items-center lg:hidden">
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className={`${isTransparentLanding ? 'text-white hover:text-amber-300' : 'text-slate-600 hover:text-indigo-600'} p-2`}>
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+          {/* ── Mobile ── */}
+          <button
+            onClick={() => setMenuOuvert((open) => !open)}
+            className={`rounded-xl p-2 lg:hidden ${
+              surFondSombre ? 'text-parchemin-100' : 'text-encre-700'
+            }`}
+            aria-label={menuOuvert ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={menuOuvert}
+          >
+            {menuOuvert ? (
+              <X className="h-6 w-6" strokeWidth={1.75} />
+            ) : (
+              <Menu className="h-6 w-6" strokeWidth={1.75} />
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-white shadow-xl border-t border-slate-100 absolute w-full max-h-[85vh] overflow-y-auto">
-          <div className="px-4 pt-3 pb-6 space-y-2">
+      {menuOuvert && (
+        <div className="absolute inset-x-0 max-h-[80vh] overflow-y-auto border-t border-parchemin-300 bg-white shadow-2xl lg:hidden">
+          <div className="space-y-1 px-4 pb-6 pt-4">
             {user ? (
               <>
-                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <LayoutDashboard className="w-4 h-4 text-indigo-600" /> Tableau de bord
-                </Link>
-                <Link href="/fiches" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <BookOpen className="w-4 h-4 text-indigo-600" /> Les 20 Fiches
-                </Link>
-                <Link href="/groupes" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <Users className="w-4 h-4 text-indigo-600" /> Groupe & Mur de Prière
-                </Link>
-                <Link href="/memorisation" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <Brain className="w-4 h-4 text-amber-600" /> Mémorisation (Flashcards)
-                </Link>
-                <Link href="/index-thematique" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <Tag className="w-4 h-4 text-slate-500" /> Index Thématique (p.163)
-                </Link>
-                <Link href="/ressources" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <BookMarked className="w-4 h-4 text-slate-500" /> Bibliographie (p.164)
-                </Link>
-                <Link href="/journal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <PenLine className="w-4 h-4 text-amber-600" /> Journal Spirituel
-                </Link>
-                <Link href="/temoignages" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <MessageCircle className="w-4 h-4 text-indigo-600" /> Témoignages
-                </Link>
-                <Link href="/certificat" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-800 hover:bg-indigo-50 hover:text-indigo-600">
-                  <Award className="w-4 h-4 text-amber-600" /> Mon Certificat
-                </Link>
-                <div className="pt-2 border-t border-slate-100">
-                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-2 w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50">
-                    <LogOut className="w-4 h-4" /> Déconnexion
+                {group && gate.state === 'ouvert' && (
+                  <div className="mb-3 rounded-2xl bg-or-50 px-4 py-3">
+                    <p className="text-2xs font-bold uppercase tracking-[0.16em] text-or-700">
+                      {group.name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-encre-600">
+                      Fiche {group.currentStep} sur 20 ·{' '}
+                      {group.stepPhase === 'rencontre' ? 'rencontre en cours' : 'préparation'}
+                    </p>
+                  </div>
+                )}
+
+                {[...LIENS_PRINCIPAUX, ...LIENS_SECONDAIRES].map((lien) => (
+                  <Link
+                    key={lien.href}
+                    href={lien.href}
+                    className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-xs font-bold text-encre-800 hover:bg-parchemin-100"
+                  >
+                    <lien.icon className="h-4 w-4 text-or-600" strokeWidth={1.75} />
+                    {lien.label}
+                  </Link>
+                ))}
+
+                <div className="border-t border-parchemin-300 pt-3">
+                  <button
+                    onClick={() => void logout()}
+                    className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-3 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                  >
+                    <LogOut className="h-4 w-4" strokeWidth={1.75} />
+                    Se déconnecter
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <Link href="/fiches" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-semibold text-slate-800">Le Parcours</Link>
-                <Link href="/index-thematique" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-semibold text-slate-800">Index Thématique</Link>
-                <Link href="/ressources" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-semibold text-slate-800">Bibliographie</Link>
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block text-center px-4 py-2.5 rounded-full text-sm font-bold bg-indigo-600 text-white shadow-sm mt-2">
-                  Connexion Gratuite
+                {[
+                  { href: '/fiches', label: 'Le parcours' },
+                  { href: '/index-thematique', label: 'Index thématique' },
+                  { href: '/ressources', label: 'Bibliographie' },
+                ].map((lien) => (
+                  <Link
+                    key={lien.href}
+                    href={lien.href}
+                    className="block rounded-2xl px-3.5 py-3 text-xs font-bold text-encre-800 hover:bg-parchemin-100"
+                  >
+                    {lien.label}
+                  </Link>
+                ))}
+                <Link
+                  href="/login"
+                  className="bouton-or mt-2 block rounded-full px-4 py-3 text-center text-xs font-bold"
+                >
+                  Commencer le parcours
                 </Link>
               </>
             )}

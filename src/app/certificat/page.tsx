@@ -3,10 +3,14 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import Link from 'next/link';
-import { Award, Printer, CheckCircle2, ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
+import { Printer, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
+import ParcoursGate from '@/components/ParcoursGate';
+import { useParcours } from '@/lib/ParcoursContext';
 
-export default function CertificatPage() {
+function CertificatPage() {
   const { user } = useAuth();
+  const { group } = useParcours();
   const [recipientName, setRecipientName] = useState(user?.displayName || 'Disciple de Jésus-Christ');
   const [completionDate] = useState(new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }));
 
@@ -14,8 +18,50 @@ export default function CertificatPage() {
     window.print();
   };
 
+  const achevees = group?.closedSteps.length ?? 0;
+  const acheve = !!group?.completedAt;
+
+  // L'attestation ne se délivre pas à mi-parcours : elle atteste que le
+  // groupe est allé au bout des vingt fiches, ensemble.
+  if (!acheve) {
+    return (
+      <div className="min-h-screen bg-parchemin-100 px-4 pb-10 pt-6">
+        <div className="mx-auto max-w-lg text-center">
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-parchemin-200 text-encre-400">
+            <Lock className="h-7 w-7" strokeWidth={1.5} />
+          </span>
+          <h1 className="mt-6 font-serif text-3xl font-bold text-encre-950">
+            L&apos;attestation vous attend au bout
+          </h1>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-encre-600">
+            {group
+              ? `${group.name} a partagé ${achevees} fiche${achevees > 1 ? 's' : ''} sur 20. L'attestation se délivre quand la vingtième est refermée.`
+              : "Elle se délivre quand les vingt fiches ont été partagées avec votre groupe."}
+          </p>
+
+          <div className="mx-auto mt-8 max-w-sm">
+            <div className="h-2 overflow-hidden rounded-full bg-parchemin-300">
+              <span
+                className="block h-full rounded-full bg-gradient-to-r from-or-400 to-or-600 transition-all duration-700"
+                style={{ width: `${(achevees / 20) * 100}%` }}
+              />
+            </div>
+            <p className="mt-2 text-2xs font-bold text-or-700">{achevees} / 20</p>
+          </div>
+
+          <Link
+            href="/fiches"
+            className="bouton-or mt-8 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold"
+          >
+            Reprendre le sentier
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-slate-50">
+    <div className="min-h-screen pb-10 pt-6 bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
 
         {/* Top Controls */}
@@ -54,13 +100,20 @@ export default function CertificatPage() {
           <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
           {/* Top Logo / Seal */}
-          <div className="w-20 h-20 bg-gradient-to-tr from-amber-500 to-amber-300 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border-4 border-white">
-            <Award className="w-10 h-10 text-white" />
+          <div className="w-20 h-20 relative mx-auto mb-6 drop-shadow-md">
+            <Image
+              src="/logo.png"
+              alt="Sceau officiel Les Fondements"
+              fill
+              sizes="80px"
+              className="object-contain"
+              priority
+            />
           </div>
 
-          <span className="text-xs uppercase tracking-widest text-amber-700 font-bold bg-amber-100 px-4 py-1.5 rounded-full inline-block mb-4">
-            Attestation Numérique d&apos;Achèvement
-          </span>
+          <p className="font-serif italic text-amber-800 text-xs sm:text-sm mb-3">
+            Attestation d&apos;achèvement du parcours
+          </p>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-2">
             Le Parcours des Fondements
@@ -79,7 +132,8 @@ export default function CertificatPage() {
           </div>
 
           <p className="text-sm text-slate-700 max-w-xl mx-auto leading-relaxed mb-8">
-            a accompli avec fidélité et persévérance les 20 fiches d&apos;enseignement, de méditation biblique, de prière et de communion fraternelle du parcours.
+            a parcouru les 20 fiches d&apos;enseignement, de méditation biblique, de prière et de
+            partage{group ? ` au sein du groupe « ${group.name} »` : ''}, jusqu&apos;au bout.
           </p>
 
           {/* Key Verse Quote (From booklet cover) */}
@@ -113,5 +167,13 @@ export default function CertificatPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <ParcoursGate>
+      <CertificatPage />
+    </ParcoursGate>
   );
 }
