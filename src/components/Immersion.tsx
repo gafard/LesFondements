@@ -106,7 +106,12 @@ function construireScenario(fiche: FicheLivret): Scene[] {
       piste: pisteId.resume(fiche.id, indexSection),
     });
     section.versets.forEach((reference) => {
-      scenes.push({ type: 'verset', reference, texte: texteDuVerset(reference) });
+      scenes.push({
+        type: 'verset',
+        reference,
+        texte: texteDuVerset(reference),
+        piste: pisteId.verset(reference),
+      });
     });
     section.lectures.forEach((texte) => scenes.push({ type: 'lecture', texte }));
   });
@@ -170,7 +175,6 @@ export default function Immersion({
   const [lecture, setLecture] = useState(false);
   const [manifeste, setManifeste] = useState<Manifeste | null>(null);
   const [enchainer, setEnchainer] = useState(false);
-  const [sommaire, setSommaire] = useState(false);
   const [cloture, setCloture] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [audioAvancement, setAudioAvancement] = useState(0);
@@ -275,13 +279,15 @@ export default function Immersion({
       } else if (event.key === 'ArrowLeft') {
         aller(-1);
       } else if (event.key === 'Escape') {
-        // La feuille gère sa propre touche Échap ; ici on efface le chrome.
-        setChrome(false);
+        // Quand la feuille est ouverte, Échap la referme — elle a son propre
+        // écouteur. Sinon la touche fait ce qu'on attend d'un plein écran :
+        // elle en sort.
+        if (!feuille) onQuitter();
       }
     };
     window.addEventListener('keydown', auClavier);
     return () => window.removeEventListener('keydown', auClavier);
-  }, [aller]);
+  }, [aller, feuille, onQuitter]);
 
   // ── Ambiance et voix ────────────────────────────────────────
   useEffect(() => {
@@ -398,6 +404,16 @@ export default function Immersion({
             className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/10 bg-encre-950/60 text-parchemin-100/70 shadow-2xl backdrop-blur-xl transition-colors hover:text-parchemin-100"
           >
             <SlidersHorizontal className="h-4 w-4" />
+          </button>
+
+          {/* La sortie ne se cache pas dans un menu : on doit pouvoir
+              quitter un plein écran sans avoir à le chercher. */}
+          <button
+            onClick={onQuitter}
+            aria-label="Quitter l’immersion"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/10 bg-encre-950/60 text-parchemin-100/70 shadow-2xl backdrop-blur-xl transition-colors hover:text-parchemin-100"
+          >
+            <X className="h-4 w-4" />
           </button>
         </div>
       </header>

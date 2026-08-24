@@ -6,6 +6,7 @@ import ShareableVerseCard from './ShareableVerseCard';
 import { getComparaisonVerset, getAudioChapitre } from '@/lib/bibleVersions';
 import { analyserReference } from '@/lib/reference';
 import { lectureDisponible, lireAVoixHaute, arreterLecture } from '@/lib/ambiance';
+import { pisteId } from '@/lib/voix';
 
 interface VersetCardProps {
   reference: string;
@@ -66,10 +67,10 @@ export default function VersetCard({ reference, text, type = 'quote' }: VersetCa
           console.warn('Audio play error, falling back to vocal synthesis:', err);
           setAudioEnCours(false);
           setAudioJoue(null);
-          lireAVoixHaute(`${reference}. ${texteAffiche}`);
+          lireAVoixHaute(`${reference}. ${texteAffiche}`, { piste: pisteId.verset(reference) });
         });
     } else if (lectureDisponible()) {
-      lireAVoixHaute(`${reference}. ${texteAffiche}`);
+      lireAVoixHaute(`${reference}. ${texteAffiche}`, { piste: pisteId.verset(reference) });
     }
   };
 

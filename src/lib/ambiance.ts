@@ -1,4 +1,6 @@
 import { preparerPourLaVoix } from './prononciation.mjs';
+import { urlVoixStudio, voixStudioEcartee, voixStudioPossible } from './voixStudio';
+import { chargerManifesteVoix } from './voix';
 
 /**
  * Ambiance sonore de l'immersion, entièrement synthétisée.
@@ -233,19 +235,83 @@ export function lectureDisponible(): boolean {
 }
 
 /** Lit un texte à voix haute. Résout quand la lecture est terminée. */
+/** La lecture de studio en cours, s'il y en a une. */
+let lecteur: HTMLAudioElement | null = null;
+/** Périme les requêtes de studio parties avant un arrêt. */
+let jeton = 0;
+
+/**
+ * L'enregistrement déjà produit pour cette piste, s'il existe.
+ *
+ * Les versets du livret sont gravés une fois pour toutes par
+ * `scripts/generer-voix.mjs` : les rejouer ne coûte rien et fonctionne hors
+ * connexion. On les préfère donc toujours à un appel à la demande.
+ */
+async function urlDePiste(id?: string): Promise<string | null> {
+  if (!id) return null;
+  const manifeste = await chargerManifesteVoix();
+  return manifeste?.pistes[id]?.url ?? null;
+}
+
 export function lireAVoixHaute(
   texte: string,
-  options: { vitesse?: number; onFin?: () => void; onErreur?: () => void } = {}
+  options: {
+    vitesse?: number;
+    onFin?: () => void;
+    onErreur?: () => void;
+    /** Piste prégénérée à préférer, ex. `pisteId.verset('Ps 37:4')`. */
+    piste?: string;
+  } = {}
 ): boolean {
-  if (!lectureDisponible()) return false;
-  window.speechSynthesis.cancel();
-
-  // Le texte du livret est écrit pour l'œil : « (Rm 3:23) » s'y lit d'un
-  // coup d'œil, mais une voix l'ânonnerait lettre par lettre au milieu
-  // d'une phrase. On développe les références avant de parler — c'est la
-  // même préparation que celle appliquée aux voix enregistrées, pour que la
-  // voix de secours du navigateur dise exactement la même chose.
   const dit = preparerPourLaVoix(texte);
+  arreterLecture();
+
+  // La voix de studio d'abord : c'est celle du reste du parcours. On ne
+  // l'attend pas pour répondre — l'appelant a besoin d'un booléen tout de
+  // suite — et si elle échoue, le navigateur prend le relais.
+  // Une piste gravée d'abord ; la voix de studio à la demande ensuite ; la
+  // synthèse du navigateur en dernier recours.
+  if (options.piste || voixStudioPossible()) {
+    const mien = jeton;
+    void urlDePiste(options.piste)
+      .then((gravee) => gravee ?? (voixStudioPossible() ? urlVoixStudio(dit) : null))
+      .then((url) => {
+        if (mien !== jeton) return; // arrêté entre-temps
+        if (!url) {
+          if (voixStudioPossible()) voixStudioEcartee();
+          lireAvecLeNavigateur(dit, options);
+          return;
+        }
+        const audio = new Audio(url);
+        audio.playbackRate = options.vitesse ?? 1;
+        audio.onended = () => options.onFin?.();
+        audio.onerror = () => {
+          if (mien === jeton) lireAvecLeNavigateur(dit, options);
+        };
+        lecteur = audio;
+        void audio.play().catch(() => {
+          if (mien === jeton) lireAvecLeNavigateur(dit, options);
+        });
+      })
+      .catch(() => {
+        if (mien === jeton) lireAvecLeNavigateur(dit, options);
+      });
+    return true;
+  }
+
+  return lireAvecLeNavigateur(dit, options);
+}
+
+/** La synthèse du navigateur : le repli, jamais le premier choix. */
+function lireAvecLeNavigateur(
+  dit: string,
+  options: { vitesse?: number; onFin?: () => void; onErreur?: () => void }
+): boolean {
+  if (!lectureDisponible()) {
+    options.onErreur?.();
+    return false;
+  }
+  window.speechSynthesis.cancel();
 
   // Les longues sections sont découpées : certains navigateurs coupent
   // brutalement au-delà de ~200 caractères.
@@ -275,6 +341,12 @@ export function lireAVoixHaute(
 }
 
 export function arreterLecture(): void {
-  if (!lectureDisponible()) return;
-  window.speechSynthesis.cancel();
+  // Un jeton qui s'incrémente : toute lecture de studio encore en vol se
+  // verra périmée à son arrivée et ne démarrera pas.
+  jeton += 1;
+  if (lecteur) {
+    lecteur.pause();
+    lecteur = null;
+  }
+  if (lectureDisponible()) window.speechSynthesis.cancel();
 }

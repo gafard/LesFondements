@@ -35,10 +35,33 @@ import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { preparerPourLaVoix } from '../src/lib/prononciation.mjs';
+import versetsLivret from '../src/data/versetsLivret.json' with { type: 'json' };
+
+/** « 1 Jn 4:16 » → « 1jn-4-16 ». Doit rester identique à `pisteId.verset`. */
+function ardoise(reference) {
+  return reference
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
 const RACINE = path.resolve(import.meta.dirname, '..');
 const LIVRET = path.join(RACINE, 'src/data/livret.json');
 const DOSSIER = path.join(RACINE, 'public/voix');
+/**
+ * Le débit des enregistrements.
+ *
+ * 128 kbps est le réglage généreux d'ElevenLabs, calibré pour de la musique.
+ * Pour une voix seule qui lit un texte, 64 kbps mono est transparent à
+ * l'oreille et divise le corpus par deux — 314 Mo deviennent ~157 Mo, ce qui
+ * décide du confort du dépôt et de la taille des paquets hors connexion.
+ *
+ * Se règle par `ELEVENLABS_FORMAT` si l'oreille n'est pas d'accord.
+ */
+const FORMAT = process.env.ELEVENLABS_FORMAT ?? 'mp3_44100_64';
+
 const DOSSIER_ELEVEN = path.join(DOSSIER, 'eleven');
 const DOSSIER_HUMAINE = path.join(DOSSIER, 'humaine');
 const MANIFESTE = path.join(DOSSIER, 'manifeste.json');
@@ -56,6 +79,8 @@ function lireArguments(argv) {
     manifesteSeul: false,
     force: false,
     fiches: null,
+    /** N'enregistrer que les versets à recopier du livret. */
+    versetsSeuls: false,
     pause: 400,
   };
 
@@ -64,6 +89,7 @@ function lireArguments(argv) {
     if (argument === '--estimation') options.estimation = true;
     else if (argument === '--manifeste-seul') options.manifesteSeul = true;
     else if (argument === '--force') options.force = true;
+    else if (argument === '--versets') options.versetsSeuls = true;
     else if (argument === '--fiches') {
       options.fiches = new Set(
         (argv[i + 1] ?? '')
@@ -89,8 +115,24 @@ function lireArguments(argv) {
  * structure — pas le contenu — pour qu'une correction de coquille ne rende
  * pas l'enregistrement orphelin.
  */
-function pistesDuLivret(livret, filtre) {
+function pistesDuLivret(livret, filtre, versetsSeuls = false) {
   const pistes = [];
+
+  // Les versets à recopier, une fois chacun : ils reviennent d'une fiche à
+  // l'autre, et un enregistrement par référence suffit. Les prégénérer, plutôt
+  // que de les demander à la volée, les rend gratuits à la relecture et
+  // audibles hors connexion.
+  if (!filtre || versetsSeuls) {
+    for (const [reference, texte] of Object.entries(versetsLivret)) {
+      pistes.push({
+        id: `v.${ardoise(reference)}`,
+        fiche: 0,
+        texte: preparerPourLaVoix(`${reference}. ${texte}`),
+      });
+    }
+  }
+
+  if (versetsSeuls) return pistes.filter((piste) => piste.texte.trim().length > 2);
 
   for (const fiche of livret.fiches) {
     if (filtre && !filtre.has(fiche.id)) continue;
@@ -222,7 +264,7 @@ const empreinteDe = (texte) => createHash('sha1').update(texte).digest('hex').sl
 // ─────────────────────────────────────────────────────────────
 
 async function synthetiser(texte, config) {
-  const url = `https://api.elevenlabs.io/v1/text-to-speech/${config.voix}?output_format=mp3_44100_128`;
+  const url = `https://api.elevenlabs.io/v1/text-to-speech/${config.voix}?output_format=${FORMAT}`;
 
   const reponse = await fetch(url, {
     method: 'POST',
@@ -289,7 +331,7 @@ async function ecrireManifeste(pistes, voixParDefaut) {
 async function main() {
   const options = lireArguments(process.argv.slice(2));
   const livret = JSON.parse(await readFile(LIVRET, 'utf8'));
-  const pistes = pistesDuLivret(livret, options.fiches);
+  const pistes = pistesDuLivret(livret, options.fiches, options.versetsSeuls);
 
   const caracteres = pistes.reduce((total, piste) => total + piste.texte.length, 0);
 
