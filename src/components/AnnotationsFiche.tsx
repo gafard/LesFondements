@@ -1,256 +1,242 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { StickyNote, Plus, Trash2, Edit3, Check } from 'lucide-react';
-
-export type CouleurPostIt = 'jaune' | 'rose' | 'bleu' | 'vert';
-
-export interface NotePostIt {
-  id: string;
-  ficheId: number;
-  texte: string;
-  couleur: CouleurPostIt;
-  createdAt: number;
-}
+import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { Check, Grip, Highlighter, Plus, StickyNote, Trash2 } from 'lucide-react';
+import type { CouleurPostIt, DocumentAnnotations, NotePostIt } from '@/lib/annotations';
 
 interface AnnotationsFicheProps {
-  ficheId: number;
+  document: DocumentAnnotations;
+  onChanger: (document: DocumentAnnotations) => void;
 }
 
-const STYLES_COULEURS: Record<CouleurPostIt, { bg: string; border: string; punaise: string; label: string }> = {
+const COULEURS: Record<
+  CouleurPostIt,
+  { classe: string; pastille: string; label: string }
+> = {
   jaune: {
-    bg: 'bg-amber-100/90 text-amber-950',
-    border: 'border-amber-300',
-    punaise: 'punaise',
-    label: 'Jaune doux',
+    classe: 'post-it-jaune',
+    pastille: 'bg-[#f7df6f] border-[#c9a92b]',
+    label: 'Jaune pâle',
   },
   rose: {
-    bg: 'bg-rose-100/90 text-rose-950',
-    border: 'border-rose-300',
-    punaise: 'punaise punaise-rouge',
+    classe: 'post-it-rose',
+    pastille: 'bg-[#efb8c2] border-[#c67c8b]',
     label: 'Rose poudré',
   },
   bleu: {
-    bg: 'bg-sky-100/90 text-sky-950',
-    border: 'border-sky-300',
-    punaise: 'punaise punaise-bleue',
+    classe: 'post-it-bleu',
+    pastille: 'bg-[#afd2ef] border-[#699bc5]',
     label: 'Bleu ciel',
-  },
-  vert: {
-    bg: 'bg-emerald-100/90 text-emerald-950',
-    border: 'border-emerald-300',
-    punaise: 'punaise',
-    label: 'Vert sauge',
   },
 };
 
-export default function AnnotationsFiche({ ficheId }: AnnotationsFicheProps) {
-  const cleStockage = `lf.postits.fiche_${ficheId}`;
-  const [notes, setNotes] = useState<NotePostIt[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const brut = localStorage.getItem(`lf.postits.fiche_${ficheId}`);
-      return brut ? JSON.parse(brut) : [];
-    } catch {
-      return [];
-    }
-  });
+interface Glissement {
+  id: string;
+  pointerId: number;
+  decalageX: number;
+  decalageY: number;
+}
 
-  const [modeAjout, setModeAjout] = useState(false);
-  const [nouveauTexte, setNouveauTexte] = useState('');
-  const [couleurChoisie, setCouleurChoisie] = useState<CouleurPostIt>('jaune');
-  const [noteEnEdition, setNoteEnEdition] = useState<string | null>(null);
-  const [texteEdite, setTexteEdite] = useState('');
+const BORNE_NOTE = 184;
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(cleStockage, JSON.stringify(notes));
-    } catch {
-      /* ignorer */
-    }
-  }, [notes, cleStockage]);
+export default function AnnotationsFiche({ document, onChanger }: AnnotationsFicheProps) {
+  const planRef = useRef<HTMLDivElement>(null);
+  const glissementRef = useRef<Glissement | null>(null);
+  const [texte, setTexte] = useState('');
+  const [couleur, setCouleur] = useState<CouleurPostIt>('jaune');
+  const [ajoutOuvert, setAjoutOuvert] = useState(false);
 
-  const ajouterNote = () => {
-    if (!nouveauTexte.trim()) return;
-    const nouvelle: NotePostIt = {
-      id: 'note_' + Date.now(),
-      ficheId,
-      texte: nouveauTexte.trim(),
-      couleur: couleurChoisie,
-      createdAt: Date.now(),
+  const mettreAJourNote = (id: string, modification: Partial<NotePostIt>) => {
+    onChanger({
+      ...document,
+      notes: document.notes.map((note) =>
+        note.id === id ? { ...note, ...modification, updatedAt: Date.now() } : note
+      ),
+    });
+  };
+
+  const ajouter = () => {
+    if (!texte.trim()) return;
+    const index = document.notes.length;
+    const maintenant = Date.now();
+    const note: NotePostIt = {
+      id: `note_${maintenant}`,
+      texte: texte.trim(),
+      couleur,
+      x: 14 + (index % 2) * 36,
+      y: 74 + (index % 4) * 128,
+      createdAt: maintenant,
+      updatedAt: maintenant,
     };
-    setNotes((prev) => [nouvelle, ...prev]);
-    setNouveauTexte('');
-    setModeAjout(false);
+    onChanger({ ...document, notes: [...document.notes, note] });
+    setTexte('');
+    setAjoutOuvert(false);
   };
 
-  const supprimerNote = (id: string) => {
-    setNotes((prev) => prev.filter((n) => n.id !== id));
+  const supprimer = (id: string) => {
+    onChanger({ ...document, notes: document.notes.filter((note) => note.id !== id) });
   };
 
-  const sauvegarderEdition = (id: string) => {
-    setNotes((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, texte: texteEdite.trim() } : n))
+  const commencerGlissement = (note: NotePostIt, event: ReactPointerEvent<HTMLButtonElement>) => {
+    const plan = planRef.current;
+    if (!plan) return;
+    const rectangle = plan.getBoundingClientRect();
+    glissementRef.current = {
+      id: note.id,
+      pointerId: event.pointerId,
+      decalageX: event.clientX - rectangle.left - note.x,
+      decalageY: event.clientY - rectangle.top - note.y,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    onChanger({
+      ...document,
+      notes: [...document.notes.filter((candidate) => candidate.id !== note.id), note],
+    });
+  };
+
+  const glisser = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const glissement = glissementRef.current;
+    const plan = planRef.current;
+    if (!glissement || glissement.pointerId !== event.pointerId || !plan) return;
+    const rectangle = plan.getBoundingClientRect();
+    const x = Math.max(
+      4,
+      Math.min(rectangle.width - BORNE_NOTE, event.clientX - rectangle.left - glissement.decalageX)
     );
-    setNoteEnEdition(null);
+    const y = Math.max(
+      46,
+      Math.min(rectangle.height - 150, event.clientY - rectangle.top - glissement.decalageY)
+    );
+    mettreAJourNote(glissement.id, { x, y });
+  };
+
+  const terminerGlissement = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (glissementRef.current?.pointerId === event.pointerId) {
+      glissementRef.current = null;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   };
 
   return (
-    <div className="space-y-4 my-8">
-      {/* En-tête de section Post-its */}
-      <div className="flex items-center justify-between border-b border-parchemin-300 pb-3">
-        <div className="flex items-center gap-2">
-          <StickyNote className="h-4 w-4 text-or-700" />
-          <h3 className="font-serif text-sm font-bold text-encre-950">
-            Notes & Post-its personnels sur cette fiche ({notes.length})
-          </h3>
+    <aside className="lg:sticky lg:top-6" aria-label="Marge d’annotations personnelle">
+      <div className="bureau-annotations overflow-hidden rounded-[1.6rem] border border-[#755538]/35 shadow-xl">
+        <div className="flex items-center justify-between border-b border-[#5e432e]/20 bg-[#0b1d38] px-4 py-3 text-parchemin-100">
+          <div>
+            <p className="text-3xs font-black uppercase tracking-[0.2em] text-or-300">Marge personnelle</p>
+            <p className="mt-0.5 font-serif text-sm font-bold">Post-it & griffonnages</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAjoutOuvert((ouvert) => !ouvert)}
+            className="grid h-9 w-9 place-items-center rounded-full bg-or-400 text-encre-950 shadow-md transition-transform hover:scale-105"
+            aria-label={ajoutOuvert ? 'Fermer le nouveau post-it' : 'Coller un nouveau post-it'}
+          >
+            {ajoutOuvert ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setModeAjout((v) => !v)}
-          className="inline-flex items-center gap-1.5 rounded-full bg-or-100 px-3.5 py-1.5 text-2xs font-bold text-or-800 transition-colors hover:bg-or-200"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          {modeAjout ? 'Annuler' : 'Coller un post-it'}
-        </button>
-      </div>
-
-      {/* Formulaire d'ajout de post-it */}
-      {modeAjout && (
-        <div className={`relative rounded-3xl p-5 shadow-md border ${STYLES_COULEURS[couleurChoisie].bg} ${STYLES_COULEURS[couleurChoisie].border}`}>
-          <span className={STYLES_COULEURS[couleurChoisie].punaise} style={{ top: '-8px', left: '20px' }} />
-
-          <textarea
-            value={nouveauTexte}
-            onChange={(e) => setNouveauTexte(e.target.value)}
-            placeholder="Écrivez une réflexion, une question personnelle, une parole reçue..."
-            rows={3}
-            className="manuscrit w-full resize-none bg-transparent text-lg text-encre-950 placeholder-encre-400 focus:outline-none"
-            autoFocus
-          />
-
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-encre-950/10 pt-3">
-            {/* Sélecteur de couleur */}
-            <div className="flex items-center gap-1.5">
-              {(['jaune', 'rose', 'bleu', 'vert'] as CouleurPostIt[]).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setCouleurChoisie(c)}
-                  className={`h-6 w-6 rounded-full border transition-transform ${
-                    c === 'jaune'
-                      ? 'bg-amber-200 border-amber-400'
-                      : c === 'rose'
-                      ? 'bg-rose-200 border-rose-400'
-                      : c === 'bleu'
-                      ? 'bg-sky-200 border-sky-400'
-                      : 'bg-emerald-200 border-emerald-400'
-                  } ${couleurChoisie === c ? 'scale-125 ring-2 ring-encre-900' : 'hover:scale-110'}`}
-                  title={STYLES_COULEURS[c].label}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
+        {ajoutOuvert && (
+          <div className="border-b border-[#755538]/20 bg-[#f8f1e4] p-3">
+            <textarea
+              value={texte}
+              onChange={(event) => setTexte(event.target.value)}
+              rows={3}
+              placeholder="Une pensée, une question, une parole reçue…"
+              className="manuscrit w-full resize-none rounded-xl border border-parchemin-400 bg-white/85 px-3 py-2 text-base text-encre-950 outline-none focus:border-or-500"
+              autoFocus
+            />
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <div className="flex gap-2" aria-label="Couleur du post-it">
+                {(Object.keys(COULEURS) as CouleurPostIt[]).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setCouleur(option)}
+                    className={`h-7 w-7 rounded-full border ${COULEURS[option].pastille} ${
+                      couleur === option ? 'ring-2 ring-encre-950 ring-offset-2' : ''
+                    }`}
+                    aria-label={COULEURS[option].label}
+                    aria-pressed={couleur === option}
+                  />
+                ))}
+              </div>
               <button
                 type="button"
-                onClick={() => setModeAjout(false)}
-                className="rounded-full px-3 py-1.5 text-2xs font-bold text-encre-600 hover:bg-black/5"
+                onClick={ajouter}
+                disabled={!texte.trim()}
+                className="rounded-full bg-encre-950 px-4 py-2 text-2xs font-bold text-white disabled:opacity-40"
               >
-                Annuler
-              </button>
-              <button
-                type="button"
-                onClick={ajouterNote}
-                disabled={!nouveauTexte.trim()}
-                className="inline-flex items-center gap-1.5 rounded-full bg-encre-950 px-4 py-1.5 text-2xs font-bold text-parchemin-100 shadow-xs transition-colors hover:bg-encre-900 disabled:opacity-50"
-              >
-                <Check className="h-3.5 w-3.5" /> Coller sur la fiche
+                Coller
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Grille des post-its existants */}
-      {notes.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {notes.map((note) => {
-            const style = STYLES_COULEURS[note.couleur] || STYLES_COULEURS.jaune;
-            const enEdition = noteEnEdition === note.id;
+        <div
+          ref={planRef}
+          data-testid="annotation-board"
+          className="plan-annotations relative h-[620px] overflow-hidden"
+        >
+          <div className="pointer-events-none absolute inset-x-4 top-3 flex items-center justify-between text-[9px] font-black uppercase tracking-[0.18em] text-[#73583f]/65">
+            <span>Fiche de travail</span>
+            <span>{document.notes.length} note{document.notes.length > 1 ? 's' : ''}</span>
+          </div>
 
+          {document.notes.map((note) => {
+            const style = COULEURS[note.couleur] ?? COULEURS.jaune;
             return (
-              <div
+              <article
                 key={note.id}
-                className={`relative rounded-3xl p-5 shadow-md border transition-transform hover:-translate-y-0.5 ${style.bg} ${style.border}`}
+                className={`${style.classe} !absolute w-[180px] rounded-[3px] p-3 shadow-lg`}
+                style={{ left: note.x, top: note.y }}
               >
-                <span className={style.punaise} style={{ top: '-8px', left: '20px' }} />
-
-                {enEdition ? (
-                  <div className="space-y-3">
-                    <textarea
-                      value={texteEdite}
-                      onChange={(e) => setTexteEdite(e.target.value)}
-                      rows={3}
-                      className="manuscrit w-full resize-none bg-transparent text-lg text-encre-950 focus:outline-none"
-                    />
-                    <div className="flex justify-end gap-2 border-t border-encre-950/10 pt-2">
-                      <button
-                        onClick={() => setNoteEnEdition(null)}
-                        className="text-2xs font-bold text-encre-600"
-                      >
-                        Annuler
-                      </button>
-                      <button
-                        onClick={() => sauvegarderEdition(note.id)}
-                        className="inline-flex items-center gap-1 rounded-full bg-encre-950 px-3 py-1 text-2xs font-bold text-white"
-                      >
-                        <Check className="h-3 w-3" /> Enregistrer
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="manuscrit text-xl leading-relaxed text-encre-950 whitespace-pre-wrap">
-                      {note.texte}
-                    </p>
-
-                    <div className="mt-4 flex items-center justify-between border-t border-encre-950/10 pt-2 text-3xs text-encre-500 font-sans">
-                      <span>{new Date(note.createdAt).toLocaleDateString('fr-FR')}</span>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            setNoteEnEdition(note.id);
-                            setTexteEdite(note.texte);
-                          }}
-                          className="p-1 text-encre-500 hover:text-encre-950 transition-colors"
-                          title="Modifier"
-                        >
-                          <Edit3 className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          onClick={() => supprimerNote(note.id)}
-                          className="p-1 text-encre-500 hover:text-rose-700 transition-colors"
-                          title="Supprimer"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                <div className="flex items-center justify-between border-b border-encre-950/10 pb-1.5">
+                  <button
+                    type="button"
+                    onPointerDown={(event) => commencerGlissement(note, event)}
+                    onPointerMove={glisser}
+                    onPointerUp={terminerGlissement}
+                    onPointerCancel={terminerGlissement}
+                    className="-ml-1 inline-flex touch-none items-center gap-1 rounded px-1 py-0.5 text-[9px] font-black uppercase tracking-wider text-encre-700/70 hover:bg-white/30"
+                    aria-label={`Déplacer le post-it : ${note.texte.slice(0, 40)}`}
+                    title="Maintenez et déplacez le post-it"
+                  >
+                    <Grip className="h-3 w-3" /> Déplacer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => supprimer(note.id)}
+                    className="rounded p-1 text-encre-600/60 hover:bg-white/40 hover:text-rose-800"
+                    aria-label="Supprimer ce post-it"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <textarea
+                  value={note.texte}
+                  onChange={(event) => mettreAJourNote(note.id, { texte: event.target.value })}
+                  className="manuscrit mt-2 h-24 w-full resize-none bg-transparent text-base leading-snug text-encre-950 outline-none"
+                  aria-label="Texte du post-it"
+                />
+              </article>
             );
           })}
+
+          {document.notes.length === 0 && (
+            <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 text-center text-[#73583f]/60">
+              <StickyNote className="mx-auto h-7 w-7" strokeWidth={1.4} />
+              <p className="mt-2 font-serif text-sm font-bold">Votre marge est encore libre.</p>
+              <p className="mt-1 text-2xs leading-relaxed">Collez une note, puis déplacez-la comme sur un vrai bureau.</p>
+            </div>
+          )}
         </div>
-      ) : (
-        !modeAjout && (
-          <div className="rounded-2xl border border-dashed border-parchemin-400 p-4 text-center text-xs text-encre-400 font-serif">
-            Aucun post-it collé sur cette fiche. Cliquez sur « Coller un post-it » pour épingler vos notes.
-          </div>
-        )
-      )}
-    </div>
+
+        <div className="flex items-center gap-2 border-t border-[#755538]/20 bg-[#efe3d0] px-4 py-3 text-2xs text-encre-600">
+          <Highlighter className="h-3.5 w-3.5 text-or-700" />
+          <span>{document.surlignages.length} passage{document.surlignages.length > 1 ? 's' : ''} surligné{document.surlignages.length > 1 ? 's' : ''}</span>
+          <span className="ml-auto inline-flex items-center gap-1 font-bold text-emerald-700"><Check className="h-3 w-3" /> Sauvegarde auto</span>
+        </div>
+      </div>
+    </aside>
   );
 }

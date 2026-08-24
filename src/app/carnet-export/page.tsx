@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Printer, ArrowLeft, BookOpen, Award, CheckCircle, PenLine } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -71,9 +72,14 @@ export default function CarnetExportPage() {
         
         {/* Page de garde */}
         <div className="flex min-h-[500px] flex-col items-center justify-center text-center border-4 border-double border-or-400/40 p-8 sm:p-12 rounded-2xl print:min-h-0 print:py-16">
-          <span className="grid h-16 w-16 place-items-center rounded-2xl bg-or-100 text-or-800 shadow-xs mb-4">
-            <BookOpen className="h-8 w-8" strokeWidth={1.5} />
-          </span>
+          <Image
+            src="/logo-transparent.png"
+            alt="Sceau Les Fondements"
+            width={80}
+            height={80}
+            className="h-20 w-20 object-contain mb-4"
+            priority
+          />
           <span className="text-2xs font-bold uppercase tracking-[0.28em] text-or-700">
             Parcours Vivant de Croissance Spirituelle
           </span>

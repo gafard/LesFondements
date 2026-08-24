@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import {
   Award,
   Bell,
   BookMarked,
-  BookOpen,
   Brain,
   Compass,
   Home,
@@ -102,7 +102,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   if (sansCoque || !user) return <>{children}</>;
 
   return (
-    <div className="min-h-screen bg-parchemin-100 lg:flex">
+    <div className="coque-table-travail min-h-screen lg:flex">
       <a href="#contenu-principal" className="skip-link">Aller au contenu</a>
       <ColonneLaterale pathname={pathname} onOuvrirNotifs={() => setNotifOuvert(true)} />
 
@@ -136,14 +136,19 @@ function ColonneLaterale({
   const { group, gate } = useParcours();
 
   return (
-    <aside className="nuit sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto px-4 py-5 text-parchemin-100 lg:flex xl:w-72">
-      <Link href="/dashboard" className="mb-6 flex items-center gap-2.5 px-2">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-or-300/25 bg-or-400/10 text-or-300">
-          <BookOpen className="h-4 w-4" strokeWidth={1.75} />
-        </span>
+    <aside className="nuit reliure-bureau sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto px-4 py-5 text-parchemin-100 lg:flex xl:w-72">
+      <Link href="/dashboard" className="group mb-6 flex items-center gap-3 px-2">
+        <Image
+          src="/logo-transparent.png"
+          alt="Les Fondements"
+          width={36}
+          height={36}
+          className="h-9 w-9 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
+          priority
+        />
         <span className="flex flex-col leading-none">
-          <span className="font-serif text-base font-bold">Les Fondements</span>
-          <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-or-400/70">
+          <span className="font-serif text-base font-bold text-parchemin-100">Les Fondements</span>
+          <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-or-400/80">
             Parcours vivant
           </span>
         </span>
@@ -240,7 +245,16 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
   return (
     <header className="sticky top-0 z-30 border-b border-parchemin-300 bg-parchemin-50/90 px-4 pb-2.5 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl lg:hidden">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="truncate font-serif text-lg font-bold text-encre-950">{titre}</h1>
+        <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
+          <Image
+            src="/logo-transparent.png"
+            alt="Logo"
+            width={26}
+            height={26}
+            className="h-6.5 w-6.5 shrink-0 object-contain"
+          />
+          <h1 className="truncate font-serif text-lg font-bold text-encre-950">{titre}</h1>
+        </Link>
         <div className="flex items-center gap-2">
           <div className="mobile-sync">
             <SyncStatusBadge />

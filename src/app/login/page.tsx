@@ -122,7 +122,7 @@ function LoginContent() {
           <div className="hidden lg:block lg:col-span-6 space-y-6 text-[#fff8e8]">
             <Link href="/" className="inline-flex items-center gap-3 group">
               <Image
-                src="/logo.png"
+                src="/logo-transparent.png"
                 alt="Les Fondements Logo"
                 width={40}
                 height={40}
@@ -181,7 +181,7 @@ function LoginContent() {
             <div className="text-center lg:hidden mb-6">
               <Link href="/" className="inline-flex items-center gap-2.5 mb-2">
                 <Image
-                  src="/logo.png"
+                  src="/logo-transparent.png"
                   alt="Les Fondements Logo"
                   width={36}
                   height={36}

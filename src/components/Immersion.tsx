@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
+  Bookmark,
   BookOpen,
   Check,
   ChevronDown,
@@ -14,6 +15,8 @@ import {
   Play,
   Quote,
   Sparkles,
+  StickyNote,
+  TimerReset,
   Volume2,
   VolumeX,
   X,
@@ -40,6 +43,7 @@ import {
   type Piste,
 } from '@/lib/voix';
 import type { Bloc, FicheLivret, ResumeSection } from '@/lib/livret';
+import { memoriserPassage } from '@/lib/marquePage';
 
 // ─────────────────────────────────────────────────────────────
 // Le scénario : la fiche devient une suite de moments
@@ -144,6 +148,7 @@ interface ImmersionProps {
   onTerminer: () => Promise<void> | void;
   onQuitter: () => void;
   dejaPreparee?: boolean;
+  indexInitial?: number;
 }
 
 export default function Immersion({
@@ -153,9 +158,12 @@ export default function Immersion({
   onTerminer,
   onQuitter,
   dejaPreparee,
+  indexInitial = 0,
 }: ImmersionProps) {
   const scenario = useMemo(() => construireScenario(fiche), [fiche]);
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() =>
+    Math.max(0, Math.min(scenario.length - 1, indexInitial))
+  );
   const [ambiance, setAmbiance] = useState<Ambiance>('silence');
   const [lecture, setLecture] = useState(false);
   const [manifeste, setManifeste] = useState<Manifeste | null>(null);
@@ -164,12 +172,29 @@ export default function Immersion({
   const [cloture, setCloture] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [audioAvancement, setAudioAvancement] = useState(0);
+  const [noteOuverte, setNoteOuverte] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const zone = useRef<HTMLDivElement>(null);
   const depart = useRef<number | null>(null);
 
   const scene = scenario[index];
   const progression = (index + 1) / scenario.length;
+  const minutesRestantes = Math.max(1, Math.ceil((scenario.length - index - 1) * 0.7));
+
+  const libelleScene = useMemo(() => {
+    switch (scene.type) {
+      case 'seuil': return 'Ouverture de la fiche';
+      case 'ouverture-section': return scene.titre;
+      case 'bloc': return scene.sousTitre ?? scene.section ?? 'Lecture guidée';
+      case 'silence': return 'Temps de silence';
+      case 'resume': return `L’essentiel — ${scene.section.titre}`;
+      case 'verset': return scene.reference;
+      case 'lecture': return 'Lecture dans votre Bible';
+      case 'question': return 'Écriture personnelle';
+      case 'pas': return 'Mon pas de la semaine';
+      case 'cloture': return 'Clôture de la fiche';
+    }
+  }, [scene]);
 
   // ── Navigation ──────────────────────────────────────────────
   const aller = useCallback(
@@ -183,6 +208,15 @@ export default function Immersion({
   useEffect(() => {
     zone.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [index]);
+
+  useEffect(() => {
+    memoriserPassage({
+      url: `/fiches/${fiche.id}?immersion=1&scene=${index}`,
+      titre: scene.type === 'verset' ? scene.reference : `Fiche ${fiche.id}`,
+      sousTitre: libelleScene,
+      type: scene.type === 'verset' ? 'verset' : 'immersion',
+    });
+  }, [fiche.id, index, libelleScene, scene]);
 
   useEffect(() => {
     const auClavier = (event: KeyboardEvent) => {
@@ -314,7 +348,11 @@ export default function Immersion({
   );
 
   return (
-    <div className="nuit nuit-grain fixed inset-0 z-[60] overflow-hidden">
+    <div className="immersion-bureau fixed inset-0 z-[60] overflow-hidden">
+      <div className="immersion-sous-main absolute inset-3 sm:inset-6" />
+      <span className="immersion-ruban absolute left-5 top-0 z-20 hidden h-24 w-10 items-end justify-center pb-4 text-or-200 sm:flex">
+        <Bookmark className="h-4 w-4 fill-current" />
+      </span>
       <span className="vitrail left-[-10rem] top-[-8rem] h-[30rem] w-[30rem] bg-or-400/10 animate-souffle" />
       <span
         className="vitrail bottom-[-12rem] right-[-8rem] h-[28rem] w-[28rem] bg-encre-400/22 animate-souffle"
@@ -323,7 +361,7 @@ export default function Immersion({
 
       {/* ── Barre haute ── */}
       <header className="absolute inset-x-0 top-0 z-20 px-4 pt-4 sm:px-8 sm:pt-6">
-        <div className="mx-auto max-w-3xl">
+        <div className="immersion-console-haute mx-auto max-w-4xl rounded-2xl border border-white/10 px-3 py-2.5 shadow-2xl backdrop-blur-xl sm:px-4">
           <div className="rail mb-3">
             <span style={{ width: `${Math.round(progression * 100)}%` }} />
           </div>
@@ -339,7 +377,26 @@ export default function Immersion({
               />
             </button>
 
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-3 px-2 sm:flex">
+              <span className="truncate font-serif text-xs font-bold text-parchemin-100/85">{libelleScene}</span>
+              <span className="inline-flex shrink-0 items-center gap-1 text-3xs font-bold uppercase tracking-wider text-parchemin-100/40">
+                <TimerReset className="h-3 w-3" /> ≈ {minutesRestantes} min
+              </span>
+            </div>
+
             <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setNoteOuverte((ouverte) => !ouverte)}
+                title="Ouvrir le carnet de bord"
+                className={`rounded-full p-2 transition-colors ${
+                  noteOuverte
+                    ? 'bg-[#f5dc72] text-encre-950'
+                    : 'bg-white/8 text-parchemin-100/60 hover:bg-white/16'
+                }`}
+              >
+                <StickyNote className="h-4 w-4" />
+              </button>
+
               {(lectureDisponible() || manifeste) && (
                 <button
                   onClick={() => setLecture((valeur) => !valeur)}
@@ -411,14 +468,45 @@ export default function Immersion({
         </div>
       </header>
 
+      {noteOuverte && (
+        <aside className="post-it-jaune !absolute right-4 top-28 z-30 w-[min(20rem,calc(100vw-2rem))] -rotate-1 rounded-[4px] p-4 shadow-2xl sm:right-8 sm:top-32">
+          <div className="flex items-center justify-between border-b border-encre-950/10 pb-2">
+            <div>
+              <p className="text-3xs font-black uppercase tracking-[0.18em] text-encre-700">Carnet de bord</p>
+              <p className="font-serif text-sm font-bold text-encre-950">Fiche {fiche.id} · note libre</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNoteOuverte(false)}
+              className="rounded-full p-1.5 text-encre-600 hover:bg-white/35"
+              aria-label="Fermer le carnet de bord"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <textarea
+            value={reponses[`immersion:note:${fiche.id}`] ?? ''}
+            onChange={(event) => onEnregistrer(`immersion:note:${fiche.id}`, event.target.value)}
+            rows={7}
+            placeholder="Ce que je veux garder de cette traversée…"
+            className="manuscrit mt-3 w-full resize-none bg-transparent text-lg leading-relaxed text-encre-950 outline-none placeholder:text-encre-600/55"
+          />
+          <p className="mt-2 inline-flex items-center gap-1 text-3xs font-bold text-emerald-800"><Check className="h-3 w-3" /> Sauvegarde automatique</p>
+        </aside>
+      )}
+
       {/* ── Scène ── */}
       <div
         ref={zone}
         onTouchStart={debutTouche}
         onTouchEnd={finTouche}
-        className="absolute inset-0 z-10 overflow-y-auto px-4 pb-32 pt-28 sm:px-8 sm:pt-32"
+        className="absolute inset-0 z-10 overflow-y-auto px-3 pb-32 pt-28 sm:px-8 sm:pt-36"
       >
-        <div className="mx-auto max-w-3xl">
+        <div className="immersion-page-nuit mx-auto min-h-[calc(100svh-12rem)] max-w-4xl rounded-[1.75rem] border border-white/10 px-5 py-5 shadow-2xl sm:px-10 sm:py-8">
+          <div className="mb-2 flex items-center justify-between border-b border-white/8 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-parchemin-100/35">
+            <span>Atelier intérieur</span>
+            <span>{Math.round(progression * 100)} % parcouru</span>
+          </div>
           {cloture ? (
             <SceneCloture fiche={fiche} onQuitter={onQuitter} />
           ) : (
@@ -438,7 +526,7 @@ export default function Immersion({
       {/* ── Barre basse unifiée (Navigation + Lecteur Audio) ── */}
       {!cloture && (
         <footer className="absolute inset-x-0 bottom-0 z-20 px-3 pb-4 sm:px-8 sm:pb-7">
-          <div className="verre mx-auto flex max-w-3xl items-center justify-between gap-2.5 rounded-full px-3.5 py-2.5 shadow-2xl border border-white/10">
+          <div className="immersion-console mx-auto flex max-w-4xl items-center justify-between gap-2.5 rounded-full border border-white/12 px-3.5 py-2.5 shadow-2xl">
             {/* Précédent */}
             <button
               onClick={() => aller(-1)}

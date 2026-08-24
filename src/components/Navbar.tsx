@@ -81,10 +81,15 @@ export default function Navbar() {
     return (
       <nav className="pointer-events-none fixed inset-x-0 top-0 z-50">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
-          <Link href="/" className="pointer-events-auto flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl border border-or-300/25 bg-encre-950/60 text-or-300 backdrop-blur-sm">
-              <BookOpen className="h-4 w-4" strokeWidth={1.75} />
-            </span>
+          <Link href="/" className="pointer-events-auto flex items-center gap-2.5 group">
+            <Image
+              src="/logo-transparent.png"
+              alt="Les Fondements Logo"
+              width={32}
+              height={32}
+              className="h-8 w-8 object-contain transition-transform duration-300 group-hover:scale-105"
+              priority
+            />
             <span className="font-serif text-sm font-bold tracking-tight text-parchemin-100">
               Les Fondements
             </span>
@@ -124,11 +129,11 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="group flex items-center gap-2.5">
             <Image
-              src="/logo.png"
+              src="/logo-transparent.png"
               alt="Les Fondements Logo"
-              width={32}
-              height={32}
-              className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              width={36}
+              height={36}
+              className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               priority
             />
             <span

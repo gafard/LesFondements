@@ -27,6 +27,7 @@ import Immersion, { ChargementImmersion } from '@/components/Immersion';
 import LettreDuPere from '@/components/LettreDuPere';
 import PauseSanctuaire from '@/components/PauseSanctuaire';
 import AnnotationsFiche from '@/components/AnnotationsFiche';
+import TexteSurlignable, { type SelectionTexte } from '@/components/TexteSurlignable';
 import EcouteContinueFiche from '@/components/EcouteContinueFiche';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
 import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswers } from '@/lib/firestore';
@@ -41,23 +42,55 @@ import { useDeclarerFondSombre } from '@/lib/fondSombre';
 import Illumination from '@/components/Illumination';
 import { MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
+import {
+  encoderAnnotations,
+  lireAnnotationsAvecMigration,
+  type CouleurSurlignage,
+  type DocumentAnnotations,
+} from '@/lib/annotations';
+import { memoriserPassage } from '@/lib/marquePage';
 
 type Onglet = 'expose' | 'partage' | 'annexes';
+
+function ancrePourCle(cle: string): string {
+  return cle
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
+}
 
 function FicheContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
   const ficheId = Number.parseInt(String(params.id), 10);
+  const cleReprise = searchParams.get('reprendre');
+  const sceneDemandee = Number.parseInt(searchParams.get('scene') ?? '0', 10);
+  const sceneInitiale = Number.isFinite(sceneDemandee) ? sceneDemandee : 0;
 
   const { user } = useAuth();
   const { group, membership, unlockedStep, preparationStep, refresh } = useParcours();
+  const cleAnnotations = `annotations:${ficheId}`;
 
   const [fiche, setFiche] = useState<FicheLivret | null | undefined>(undefined);
   const [reponses, setReponses] = useState<Record<string, string>>(() =>
     user && Number.isFinite(ficheId) ? getCachedAnswers(user.uid, ficheId) : {}
   );
-  const [onglet, setOnglet] = useState<Onglet>('expose');
+  const [onglet, setOnglet] = useState<Onglet>(() => {
+    const demande = searchParams.get('onglet');
+    return demande === 'partage' || demande === 'annexes' ? demande : 'expose';
+  });
+  const [annotations, setAnnotations] = useState<DocumentAnnotations>(() => {
+    if (!user || !Number.isFinite(ficheId)) {
+      return lireAnnotationsAvecMigration(null, ficheId);
+    }
+    return lireAnnotationsAvecMigration(
+      getCachedAnswers(user.uid, ficheId)[cleAnnotations],
+      ficheId
+    );
+  });
   const [immersion, setImmersion] = useState(searchParams.get('immersion') === '1');
   const [pauseSanctuaireOuverte, setPauseSanctuaireOuverte] = useState(false);
   const [ecouteContinueOuverte, setEcouteContinueOuverte] = useState(false);
@@ -86,26 +119,78 @@ function FicheContent() {
   useEffect(() => {
     if (!user || !Number.isFinite(ficheId)) return;
     void getAnswers(user.uid, ficheId).then((valeurs) => {
-      if (valeurs && typeof valeurs === 'object') setReponses(valeurs as Record<string, string>);
+      if (valeurs && typeof valeurs === 'object') {
+        const chargees = valeurs as Record<string, string>;
+        const annotationsChargees = lireAnnotationsAvecMigration(
+          chargees[cleAnnotations],
+          ficheId
+        );
+        if (!chargees[cleAnnotations] && annotationsChargees.notes.length > 0) {
+          chargees[cleAnnotations] = encoderAnnotations(annotationsChargees);
+          void saveAnswers(user.uid, ficheId, chargees);
+        }
+        reponsesRef.current = chargees;
+        setReponses(chargees);
+        setAnnotations(annotationsChargees);
+      }
     });
-  }, [user, ficheId]);
+  }, [user, ficheId, cleAnnotations]);
 
   useEffect(() => {
     reponsesRef.current = reponses;
   }, [reponses]);
 
+  useEffect(() => {
+    if (!fiche || immersion) return;
+    memoriserPassage({
+      url: `/fiches/${ficheId}`,
+      titre: `Fiche ${ficheId} — ${fiche.titre}`,
+      sousTitre: 'Dernière fiche ouverte',
+      type: 'fiche',
+    });
+  }, [fiche, ficheId, immersion]);
+
+  useEffect(() => {
+    if (!fiche || !cleReprise) return;
+    const timer = window.setTimeout(() => {
+      document.getElementById(`passage-${ancrePourCle(cleReprise)}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 180);
+    return () => window.clearTimeout(timer);
+  }, [cleReprise, fiche]);
+
   /** Enregistrement différé : on n'écrit pas à chaque frappe. */
-  const enregistrer = (cle: string, valeur: string) => {
+  const enregistrer = useCallback((cle: string, valeur: string) => {
     const suivantes = { ...reponsesRef.current, [cle]: valeur };
     const uid = user?.uid;
+    reponsesRef.current = suivantes;
     setReponses(suivantes);
+
+    if (valeur.trim() && cle !== cleAnnotations) {
+      const estVerset = cle.startsWith('v:');
+      const reference = estVerset ? cle.slice(2) : null;
+      memoriserPassage({
+        url: `/fiches/${ficheId}?onglet=partage&reprendre=${encodeURIComponent(cle)}#passage-${ancrePourCle(cle)}`,
+        titre: reference ?? `Fiche ${ficheId}`,
+        sousTitre: reference ? 'Verset en cours d’écriture' : 'Réponse en cours d’écriture',
+        type: estVerset ? 'verset' : 'ecriture',
+      });
+    }
+
     if (minuteur.current) window.clearTimeout(minuteur.current);
     minuteur.current = window.setTimeout(() => {
       if (uid) void saveAnswers(uid, ficheId, suivantes);
       setEnregistre(true);
       window.setTimeout(() => setEnregistre(false), 1800);
     }, 800);
-  };
+  }, [cleAnnotations, ficheId, user?.uid]);
+
+  const changerAnnotations = useCallback((prochain: DocumentAnnotations) => {
+    setAnnotations(prochain);
+    enregistrer(cleAnnotations, encoderAnnotations(prochain));
+  }, [cleAnnotations, enregistrer]);
 
   const marquerPreparee = useCallback(async () => {
     if (!user) return;
@@ -165,6 +250,7 @@ function FicheContent() {
           router.replace(`/fiches/${ficheId}`);
         }}
         dejaPreparee={preparee}
+        indexInitial={sceneInitiale}
       />
     );
   }
@@ -178,7 +264,7 @@ function FicheContent() {
 
   return (
     <div className="table-travail min-h-screen pb-16 pt-6">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      <div className="mx-auto max-w-[90rem] px-4 sm:px-6">
         {/* ══ En-tête ══ */}
         <Link
           href="/fiches"
@@ -255,8 +341,10 @@ function FicheContent() {
           </div>
         </header>
 
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_330px]">
+          <main className="min-w-0">
         {/* ══ Onglets ══ */}
-        <div className="mt-8 flex gap-1.5 overflow-x-auto border-b border-parchemin-300 pb-px">
+        <div className="flex gap-1.5 overflow-x-auto border-b border-parchemin-300 pb-px">
           {(
             [
               { id: 'expose' as const, label: 'L’exposé', icon: BookOpen },
@@ -294,7 +382,13 @@ function FicheContent() {
                 )}
                 <div className="prose-livret space-y-1 text-sm text-encre-700 sm:text-base">
                   {section.blocs.map((bloc, i) => (
-                    <RenduBloc key={i} bloc={bloc} />
+                    <RenduBloc
+                      key={i}
+                      bloc={bloc}
+                      blocId={`section:${index}:${i}`}
+                      annotations={annotations}
+                      onChangerAnnotations={changerAnnotations}
+                    />
                   ))}
                 </div>
               </section>
@@ -407,6 +501,7 @@ function FicheContent() {
                           valeur={reponses[`v:${reference}`] ?? ''}
                           onEnregistrer={(valeur) => enregistrer(`v:${reference}`, valeur)}
                           index={i}
+                          ancre={`passage-${ancrePourCle(`v:${reference}`)}`}
                         />
                       ))}
                     </div>
@@ -434,6 +529,7 @@ function FicheContent() {
                         key={i}
                         question={question}
                         numero={i + 1}
+                        ancre={`passage-${ancrePourCle(`q:${fiche.id}_${indexSection}_${i}`)}`}
                         valeur={reponses[`q:${fiche.id}_${indexSection}_${i}`] ?? ''}
                         onEnregistrer={(valeur) =>
                           enregistrer(`q:${fiche.id}_${indexSection}_${i}`, valeur)
@@ -470,6 +566,7 @@ function FicheContent() {
                       key={i}
                       question={question}
                       numero={i + 1}
+                      ancre={`passage-${ancrePourCle(`q:${fiche.id}_libre_${i}`)}`}
                       valeur={reponses[`q:${fiche.id}_libre_${i}`] ?? ''}
                       onEnregistrer={(valeur) => enregistrer(`q:${fiche.id}_libre_${i}`, valeur)}
                     />
@@ -479,7 +576,10 @@ function FicheContent() {
             )}
 
             {/* Le pas de la semaine — Post-it collé sur la table */}
-            <section className="postit postit-vert pose-1 relative rounded-3xl p-6 shadow-md transition-all sm:p-8">
+            <section
+              id={`passage-${ancrePourCle(`pas:${fiche.id}`)}`}
+              className="postit postit-vert pose-1 relative rounded-3xl p-6 shadow-md transition-all sm:p-8"
+            >
               <span className="ruban -top-3 left-8 -rotate-2 rounded-[2px]" />
               <div className="flex items-start justify-between gap-3 pt-1">
                 <div>
@@ -522,7 +622,13 @@ function FicheContent() {
                   </h2>
                   <div className="prose-livret space-y-1 text-sm text-encre-700">
                     {annexe.blocs.map((bloc, i) => (
-                      <RenduBloc key={i} bloc={bloc} />
+                      <RenduBloc
+                        key={i}
+                        bloc={bloc}
+                        blocId={`annexe:${index}:${i}`}
+                        annotations={annotations}
+                        onChangerAnnotations={changerAnnotations}
+                      />
                     ))}
                   </div>
                 </section>
@@ -568,9 +674,6 @@ function FicheContent() {
           )}
         </div>
 
-        {/* ══ Marge d'annotations & Post-its libres ══ */}
-        <AnnotationsFiche ficheId={fiche.id} />
-
         <div className="mt-6 flex items-center justify-between gap-3">
           {precedente ? (
             <Link
@@ -604,6 +707,10 @@ function FicheContent() {
             </span>
           )}
         </div>
+          </main>
+
+          <AnnotationsFiche document={annotations} onChanger={changerAnnotations} />
+        </div>
 
         {/* Modals & Outils */}
         <PauseSanctuaire
@@ -634,7 +741,57 @@ function FicheContent() {
 
 // ─────────────────────────────────────────────────────────────
 
-function RenduBloc({ bloc }: { bloc: Bloc }) {
+function RenduBloc({
+  bloc,
+  blocId,
+  annotations,
+  onChangerAnnotations,
+}: {
+  bloc: Bloc;
+  blocId: string;
+  annotations: DocumentAnnotations;
+  onChangerAnnotations: (document: DocumentAnnotations) => void;
+}) {
+  const rendreSurlignable = (texte: string, identifiant = blocId) => (
+    <TexteSurlignable
+      blocId={identifiant}
+      texte={texte}
+      surlignages={annotations.surlignages}
+      onAjouter={(selection: SelectionTexte, couleur: CouleurSurlignage) => {
+        const maintenant = Date.now();
+        const sansChevauchement = annotations.surlignages.filter(
+          (surlignage) =>
+            surlignage.blocId !== identifiant ||
+            surlignage.fin <= selection.debut ||
+            surlignage.debut >= selection.fin
+        );
+        onChangerAnnotations({
+          ...annotations,
+          surlignages: [
+            ...sansChevauchement,
+            {
+              id: `surlignage_${maintenant}`,
+              blocId: identifiant,
+              debut: selection.debut,
+              fin: selection.fin,
+              couleur,
+              extrait: selection.extrait,
+              createdAt: maintenant,
+            },
+          ],
+        });
+      }}
+      onEffacer={() =>
+        onChangerAnnotations({
+          ...annotations,
+          surlignages: annotations.surlignages.filter(
+            (surlignage) => surlignage.blocId !== identifiant
+          ),
+        })
+      }
+    />
+  );
+
   switch (bloc.type) {
     case 'sous-titre':
       return <h4>{bloc.texte}</h4>;
@@ -643,16 +800,14 @@ function RenduBloc({ bloc }: { bloc: Bloc }) {
       return (
         <blockquote className="my-4 flex gap-3">
           <Quote className="mt-1 h-4 w-4 shrink-0 text-or-400" strokeWidth={1.5} />
-          <span>
-            <TexteAvecReferences>{bloc.texte}</TexteAvecReferences>
-          </span>
+          <span>{rendreSurlignable(bloc.texte)}</span>
         </blockquote>
       );
 
     case 'encadre':
       return (
         <div className="encadre my-5 text-sm leading-relaxed text-encre-800">
-          <TexteAvecReferences>{bloc.texte}</TexteAvecReferences>
+          {rendreSurlignable(bloc.texte)}
         </div>
       );
 
@@ -665,7 +820,7 @@ function RenduBloc({ bloc }: { bloc: Bloc }) {
         <ul>
           {items.map((item, index) => (
             <li key={index}>
-              <TexteAvecReferences>{item}</TexteAvecReferences>
+              {rendreSurlignable(item, `${blocId}:item:${index}`)}
             </li>
           ))}
         </ul>
@@ -675,16 +830,12 @@ function RenduBloc({ bloc }: { bloc: Bloc }) {
     case 'aparte':
       return (
         <p className="my-3 rounded-xl border border-or-200 bg-or-50 px-4 py-2.5 text-xs italic text-or-800">
-          <TexteAvecReferences>{bloc.texte.replace(/^>\s*/, '')}</TexteAvecReferences>
+          {rendreSurlignable(bloc.texte.replace(/^>\s*/, ''))}
         </p>
       );
 
     default:
-      return (
-        <p>
-          <TexteAvecReferences>{bloc.texte}</TexteAvecReferences>
-        </p>
-      );
+      return <p>{rendreSurlignable(bloc.texte)}</p>;
   }
 }
 
@@ -693,11 +844,13 @@ function CarteVerset({
   valeur,
   onEnregistrer,
   index = 0,
+  ancre,
 }: {
   reference: string;
   valeur: string;
   onEnregistrer: (valeur: string) => void;
   index?: number;
+  ancre?: string;
 }) {
   const texte = texteDuVerset(reference);
   const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
@@ -706,7 +859,7 @@ function CarteVerset({
   const couleur = postitColors[index % postitColors.length];
 
   return (
-    <div className={`${couleur} ${pose} relative rounded-2xl p-5 shadow-md transition-all`}>
+    <div id={ancre} className={`${couleur} ${pose} relative rounded-2xl p-5 shadow-md transition-all`}>
       {/* Ruban adhésif / Washi tape */}
       <span className="ruban -top-3 left-1/2 -translate-x-1/2 -rotate-2 rounded-[2px]" />
 
@@ -748,17 +901,19 @@ function BlocQuestion({
   onEnregistrer,
   onPartager,
   numero,
+  ancre,
 }: {
   question: string;
   valeur: string;
   onEnregistrer: (valeur: string) => void;
   onPartager?: (texte: string) => Promise<void>;
   numero?: number;
+  ancre?: string;
 }) {
   const [partage, setPartage] = useState(false);
 
   return (
-    <div className="relative rounded-3xl border border-parchemin-300 bg-parchemin-50/70 p-5 shadow-2xs transition-all hover:bg-white sm:p-6">
+    <div id={ancre} className="relative rounded-3xl border border-parchemin-300 bg-parchemin-50/70 p-5 shadow-2xs transition-all hover:bg-white sm:p-6">
       <div className="flex items-baseline gap-2.5">
         {numero !== undefined && (
           <span className="manuscrit text-2xl font-bold text-or-600">

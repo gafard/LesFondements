@@ -102,7 +102,7 @@ function CertificatPage() {
           {/* Top Logo / Seal */}
           <div className="relative mx-auto mb-6 h-20 w-20 drop-shadow-md">
             <Image
-              src="/logo.png"
+              src="/logo-transparent.png"
               alt="Sceau officiel Les Fondements"
               fill
               sizes="80px"
