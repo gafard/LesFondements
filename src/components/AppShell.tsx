@@ -4,10 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { ouvrirCentre } from '@/lib/centre';
+import { useApplication } from '@/lib/application';
 import type { LucideIcon } from 'lucide-react';
 import {
   Award,
   Bell,
+  Smartphone,
   BookMarked,
   Brain,
   Compass,
@@ -132,6 +135,7 @@ function ColonneLaterale({
   pathname: string;
   onOuvrirNotifs: () => void;
 }) {
+  const { miseAJourPrete } = useApplication();
   const { logout } = useAuth();
   const { group, gate } = useParcours();
 
@@ -195,6 +199,20 @@ function ColonneLaterale({
       >
         <Bell className="h-4 w-4" strokeWidth={1.75} />
         Rappels & Notifications
+      </button>
+
+      {/* Installation, paquets hors connexion et mises à jour : un seul
+          endroit, consultable quand on veut plutôt qu'une invite qui
+          surgit et qu'on écarte pour toujours. */}
+      <button
+        onClick={ouvrirCentre}
+        className="mt-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-2xs font-bold text-parchemin-100/70 transition-colors hover:bg-white/12 hover:text-parchemin-100"
+      >
+        <Smartphone className="h-4 w-4" strokeWidth={1.75} />
+        L&apos;application
+        {miseAJourPrete && (
+          <span className="ml-auto h-1.5 w-1.5 rounded-full bg-or-400" aria-label="Mise à jour disponible" />
+        )}
       </button>
 
       <div className="mt-3 px-1">

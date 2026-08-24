@@ -34,7 +34,7 @@ export const metadata: Metadata = {
       { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
       { url: '/favicon.ico', sizes: 'any' },
     ],
-    apple: [{ url: '/icon-512.png', sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   // Installée sur iOS, l'application s'ouvre sans la barre de Safari.
   appleWebApp: {

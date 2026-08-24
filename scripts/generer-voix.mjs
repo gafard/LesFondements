@@ -53,14 +53,15 @@ const DOSSIER = path.join(RACINE, 'public/voix');
 /**
  * Le débit des enregistrements.
  *
- * 128 kbps est le réglage généreux d'ElevenLabs, calibré pour de la musique.
- * Pour une voix seule qui lit un texte, 64 kbps mono est transparent à
- * l'oreille et divise le corpus par deux — 314 Mo deviennent ~157 Mo, ce qui
- * décide du confort du dépôt et de la taille des paquets hors connexion.
+ * 64 kbps mono divise le corpus par deux — 314 Mo deviennent ~159 Mo — mais
+ * l'oreille a tranché pour 128, et sur une voix qui porte un texte spirituel
+ * c'est l'oreille qui décide, pas la mesure.
  *
- * Se règle par `ELEVENLABS_FORMAT` si l'oreille n'est pas d'accord.
+ * Le débit fait partie de l'empreinte : en changer rend obsolètes exactement
+ * les pistes concernées, et une relance sans `--force` régénère celles-là
+ * seules au lieu de tout refacturer.
  */
-const FORMAT = process.env.ELEVENLABS_FORMAT ?? 'mp3_44100_64';
+const FORMAT = process.env.ELEVENLABS_FORMAT ?? 'mp3_44100_128';
 
 const DOSSIER_ELEVEN = path.join(DOSSIER, 'eleven');
 const DOSSIER_HUMAINE = path.join(DOSSIER, 'humaine');
@@ -263,6 +264,34 @@ const empreinteDe = (texte) => createHash('sha1').update(texte).digest('hex').sl
 // ElevenLabs
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * Les coupures de flux — « terminated », `ECONNRESET`, un 5xx passager, un
+ * 429 de cadence — n'ont rien à voir avec une clé invalide ou un quota
+ * épuisé. Les premières se réessaient, les secondes doivent arrêter la
+ * course : réessayer une erreur de fond ne ferait que brûler le quota.
+ */
+function estPassagere(erreur) {
+  const message = String(erreur?.message ?? erreur);
+  if (/terminated|ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|fetch failed|socket/i.test(message)) {
+    return true;
+  }
+  const statut = Number(message.match(/ElevenLabs (\d{3})/)?.[1]);
+  return statut === 429 || (statut >= 500 && statut < 600);
+}
+
+/** Trois essais, en espaçant : 1 s, puis 3 s. */
+async function synthetiserAvecReprises(texte, config, essais = 3) {
+  for (let essai = 1; ; essai += 1) {
+    try {
+      return await synthetiser(texte, config);
+    } catch (erreur) {
+      if (essai >= essais || !estPassagere(erreur)) throw erreur;
+      process.stdout.write(`↻${essai} `);
+      await new Promise((r) => setTimeout(r, essai * 2000 - 1000));
+    }
+  }
+}
+
 async function synthetiser(texte, config) {
   const url = `https://api.elevenlabs.io/v1/text-to-speech/${config.voix}?output_format=${FORMAT}`;
 
@@ -405,6 +434,8 @@ async function main() {
       existante?.source === 'eleven' &&
       existante?.voix === config.voix &&
       existante.empreinte === empreinte &&
+      // Les pistes d'avant ce champ ont été produites en 128 kbps.
+      (existante.format ?? 'mp3_44100_128') === FORMAT &&
       existsSync(chemin)
     ) {
       ignorees += 1;
@@ -421,7 +452,7 @@ async function main() {
 
     process.stdout.write(`  ${piste.id.padEnd(14)} ${piste.texte.length.toString().padStart(5)} c. `);
     try {
-      const audio = await synthetiser(piste.texte, config);
+      const audio = await synthetiserAvecReprises(piste.texte, config);
       await mkdir(DOSSIER_ELEVEN, { recursive: true });
       await writeFile(chemin, audio);
       const taille = (await stat(chemin)).size;
@@ -430,6 +461,7 @@ async function main() {
         url: `/voix/eleven/${piste.id}.mp3`,
         source: 'eleven',
         empreinte,
+        format: FORMAT,
         voix: config.voix,
       };
       generees += 1;

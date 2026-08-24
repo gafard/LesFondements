@@ -14,7 +14,14 @@ self.addEventListener('install', (event) => {
       });
     })
   );
-  self.skipWaiting();
+  // Pas de `skipWaiting()` ici : une nouvelle version qui prend la main au
+  // milieu d'une session remplace l'application sous les doigts de quelqu'un
+  // qui est peut-être en train d'écrire. On attend que l'application le
+  // demande — voir `appliquerMiseAJour()` dans src/lib/application.ts.
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'PRENDRE_LA_MAIN') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

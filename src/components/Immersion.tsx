@@ -46,6 +46,15 @@ import {
 import type { Bloc, FicheLivret, ResumeSection } from '@/lib/livret';
 import { memoriserPassage } from '@/lib/marquePage';
 import { decouperEnMoments, momentDe, type Moment } from '@/lib/moments';
+import {
+  annoncerAuSysteme,
+  etatDeLecture,
+  fairelSilenceAuSysteme,
+  frisson,
+  garderLEcranEveille,
+  laisserLEcranSEteindre,
+  suivreLaVisibilite,
+} from '@/lib/seance';
 
 // ─────────────────────────────────────────────────────────────
 // Le scénario : la fiche devient une suite de moments
@@ -245,6 +254,20 @@ export default function Immersion({
     return () => window.clearTimeout(minuterie);
   }, [chrome, feuille, noteOuverte, index]);
 
+  // ── L'écran et les commandes du système ─────────────────────
+  // Une immersion dure dix minutes, dont une partie sans toucher l'écran.
+  // Sans ces deux-là, le téléphone s'éteint au milieu d'un silence et la
+  // lecture s'arrête au verrouillage.
+  useEffect(() => {
+    void garderLEcranEveille();
+    const cesser = suivreLaVisibilite();
+    return () => {
+      cesser();
+      laisserLEcranSEteindre();
+      fairelSilenceAuSysteme();
+    };
+  }, []);
+
   // ── Navigation ──────────────────────────────────────────────
   const aller = useCallback(
     (delta: number) => {
@@ -259,6 +282,27 @@ export default function Immersion({
   useEffect(() => {
     zone.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [index]);
+
+  // Ce qui joue, décrit au système : l'écran verrouillé et les écouteurs
+  // affichent le moment en cours et commandent la navigation.
+  useEffect(() => {
+    annoncerAuSysteme(libelleScene, `Fiche ${fiche.id} · ${moment?.titre ?? ''}`.trim(), {
+      precedent: () => aller(-1),
+      suivant: () => aller(1),
+      jouer: () => void audioRef.current?.play(),
+      pause: () => audioRef.current?.pause(),
+    });
+  }, [libelleScene, fiche.id, moment?.titre, aller]);
+
+  useEffect(() => {
+    etatDeLecture(audioEnCours);
+  }, [audioEnCours]);
+
+  // Un frisson très bref au passage d'un moment : le corps sait qu'une
+  // étape est franchie sans qu'on ait à le lire.
+  useEffect(() => {
+    if (rangMoment > 0) frisson();
+  }, [rangMoment]);
 
   useEffect(() => {
     memoriserPassage({

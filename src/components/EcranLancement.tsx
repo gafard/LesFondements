@@ -10,6 +10,7 @@ import {
   type DernierPassage,
 } from '@/lib/marquePage';
 import { VERSETS_CONNUS } from '@/data/versets';
+import { ouvrirCentre } from '@/lib/centre';
 
 /**
  * L'écran de lancement mobile.
@@ -198,10 +199,13 @@ export default function EcranLancement() {
             Ouvrir mon parcours
           </Link>
         ) : (
-          <p className="flex items-center justify-center gap-2 text-3xs leading-relaxed text-encre-500">
+          <button
+            onClick={ouvrirCentre}
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-encre-200 px-5 py-3 text-2xs font-bold text-encre-700 transition-colors hover:bg-encre-950/[0.04]"
+          >
             <Download className="h-3 w-3 shrink-0" />
-            Installez l&apos;application pour l&apos;ouvrir hors connexion
-          </p>
+            Installer l&apos;application
+          </button>
         )}
       </div>
     </section>

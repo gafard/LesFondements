@@ -19,9 +19,29 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-      // Android découpe l'icône à sa guise : la version « maskable » lui
-      // donne la marge nécessaire pour le faire sans amputer le dessin.
-      { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      // Android découpe l'icône à sa guise — cercle, goutte, écusson. La
+      // version « maskable » place le dessin dans la zone sûre, sur le fond
+      // de marque, pour qu'aucune découpe ne l'ampute. Réutiliser l'icône
+      // ordinaire ici revenait à laisser le système rogner le logo.
+      { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ],
+    // Android montre ces captures dans sa fiche d'installation : sans elles,
+    // il propose une invite minimale au lieu de la vitrine complète.
+    screenshots: [
+      {
+        src: '/capture-accueil.png',
+        sizes: '1080x1920',
+        type: 'image/png',
+        form_factor: 'narrow',
+        label: 'Reprendre le parcours là où on s’est arrêté',
+      },
+      {
+        src: '/capture-etude.png',
+        sizes: '1080x1920',
+        type: 'image/png',
+        form_factor: 'narrow',
+        label: 'L’index thématique : retrouver un sujet dans les vingt fiches',
+      },
     ],
     shortcuts: [
       {
@@ -35,6 +55,18 @@ export default function manifest(): MetadataRoute.Manifest {
         short_name: 'Cellule',
         url: '/groupes',
         description: 'La rencontre, le mur de prière, les partages',
+      },
+      {
+        name: 'Écrire dans mon journal',
+        short_name: 'Journal',
+        url: '/journal',
+        description: 'Déposer ce que la lecture a remué',
+      },
+      {
+        name: 'Le verset du jour',
+        short_name: 'Verset',
+        url: '/memorisation',
+        description: 'Réviser et réciter les versets à retenir',
       },
     ],
   };
