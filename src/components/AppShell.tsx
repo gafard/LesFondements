@@ -15,6 +15,7 @@ import {
   LogOut,
   MessageCircle,
   PenLine,
+  Printer,
   Tag,
   Users,
 } from 'lucide-react';
@@ -59,8 +60,9 @@ const PRINCIPALES: Destination[] = [
 ];
 
 const SECONDAIRES: Destination[] = [
-  { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Tag },
+  { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
   { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
+  { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Tag },
   { href: '/ressources', label: 'Autour du parcours', court: 'Ressources', icon: BookMarked },
   { href: '/certificat', label: 'Mon attestation', court: 'Attestation', icon: Award },
 ];

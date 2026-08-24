@@ -18,12 +18,17 @@ import {
   Quote,
   Heart,
   Users,
+  Hourglass,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
 import Immersion, { ChargementImmersion } from '@/components/Immersion';
 import LettreDuPere from '@/components/LettreDuPere';
+import PauseSanctuaire from '@/components/PauseSanctuaire';
+import AnnotationsFiche from '@/components/AnnotationsFiche';
+import EcouteContinueFiche from '@/components/EcouteContinueFiche';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
 import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswers } from '@/lib/firestore';
 import {
@@ -55,6 +60,8 @@ function FicheContent() {
   );
   const [onglet, setOnglet] = useState<Onglet>('expose');
   const [immersion, setImmersion] = useState(searchParams.get('immersion') === '1');
+  const [pauseSanctuaireOuverte, setPauseSanctuaireOuverte] = useState(false);
+  const [ecouteContinueOuverte, setEcouteContinueOuverte] = useState(false);
   const [enregistre, setEnregistre] = useState(false);
   const minuteur = useRef<number | null>(null);
   // Dernière valeur des réponses, lue par l'enregistrement différé sans
@@ -207,13 +214,29 @@ function FicheContent() {
                 {fiche.sousTitre}
               </p>
 
-              <div className="mt-7 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+              <div className="mt-7 flex flex-wrap gap-2.5">
                 <button
                   onClick={() => setImmersion(true)}
-                  className="bouton-or inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold shadow-md"
+                  className="bouton-or inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-xs font-bold shadow-md"
                 >
                   <Headphones className="h-4 w-4" strokeWidth={2} />
-                  Lancer l&apos;immersion guidée
+                  Immersion guidée
+                </button>
+
+                <button
+                  onClick={() => setEcouteContinueOuverte(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-3 text-xs font-bold text-parchemin-100 backdrop-blur-sm transition-colors hover:bg-white/20"
+                >
+                  <Headphones className="h-4 w-4 text-or-300" strokeWidth={2} />
+                  Écoute continue (Mains-libres)
+                </button>
+
+                <button
+                  onClick={() => setPauseSanctuaireOuverte(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-3 text-xs font-bold text-parchemin-100 backdrop-blur-sm transition-colors hover:bg-white/20"
+                >
+                  <Hourglass className="h-4 w-4 text-or-300" strokeWidth={2} />
+                  Pause Sanctuaire
                 </button>
               </div>
             </div>
@@ -526,6 +549,9 @@ function FicheContent() {
           )}
         </div>
 
+        {/* ══ Marge d'annotations & Post-its libres ══ */}
+        <AnnotationsFiche ficheId={fiche.id} />
+
         <div className="mt-6 flex items-center justify-between gap-3">
           {precedente ? (
             <Link
@@ -559,6 +585,29 @@ function FicheContent() {
             </span>
           )}
         </div>
+
+        {/* Modals & Outils */}
+        <PauseSanctuaire
+          ouvert={pauseSanctuaireOuverte}
+          onFermer={() => setPauseSanctuaireOuverte(false)}
+        />
+
+        <EcouteContinueFiche
+          fiche={{
+            id: fiche.id,
+            titre: fiche.titre,
+            sousTitre: fiche.sousTitre,
+            sections: fiche.sections.map((s) => ({
+              titre: s.titre || '',
+              texte: s.blocs
+                .map((b) => ('texte' in b ? (b as any).texte : ''))
+                .filter(Boolean)
+                .join(' '),
+            })),
+          }}
+          ouvert={ecouteContinueOuverte}
+          onFermer={() => setEcouteContinueOuverte(false)}
+        />
       </div>
     </div>
   );

@@ -24,6 +24,9 @@ import { analyserReference } from '@/lib/reference';
 import { lectureDisponible, lireAVoixHaute } from '@/lib/ambiance';
 import { FICHES_META } from '@/data/fichesMeta';
 
+import RecitationVocale from '@/components/RecitationVocale';
+import { Mic } from 'lucide-react';
+
 interface Carte {
   cle: string;
   reference: string;
@@ -44,6 +47,7 @@ function MemorisationContent() {
   const [cartes, setCartes] = useState<Carte[] | null>(null);
   const [index, setIndex] = useState(0);
   const [retournee, setRetournee] = useState(false);
+  const [modeRecitation, setModeRecitation] = useState(false);
   const [filtre, setFiltre] = useState<number | 'toutes'>('toutes');
   const [audioEnCours, setAudioEnCours] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -279,52 +283,83 @@ function MemorisationContent() {
                       </div>
                     )}
                     {(carte.texte || carte.copie) && (
-                    <button
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        const comp = getComparaisonVerset(carte.reference);
-                        const parsed = analyserReference(carte.reference);
-                        const audioUrl =
-                          comp?.audioBds ||
-                          (parsed
-                            ? getAudioChapitre(parsed.livre.numero, parsed.livre.nom, parsed.chapitre)
-                            : null);
+                      <div className="mt-5 flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            const comp = getComparaisonVerset(carte.reference);
+                            const parsed = analyserReference(carte.reference);
+                            const audioUrl =
+                              comp?.audioBds ||
+                              (parsed
+                                ? getAudioChapitre(parsed.livre.numero, parsed.livre.nom, parsed.chapitre)
+                                : null);
 
-                        if (audioEnCours) {
-                          audioRef.current?.pause();
-                          setAudioEnCours(false);
-                          return;
-                        }
-                        if (audioUrl && audioRef.current) {
-                          if (audioRef.current.src !== audioUrl) {
-                            audioRef.current.src = audioUrl;
-                          }
-                          audioRef.current
-                            .play()
-                            .then(() => setAudioEnCours(true))
-                            .catch((err) => {
-                              console.warn('Audio play error, falling back to vocal synthesis:', err);
+                            if (audioEnCours) {
+                              audioRef.current?.pause();
                               setAudioEnCours(false);
+                              return;
+                            }
+                            if (audioUrl && audioRef.current) {
+                              if (audioRef.current.src !== audioUrl) {
+                                audioRef.current.src = audioUrl;
+                              }
+                              audioRef.current
+                                .play()
+                                .then(() => setAudioEnCours(true))
+                                .catch((err) => {
+                                  console.warn('Audio play error, falling back to vocal synthesis:', err);
+                                  setAudioEnCours(false);
+                                  lireAVoixHaute(`${carte.reference}. ${comp?.bds ?? carte.texte ?? carte.copie}`);
+                                });
+                            } else if (lectureDisponible()) {
                               lireAVoixHaute(`${carte.reference}. ${comp?.bds ?? carte.texte ?? carte.copie}`);
-                            });
-                        } else if (lectureDisponible()) {
-                          lireAVoixHaute(`${carte.reference}. ${comp?.bds ?? carte.texte ?? carte.copie}`);
-                        }
-                      }}
-                      className={`mt-5 inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-2xs font-bold transition-colors ${
-                        audioEnCours
-                          ? 'bg-indigo-600 text-white shadow-xs'
-                          : 'bg-parchemin-100 text-encre-600 hover:bg-indigo-100 hover:text-indigo-900'
-                      }`}
-                    >
-                      <Volume2 className="h-3.5 w-3.5" />
-                      {audioEnCours ? 'Pause' : 'Écouter (Audio)'}
-                    </button>
-                  )}
+                            }
+                          }}
+                          className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-2xs font-bold transition-colors ${
+                            audioEnCours
+                              ? 'bg-indigo-600 text-white shadow-xs'
+                              : 'bg-parchemin-100 text-encre-600 hover:bg-indigo-100 hover:text-indigo-900'
+                          }`}
+                        >
+                          <Volume2 className="h-3.5 w-3.5" />
+                          {audioEnCours ? 'Pause' : 'Écouter (Audio)'}
+                        </button>
+
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setModeRecitation((v) => !v);
+                          }}
+                          className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-2xs font-bold transition-colors ${
+                            modeRecitation
+                              ? 'bg-or-600 text-white shadow-xs'
+                              : 'bg-or-100 text-or-800 hover:bg-or-200'
+                          }`}
+                        >
+                          <Mic className="h-3.5 w-3.5" />
+                          {modeRecitation ? 'Masquer la récitation' : 'Réciter au micro'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </button>
+
+            {modeRecitation && (carte.texte || carte.copie) && (
+              <div className="mt-4">
+                <RecitationVocale
+                  reference={carte.reference}
+                  texteCible={carte.texte || carte.copie}
+                  onSucces={() => {
+                    if (!maitrisees.includes(carte.cle)) {
+                      basculerMaitrise(carte.cle);
+                    }
+                  }}
+                />
+              </div>
+            )}
 
             <audio
               ref={audioRef}

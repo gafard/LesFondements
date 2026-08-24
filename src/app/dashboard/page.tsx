@@ -19,6 +19,9 @@ import {
   Sparkles,
   Star,
   Users,
+  Hourglass,
+  Printer,
+  WifiOff,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -27,6 +30,9 @@ import ProgressBar from '@/components/ProgressBar';
 import YearHeatmap from '@/components/YearHeatmap';
 import ModernIcon from '@/components/ModernIcon';
 import NotificationCenter from '@/components/NotificationCenter';
+import EdificeFondements from '@/components/EdificeFondements';
+import PauseSanctuaire from '@/components/PauseSanctuaire';
+import TelechargementHorsLigne from '@/components/TelechargementHorsLigne';
 import { getCachedJournalEntries, getJournalEntries, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
 import { getCachedPosts, getPosts, nextMeetingDate, subscribe } from '@/lib/parcoursStore';
@@ -43,6 +49,8 @@ function DashboardContent() {
   const { user } = useAuth();
   const { group, members, membership, session, isLeader } = useParcours();
   const [notifOuvert, setNotifOuvert] = useState(false);
+  const [pauseOuverte, setPauseOuverte] = useState(false);
+  const [horsLigneOuvert, setHorsLigneOuvert] = useState(false);
   const [journal, setJournal] = useState<JournalEntry[]>(() =>
     user ? getCachedJournalEntries(user.uid).slice(0, 3) : []
   );
@@ -440,10 +448,16 @@ function DashboardContent() {
           <YearHeatmap />
         </div>
 
+        {/* ══ L'Édifice des Fondements (Temple architectural de 20 pierres) ══ */}
+        <EdificeFondements
+          closedSteps={group.closedSteps}
+          currentStep={group.currentStep}
+        />
+
         {/* ══ Outils de la table ══ */}
         <section className="space-y-4">
           <h3 className="font-serif text-lg font-bold text-encre-950 px-1">Vos outils de disciple</h3>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
             <CarteOutil
               href="/groupes"
               icone={Users}
@@ -455,7 +469,7 @@ function DashboardContent() {
               href="/memorisation"
               icone={Brain}
               titre="Mémorisation"
-              sous="Versets clés"
+              sous="Versets & Récitation"
               color="border-amber-200"
             />
             <CarteOutil
@@ -466,12 +480,37 @@ function DashboardContent() {
               color="border-emerald-200"
             />
             <CarteOutil
-              href="/index-thematique"
-              icone={Bookmark}
-              titre="Index"
-              sous="Thèmes bibliques"
-              color="border-slate-200"
+              href="/temoignages"
+              icone={Heart}
+              titre="Témoignages"
+              sous="Audio & Récits"
+              color="border-rose-200"
             />
+            <CarteOutil
+              href="/carnet-export"
+              icone={Printer}
+              titre="Carnet de Disciple"
+              sous="Imprimer en PDF"
+              color="border-or-300"
+            />
+            <button
+              type="button"
+              onClick={() => setPauseOuverte(true)}
+              className="feuille rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center border border-amber-300"
+            >
+              <Hourglass className="h-5 w-5 text-or-700 mb-2" />
+              <h4 className="manuscrit text-sm font-bold text-encre-900">Pause Sanctuaire</h4>
+              <p className="text-2xs text-encre-500 mt-0.5">Silence & Méditation</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setHorsLigneOuvert(true)}
+              className="feuille rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center border border-indigo-200"
+            >
+              <WifiOff className="h-5 w-5 text-indigo-700 mb-2" />
+              <h4 className="manuscrit text-sm font-bold text-encre-900">Mode Retraite</h4>
+              <p className="text-2xs text-encre-500 mt-0.5">Parcours hors-ligne</p>
+            </button>
             <CarteOutil
               href="/certificat"
               icone={Award}
@@ -481,6 +520,9 @@ function DashboardContent() {
             />
           </div>
         </section>
+
+        <PauseSanctuaire ouvert={pauseOuverte} onFermer={() => setPauseOuverte(false)} />
+        <TelechargementHorsLigne ouvert={horsLigneOuvert} onFermer={() => setHorsLigneOuvert(false)} />
 
         {/* ══ Journal Spirituel Récent (Cahier ouvert) ══ */}
         <div className="feuille feuille-dechiree relative rounded-3xl p-6 sm:p-8 shadow-md">
