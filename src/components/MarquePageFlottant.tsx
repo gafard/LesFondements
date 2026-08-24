@@ -1,5 +1,7 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Bookmark, BookOpen, PenLine } from 'lucide-react';
@@ -10,6 +12,7 @@ import {
 } from '@/lib/marquePage';
 
 export default function MarquePageFlottant() {
+  const pathname = usePathname();
   const [passage, setPassage] = useState<DernierPassage | null>(lireDernierPassage);
 
   useEffect(() => {
@@ -31,7 +34,14 @@ export default function MarquePageFlottant() {
   const Icone = passage.type === 'verset' || passage.type === 'ecriture' ? PenLine : BookOpen;
 
   return (
-    <div className="group fixed right-4 top-0 z-50 sm:right-10" data-testid="bookmark-ribbon">
+    <div
+      // Sur l'accueil mobile, « Continuer » est déjà l'action dominante de
+      // l'écran de lancement : le ruban ferait doublon et le chevaucherait.
+      className={`group fixed right-4 top-0 z-50 sm:right-10 ${
+        pathname === '/' ? 'hidden lg:block' : ''
+      }`}
+      data-testid="bookmark-ribbon"
+    >
       <Link
         href={passage.url}
         className="ruban-marque-page relative flex h-[88px] w-12 flex-col items-center justify-end gap-1 pb-4 text-[#f8d98a] transition-transform duration-300 hover:translate-y-1 focus-visible:translate-y-1"

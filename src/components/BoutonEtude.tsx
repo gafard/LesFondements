@@ -68,7 +68,11 @@ export default function BoutonEtude() {
         onClick={() => setOuvert(true)}
         // Sur mobile, le bouton se pose au-dessus de la barre d'onglets ; sur
         // grand écran, la barre n'existe pas et il reprend le coin bas.
-        className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-4 z-40 flex items-center gap-2 rounded-full bg-encre-950 px-4 py-3.5 text-xs font-bold text-or-300 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl lg:bottom-6 lg:right-6"
+        className={`fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-4 z-40 items-center gap-2 rounded-full bg-encre-950 px-4 py-3.5 text-xs font-bold text-or-300 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl lg:bottom-6 lg:right-6 ${
+          // L'accueil mobile est un écran de lancement : rien ne doit s'y
+          // superposer. Le bouton d'étude revient dès qu'on entre.
+          pathname === '/' ? 'hidden lg:flex' : 'flex'
+        }`}
         aria-label="Ouvrir la Bible et les outils d’étude"
       >
         <BookOpen className="h-5 w-5" strokeWidth={1.75} />

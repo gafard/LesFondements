@@ -107,7 +107,12 @@ export default function Navbar() {
     );
   }
 
+  // Sur mobile, l'accueil est un écran de lancement : il porte sa propre
+  // identité et doit tenir dans un écran. Une barre par-dessus le ferait
+  // déborder et rendrait la marque deux fois.
   const classeNav = `fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+    estAccueil ? 'hidden lg:block' : ''
+  } ${
     surFondSombre
       ? 'border-b border-white/10 bg-encre-950/70 backdrop-blur-xl'
       : 'border-b border-parchemin-400/60 bg-white/90 backdrop-blur-xl'
