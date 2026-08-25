@@ -481,3 +481,49 @@ export function getAudioChapitre(
   const chap = Number(chapitre) > 0 ? Number(chapitre) : 1;
   return `https://www.wordproaudio.net/bibles/app/audio/7/${num}/${chap}.mp3`;
 }
+
+// ─────────────────────────────────────────────────────────────
+// Chargement dynamique des traductions réelles (BDS, Darby, PDV, NBS)
+// ─────────────────────────────────────────────────────────────
+
+const CACHE_VERSIONS: Record<string, string> = {};
+
+function nettoyerTexteHtml(brut: string): string {
+  return brut
+    .replace(/<sup\b[^>]*>.*?<\/sup>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/[¶\u00b6]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Charge la véritable traduction d'un verset depuis l'API publique (BDS, Darby, PDV, NBS)
+ * avec mise en cache mémoire instantanée.
+ */
+export async function chargerTraductionEnLigne(
+  codeVersion: 'BDS' | 'FRDBY' | 'FRPDV17' | 'NBS',
+  livreNumero: number,
+  chapitre: number,
+  verset: number
+): Promise<string | null> {
+  const cle = `${codeVersion}_${livreNumero}_${chapitre}_${verset}`;
+  if (CACHE_VERSIONS[cle]) return CACHE_VERSIONS[cle];
+
+  try {
+    const res = await fetch(
+      `https://bolls.life/get-verse/${codeVersion}/${livreNumero}/${chapitre}/${verset}/`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && typeof data.text === 'string' && data.text.trim()) {
+      const propre = nettoyerTexteHtml(data.text);
+      CACHE_VERSIONS[cle] = propre;
+      return propre;
+    }
+  } catch (err) {
+    console.warn(`Impossible de charger la version ${codeVersion}:`, err);
+  }
+  return null;
+}
+

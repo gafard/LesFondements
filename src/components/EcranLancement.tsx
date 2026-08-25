@@ -165,11 +165,17 @@ export default function EcranLancement() {
                 Vingt fiches préparées seul, vécues chaque semaine en cellule.
               </p>
               <Link
-                href="/login"
+                href="/fiches/1"
                 className="bouton-or mt-6 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-bold shadow-lg"
               >
-                Commencer
+                Explorer la Fiche 1 (Accès libre)
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </Link>
+              <Link
+                href="/login"
+                className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-full bg-encre-950 px-4 py-3 text-xs font-bold text-parchemin-100 shadow-sm"
+              >
+                Rejoindre ou créer une cellule
               </Link>
             </>
           )}

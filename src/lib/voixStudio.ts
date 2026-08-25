@@ -38,8 +38,11 @@ export async function urlVoixStudio(texte: string): Promise<string | null> {
   const deja = enMemoire.get(clef);
   if (deja) return deja;
 
-  // Le Cache Storage garde l'audio d'une session à l'autre, et hors ligne.
-  const requete = new Request(`/api/voix#${clef}`);
+  // La clé passe par la requête, pas par un fragment : `Request.url` garde
+  // bien le « # », mais le Cache Storage l'ignore au moment de comparer —
+  // deux passages différents s'écrasaient l'un l'autre, et relire le premier
+  // rendait l'audio du second. Vérifié dans le navigateur.
+  const requete = new Request(`/api/voix?e=${clef}`);
   let cache: Cache | null = null;
   try {
     cache = await caches.open(CACHE);

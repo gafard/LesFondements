@@ -78,89 +78,6 @@ export const LETTRE_DU_PERE: ParagrapheLettre[] = [
   { texte: "Je t'attends les bras ouverts.", reference: "Luc 15:11-32" },
 ];
 
-/**
- * Moteur audio céleste doux synthétisé par la Web Audio API (aucun fichier externe requis,
- * 100% gratuit, fonctionne hors-ligne).
- */
-class AmbianceLettre {
-  private ctx: AudioContext | null = null;
-  private gainMaster: GainNode | null = null;
-  private oscillators: OscillatorNode[] = [];
-  private lfos: OscillatorNode[] = [];
-  private gains: GainNode[] = [];
-
-  demarrer() {
-    if (this.ctx) return;
-    try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ctx = new AudioCtx();
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0.001, ctx.currentTime);
-      // Montée douce du volume en 3 secondes
-      master.gain.exponentialRampToValueAtTime(0.14, ctx.currentTime + 3);
-      master.connect(ctx.destination);
-
-      // Harmonie céleste en Ré Majeur / Sol : Ré2, La2, Fa#3, Ré4
-      const notes = [73.42, 110.0, 185.0, 293.66, 440.0];
-
-      notes.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-        osc.frequency.value = freq;
-
-        const noteGain = ctx.createGain();
-        noteGain.gain.value = idx === 0 ? 0.08 : 0.04;
-
-        // Ondulation douce LFO
-        const lfo = ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.08 + idx * 0.025;
-
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 0.02;
-        lfo.connect(lfoGain).connect(noteGain.gain);
-
-        osc.connect(noteGain).connect(master);
-        osc.start();
-        lfo.start();
-
-        this.oscillators.push(osc);
-        this.lfos.push(lfo);
-        this.gains.push(noteGain, lfoGain);
-      });
-
-      this.ctx = ctx;
-      this.gainMaster = master;
-    } catch {
-      // AudioContext non disponible
-    }
-  }
-
-  arreter() {
-    if (!this.ctx || !this.gainMaster) return;
-    try {
-      const t = this.ctx.currentTime;
-      this.gainMaster.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
-      setTimeout(() => {
-        this.oscillators.forEach((o) => {
-          try { o.stop(); o.disconnect(); } catch {}
-        });
-        this.lfos.forEach((l) => {
-          try { l.stop(); l.disconnect(); } catch {}
-        });
-        this.ctx?.close();
-        this.ctx = null;
-        this.gainMaster = null;
-        this.oscillators = [];
-        this.lfos = [];
-        this.gains = [];
-      }, 1300);
-    } catch {
-      this.ctx = null;
-    }
-  }
-}
-
 export default function LettreDuPere() {
   const [ouverte, setOuverte] = useState(false);
   const [enveloppeOuverte, setEnveloppeOuverte] = useState(false);
@@ -169,19 +86,24 @@ export default function LettreDuPere() {
   const [musiqueActive, setMusiqueActive] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
 
-  const ambianceRef = useRef<AmbianceLettre | null>(null);
+  const musiqueAudioRef = useRef<HTMLAudioElement | null>(null);
   const timerLectureRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const contenuRef = useRef<HTMLDivElement>(null);
   // Référence stable pour la récursion du minuteur de lecture.
   const lireLigneRef = useRef<(index: number) => void>(() => {});
 
-  // Initialisation de la musique d'ambiance et de l'audio
+  // Initialisation du piano d'ambiance en boucle et de la voix
   useEffect(() => {
-    ambianceRef.current = new AmbianceLettre();
+    const musique = new Audio('/audio/lettre-du-pere-piano.mp3');
+    musique.loop = true;
+    musique.volume = 0.32;
+    musiqueAudioRef.current = musique;
+
     audioRef.current = new Audio();
     return () => {
-      ambianceRef.current?.arreter();
+      musique.pause();
+      musique.currentTime = 0;
       audioRef.current?.pause();
       arreterLecture();
       if (timerLectureRef.current) window.clearTimeout(timerLectureRef.current);
@@ -250,8 +172,9 @@ export default function LettreDuPere() {
   const ouvrirLettre = () => {
     setEnveloppeOuverte(true);
 
-    if (musiqueActive) {
-      ambianceRef.current?.demarrer();
+    if (musiqueActive && musiqueAudioRef.current) {
+      musiqueAudioRef.current.currentTime = 0;
+      void musiqueAudioRef.current.play().catch(() => {});
     }
 
     // Après l'animation de dépliage du rabat 3D (~700ms), la lettre s'ouvre
@@ -285,10 +208,10 @@ export default function LettreDuPere() {
 
   const basculerMusique = () => {
     if (musiqueActive) {
-      ambianceRef.current?.arreter();
+      musiqueAudioRef.current?.pause();
       setMusiqueActive(false);
     } else {
-      ambianceRef.current?.demarrer();
+      void musiqueAudioRef.current?.play().catch(() => {});
       setMusiqueActive(true);
     }
   };
@@ -297,7 +220,8 @@ export default function LettreDuPere() {
     audioRef.current?.pause();
     arreterLecture();
     if (timerLectureRef.current) window.clearTimeout(timerLectureRef.current);
-    ambianceRef.current?.arreter();
+    musiqueAudioRef.current?.pause();
+    if (musiqueAudioRef.current) musiqueAudioRef.current.currentTime = 0;
     setEnLecture(false);
     setOuverte(false);
     setEnveloppeOuverte(false);

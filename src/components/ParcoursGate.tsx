@@ -21,7 +21,7 @@ import { useDeclarerFondSombre } from '@/lib/fondSombre';
  *                 attend son groupe, c'était appliquer la règle du parcours
  *                 à ce qui n'en relève pas.
  */
-export type NiveauAcces = 'groupe' | 'attente' | 'personnel';
+export type NiveauAcces = 'groupe' | 'attente' | 'personnel' | 'decouverte';
 
 interface ParcoursGateProps {
   children: React.ReactNode;
@@ -29,8 +29,9 @@ interface ParcoursGateProps {
 }
 
 /**
- * Garde d'accès du parcours. La règle : pas de groupe, pas de fiches.
- * Le contenu n'est pas seulement masqué visuellement — il n'est pas rendu.
+ * Garde d'accès du parcours.
+ * - Fiche 1 & Lettre du Père : Découverte libre sans obligation de groupe.
+ * - Fiches 2 à 20 : Se vivent en cellule de maison (groupe requis).
  */
 export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGateProps) {
   const router = useRouter();
@@ -38,8 +39,10 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
   const { gate, group } = useParcours();
 
   useEffect(() => {
-    if (!authLoading && !user) router.replace('/login');
-  }, [authLoading, user, router]);
+    if (!authLoading && !user && acces !== 'decouverte') {
+      router.replace('/login');
+    }
+  }, [authLoading, user, router, acces]);
 
   if (authLoading || gate.state === 'chargement') {
     return (
@@ -51,6 +54,9 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
       </div>
     );
   }
+
+  // Le mode découverte (Fiche 1 & Lettre du Père) est en accès libre et immédiat
+  if (acces === 'decouverte') return <>{children}</>;
 
   if (!user) return null;
 
@@ -64,12 +70,12 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
         titre={
           gate.state === 'refuse'
             ? 'Vous n’êtes plus rattaché à un groupe'
-            : 'Le parcours attend votre groupe'
+            : 'Rejoignez une cellule pour les étapes suivantes'
         }
         texte={
           gate.state === 'refuse'
             ? "Votre place dans ce groupe s'est libérée. Rejoignez-en un autre, ou créez le vôtre — le parcours reprendra là où vous l'aviez laissé."
-            : "Les vingt fiches se préparent seul, mais elles se vivent à cinq ou six. Rejoignez un groupe près de chez vous, ou rassemblez le vôtre : c'est ce qui ouvre le parcours."
+            : "La Fiche 1 est en accès libre. Pour vivre les 19 fiches suivantes en profondeur, rejoignez une cellule de 5 ou 6 personnes près de chez vous, ou rassemblez la vôtre."
         }
         action={{ href: '/onboarding', label: 'Trouver ou créer mon groupe' }}
       />

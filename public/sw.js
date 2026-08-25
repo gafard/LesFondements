@@ -27,12 +27,14 @@ self.addEventListener('message', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
+      // On ne supprime que les versions périmées de NOTRE coquille.
+      // Balayer tous les caches emportait aussi ce que la personne avait
+      // délibérément téléchargé — les paquets hors connexion et les voix,
+      // jusqu'à plusieurs dizaines de mégaoctets — à chaque mise à jour.
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
+        keys
+          .filter((key) => key.startsWith('lesfondements-v') && key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
       );
     })
   );

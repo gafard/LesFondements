@@ -543,6 +543,9 @@
   background: linear-gradient(135deg, transparent 50%, rgba(11, 29, 56, 0.10) 50%);
 }
 
+/* Le jaune est celui de `.postit` : l'alias rend l'intention lisible
+   plutôt que de laisser deviner qu'aucune variante signifie « jaune ». */
+.postit-jaune { background: linear-gradient(168deg, #fdf3b8 0%, #fce98d 62%, #f7dd72 100%); }
 .postit-rose { background: linear-gradient(168deg, #ffe0e4 0%, #ffc9d0 64%, #ffb6c0 100%); }
 .postit-bleu { background: linear-gradient(168deg, #dcecfb 0%, #c2ddf6 64%, #abd0f2 100%); }
 .postit-vert { background: linear-gradient(168deg, #ddf5e0 0%, #c2ebc9 64%, #a9e0b4 100%); }
@@ -931,3 +934,254 @@
 @media (prefers-reduced-motion: reduce) {
   .pose-1, .pose-2, .pose-3, .pose-4 { transform: none; }
 }
+
+/* ── Intercalaires de carnet & Bible d'étude ──────────────────
+   Les onglets d'un classeur d'érudit : légèrement en retrait, la languette
+   ouverte avance d'un cran et rejoint le niveau de la page avec dorure. */
+.intercalaire {
+  position: relative;
+  border-radius: 0.65rem 0.65rem 0 0;
+  background: color-mix(in oklab, var(--color-parchemin-200) 85%, transparent);
+  border: 1px solid var(--color-parchemin-400);
+  border-bottom: none;
+  box-shadow: inset 0 -4px 6px -4px rgb(0 0 0 / 0.15);
+  transition: all 0.2s var(--ease-doux);
+}
+
+.intercalaire:hover:not(.intercalaire-actif) {
+  background: color-mix(in oklab, var(--color-parchemin-100) 95%, transparent);
+  transform: translateY(-1px);
+}
+
+.intercalaire-actif {
+  background: var(--color-parchemin-50);
+  border-color: var(--color-or-400);
+  box-shadow: 0 -3px 8px -2px rgb(209 132 16 / 0.18), inset 0 2px 0 0 var(--color-or-400);
+  z-index: 2;
+}
+
+/* La languette ouverte mord sur la page pour effacer le trait. */
+.intercalaire-actif::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 3px;
+  background: var(--color-parchemin-50);
+}
+
+/* ── La page d'étude sur plan de travail ───────────────────── */
+.page-etude {
+  background: var(--color-parchemin-50);
+  border-top: 1px solid var(--color-parchemin-400);
+  box-shadow: inset 0 3px 6px -3px rgb(0 0 0 / 0.08);
+}
+
+/* ── Fiche Bristol pour le lexique Strong & grammaire ──────── */
+.fiche-bristol {
+  background: #ffffff;
+  background-image:
+    linear-gradient(90deg, transparent 79px, rgba(239, 68, 68, 0.18) 79px, rgba(239, 68, 68, 0.18) 81px, transparent 81px),
+    linear-gradient(rgba(11, 29, 56, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 24px;
+  border: 1px solid var(--color-parchemin-400);
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.12), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+}
+
+/* ── Post-its d'étude thématique Nave & Renvois ────────────── */
+.postit-etude-jaune {
+  background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fde68a;
+  box-shadow: 0 4px 10px -2px rgba(217, 119, 6, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.postit-etude-vert {
+  background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #bbf7d0;
+  box-shadow: 0 4px 10px -2px rgba(22, 163, 74, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.postit-etude-rose {
+  background: linear-gradient(145deg, #fff1f2 0%, #ffe4e6 100%);
+  border: 1px solid #fecdd3;
+  box-shadow: 0 4px 10px -2px rgba(225, 29, 72, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.postit-etude-bleu {
+  background: linear-gradient(145deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  box-shadow: 0 4px 10px -2px rgba(2, 132, 199, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Reliure commentaire historique ────────────────────────── */
+.reliure-commentaire {
+  background: #fcfaf5;
+  border-left: 4px double var(--color-or-500);
+  box-shadow: inset 10px 0 15px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* ── 8 Objets Réels de l'Établi du Disciple ────────────────── */
+.objet-table {
+  transition: transform 0.25s var(--ease-doux), box-shadow 0.25s var(--ease-doux);
+  will-change: transform;
+}
+.objet-table:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 14px 28px -6px rgba(11, 29, 56, 0.18), 0 8px 12px -4px rgba(11, 29, 56, 0.08);
+  z-index: 10;
+}
+
+/* 1. Carnet Moleskine Cuir */
+.objet-carnet-cuir {
+  background: linear-gradient(135deg, #3d1c24 0%, #260f15 100%);
+  border: 1px solid #6b3542;
+  box-shadow: 3px 6px 16px -2px rgba(0, 0, 0, 0.35), inset -4px 0 8px -2px rgba(0,0,0,0.5);
+}
+
+/* 2. Photo Polaroid avec Trombone */
+.objet-polaroid {
+  background: #fcfbf9;
+  border: 1px solid #e5dcce;
+  box-shadow: 2px 6px 14px -3px rgba(0, 0, 0, 0.15);
+}
+
+/* 3. Paquet de fiches bristol sur anneau */
+.objet-paquet-bristol {
+  background: #ffffff;
+  background-image: repeating-linear-gradient(transparent, transparent 18px, rgba(11, 29, 56, 0.05) 19px);
+  border: 1px solid #d4c8b8;
+  box-shadow: 3px 6px 12px -3px rgba(0, 0, 0, 0.12), -2px 3px 0 -1px #ece4d8, -4px 5px 0 -2px #ded3c4;
+}
+
+/* 4. Cassette Audio Rétro */
+.objet-cassette {
+  background: linear-gradient(145deg, #2a2a2a 0%, #171717 100%);
+  border: 1px solid #444444;
+  box-shadow: 3px 6px 16px -3px rgba(0, 0, 0, 0.4);
+}
+
+/* 5. Sablier en Laiton */
+.objet-sablier {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fde047;
+  box-shadow: 2px 6px 14px -2px rgba(202, 138, 4, 0.2);
+}
+
+/* 6. Livret PDF sous presse */
+.objet-livret-pdf {
+  background: #fefdfa;
+  border: 1px solid #d9cdbd;
+  box-shadow: 3px 6px 12px -3px rgba(0, 0, 0, 0.12), 2px 2px 0 0 #f0e6d6;
+}
+
+/* 7. Boussole de Pèlerin */
+.objet-boussole {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #475569;
+  box-shadow: 3px 6px 16px -3px rgba(15, 23, 42, 0.4);
+}
+
+/* 8. Parchemin & Sceau de Cire */
+.objet-parchemin-sceau {
+  background: linear-gradient(135deg, #faf6ee 0%, #f4ede0 100%);
+  border: 1px solid #ded3c0;
+  box-shadow: 3px 6px 14px -3px rgba(0, 0, 0, 0.16);
+}
+
+/* ── Sanctuaire & Architecture du Temple des Fondements ─────── */
+.temple-cadre {
+  background: linear-gradient(180deg, #fdfbf7 0%, #f7f0e3 100%);
+  border: 2px solid #dfd3c1;
+  box-shadow: 0 20px 40px -15px rgba(11, 29, 56, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.fronton-temple {
+  background: linear-gradient(180deg, #fdf8eb 0%, #f6ecd5 100%);
+  border: 2px solid #e0cfb3;
+  box-shadow: 0 4px 12px -2px rgba(209, 132, 16, 0.15), inset 0 -2px 0 #caa974;
+}
+
+.pierre-appareillee {
+  position: relative;
+  background: #fbf9f4;
+  border: 1px solid #dcd1c1;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.9), 0 2px 4px -1px rgba(11, 29, 56, 0.06);
+  transition: all 0.25s var(--ease-doux);
+}
+
+.pierre-appareillee:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.9), 0 8px 16px -3px rgba(11, 29, 56, 0.15);
+  z-index: 5;
+}
+
+/* Pierre Scellée (Validée / Clôturée) */
+.pierre-scellee {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%);
+  border: 1.5px solid #f59e0b;
+  box-shadow: 0 4px 10px -2px rgba(245, 158, 11, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Pierre En Cours (Chantier Actuel) */
+.pierre-en-cours {
+  background: #ffffff;
+  border: 2px solid #6366f1;
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.35), inset 0 0 8px rgba(99, 102, 241, 0.15);
+}
+
+/* Colonnes Latérales Cannelées */
+.pilastre-temple {
+  background: repeating-linear-gradient(90deg, #eee4d3, #eee4d3 4px, #fdfaf4 4px, #fdfaf4 8px);
+  border-left: 2px solid #dfd1bd;
+  border-right: 2px solid #dfd1bd;
+}
+
+/* Socle en Roc / Granit */
+.socle-pierre-angulaire {
+  background: linear-gradient(180deg, #112340 0%, #07162b 100%);
+  border: 2px solid #d18410;
+  box-shadow: 0 8px 24px -4px rgba(7, 22, 43, 0.45), inset 0 1px 1px rgba(246, 196, 83, 0.4);
+}
+
+/* ── Tableau de Liège des Témoignages & Lampe d'Atelier ─────── */
+.tableau-liege {
+  background-color: #b78356;
+  background-image:
+    radial-gradient(#8d5930 1.2px, transparent 1.2px),
+    radial-gradient(#6d421e 0.8px, #b78356 0.8px);
+  background-size: 14px 14px, 28px 28px;
+  background-position: 0 0, 7px 7px;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.4), 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.faisceau-lampe {
+  background: radial-gradient(circle at 85% 15%, rgba(255, 236, 179, 0.55) 0%, rgba(255, 218, 128, 0.25) 35%, rgba(183, 131, 86, 0) 70%);
+}
+
+.punaise-bois {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d4a373 0%, #8c5a2b 100%);
+  border: 1px solid #5c3817;
+  box-shadow: 2px 4px 6px -1px rgba(0, 0, 0, 0.45);
+}
+
+.punaise-metal {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f1f5f9 0%, #94a3b8 100%);
+  border: 1px solid #64748b;
+  box-shadow: 2px 4px 6px -1px rgba(0, 0, 0, 0.4);
+}
+
+.bandeau-kraft {
+  background: #f0e6d6;
+  border: 1px dashed #c4b5a0;
+  box-shadow: 2px 4px 10px -2px rgba(0, 0, 0, 0.2);
+}
+
+
+
+

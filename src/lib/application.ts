@@ -93,6 +93,11 @@ export function demarrerApplication(): void {
   if (demarre || typeof window === 'undefined') return;
   demarre = true;
 
+  // L'invite a peut-être déjà été émise et retenue par le script du
+  // document : ce module démarre au premier abonnement, souvent trop tard.
+  const dejaCaptee = (window as unknown as { __lfInvite?: EvenementInstallation }).__lfInvite;
+  if (dejaCaptee) invite = dejaCaptee;
+
   window.addEventListener('beforeinstallprompt', (evenement) => {
     // Sans `preventDefault`, Chrome affiche sa propre barre : on préfère
     // proposer l'installation au moment choisi, depuis le centre.

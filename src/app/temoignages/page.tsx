@@ -12,88 +12,69 @@ import {
   Pause,
   Sparkles,
   Check,
+  MessageSquare,
+  Trash2,
+  RotateCcw,
 } from 'lucide-react';
+import {
+  abonnerTemoignages,
+  publierTemoignage as publierDistant,
+  supprimerTemoignage as supprimerDistant,
+  voterAmen as voterAmenDistant,
+  reinitialiserTableauLocal,
+  TEMOIGNAGES_INITIAUX,
+  type TemoignageItem,
+} from '@/lib/temoignagesStore';
 import { useAuth } from '@/lib/AuthContext';
 import { FICHES_META } from '@/data/fichesMeta';
 import { lireAVoixHaute, lectureDisponible } from '@/lib/ambiance';
 
-export interface TemoignageItem {
-  id: string;
-  auteur: string;
-  avatar?: string;
-  ficheId?: number;
-  texte: string;
-  audioUrl?: string;
-  amens: number;
-  aVote?: boolean;
-  date: number;
-}
-
-const TEMOIGNAGES_COMMUNAUTE_INITIAUX: TemoignageItem[] = [
-  {
-    id: 'tem_1',
-    auteur: 'Samuel M.',
-    ficheId: 1,
-    texte: 'La révélation que Dieu est un Père qui règne avec amour inconditionnel a guéri mon anxiété. Je ne cherche plus à performer, mais à demeurer dans sa présence chaque matin.',
-    amens: 24,
-    date: Date.now() - 1000 * 60 * 60 * 24 * 3,
-  },
-  {
-    id: 'tem_2',
-    auteur: 'Esther K.',
-    ficheId: 4,
-    texte: 'Pendant des années, je vivais dans le légalisme et la culpabilité. Comprendre l’échange divin de la croix à la fiche 5 a complètement transformé ma joie et mon identité en Christ.',
-    amens: 38,
-    date: Date.now() - 1000 * 60 * 60 * 24 * 7,
-  },
-  {
-    id: 'tem_3',
-    auteur: 'Marc & Chantal',
-    ficheId: 15,
-    texte: 'Vivre ces fiches avec notre cellule de maison nous a soudés d’une manière que nous n’avions jamais expérimentée. Nous portons les fardeaux les uns des autres dans la prière.',
-    amens: 42,
-    date: Date.now() - 1000 * 60 * 60 * 24 * 12,
-  },
-];
-
-const CLE_STOCKAGE_TEMOIGNAGES = 'lf.temoignagesCommunautes';
-
 export default function TemoignagesPage() {
   const { user } = useAuth();
-  const [temoignages, setTemoignages] = useState<TemoignageItem[]>(() => {
-    if (typeof window === 'undefined') return TEMOIGNAGES_COMMUNAUTE_INITIAUX;
-    try {
-      const brut = localStorage.getItem(CLE_STOCKAGE_TEMOIGNAGES);
-      return brut ? JSON.parse(brut) : TEMOIGNAGES_COMMUNAUTE_INITIAUX;
-    } catch {
-      return TEMOIGNAGES_COMMUNAUTE_INITIAUX;
-    }
-  });
-
+  const [temoignages, setTemoignages] = useState<TemoignageItem[]>(TEMOIGNAGES_INITIAUX);
+  const [temoignageActif, setTemoignageActif] = useState<TemoignageItem>(TEMOIGNAGES_INITIAUX[0]);
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
   const [ficheSelectionnee, setFicheSelectionnee] = useState<number>(1);
   const [texteTemoignage, setTexteTemoignage] = useState('');
+  const [couleurChoisie, setCouleurChoisie] = useState<'rose' | 'jaune' | 'vert' | 'blanc' | 'orange'>('rose');
   const [enEnregistrement, setEnEnregistrement] = useState(false);
   const [audioBlobUrl, setAudioBlobUrl] = useState<string | null>(null);
   const [audioEnLecture, setAudioEnLecture] = useState<string | null>(null);
+  const [enPublication, setEnPublication] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
+  // ── Synchronisation Temps Réel (Cloud Firestore + Cache Local) ──
   useEffect(() => {
-    try {
-      localStorage.setItem(CLE_STOCKAGE_TEMOIGNAGES, JSON.stringify(temoignages));
-    } catch {
-      /* ignorer */
-    }
-  }, [temoignages]);
+    const desabonner = abonnerTemoignages(user?.uid, (nouvelleListe) => {
+      setTemoignages(nouvelleListe);
+      setTemoignageActif((actuel) => {
+        const toujoursExistant = nouvelleListe.find((t) => t.id === actuel?.id);
+        return toujoursExistant || nouvelleListe[0] || TEMOIGNAGES_INITIAUX[0];
+      });
+    });
 
-  // ── Enregistrement vocal ──
+    return () => desabonner();
+  }, [user?.uid]);
+
+  // ── Enregistrement vocal universel (WebM / MP4 / AAC) ──
   const demarrerEnregistrement = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      let mimeType = 'audio/webm';
+      if (typeof MediaRecorder !== 'undefined' && typeof MediaRecorder.isTypeSupported === 'function') {
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+          mimeType = 'audio/webm;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+          mimeType = 'audio/mp4';
+        } else if (MediaRecorder.isTypeSupported('audio/aac')) {
+          mimeType = 'audio/aac';
+        }
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -102,7 +83,7 @@ export default function TemoignagesPage() {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType || 'audio/webm' });
         const reader = new FileReader();
         reader.readAsDataURL(audioBlob);
         reader.onloadend = () => {
@@ -114,7 +95,7 @@ export default function TemoignagesPage() {
       mediaRecorder.start();
       setEnEnregistrement(true);
     } catch {
-      alert('Impossible d’accéder au microphone. Veuillez autoriser l’accès.');
+      alert('Impossible d’accéder au microphone. Veuillez autoriser l’accès dans votre navigateur.');
     }
   };
 
@@ -125,41 +106,68 @@ export default function TemoignagesPage() {
     }
   };
 
-  const publier = (e: React.FormEvent) => {
+  const publier = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!texteTemoignage.trim() && !audioBlobUrl) return;
 
+    setEnPublication(true);
+
     const nouveau: TemoignageItem = {
-      id: 'tem_' + Date.now(),
-      auteur: user?.displayName || 'Disciple',
+      id: 'tem_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      auteur: user?.displayName || 'Compagnon de route',
+      auteurId: user?.uid,
       ficheId: ficheSelectionnee,
       texte: texteTemoignage.trim() || 'Témoignage audio partagé avec la communauté.',
       audioUrl: audioBlobUrl || undefined,
       amens: 1,
+      amensVotants: user?.uid ? [user.uid] : [],
       aVote: true,
       date: Date.now(),
+      couleur: couleurChoisie,
+      attache: 'punaise-bois',
+      rotation: '-rotate-2',
     };
 
-    setTemoignages([nouveau, ...temoignages]);
+    // 1. Optimistic local update
+    setTemoignages((prev) => [nouveau, ...prev]);
+    setTemoignageActif(nouveau);
     setTexteTemoignage('');
     setAudioBlobUrl(null);
     setFormulaireOuvert(false);
+
+    // 2. Cloud broadcast to all devices
+    await publierDistant(nouveau);
+    setEnPublication(false);
   };
 
-  const voterAmen = (id: string) => {
+  const supprimerTemoignage = async (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (window.confirm('Voulez-vous décrocher et supprimer ce témoignage du tableau de liège communautaire ?')) {
+      const nouvelleListe = temoignages.filter((t) => t.id !== id);
+      setTemoignages(nouvelleListe);
+      if (temoignageActif.id === id) {
+        setTemoignageActif(nouvelleListe[0] || TEMOIGNAGES_INITIAUX[0]);
+      }
+      await supprimerDistant(id);
+    }
+  };
+
+  const reinitialiserTableau = () => {
+    if (window.confirm('Voulez-vous restaurer les témoignages initiaux sur votre écran ?')) {
+      const init = reinitialiserTableauLocal();
+      setTemoignages(init);
+      setTemoignageActif(init[0]);
+    }
+  };
+
+  const voterAmen = async (id: string) => {
+    const res = await voterAmenDistant(id, user?.uid);
     setTemoignages((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          const aVote = !t.aVote;
-          return {
-            ...t,
-            amens: aVote ? t.amens + 1 : Math.max(0, t.amens - 1),
-            aVote,
-          };
-        }
-        return t;
-      })
+      prev.map((t) => (t.id === id ? { ...t, amens: res.amens, aVote: res.aVote } : t))
     );
+    if (temoignageActif.id === id) {
+      setTemoignageActif((prev) => ({ ...prev, amens: res.amens, aVote: res.aVote }));
+    }
   };
 
   const basculerAudio = (t: TemoignageItem) => {
@@ -181,59 +189,138 @@ export default function TemoignagesPage() {
     }
   };
 
+  const obtenirClassesCouleur = (couleur?: string) => {
+    switch (couleur) {
+      case 'rose':
+        return 'bg-[#ffd7e2] text-rose-950 border border-rose-300 shadow-md';
+      case 'jaune':
+        return 'bg-[#fef08a] text-amber-950 border border-amber-300 shadow-md';
+      case 'vert':
+        return 'bg-[#dcfce7] text-emerald-950 border border-emerald-300 shadow-md';
+      case 'orange':
+        return 'bg-[#fed7aa] text-orange-950 border border-orange-300 shadow-md';
+      case 'blanc':
+      default:
+        return 'bg-[#fefbf6] text-encre-950 border border-parchemin-300 shadow-md';
+    }
+  };
+
+  const metaFiche = FICHES_META.find((f) => f.id === temoignageActif.ficheId);
+
   return (
-    <div className="table-travail min-h-screen pb-20 pt-8 px-4 sm:px-6 lg:px-8">
+    <div className="tableau-liege relative min-h-screen overflow-hidden p-4 sm:p-8 lg:p-12 text-encre-950">
       <audio
         ref={audioPlayerRef}
         onEnded={() => setAudioEnLecture(null)}
         onError={() => setAudioEnLecture(null)}
       />
 
-      <div className="mx-auto max-w-4xl space-y-8">
+      {/* ══ Faisceau de Lumière de la Lampe d'Atelier (Haut Droit) ══ */}
+      <div className="faisceau-lampe pointer-events-none absolute inset-0 z-0" />
+
+      {/* Abat-jour / Lampe d'architecte vintage */}
+      <div className="pointer-events-none absolute right-[-20px] top-[-30px] z-10 hidden md:block opacity-95">
+        <svg width="220" height="220" viewBox="0 0 200 200" fill="none">
+          {/* Bras articulé métallique */}
+          <path d="M190 10 L140 40 L160 80" stroke="#222" strokeWidth="12" strokeLinecap="round" />
+          <circle cx="140" cy="40" r="8" fill="#444" />
+          {/* Abat-jour noir biseauté */}
+          <path d="M110 50 L180 100 L140 160 L70 110 Z" fill="#18181b" stroke="#27272a" strokeWidth="4" />
+          <ellipse cx="105" cy="135" rx="35" ry="20" fill="#fef08a" opacity="0.85" filter="blur(8px)" />
+        </svg>
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl">
         
-        {/* En-tête */}
-        <div className="feuille relative rounded-4xl p-8 sm:p-12 text-center shadow-md border border-parchemin-400">
-          <span className="punaise -top-2.5 left-12" />
-          <span className="ruban -top-3 right-14 rotate-2 rounded-[2px]" />
+        {/* ══ En-tête : Carte de Titre épinglée (Haut Gauche) & Bouton d'Ajout ══ */}
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          
+          {/* Carte Titre : "Le fruit visible de l'atelier" */}
+          <div className="feuille relative rounded-2xl border border-parchemin-400 bg-[#fbf7ee] p-5 sm:p-6 shadow-xl -rotate-1 max-w-sm">
+            <span className="punaise-metal absolute -top-2 left-6" />
+            <span className="text-3xs font-bold uppercase tracking-[0.22em] text-or-800 font-serif block mb-1">
+              Table de transformation
+            </span>
+            <h1 className="manuscrit text-2xl sm:text-3xl font-bold text-encre-950 leading-tight">
+              Le fruit visible de l’atelier
+            </h1>
+            <p className="mt-1 font-serif text-2xs italic text-encre-600">
+              « Ce que Dieu a fait au milieu de nous, partagé par nos compagnons. »
+            </p>
+          </div>
 
-          <span className="text-2xs font-bold uppercase tracking-[0.26em] text-or-700">
-            Mur Vivant de la Communauté
-          </span>
-          <h1 className="manuscrit mt-2 text-4xl sm:text-5xl font-bold text-encre-950">
-            Ce que Dieu a fait
-          </h1>
-          <p className="font-serif text-sm sm:text-base text-encre-600 max-w-xl mx-auto mt-2 italic">
-            « Racontez parmi les nations sa gloire, parmi tous les peuples ses merveilles ! » (Psaume 96:3)
-          </p>
+          {/* Boutons d'action en-tête */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={reinitialiserTableau}
+              title="Réinitialiser les témoignages du tableau"
+              className="inline-flex items-center gap-1.5 rounded-full bg-parchemin-100/90 px-3.5 py-3 text-2xs font-bold text-encre-700 hover:bg-white hover:text-encre-950 shadow-md border border-parchemin-300 transition-all"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Réinitialiser</span>
+            </button>
 
-          <div className="mt-6 flex justify-center">
+            {/* Bouton pour Épingler son témoignage */}
             <button
               onClick={() => setFormulaireOuvert((v) => !v)}
-              className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-6 py-3 text-xs font-bold text-parchemin-100 shadow-md transition-all hover:bg-encre-900 hover:scale-105"
+              className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-6 py-3.5 text-xs font-bold text-parchemin-100 shadow-2xl transition-all hover:bg-encre-900 hover:scale-105 active:scale-95 border border-or-400/40 shrink-0"
             >
-              <Plus className="h-4 w-4 text-or-300" strokeWidth={2.5} />
-              {formulaireOuvert ? 'Fermer le formulaire' : 'Déposer un témoignage (Texte ou Voix)'}
+              <Plus className="h-4 w-4 text-or-400" strokeWidth={2.5} />
+              {formulaireOuvert ? 'Fermer le bloc-notes' : 'Épingler mon témoignage (Voix ou Texte)'}
             </button>
           </div>
         </div>
 
-        {/* Formulaire de dépôt */}
+        {/* ══ Formulaire de dépôt en Post-it ══ */}
         {formulaireOuvert && (
           <form
             onSubmit={publier}
-            className="feuille relative rounded-3xl border border-or-400/80 p-6 sm:p-8 shadow-xl animate-fadeIn bg-white/95"
+            className="feuille relative mx-auto mb-10 max-w-2xl rounded-3xl border-2 border-or-400/80 bg-[#fffdfa] p-6 sm:p-8 shadow-2xl animate-fadeIn"
           >
-            <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
+            <span className="punaise-bois absolute -top-2.5 left-12" />
+            <span className="scotch-kraft absolute -top-3 right-10 h-6 w-16 rotate-2" />
 
             <div className="flex items-center justify-between border-b border-parchemin-300 pb-3 mb-4">
-              <h3 className="manuscrit text-2xl font-bold text-encre-950">Votre témoignage</h3>
+              <div>
+                <span className="text-3xs font-bold uppercase tracking-wider text-or-700">
+                  Nouvelle Note sur le Liège
+                </span>
+                <h3 className="manuscrit text-2xl font-bold text-encre-950">
+                  Déposer une pépite ou un témoignage
+                </h3>
+              </div>
               <button
                 type="button"
                 onClick={() => setFormulaireOuvert(false)}
-                className="text-encre-400 hover:text-encre-800"
+                className="rounded-full p-1.5 text-encre-400 hover:bg-parchemin-200 hover:text-encre-800"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </button>
+            </div>
+
+            {/* Choix de la couleur du Post-it */}
+            <div className="mb-4 flex items-center gap-3">
+              <span className="text-2xs font-bold text-encre-700">Couleur du papillon :</span>
+              <div className="flex items-center gap-2">
+                {(['rose', 'jaune', 'vert', 'orange', 'blanc'] as const).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCouleurChoisie(c)}
+                    className={`h-6 w-6 rounded-full border-2 transition-transform ${
+                      c === 'rose'
+                        ? 'bg-[#ffd7e2]'
+                        : c === 'jaune'
+                        ? 'bg-[#fef08a]'
+                        : c === 'vert'
+                        ? 'bg-[#dcfce7]'
+                        : c === 'orange'
+                        ? 'bg-[#fed7aa]'
+                        : 'bg-white'
+                    } ${couleurChoisie === c ? 'scale-125 border-encre-950 shadow-xs' : 'border-transparent'}`}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Sélecteur de fiche associée */}
@@ -257,30 +344,30 @@ export default function TemoignagesPage() {
             {/* Zone de texte */}
             <div className="mb-4">
               <label className="block text-2xs font-bold uppercase tracking-wider text-encre-600 mb-1.5">
-                Récit écrit
+                Votre phrase / Récit de transformation
               </label>
               <textarea
                 value={texteTemoignage}
                 onChange={(e) => setTexteTemoignage(e.target.value)}
-                placeholder="Racontez comment Dieu vous a touché, délivré ou enseigné..."
+                placeholder="« La révélation que Dieu m'aime m'a guéri... »"
                 rows={4}
-                className="manuscrit w-full rounded-2xl border border-parchemin-300 bg-parchemin-50/50 p-4 text-xl text-encre-950 placeholder-encre-400 focus:bg-white focus:outline-none"
+                className="manuscrit w-full rounded-2xl border border-parchemin-300 bg-parchemin-50/70 p-4 text-xl text-encre-950 placeholder-encre-400 focus:bg-white focus:outline-none"
               />
             </div>
 
             {/* Enregistreur Audio */}
-            <div className="mb-6 rounded-2xl border border-or-200 bg-or-50/60 p-4">
+            <div className="mb-6 rounded-2xl border border-or-300 bg-or-50/60 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Mic className="h-4 w-4 text-or-700" />
-                  <span className="text-xs font-bold text-or-950">Témoignage vocal (Optionnel)</span>
+                  <span className="text-xs font-bold text-or-950">Mémo vocal (Optionnel)</span>
                 </div>
 
                 {!enEnregistrement ? (
                   <button
                     type="button"
                     onClick={demarrerEnregistrement}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-or-600 px-3.5 py-1.5 text-2xs font-bold text-white hover:bg-or-700"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-or-600 px-3.5 py-1.5 text-2xs font-bold text-white hover:bg-or-700 shadow-xs"
                   >
                     <Mic className="h-3 w-3" /> Enregistrer ma voix
                   </button>
@@ -288,114 +375,222 @@ export default function TemoignagesPage() {
                   <button
                     type="button"
                     onClick={arreterEnregistrement}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-3.5 py-1.5 text-2xs font-bold text-white animate-pulse"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-3.5 py-1.5 text-2xs font-bold text-white animate-pulse shadow-xs"
                   >
-                    <MicOff className="h-3 w-3" /> Arrêter l’enregistrement
+                    <MicOff className="h-3 w-3" /> Terminer l’enregistrement
                   </button>
                 )}
               </div>
 
               {audioBlobUrl && (
-                <div className="mt-3 flex items-center gap-2 text-2xs font-semibold text-emerald-800">
-                  <Check className="h-3.5 w-3.5 text-emerald-600" /> Enregistrement audio prêt !
+                <div className="mt-3 flex items-center justify-between gap-2 text-2xs font-semibold text-emerald-800 bg-emerald-50/80 p-2 rounded-xl border border-emerald-200">
+                  <span className="flex items-center gap-1.5">
+                    <Check className="h-3.5 w-3.5 text-emerald-600" /> Audio prêt à être épinglé !
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setAudioBlobUrl(null)}
+                    className="text-rose-700 hover:text-rose-900 inline-flex items-center gap-1 hover:underline text-2xs font-bold"
+                  >
+                    <Trash2 className="h-3 w-3" /> Effacer l&apos;audio
+                  </button>
                 </div>
               )}
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 border-t border-parchemin-300 pt-4">
               <button
                 type="button"
                 onClick={() => setFormulaireOuvert(false)}
-                className="rounded-full px-4 py-2 text-xs font-bold text-encre-600 hover:bg-parchemin-200"
+                className="rounded-full px-5 py-2.5 text-xs font-bold text-encre-600 hover:bg-parchemin-200"
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                disabled={!texteTemoignage.trim() && !audioBlobUrl}
+                disabled={enPublication || (!texteTemoignage.trim() && !audioBlobUrl)}
                 className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-6 py-2.5 text-xs font-bold text-parchemin-100 shadow-md hover:bg-encre-900 disabled:opacity-50"
               >
                 <Sparkles className="h-3.5 w-3.5 text-or-300" />
-                Publier le témoignage
+                {enPublication ? 'Diffusion en cours...' : 'Épingler sur le Liège'}
               </button>
             </div>
           </form>
         )}
 
-        {/* Mur des Témoignages */}
-        <div className="grid gap-6 sm:grid-cols-2">
-          {temoignages.map((t) => {
-            const meta = FICHES_META.find((f) => f.id === t.ficheId);
-            const estEnLecture = audioEnLecture === t.id;
+        {/* ══ Le Pêle-Mêle Central : Post-it Vedette & Constellation de Papillons ══ */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* 🌟 LE GRAND POST-IT VEDETTE AU PREMIER PLAN (Gauche / Centre) */}
+          <div className="lg:col-span-6 relative">
+            <div
+              className={`relative rounded-3xl p-7 sm:p-9 shadow-2xl transition-all duration-300 ${temoignageActif.rotation || '-rotate-2'} ${obtenirClassesCouleur(
+                temoignageActif.couleur
+              )}`}
+            >
+              {/* Punaise en bois réaliste */}
+              <span className="punaise-bois absolute -top-3 left-10" />
 
-            return (
-              <div
-                key={t.id}
-                className="feuille relative flex flex-col justify-between overflow-hidden rounded-3xl border border-parchemin-300 p-6 shadow-md transition-all duration-300 hover:shadow-lg"
-              >
-                <span className="punaise -top-2 left-6" />
-
+              <div className="flex items-center justify-between border-b border-black/10 pb-3 mb-4">
                 <div>
-                  {/* En-tête auteur & fiche */}
-                  <div className="flex items-center justify-between border-b border-parchemin-200 pb-3 mb-3">
-                    <div>
-                      <h4 className="manuscrit text-xl font-bold text-encre-950">{t.auteur}</h4>
-                      {meta && (
-                        <span className="text-3xs font-bold uppercase tracking-wider text-or-700">
-                          Fiche {meta.id} · {meta.titre}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-3xs text-encre-400 font-sans">
-                      {new Date(t.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                    </span>
-                  </div>
-
-                  {/* Récit */}
-                  <p className="font-serif text-sm leading-relaxed text-encre-900 italic">
-                    « {t.texte} »
-                  </p>
+                  <span className="text-3xs font-bold uppercase tracking-wider text-encre-600 block">
+                    Témoignage mis en lumière
+                  </span>
+                  <h3 className="manuscrit text-2xl font-bold text-encre-950">
+                    {temoignageActif.auteur}
+                  </h3>
                 </div>
-
-                {/* Barre d'action basse (Écoute & Amen) */}
-                <div className="mt-6 flex items-center justify-between border-t border-parchemin-200 pt-3">
-                  {/* Bouton d'écoute audio */}
+                <div className="flex items-center gap-2">
+                  {metaFiche && (
+                    <span className="rounded-full bg-black/10 px-3 py-1 text-3xs font-bold uppercase tracking-wider text-encre-800">
+                      Fiche {metaFiche.id}
+                    </span>
+                  )}
+                  {/* Bouton Décrocher / Supprimer ce post-it vedette */}
                   <button
                     type="button"
-                    onClick={() => basculerAudio(t)}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-2xs font-bold transition-colors ${
-                      estEnLecture
-                        ? 'bg-indigo-600 text-white shadow-xs'
-                        : 'bg-parchemin-100 text-encre-700 hover:bg-indigo-100 hover:text-indigo-900'
-                    }`}
+                    onClick={(e) => supprimerTemoignage(temoignageActif.id, e)}
+                    title="Décrocher et effacer ce témoignage du tableau"
+                    className="p-1.5 rounded-full text-encre-500 hover:text-rose-700 hover:bg-rose-100/60 transition-colors"
                   >
-                    {t.audioUrl ? (
-                      estEnLecture ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />
-                    ) : (
-                      <Volume2 className="h-3 w-3" />
-                    )}
-                    {estEnLecture ? 'Pause' : t.audioUrl ? 'Écouter la voix' : 'Écouter'}
-                  </button>
-
-                  {/* Bouton Amen */}
-                  <button
-                    type="button"
-                    onClick={() => voterAmen(t.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-2xs font-bold transition-all ${
-                      t.aVote
-                        ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                        : 'bg-white text-encre-600 border border-parchemin-300 hover:bg-rose-50'
-                    }`}
-                  >
-                    <Heart className={`h-3.5 w-3.5 ${t.aVote ? 'fill-current text-rose-600' : ''}`} />
-                    <span>{t.amens} Amen</span>
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Texte Mis en Avant */}
+              <p className="manuscrit text-2xl sm:text-3xl leading-snug text-encre-950 font-bold my-4">
+                « {temoignageActif.texte} »
+              </p>
+
+              {/* Barre d'action basse : Écouter, Voter Amen & Supprimer */}
+              <div className="mt-6 flex items-center justify-between border-t border-black/10 pt-4">
+                <button
+                  type="button"
+                  onClick={() => basculerAudio(temoignageActif)}
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all shadow-xs ${
+                    audioEnLecture === temoignageActif.id
+                      ? 'bg-indigo-600 text-white animate-pulse'
+                      : 'bg-encre-950 text-white hover:bg-encre-800'
+                  }`}
+                >
+                  {temoignageActif.audioUrl ? (
+                    audioEnLecture === temoignageActif.id ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />
+                  ) : (
+                    <Volume2 className="h-3.5 w-3.5" />
+                  )}
+                  <span>
+                    {audioEnLecture === temoignageActif.id
+                      ? 'Pause audio'
+                      : temoignageActif.audioUrl
+                      ? 'Écouter le mémo vocal'
+                      : 'Écouter la lecture'}
+                  </span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => voterAmen(temoignageActif.id)}
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                      temoignageActif.aVote
+                        ? 'bg-rose-600 text-white shadow-xs'
+                        : 'bg-white/80 text-rose-900 border border-rose-300 hover:bg-white'
+                    }`}
+                  >
+                    <Heart className={`h-4 w-4 ${temoignageActif.aVote ? 'fill-current' : ''}`} />
+                    <span>{temoignageActif.amens} Amen</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 🌟 LA CONSTELLATION DE POST-ITS ÉPINGLÉS (Droite) */}
+          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {temoignages.map((item) => {
+              const estSelectionne = temoignageActif.id === item.id;
+              const meta = FICHES_META.find((f) => f.id === item.ficheId);
+
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setTemoignageActif(item)}
+                  className={`group relative cursor-pointer rounded-2xl p-4 transition-all duration-200 hover:scale-105 hover:z-20 ${item.rotation || 'rotate-1'} ${obtenirClassesCouleur(
+                    item.couleur
+                  )} ${estSelectionne ? 'ring-3 ring-encre-950 scale-102 z-10' : ''}`}
+                >
+                  {/* Attache physique */}
+                  {item.attache === 'punaise-bois' ? (
+                    <span className="punaise-bois absolute -top-2 left-6" />
+                  ) : item.attache === 'trombone' ? (
+                    <span className="trombone absolute -top-3 right-6 rotate-12" />
+                  ) : item.attache === 'scotch' ? (
+                    <span className="scotch-kraft absolute -top-2 left-1/2 -translate-x-1/2 h-4 w-12" />
+                  ) : (
+                    <span className="punaise-metal absolute -top-2 right-6" />
+                  )}
+
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="manuscrit text-sm font-bold text-encre-950 truncate max-w-[120px]">
+                      {item.auteur}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {meta && (
+                        <span className="text-3xs font-semibold text-encre-600">
+                          F.{meta.id}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => supprimerTemoignage(item.id, e)}
+                        title="Décrocher ce témoignage"
+                        className="p-1 rounded-full text-encre-400 hover:text-rose-700 hover:bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="manuscrit text-base font-bold leading-snug line-clamp-3 text-encre-950">
+                    « {item.texte} »
+                  </p>
+
+                  <div className="mt-3 flex items-center justify-between border-t border-black/10 pt-2 text-3xs text-encre-600">
+                    <span className="flex items-center gap-1">
+                      {item.audioUrl && <span>🎙️ Audio</span>}
+                      <span>{item.amens} Amen</span>
+                    </span>
+                    <span className="font-bold text-encre-950 group-hover:underline">
+                      Afficher en grand →
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        {/* ══ Encart Bas Droit : "La technologie s'efface. La transformation demeure." ══ */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-black/15 pt-6">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎙️</span>
+            <span className="text-2xl">💬</span>
+            <span className="text-xs font-serif italic text-encre-800">
+              Récits vocaux & témoignages écrits vérifiés
+            </span>
+          </div>
+
+          {/* Bandeau de papier kraft */}
+          <div className="bandeau-kraft rounded-2xl px-6 py-3 shadow-md rotate-1 text-center">
+            <p className="manuscrit text-lg sm:text-xl font-bold text-encre-950 tracking-wide">
+              « La technologie s’efface. La transformation demeure. »
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
   );
 }
+

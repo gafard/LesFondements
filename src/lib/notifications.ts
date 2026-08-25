@@ -3,18 +3,60 @@
  */
 
 export interface NotificationPreferences {
-  goutteDeRosee: boolean; // Méditation du matin
-  rappelFiche: boolean;    // Reprendre la fiche en cours
-  vieDeGroupe: boolean;    // Rappels de rencontres & partages
+  goutteDeRosee: boolean; // Méditation & Verset du matin
   heureMatin: string;      // ex: "07:30"
+  rappel48h: boolean;      // Rappel 48h avant la rencontre de cellule
+  jourDeRencontre: boolean; // Rappel Jour J de la rencontre
+  vieDeGroupe: boolean;    // Célébration d'étape clôturée & nouvelles pépites
 }
 
 export const PREFERENCES_DEFAUT: NotificationPreferences = {
   goutteDeRosee: true,
-  rappelFiche: true,
-  vieDeGroupe: true,
   heureMatin: '07:30',
+  rappel48h: true,
+  jourDeRencontre: true,
+  vieDeGroupe: true,
 };
+
+export interface DiagnosticPWA {
+  estPWA: boolean;
+  estIOS: boolean;
+  estAndroid: boolean;
+  supportePush: boolean;
+  permission: NotificationPermission | 'unsupported';
+  serviceWorkerPret: boolean;
+}
+
+export function diagnostiquerEnvironnement(): DiagnosticPWA {
+  if (typeof window === 'undefined') {
+    return {
+      estPWA: false,
+      estIOS: false,
+      estAndroid: false,
+      supportePush: false,
+      permission: 'unsupported',
+      serviceWorkerPret: false,
+    };
+  }
+
+  const ua = navigator.userAgent || '';
+  const estIOS = /iPhone|iPad|iPod/i.test(ua);
+  const estAndroid = /Android/i.test(ua);
+  const estPWA =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    Boolean((navigator as unknown as { standalone?: boolean }).standalone);
+  const supportePush = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+  const permission = supportePush ? Notification.permission : 'unsupported';
+
+  return {
+    estPWA,
+    estIOS,
+    estAndroid,
+    supportePush,
+    permission,
+    serviceWorkerPret: 'serviceWorker' in navigator,
+  };
+}
 
 const CLE_STOCKAGE_PREFS = 'lf.notifPreferences';
 const CLE_STOCKAGE_SUB = 'lf.pushSubscription';

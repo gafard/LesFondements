@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Loader2, Lock, Mail, User, UserCheck } from 'lucide-react';
+import { ArrowRight, BookOpen, Loader2, Lock, Mail, User, UserCheck } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 
 function LoginContent() {
@@ -179,21 +179,10 @@ function LoginContent() {
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-6 w-full max-w-md mx-auto">
             <div className="text-center lg:hidden mb-6">
-              <Link href="/" className="inline-flex items-center gap-2.5 mb-2">
-                <Image
-                  src="/logo-transparent.png"
-                  alt="Les Fondements Logo"
-                  width={36}
-                  height={36}
-                  className="h-9 w-auto object-contain"
-                  priority
-                />
-                <span className="font-serif font-bold text-white text-lg">Les Fondements</span>
-              </Link>
-              <h1 className="mt-1 font-serif text-2xl font-bold text-parchemin-100">
+              <h1 className="font-serif text-2xl font-bold text-parchemin-100">
                 {isLogin ? 'Bon retour' : 'Entrer dans le parcours'}
               </h1>
-              <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-parchemin-100/60">
+              <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-parchemin-100/70">
                 {suite.startsWith('/rejoindre')
                   ? 'Créez votre compte pour rejoindre votre groupe.'
                   : 'Vingt fiches, un petit groupe, cinq mois.'}
@@ -328,32 +317,18 @@ function LoginContent() {
             Continuer avec Google
           </button>
 
-          {/*
-            Le mode découverte ne vaut que sans backend : une session locale
-            ne peut pas rejoindre un groupe partagé, ni recevoir d'invitation.
-            Le proposer une fois Firebase branché serait une fausse promesse.
-          */}
-          {!isFirebaseConfigured && (
-            <button
-              type="button"
-              onClick={handleGuest}
-              disabled={loading}
-              className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/8 py-3 text-2xs font-bold text-parchemin-100/75 transition-colors hover:bg-white/14 disabled:opacity-60"
-            >
-              <UserCheck className="h-3.5 w-3.5" />
-              Découvrir sans créer de compte
-            </button>
-          )}
+          {/* Mode Découverte libre : Fiche 1 & Lettre du Père */}
+          <Link
+            href="/fiches/1"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-50 border border-or-400/80 py-3.5 text-xs font-bold text-or-950 transition-all hover:bg-amber-100 shadow-xs hover:scale-101"
+          >
+            <BookOpen className="h-4 w-4 text-or-700" />
+            Explorer en accès libre (Fiche 1 & Lettre du Père)
+          </Link>
         </div>
 
         <p className="mt-5 text-center text-2xs leading-relaxed text-parchemin-100/40">
-          Après la connexion, vous choisirez votre groupe : c&apos;est lui qui ouvre le parcours.
-          {!isFirebaseConfigured && (
-            <>
-              <br />
-              Aucun serveur n&apos;est branché : tout reste dans ce navigateur.
-            </>
-          )}
+          La Fiche 1 est en accès libre. Pour les 19 fiches suivantes, vous rejoindrez votre cellule de partage.
         </p>
       </div>
     </div>

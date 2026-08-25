@@ -20,6 +20,7 @@ import {
   Play,
   RotateCcw,
   StickyNote,
+  Users,
   Video,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
@@ -211,21 +212,33 @@ function RencontreContent() {
           </h1>
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-parchemin-100/70">
             {isLeader
-              ? 'Ouvrez-la quand le groupe est prêt : le déroulé se synchronisera pour tout le monde, sur place comme en visio.'
+              ? actifs.length < 2
+                ? 'Une cellule exige au moins 2 personnes pour ouvrir sa rencontre fraternelle. Partagez votre code d’invitation pour accueillir un frère ou une sœur.'
+                : 'Ouvrez-la quand le groupe est prêt : le déroulé se synchronisera pour tout le monde, sur place comme en visio.'
               : `${group.leaderName} ouvrira la rencontre au moment venu. Vous serez au même endroit du déroulé que les autres.`}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {isLeader && (
-              <button
-                onClick={async () => {
-                  await openMeeting(group.id, user.uid);
-                  await refresh();
-                }}
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold"
-              >
-                <Play className="h-4 w-4" strokeWidth={2.5} />
-                Ouvrir la rencontre
-              </button>
+              actifs.length >= 2 ? (
+                <button
+                  onClick={async () => {
+                    await openMeeting(group.id, user.uid);
+                    await refresh();
+                  }}
+                  className="bouton-or inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold"
+                >
+                  <Play className="h-4 w-4" strokeWidth={2.5} />
+                  Ouvrir la rencontre
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push('/groupes')}
+                  className="bouton-or inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold shadow-lg"
+                >
+                  <Users className="h-4 w-4" />
+                  Inviter un membre ({actifs.length}/2 min)
+                </button>
+              )
             )}
             <button
               onClick={() => router.push('/groupes')}

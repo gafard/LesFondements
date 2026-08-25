@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import {
   Award,
   Bookmark,
+  BookMarked,
   Brain,
   Compass,
   LayoutDashboard,
@@ -34,8 +35,9 @@ const LIENS_PRINCIPAUX = [
 ];
 
 const LIENS_SECONDAIRES = [
-  { href: '/index-thematique', label: 'Index thématique', icon: Bookmark },
+  { href: '/ressources', label: 'Bibliothèque & Contact', icon: BookMarked },
   { href: '/temoignages', label: 'Témoignages', icon: MessageCircle },
+  { href: '/index-thematique', label: 'Index thématique', icon: Bookmark },
   { href: '/certificat', label: 'Mon attestation', icon: Award },
 ];
 

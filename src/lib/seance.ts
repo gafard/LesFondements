@@ -1,7 +1,5 @@
 'use client';
 
-import type { Manifeste, Piste } from './voix';
-
 /**
  * Ce qui doit tenir pendant qu'on écoute : l'écran, et les commandes.
  *
@@ -103,10 +101,4 @@ export function frisson(motif: number | number[] = 12): void {
   } catch {
     /* refusé */
   }
-}
-
-/** Le titre lisible d'une piste, pour l'écran verrouillé. */
-export function titreDePiste(manifeste: Manifeste | null, id?: string): Piste | null {
-  if (!manifeste || !id) return null;
-  return manifeste.pistes[id] ?? null;
 }

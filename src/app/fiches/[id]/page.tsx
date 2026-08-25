@@ -713,6 +713,34 @@ function FicheContent() {
             </span>
           )}
         </div>
+
+        {/* ══ Bandeau d'invitation à la cellule à la fin de la Fiche 1 ══ */}
+        {ficheId === 1 && !group && (
+          <div className="feuille relative mt-10 overflow-hidden rounded-3xl border-2 border-or-400 bg-gradient-to-br from-amber-50/90 via-[#fbf7ee] to-amber-100/60 p-6 sm:p-8 shadow-xl text-encre-950">
+            <span className="ruban -top-3 left-10 -rotate-2 rounded-[2px]" />
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-xl">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-or-200/90 px-3 py-1 text-3xs font-bold uppercase tracking-wider text-or-950 font-serif">
+                  ✨ Premier Fondement Posé
+                </span>
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-encre-950">
+                  Vous avez exploré « Connaître Dieu »
+                </h3>
+                <p className="font-serif text-xs text-encre-700 leading-relaxed">
+                  Pour aller plus loin, vivre les 19 fiches suivantes et partager vos découvertes chaque semaine, rassemblez 4 ou 5 compagnons ou rejoignez une cellule existante.
+                </p>
+              </div>
+              <Link
+                href="/onboarding"
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold text-slate-950 shadow-lg shrink-0 hover:scale-105 transition-all border border-or-400"
+              >
+                <Users className="h-4 w-4 text-or-900" />
+                Trouver ou créer ma cellule
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        )}
           </main>
 
           <AnnotationsFiche document={annotations} onChanger={changerAnnotations} />
@@ -1022,8 +1050,12 @@ function ChargementLecture({ titre }: { titre: string }) {
 }
 
 export default function Page() {
+  const params = useParams();
+  const ficheId = Number.parseInt(String(params?.id), 10);
+  const acces = ficheId === 1 ? 'decouverte' : 'groupe';
+
   return (
-    <ParcoursGate>
+    <ParcoursGate acces={acces}>
       <Suspense fallback={<ChargementImmersion />}>
         <FicheContent />
       </Suspense>

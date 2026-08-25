@@ -226,13 +226,24 @@ function CelluleContent() {
                   Rejoindre la rencontre
                 </Link>
               ) : isLeader ? (
-                <button
-                  onClick={() => void ouvrirRencontre()}
-                  className="bouton-or inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold"
-                >
-                  <PlayCircle className="h-4 w-4" strokeWidth={2} />
-                  Ouvrir la rencontre
-                </button>
+                actifs.length >= 2 ? (
+                  <button
+                    onClick={() => void ouvrirRencontre()}
+                    className="bouton-or inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
+                  >
+                    <PlayCircle className="h-4 w-4" strokeWidth={2} />
+                    Ouvrir la rencontre
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => void copierCode()}
+                    title="Une cellule fraternelle a besoin d'au moins 2 membres pour ouvrir une rencontre"
+                    className="verre inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold text-amber-200 border border-amber-300/30 hover:bg-white/10 transition-colors"
+                  >
+                    <Users className="h-4 w-4 text-or-400" />
+                    {codeCopie ? 'Code d’invitation copié !' : 'Inviter un membre pour ouvrir (1/2)'}
+                  </button>
+                )
               ) : null}
             </div>
           </div>

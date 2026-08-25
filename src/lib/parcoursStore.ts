@@ -1154,8 +1154,19 @@ export function nextMeetingDate(meeting: GroupMeetingPlan, from: number = Date.n
 }
 
 export async function openMeeting(groupId: string, uid: string): Promise<GroupSession | null> {
-  const [group, session] = await Promise.all([getGroup(groupId), getCurrentSession(groupId)]);
+  const [group, session, members] = await Promise.all([
+    getGroup(groupId),
+    getCurrentSession(groupId),
+    getMembers(groupId),
+  ]);
   if (!group || !session) return null;
+
+  // Règle du Discipulat : Une cellule exige au moins 2 personnes pour tenir une rencontre
+  const actifs = members.filter((m) => m.status === 'actif');
+  if (!group.demo && actifs.length < 2) {
+    throw new Error('Une rencontre fraternelle exige au moins deux disciples réunis.');
+  }
+
   const updated: GroupSession = {
     ...session,
     status: 'ouverte',
@@ -1207,8 +1218,17 @@ export async function closeMeeting(
     recap?: GroupSession['recap'];
   } = {}
 ): Promise<ParcoursGroup | null> {
-  const [group, session] = await Promise.all([getGroup(groupId), getCurrentSession(groupId)]);
+  const [group, session, members] = await Promise.all([
+    getGroup(groupId),
+    getCurrentSession(groupId),
+    getMembers(groupId),
+  ]);
   if (!group || !session) return null;
+
+  const actifs = members.filter((m) => m.status === 'actif');
+  if (!group.demo && actifs.length < 2) {
+    throw new Error('Une rencontre ne peut être clôturée qu’avec au moins deux participants.');
+  }
 
   await writeSession({
     ...session,

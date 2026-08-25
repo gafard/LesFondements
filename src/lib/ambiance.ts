@@ -15,13 +15,48 @@ import { chargerManifesteVoix } from './voix';
  *  · silence — rien du tout, c'est aussi une option.
  */
 
-export type Ambiance = 'silence' | 'souffle' | 'pluie';
+export type Ambiance =
+  | 'silence'
+  | 'souffle'
+  | 'pluie'
+  | 'emotional-piano'
+  | 'a-beautiful-story'
+  | 'fly-like-a-bird';
 
-export const AMBIANCES: { valeur: Ambiance; label: string; description: string }[] = [
-  { valeur: 'silence', label: 'Silence', description: 'Rien que votre lecture' },
-  { valeur: 'souffle', label: 'Souffle', description: 'Un fond chaud et lent' },
-  { valeur: 'pluie', label: 'Pluie', description: 'Pour couvrir le bruit autour' },
+export const AMBIANCES: {
+  valeur: Ambiance;
+  label: string;
+  description: string;
+  type: 'silence' | 'synthese' | 'musique';
+}[] = [
+  { valeur: 'silence', label: 'Silence', description: 'Rien que votre lecture', type: 'silence' },
+  { valeur: 'souffle', label: 'Souffle', description: 'Un fond chaud et respirant', type: 'synthese' },
+  { valeur: 'pluie', label: 'Pluie', description: 'Pour couvrir le bruit autour', type: 'synthese' },
+  {
+    valeur: 'emotional-piano',
+    label: 'Piano Émotionnel',
+    description: 'Contemplatif, doux et profond',
+    type: 'musique',
+  },
+  {
+    valeur: 'a-beautiful-story',
+    label: 'A Beautiful Story',
+    description: 'Harmonie orchestrale paisible et inspirante',
+    type: 'musique',
+  },
+  {
+    valeur: 'fly-like-a-bird',
+    label: 'Fly Like A Bird',
+    description: 'Mélodie aérienne, lumineuse et chaleureuse',
+    type: 'musique',
+  },
 ];
+
+const FICHIERS_MUSIQUE: Record<string, string> = {
+  'emotional-piano': '/audio/ambiances/emotional-piano.mp3',
+  'a-beautiful-story': '/audio/ambiances/a-beautiful-story.mp3',
+  'fly-like-a-bird': '/audio/ambiances/fly-like-a-bird.mp3',
+};
 
 type Contexte = {
   ctx: AudioContext;
@@ -31,6 +66,7 @@ type Contexte = {
 };
 
 let actif: Contexte | null = null;
+let audioMusiqueActif: HTMLAudioElement | null = null;
 let ambianceActuelle: Ambiance = 'silence';
 
 /** Un tampon de bruit rose : plus doux à l'oreille qu'un bruit blanc. */
@@ -148,7 +184,7 @@ function construirePluie(ctx: AudioContext, master: GainNode): Contexte {
 /** Démarre (ou remplace) l'ambiance. Un fondu évite toute cassure. */
 export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<void> {
   if (typeof window === 'undefined') return;
-  if (ambiance === ambianceActuelle && actif) {
+  if (ambiance === ambianceActuelle && (actif || audioMusiqueActif)) {
     reglerVolume(volume);
     return;
   }
@@ -157,6 +193,21 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
   ambianceActuelle = ambiance;
   if (ambiance === 'silence') return;
 
+  // 1. Ambiance musicale par fichier MP3
+  if (FICHIERS_MUSIQUE[ambiance]) {
+    try {
+      const audio = new Audio(FICHIERS_MUSIQUE[ambiance]);
+      audio.loop = true;
+      audio.volume = Math.max(0, Math.min(1, volume * 0.32));
+      void audio.play().catch(() => {});
+      audioMusiqueActif = audio;
+    } catch {
+      /* impossible de lire l'audio */
+    }
+    return;
+  }
+
+  // 2. Ambiance de synthèse Web Audio API
   type FenetreAudio = Window & { webkitAudioContext?: typeof AudioContext };
   const Constructeur =
     window.AudioContext ?? (window as FenetreAudio).webkitAudioContext;
@@ -176,6 +227,9 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
 }
 
 export function reglerVolume(volume: number): void {
+  if (audioMusiqueActif) {
+    audioMusiqueActif.volume = Math.max(0, Math.min(1, volume * 0.32));
+  }
   if (!actif) return;
   const { ctx, master } = actif;
   master.gain.cancelScheduledValues(ctx.currentTime);
@@ -186,6 +240,17 @@ export function reglerVolume(volume: number): void {
 }
 
 export async function arreterAmbiance(): Promise<void> {
+  // Arrêt de la musique MP3
+  if (audioMusiqueActif) {
+    const el = audioMusiqueActif;
+    audioMusiqueActif = null;
+    try {
+      el.pause();
+      el.currentTime = 0;
+    } catch {}
+  }
+
+  // Arrêt de la synthèse WebAudio
   const courant = actif;
   ambianceActuelle = 'silence';
   if (!courant) return;

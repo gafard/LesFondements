@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
+  BookOpen,
   CalendarDays,
   CheckCircle,
   Flag,
@@ -79,7 +80,10 @@ function SentierContent() {
   // La fiche du groupe, plus la suivante qu'on prépare seul.
   const maxAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
   const etatDe = (id: number): Etat => {
-    if (!group) return 'close';
+    if (!group) {
+      if (id === 1) return 'ouverte';
+      return 'close';
+    }
     if (group.closedSteps.includes(id)) return 'terminee';
     if (id > maxAccessible) return 'close';
     if (membership?.preparedSteps.includes(id) || validees.includes(id)) return 'preparee';
@@ -119,10 +123,45 @@ function SentierContent() {
           </h1>
 
           <p className="mx-auto max-w-2xl text-xs sm:text-sm leading-relaxed text-encre-700">
-            Une fiche s&apos;ouvre quand la précédente a été partagée en groupe. Vous la préparez
-            chez vous, puis vous la vivez ensemble.
+            La Fiche 1 est en accès libre. Les fiches suivantes s&apos;ouvrent au rythme de vos partages en cellule : vous les préparez chez vous, puis vous les vivez ensemble.
           </p>
         </div>
+
+        {/* ── Bandeau Mode Découverte (sans groupe) ── */}
+        {!group && (
+          <div className="feuille relative mb-8 overflow-hidden rounded-3xl border-2 border-or-400 bg-gradient-to-r from-amber-50/90 via-[#fbf7ee] to-amber-100/50 p-5 sm:p-6 shadow-md text-encre-950">
+            <span className="ruban -top-2.5 left-8 -rotate-1 rounded-[2px]" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-or-200/90 px-2.5 py-0.5 text-3xs font-bold uppercase tracking-wider text-or-950 font-serif">
+                  ✨ Mode Découverte Libre
+                </span>
+                <h3 className="font-serif text-lg font-bold text-encre-950">
+                  La Fiche 1 « Connaître Dieu » est ouverte à tous
+                </h3>
+                <p className="font-serif text-xs text-encre-700 max-w-xl leading-relaxed">
+                  Explorez le premier fondement et la lettre d&apos;amour du Père. Pour vivre les 20 fiches et échanger chaque semaine, rejoignez ou rassemblez votre cellule.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <Link
+                  href="/fiches/1"
+                  className="bouton-or inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold text-slate-950 shadow-xs"
+                >
+                  <BookOpen className="h-3.5 w-3.5" />
+                  Ouvrir Fiche 1
+                </Link>
+                <Link
+                  href="/onboarding"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-encre-950 px-5 py-2.5 text-xs font-bold text-parchemin-100 shadow-xs hover:bg-encre-900 transition-colors"
+                >
+                  <Users className="h-3.5 w-3.5 text-or-400" />
+                  Trouver ma cellule
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Bandeau du groupe ── */}
         {group && (
@@ -493,7 +532,7 @@ function EtapeSentier({
 
 export default function Page() {
   return (
-    <ParcoursGate>
+    <ParcoursGate acces="decouverte">
       <SentierContent />
     </ParcoursGate>
   );

@@ -38,6 +38,7 @@ import { fermerEtude, ouvrirEtude, usePanneauEtude } from '@/lib/panneauEtude';
 import {
   getComparaisonVerset,
   getAudioChapitre,
+  chargerTraductionEnLigne,
 } from '@/lib/bibleVersions';
 import { arreterLecture, lireAVoixHaute } from '@/lib/ambiance';
 
@@ -223,15 +224,18 @@ export default function PanneauEtude() {
         className="absolute inset-0 bg-encre-950/50 backdrop-blur-sm"
       />
 
-      <aside className="animate-fade-in relative flex h-full w-full max-w-lg flex-col border-l border-parchemin-400 bg-parchemin-50 shadow-2xl">
-        {/* ── En-tête ── */}
-        <header className="nuit shrink-0 px-5 pb-4 pt-5 text-parchemin-100">
+      <aside className="table-travail animate-fade-in relative flex h-full w-full max-w-lg flex-col border-l border-parchemin-400 shadow-2xl overflow-hidden">
+        {/* ── En-tête de Table d'Étude ── */}
+        <header className="nuit nuit-grain relative shrink-0 px-5 pb-4 pt-5 text-parchemin-100 border-b border-or-400/20">
+          <span className="ruban -top-2 left-10 -rotate-1 rounded-[2px]" />
+          
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <span className="text-2xs font-bold uppercase tracking-[0.18em] text-or-300/70">
-                Bible d’étude interactive
+              <span className="text-3xs font-bold uppercase tracking-[0.2em] text-or-400/90 flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-or-300" />
+                Bible d’étude du disciple
               </span>
-              <h2 className="mt-1 truncate font-serif text-xl font-bold">
+              <h2 className="manuscrit mt-1 truncate text-3xl font-bold leading-none text-parchemin-100">
                 {passage?.titre ?? formaterReference(reference, true)}
               </h2>
             </div>
@@ -240,7 +244,7 @@ export default function PanneauEtude() {
                 arreterAudio();
                 fermerEtude();
               }}
-              className="shrink-0 rounded-full bg-white/10 p-2 text-parchemin-100/70 transition-colors hover:bg-white/20 hover:text-parchemin-100"
+              className="shrink-0 rounded-full bg-white/10 p-2 text-parchemin-100/70 transition-colors hover:bg-white/20 hover:text-white"
               aria-label="Fermer"
             >
               <X className="h-4 w-4" />
@@ -251,7 +255,7 @@ export default function PanneauEtude() {
             {passage && passage.reference.chapitre > 1 && (
               <button
                 onClick={() => changerChapitre(-1)}
-                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-2xs font-bold transition-colors hover:bg-white/18"
+                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-2xs font-bold transition-colors hover:bg-white/20"
               >
                 <ArrowLeft className="h-3 w-3" /> Ch. {passage.reference.chapitre - 1}
               </button>
@@ -259,7 +263,7 @@ export default function PanneauEtude() {
             {passage && passage.reference.chapitre < passage.nbChapitres && (
               <button
                 onClick={() => changerChapitre(1)}
-                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-2xs font-bold transition-colors hover:bg-white/18"
+                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-2xs font-bold transition-colors hover:bg-white/20"
               >
                 Ch. {passage.reference.chapitre + 1} <ArrowRight className="h-3 w-3" />
               </button>
@@ -272,8 +276,8 @@ export default function PanneauEtude() {
               title="Afficher ou masquer les numéros Strong"
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-2xs font-bold transition-colors ${
                 afficherStrong
-                  ? 'bg-or-400 text-encre-950'
-                  : 'bg-white/10 text-parchemin-100/70 hover:bg-white/18'
+                  ? 'bg-or-400 text-encre-950 font-bold shadow-xs'
+                  : 'bg-white/10 text-parchemin-100/70 hover:bg-white/20'
               }`}
             >
               <Languages className="h-3 w-3" /> Strong
@@ -288,8 +292,8 @@ export default function PanneauEtude() {
                       onClick={() => basculerAudio('semeur')}
                       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
                         audioVersion === 'semeur' && audioEnCours
-                          ? 'bg-amber-400 text-slate-950 shadow-xs'
-                          : 'text-amber-200/90 hover:bg-white/10'
+                          ? 'bg-or-400 text-encre-950 shadow-xs'
+                          : 'text-or-300 hover:bg-white/10'
                       }`}
                       title="Écouter le chapitre en Bible du Semeur"
                     >
@@ -301,8 +305,8 @@ export default function PanneauEtude() {
                       onClick={() => basculerAudio('lsg')}
                       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
                         audioVersion === 'lsg' && audioEnCours
-                          ? 'bg-amber-400 text-slate-950 shadow-xs'
-                          : 'text-amber-200/90 hover:bg-white/10'
+                          ? 'bg-or-400 text-encre-950 shadow-xs'
+                          : 'text-or-300 hover:bg-white/10'
                       }`}
                       title="Écouter le chapitre en Louis Segond"
                     >
@@ -315,8 +319,8 @@ export default function PanneauEtude() {
                     onClick={() => basculerAudio('lsg')}
                     className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-bold transition-all ${
                       audioVersion === 'lsg' && audioEnCours
-                        ? 'bg-amber-400 text-slate-950 shadow-xs'
-                        : 'text-amber-200/90 hover:bg-white/10'
+                        ? 'bg-or-400 text-encre-950 shadow-xs'
+                        : 'text-or-300 hover:bg-white/10'
                     }`}
                     title="Écouter uniquement les versets affichés"
                   >
@@ -329,7 +333,7 @@ export default function PanneauEtude() {
 
             <button
               onClick={copier}
-              className="rounded-full bg-white/10 p-1.5 text-parchemin-100/70 transition-colors hover:bg-white/18"
+              className="rounded-full bg-white/10 p-1.5 text-parchemin-100/70 transition-colors hover:bg-white/20 hover:text-white"
               aria-label="Copier le passage"
             >
               {copie ? (
@@ -341,33 +345,33 @@ export default function PanneauEtude() {
           </div>
         </header>
 
-        {/* ── Onglets ── */}
-        <nav className="flex shrink-0 gap-1 border-b border-parchemin-300 bg-white px-3 overflow-x-auto">
+        {/* ── Intercalaires de classeur d'étude ── */}
+        <nav className="flex shrink-0 items-end gap-1.5 overflow-x-auto px-4 pt-3 bg-parchemin-300/40">
           {onglets.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setOnglet(tab.id)}
-              className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2.5 text-2xs font-bold transition-colors ${
+              className={`intercalaire flex shrink-0 items-center gap-1.5 px-3.5 text-2xs font-bold transition-all ${
                 onglet === tab.id
-                  ? 'border-or-500 text-or-700'
-                  : 'border-transparent text-encre-400 hover:text-encre-700'
+                  ? 'intercalaire-actif pt-2.5 pb-3 text-or-800'
+                  : 'pb-2 pt-2 text-encre-600 hover:text-encre-900'
               }`}
             >
-              <tab.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <tab.icon className="h-3.5 w-3.5" strokeWidth={onglet === tab.id ? 2.25 : 1.75} />
               {tab.label}
             </button>
           ))}
         </nav>
 
-        {/* ── Contenu ── */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+        {/* ── Contenu sur la Page d'Étude ── */}
+        <div className="page-etude min-h-0 flex-1 overflow-y-auto px-4 sm:px-6 py-6">
           {passage === undefined ? (
             <div className="flex flex-col items-center gap-2 py-16">
-              <Loader2 className="h-5 w-5 animate-spin text-or-600" />
-              <p className="text-2xs text-encre-400">Ouverture du passage…</p>
+              <Loader2 className="h-6 w-6 animate-spin text-or-600" />
+              <p className="text-xs font-serif italic text-encre-500">Déroulement du rouleau des Écritures…</p>
             </div>
           ) : passage === null ? (
-            <p className="py-16 text-center text-sm text-encre-400">
+            <p className="py-16 text-center text-sm font-serif italic text-encre-400">
               Ce passage n&apos;a pas pu être trouvé.
             </p>
           ) : onglet === 'texte' ? (
@@ -401,7 +405,7 @@ export default function PanneauEtude() {
           )}
         </div>
 
-        {/* ── Fiche Strong ── */}
+        {/* ── Fiche Strong sur Bristol ── */}
         {(strongActif || chargementStrong) && (
           <FicheStrong
             entree={strongActif}
@@ -430,31 +434,37 @@ function TexteDuPassage({
   onStrong: (code: number) => void;
 }) {
   return (
-    <div className="space-y-1">
-      {passage.versets.map((verset) => (
-        <p
-          key={verset.v}
-          onClick={() => onVerset(verset.v)}
-          className={`cursor-pointer rounded-2xl px-3 py-2.5 font-serif text-base leading-[1.9] transition-colors ${
-            versetActif === verset.v
-              ? 'bg-or-50 text-encre-900 ring-1 ring-or-200'
-              : 'text-encre-800 hover:bg-white'
-          }`}
-        >
-          <sup className="mr-1.5 select-none font-sans text-2xs font-bold text-or-600">
-            {verset.v}
-          </sup>
-          {afficherStrong ? (
-            <VersetAnnote verset={verset} onStrong={onStrong} />
-          ) : (
-            verset.t
-          )}
-        </p>
-      ))}
+    <div className="feuille relative rounded-3xl p-5 sm:p-6 shadow-md border border-parchemin-300">
+      <span className="ruban -top-2.5 left-10 -rotate-1 rounded-[2px]" />
+      <span className="attache-pince -top-3 right-8" />
 
-      <p className="pt-4 text-2xs leading-relaxed text-encre-400">
-        Cliquez un mot souligné pour ouvrir son entrée dans le lexique hébreu ou grec.
-      </p>
+      <div className="space-y-1.5">
+        {passage.versets.map((verset) => (
+          <p
+            key={verset.v}
+            onClick={() => onVerset(verset.v)}
+            className={`cursor-pointer rounded-2xl px-3.5 py-2 font-serif text-base leading-[1.95] transition-all ${
+              versetActif === verset.v
+                ? 'bg-or-100/70 text-encre-950 ring-1 ring-or-300 shadow-xs'
+                : 'text-encre-900 hover:bg-parchemin-100/80'
+            }`}
+          >
+            <sup className="mr-2 select-none font-sans text-2xs font-bold text-or-700">
+              {verset.v}
+            </sup>
+            {afficherStrong ? (
+              <VersetAnnote verset={verset} onStrong={onStrong} />
+            ) : (
+              verset.t
+            )}
+          </p>
+        ))}
+      </div>
+
+      <div className="mt-5 border-t border-parchemin-300/80 pt-3 flex items-center justify-between text-3xs text-encre-500 font-serif italic">
+        <span>Louis Segond 1910 · Texte authentique</span>
+        <span>Cliquez un mot souligné pour ouvrir le lexique Strong</span>
+      </div>
     </div>
   );
 }
@@ -527,32 +537,45 @@ function FicheStrong({
   onFermer: () => void;
 }) {
   return (
-    <div className="max-h-[55%] shrink-0 overflow-y-auto border-t border-parchemin-400 bg-white px-5 py-4 shadow-[0_-12px_30px_-12px_rgba(11,29,56,0.2)]">
+    <div className="fiche-bristol relative max-h-[55%] shrink-0 overflow-y-auto border-t-2 border-or-400 bg-white px-5 py-5 shadow-[0_-12px_35px_-10px_rgba(11,29,56,0.25)]">
+      <span className="attache-pince -top-3 left-10" />
+
       <div className="flex items-start justify-between gap-3">
         {chargement || !entree ? (
-          <p className="text-2xs text-encre-400">Ouverture du lexique…</p>
+          <div className="flex items-center gap-2 py-4">
+            <Loader2 className="h-4 w-4 animate-spin text-or-600" />
+            <p className="text-xs font-serif italic text-encre-500">Ouverture du lexique Strong…</p>
+          </div>
         ) : (
           <div className="min-w-0">
-            <span className="text-2xs font-bold uppercase tracking-[0.16em] text-or-600">
-              {entree.langue === 'hebreu' ? 'Hébreu' : 'Grec'} · Strong{' '}
-              {entree.langue === 'hebreu' ? 'H' : 'G'}
-              {entree.code}
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-3xs font-bold uppercase tracking-wider ${
+                  entree.langue === 'hebreu'
+                    ? 'bg-indigo-100 text-indigo-800'
+                    : 'bg-amber-100 text-amber-800'
+                }`}
+              >
+                {entree.langue === 'hebreu' ? '📜 Hébreu' : '🏛️ Grec'} · Strong{' '}
+                {entree.langue === 'hebreu' ? 'H' : 'G'}
+                {entree.code}
+              </span>
+            </div>
             <p
-              className="mt-1 font-serif text-2xl font-bold text-encre-950"
+              className="mt-1.5 font-serif text-3xl font-bold text-encre-950 tracking-wide"
               dir={entree.langue === 'hebreu' ? 'rtl' : 'ltr'}
             >
               {entree.original || entree.mot}
             </p>
-            <p className="text-xs italic text-encre-500">
+            <p className="text-xs font-serif italic text-or-800">
               {entree.mot}
-              {entree.phonetique && ` · ${entree.phonetique}`}
+              {entree.phonetique && ` · [ ${entree.phonetique} ]`}
             </p>
           </div>
         )}
         <button
           onClick={onFermer}
-          className="shrink-0 rounded-full p-1.5 text-encre-300 transition-colors hover:text-encre-700"
+          className="shrink-0 rounded-full bg-parchemin-200 p-1.5 text-encre-600 transition-colors hover:bg-parchemin-300 hover:text-encre-900"
           aria-label="Fermer le lexique"
         >
           <X className="h-4 w-4" />
@@ -560,36 +583,43 @@ function FicheStrong({
       </div>
 
       {entree && !chargement && (
-        <div className="mt-3 space-y-3">
+        <div className="mt-4 space-y-3.5 border-t border-parchemin-300 pt-3">
           {entree.type && (
-            <p className="inline-block rounded-full bg-parchemin-100 px-2.5 py-1 text-2xs font-semibold text-encre-600">
-              {entree.type}
-            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-3xs font-bold uppercase tracking-wider text-encre-400">
+                Nature grammaticale :
+              </span>
+              <span className="inline-block rounded-md bg-parchemin-100 px-2 py-0.5 text-2xs font-semibold text-encre-800 border border-parchemin-300">
+                {entree.type}
+              </span>
+            </div>
           )}
 
           {entree.lsg && (
-            <div>
-              <p className="text-2xs font-bold uppercase tracking-[0.14em] text-encre-400">
-                Traduit dans la Segond par
+            <div className="rounded-xl bg-parchemin-50 p-3 border border-parchemin-300/80">
+              <p className="text-3xs font-bold uppercase tracking-[0.14em] text-or-800">
+                Traduit dans la Segond par :
               </p>
-              <p className="mt-0.5 text-xs leading-relaxed text-encre-700">{entree.lsg}</p>
+              <p className="mt-0.5 font-serif text-xs font-semibold leading-relaxed text-encre-900">
+                « {entree.lsg} »
+              </p>
             </div>
           )}
 
           {entree.definition && (
             <div>
-              <p className="text-2xs font-bold uppercase tracking-[0.14em] text-encre-400">
-                Définition
+              <p className="text-3xs font-bold uppercase tracking-[0.14em] text-encre-400">
+                Définition biblique & sens profond
               </p>
-              <p className="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-encre-700">
+              <p className="mt-1 whitespace-pre-line font-serif text-xs leading-relaxed text-encre-800">
                 {entree.definition}
               </p>
             </div>
           )}
 
           {entree.origine && (
-            <p className="border-t border-parchemin-300 pt-2.5 text-2xs leading-relaxed text-encre-400">
-              Origine : {entree.origine}
+            <p className="border-t border-parchemin-300 pt-2.5 text-3xs italic text-encre-500 font-serif">
+              Étymologie / Origine : {entree.origine}
             </p>
           )}
         </div>
@@ -617,34 +647,52 @@ function OngletRenvois({
   }, [passage.reference, verset]);
 
   return (
-    <div>
+    <div className="space-y-4">
       <SelecteurVerset passage={passage} verset={verset} onVerset={onVerset} />
 
       {groupes === null ? (
-        <p className="py-10 text-center text-2xs text-encre-400">Chargement…</p>
+        <div className="flex flex-col items-center gap-2 py-10">
+          <Loader2 className="h-5 w-5 animate-spin text-or-600" />
+          <p className="text-2xs text-encre-400 font-serif italic">Recherche des renvois croisés…</p>
+        </div>
       ) : groupes.length === 0 ? (
-        <p className="py-10 text-center text-xs leading-relaxed text-encre-400">
-          Aucun renvoi pour ce verset dans le Treasury of Scripture Knowledge.
-        </p>
+        <div className="feuille rounded-2xl p-6 text-center border border-parchemin-300">
+          <p className="text-xs font-serif italic leading-relaxed text-encre-500">
+            Aucun renvoi pour ce verset dans le Treasury of Scripture Knowledge.
+          </p>
+        </div>
       ) : (
-        <div className="space-y-4">
-          {groupes.map((groupe, index) => (
-            <div key={index}>
-              {groupe.titre && (
-                <p className="mb-1.5 font-serif text-xs italic text-encre-500">
-                  {groupe.titre}
-                </p>
-              )}
-              <div className="flex flex-wrap gap-1.5">
-                {groupe.refs.map((cle) => (
-                  <BoutonRenvoi key={cle} cle={cle} />
-                ))}
+        <div className="feuille relative rounded-3xl p-5 sm:p-6 shadow-md border border-parchemin-300 space-y-5">
+          <span className="ruban -top-2.5 left-10 -rotate-1 rounded-[2px]" />
+          
+          <div className="border-b border-parchemin-300 pb-2">
+            <span className="text-3xs font-bold uppercase tracking-[0.16em] text-or-800">
+              Renvois Scripturaires Croisés (TSK 1833)
+            </span>
+            <p className="text-xs text-encre-600 font-serif italic">
+              Passages éclairant le verset {verset}
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {groupes.map((groupe, index) => (
+              <div key={index} className="rounded-2xl bg-parchemin-50/80 p-3.5 border border-parchemin-300/80">
+                {groupe.titre && (
+                  <p className="mb-2 font-serif text-xs font-bold text-encre-900">
+                    • {groupe.titre}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-1.5">
+                  {groupe.refs.map((cle) => (
+                    <BoutonRenvoi key={cle} cle={cle} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-          <p className="border-t border-parchemin-300 pt-3 text-2xs leading-relaxed text-encre-400">
-            Renvois du <em>Treasury of Scripture Knowledge</em> (1833). Les intitulés sont ceux de
-            l&apos;original anglais.
+            ))}
+          </div>
+
+          <p className="border-t border-parchemin-300 pt-3 text-3xs leading-relaxed text-encre-400 font-serif italic">
+            Renvois du <em>Treasury of Scripture Knowledge</em> (1833). Cliquez sur une référence pour l’ouvrir instantanément sur votre table.
           </p>
         </div>
       )}
@@ -659,8 +707,9 @@ function BoutonRenvoi({ cle }: { cle: string }) {
         const reference = analyserClefVerset(cle);
         if (reference) ouvrirEtude(reference);
       }}
-      className="rounded-full bg-white px-2.5 py-1 text-2xs font-semibold text-encre-700 shadow-2xs transition-colors hover:bg-or-100 hover:text-or-700"
+      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-2xs font-bold text-encre-800 shadow-2xs border border-parchemin-300 transition-all hover:bg-or-400 hover:text-encre-950 hover:scale-105 active:scale-95"
     >
+      <span>📖</span>
       {libelleClef(cle)}
     </button>
   );
@@ -675,43 +724,82 @@ function OngletThemes({ passage, verset }: { passage: Passage; verset: number | 
     void chargerThemesDuVerset(passage.reference, verset).then(setCles);
   }, [passage.reference, verset]);
 
+  const stylesPostIt = [
+    'postit-etude-jaune rotate-1',
+    'postit-etude-vert -rotate-1',
+    'postit-etude-rose rotate-2',
+    'postit-etude-bleu -rotate-2',
+  ];
+
   return (
-    <div>
+    <div className="space-y-4">
       {cles === null ? (
-        <p className="py-10 text-center text-2xs text-encre-400">Chargement…</p>
+        <div className="flex flex-col items-center gap-2 py-10">
+          <Loader2 className="h-5 w-5 animate-spin text-or-600" />
+          <p className="text-2xs text-encre-400 font-serif italic">Indexation thématique de Nave…</p>
+        </div>
       ) : cles.length === 0 ? (
-        <p className="py-10 text-center text-xs leading-relaxed text-encre-400">
-          Ce verset n&apos;est rattaché à aucun thème de la bible thématique de Nave.
-        </p>
+        <div className="feuille rounded-2xl p-6 text-center border border-parchemin-300">
+          <p className="text-xs font-serif italic leading-relaxed text-encre-500">
+            Ce verset n&apos;est rattaché à aucun thème de la bible thématique de Nave.
+          </p>
+        </div>
       ) : (
         <>
-          <p className="mb-3 text-2xs font-bold uppercase tracking-[0.14em] text-encre-400">
-            Thèmes du verset {verset}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {cles.map((cle) => (
-              <button
-                key={cle}
-                onClick={() => void chargerTheme(cle).then(setOuvert)}
-                className="rounded-full bg-white px-3 py-1.5 text-2xs font-semibold capitalize text-encre-700 shadow-2xs transition-colors hover:bg-or-100 hover:text-or-700"
-              >
-                {cle}
-              </button>
-            ))}
+          <div className="flex items-center justify-between">
+            <p className="text-3xs font-bold uppercase tracking-[0.16em] text-or-800 flex items-center gap-1.5">
+              <Tag className="h-3.5 w-3.5 text-or-600" />
+              Post-its Thématiques du verset {verset}
+            </p>
+            <span className="text-3xs font-serif italic text-encre-500">
+              {cles.length} thème{cles.length > 1 ? 's' : ''} indexé{cles.length > 1 ? 's' : ''}
+            </span>
+          </div>
+
+          {/* Grille de Post-its */}
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            {cles.map((cle, idx) => {
+              const style = stylesPostIt[idx % stylesPostIt.length];
+              const estOuvert = ouvert?.nom.toLowerCase() === cle.toLowerCase();
+              return (
+                <button
+                  key={cle}
+                  onClick={() => void chargerTheme(cle).then(setOuvert)}
+                  className={`relative rounded-2xl p-3.5 text-left transition-all duration-200 hover:rotate-0 hover:scale-105 active:scale-95 ${style} ${
+                    estOuvert ? 'ring-2 ring-or-500 shadow-md rotate-0 scale-102' : ''
+                  }`}
+                >
+                  <span className="punaise -top-2 left-1/2 -translate-x-1/2" />
+                  <p className="font-serif text-xs font-bold text-encre-950 capitalize leading-snug">
+                    {cle}
+                  </p>
+                  <span className="mt-1 block text-3xs font-semibold text-encre-600/70">
+                    Déplier la fiche →
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {ouvert && (
-            <article className="mt-5 rounded-3xl border border-parchemin-400 bg-white p-4">
-              <h3 className="font-serif text-lg font-bold text-encre-950">{ouvert.nom}</h3>
-              <div className="mt-2 whitespace-pre-line text-xs leading-relaxed text-encre-700">
+            <article className="feuille relative rounded-3xl border border-parchemin-400 bg-white p-5 sm:p-6 shadow-md animate-fadeIn mt-4">
+              <span className="ruban -top-2.5 left-10 -rotate-1 rounded-[2px]" />
+              <div className="flex items-center justify-between border-b border-parchemin-300 pb-2">
+                <h3 className="font-serif text-lg font-bold text-encre-950 capitalize">
+                  {ouvert.nom}
+                </h3>
+                <span className="text-3xs font-bold uppercase tracking-wider text-or-700">
+                  Bible de Nave (1897)
+                </span>
+              </div>
+              <div className="mt-3 whitespace-pre-line font-serif text-xs leading-relaxed text-encre-800">
                 <TexteAvecRenvois texte={ouvert.description} />
               </div>
             </article>
           )}
 
-          <p className="mt-5 border-t border-parchemin-300 pt-3 text-2xs leading-relaxed text-encre-400">
-            Bible thématique de Nave (1897). Les intitulés de thèmes sont restés dans la langue
-            de l&apos;original ; les développements, eux, sont en français.
+          <p className="border-t border-parchemin-300 pt-3 text-3xs leading-relaxed text-encre-400 font-serif italic">
+            Bible thématique de Nave (1897). Cliquez sur un Post-it pour ouvrir son développement théologique complet.
           </p>
         </>
       )}
@@ -747,31 +835,56 @@ function OngletCommentaire({ passage }: { passage: Passage }) {
   }, [passage.reference]);
 
   if (textes === null) {
-    return <p className="py-10 text-center text-2xs text-encre-400">Chargement…</p>;
+    return (
+      <div className="flex flex-col items-center gap-2 py-10">
+        <Loader2 className="h-5 w-5 animate-spin text-or-600" />
+        <p className="text-2xs text-encre-400 font-serif italic">Chargement du commentaire classique…</p>
+      </div>
+    );
   }
   if (!textes.length) {
     return (
-      <p className="py-10 text-center text-xs leading-relaxed text-encre-400">
-        Pas de commentaire pour ce chapitre.
-      </p>
+      <div className="feuille rounded-2xl p-6 text-center border border-parchemin-300">
+        <p className="text-xs font-serif italic leading-relaxed text-encre-500">
+          Pas de commentaire pour ce chapitre.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div>
-      <p className="mb-3 flex items-center gap-1.5 text-2xs font-bold uppercase tracking-[0.14em] text-encre-400">
-        <Sparkles className="h-3 w-3 text-or-500" />
-        Matthew Henry · {passage.reference.livre.nom} {passage.reference.chapitre}
-      </p>
-      <div className="space-y-4">
+    <div className="feuille reliure-commentaire relative rounded-3xl p-6 sm:p-7 shadow-md border border-parchemin-300 space-y-4">
+      <span className="ruban -top-2.5 left-10 -rotate-1 rounded-[2px]" />
+
+      <div className="border-b border-parchemin-300 pb-3">
+        <p className="flex items-center gap-1.5 text-3xs font-bold uppercase tracking-[0.16em] text-or-800">
+          <Sparkles className="h-3.5 w-3.5 text-or-600" />
+          Commentaire Exégétique · Matthew Henry (1710)
+        </p>
+        <h3 className="manuscrit text-2xl font-bold text-encre-950 mt-1">
+          {passage.reference.livre.nom} {passage.reference.chapitre}
+        </h3>
+      </div>
+
+      <div className="space-y-4 font-serif text-xs leading-[1.9] text-encre-900">
         {textes.map((texte, index) => (
-          <p key={index} className="whitespace-pre-line text-xs leading-relaxed text-encre-700">
-            {texte}
+          <p key={index} className="whitespace-pre-line">
+            {index === 0 ? (
+              <>
+                <span className="float-left mr-2.5 font-serif text-3xl font-bold text-or-800 leading-none">
+                  {texte.charAt(0)}
+                </span>
+                {texte.slice(1)}
+              </>
+            ) : (
+              texte
+            )}
           </p>
         ))}
       </div>
-      <p className="mt-5 border-t border-parchemin-300 pt-3 text-2xs leading-relaxed text-encre-400">
-        Commentaire de Matthew Henry (1710), traduction française.
+
+      <p className="border-t border-parchemin-300 pt-3 text-3xs leading-relaxed text-encre-400 font-serif italic">
+        Commentaire de Matthew Henry (1710), traduction française classique du domaine public.
       </p>
     </div>
   );
@@ -788,15 +901,18 @@ function SelecteurVerset({
 }) {
   if (passage.versets.length <= 1) return null;
   return (
-    <div className="mb-4 flex flex-wrap gap-1">
+    <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+      <span className="text-3xs font-bold uppercase tracking-wider text-encre-400 shrink-0 mr-1">
+        Verset :
+      </span>
       {passage.versets.map((v) => (
         <button
           key={v.v}
           onClick={() => onVerset(v.v)}
-          className={`h-7 w-7 rounded-lg text-2xs font-bold transition-colors ${
+          className={`h-7 w-7 shrink-0 rounded-lg text-2xs font-bold transition-all ${
             verset === v.v
-              ? 'bg-or-400 text-encre-950'
-              : 'bg-white text-encre-500 hover:bg-parchemin-200'
+              ? 'bg-or-400 text-encre-950 font-bold shadow-xs scale-105'
+              : 'bg-white text-encre-600 hover:bg-parchemin-200 border border-parchemin-300'
           }`}
         >
           {v.v}
@@ -807,95 +923,217 @@ function SelecteurVerset({
 }
 
 function OngletComparer({ passage, verset }: { passage: Passage; verset: number | null }) {
-  const numVerset = verset ?? 1;
-  const refComplete = `${passage.reference.livre.nom} ${passage.reference.chapitre}:${numVerset}`;
-  const refAbregee = `${passage.reference.livre.code} ${passage.reference.chapitre}:${numVerset}`;
-  const comparaison = getComparaisonVerset(refComplete) || getComparaisonVerset(refAbregee);
+  const [versetSelectionne, setVersetSelectionne] = useState<number>(verset ?? 1);
+  const [traductionsLive, setTraductionsLive] = useState<Record<string, string>>({});
+  const [enChargement, setEnChargement] = useState(false);
+
+  const numVerset = versetSelectionne;
+  const livreNum = passage.reference.livre.numero;
+  const chapNum = passage.reference.chapitre;
+
+  const refComplete = `${passage.reference.livre.nom} ${chapNum}:${numVerset}`;
+  const refAbregee = `${passage.reference.livre.code} ${chapNum}:${numVerset}`;
+  const comparaisonPrechargee = getComparaisonVerset(refComplete) || getComparaisonVerset(refAbregee);
 
   const versetActuel = passage.versets.find((v) => v.v === numVerset);
-  const texteLsg = versetActuel ? versetActuel.t : comparaison?.lsg || '';
+  const texteLsg = versetActuel ? versetActuel.t : comparaisonPrechargee?.lsg || '';
+
+  useEffect(() => {
+    setVersetSelectionne(verset ?? 1);
+  }, [verset]);
+
+  // Chargement des véritables traductions en direct (BDS, Darby, PDV, NBS)
+  useEffect(() => {
+    let actif = true;
+    async function chargerTraductions() {
+      setEnChargement(true);
+      try {
+        const [bds, darby, pdv, nbs] = await Promise.all([
+          comparaisonPrechargee?.bds
+            ? Promise.resolve(comparaisonPrechargee.bds)
+            : chargerTraductionEnLigne('BDS', livreNum, chapNum, numVerset),
+          chargerTraductionEnLigne('FRDBY', livreNum, chapNum, numVerset),
+          comparaisonPrechargee?.s21
+            ? Promise.resolve(comparaisonPrechargee.s21)
+            : chargerTraductionEnLigne('FRPDV17', livreNum, chapNum, numVerset),
+          chargerTraductionEnLigne('NBS', livreNum, chapNum, numVerset),
+        ]);
+
+        if (actif) {
+          const dict: Record<string, string> = {};
+          if (bds) dict['BDS'] = bds;
+          if (darby) dict['FRDBY'] = darby;
+          if (pdv) dict['FRPDV17'] = pdv;
+          if (nbs) dict['NBS'] = nbs;
+          setTraductionsLive(dict);
+        }
+      } finally {
+        if (actif) setEnChargement(false);
+      }
+    }
+
+    void chargerTraductions();
+    return () => {
+      actif = false;
+    };
+  }, [livreNum, chapNum, numVerset, comparaisonPrechargee?.bds, comparaisonPrechargee?.s21]);
+
+  const texteBds = traductionsLive['BDS'] || comparaisonPrechargee?.bds;
+  const texteDarby = traductionsLive['FRDBY'] || comparaisonPrechargee?.nfc;
+  const textePdv = traductionsLive['FRPDV17'] || comparaisonPrechargee?.s21;
+  const texteNbs = traductionsLive['NBS'];
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+    <div className="space-y-4">
+      {/* En-tête avec sélecteur de verset */}
+      <div className="feuille rounded-2xl border border-or-300/80 bg-or-50/80 p-4 shadow-xs">
         <div className="flex items-center justify-between">
-          <p className="font-serif text-xs font-bold text-amber-900">
-            Comparatif : {passage.reference.livre.nom} {passage.reference.chapitre}:{numVerset}
+          <p className="font-serif text-xs font-bold text-or-950">
+            Comparatif parallèle : {passage.reference.livre.nom} {chapNum}:{numVerset}
           </p>
-          <span className="text-2xs font-serif italic text-amber-800">
-            Traductions parallèles
+          <span className="text-3xs font-bold uppercase tracking-wider text-or-800">
+            Écritures en vis-à-vis
           </span>
         </div>
-        <p className="mt-1 text-2xs text-amber-800/80 leading-relaxed">
-          Comparez la précision du texte original (Segond 1910) avec la fluidité contemporaine (Bible du Semeur).
+        <p className="mt-1 text-2xs text-encre-700 leading-relaxed font-serif italic">
+          Comparez les véritables traductions françaises en temps réel (Segond 1910, Semeur 2015, Darby, Parole de Vie, NBS).
         </p>
+
+        {/* Sélecteur rapide de verset du chapitre */}
+        {passage.versets.length > 1 && (
+          <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pt-1 pb-1">
+            <span className="text-3xs font-bold text-or-900 shrink-0">Verset :</span>
+            {passage.versets.map((v) => (
+              <button
+                key={v.v}
+                type="button"
+                onClick={() => setVersetSelectionne(v.v)}
+                className={`flex h-6 w-6 items-center justify-center rounded-lg text-3xs font-bold transition-all shrink-0 ${
+                  v.v === numVerset
+                    ? 'bg-or-600 text-white shadow-xs scale-105'
+                    : 'bg-white/80 text-encre-800 hover:bg-white'
+                }`}
+              >
+                {v.v}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="space-y-4">
-        {/* 1. Louis Segond 1910 */}
-        <div className="rounded-2xl border border-amber-300/80 bg-white p-4 shadow-xs">
+      <div className="space-y-3.5">
+        {/* 1. Louis Segond 1910 (Référence) */}
+        <div className="feuille rounded-2xl border border-parchemin-400 bg-white p-4 shadow-xs">
           <div className="flex items-center justify-between border-b border-parchemin-200 pb-2">
-            <span className="font-serif text-xs font-bold text-amber-900">
-              Louis Segond 1910 (LSG)
+            <span className="font-serif text-xs font-bold text-encre-950 flex items-center gap-1.5">
+              <span>📜</span> Louis Segond 1910 (LSG)
             </span>
-            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-2xs font-semibold text-amber-800">
+            <span className="timbre px-2 py-0.5 text-3xs font-bold text-or-800">
               Littérale historique
             </span>
           </div>
-          <p className="mt-3 font-serif text-sm leading-relaxed text-slate-900">
+          <p className="mt-3 font-serif text-sm leading-relaxed text-encre-900">
             « {texteLsg} »
           </p>
         </div>
 
-        {/* 2. La Bible du Semeur */}
-        <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 shadow-xs">
+        {/* 2. La Bible du Semeur 2015 */}
+        <div className="feuille rounded-2xl border border-indigo-200 bg-indigo-50/50 p-4 shadow-xs">
           <div className="flex items-center justify-between border-b border-indigo-100 pb-2">
-            <span className="font-serif text-xs font-bold text-indigo-950">
-              La Bible du Semeur (BDS)
+            <span className="font-serif text-xs font-bold text-indigo-950 flex items-center gap-1.5">
+              <span>📖</span> La Bible du Semeur (BDS 2015)
             </span>
-            <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-2xs font-semibold text-indigo-800">
+            <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-3xs font-bold text-indigo-800">
               Équivalence dynamique
             </span>
           </div>
-          <p className="mt-3 font-serif text-sm leading-relaxed text-slate-900">
-            « {comparaison?.bds || texteLsg} »
-          </p>
+          {texteBds ? (
+            <p className="mt-3 font-serif text-sm leading-relaxed text-slate-900">
+              « {texteBds} »
+            </p>
+          ) : enChargement ? (
+            <div className="mt-3 flex items-center gap-2 text-2xs text-indigo-700 italic">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Récupération de la traduction BDS authentique...
+            </div>
+          ) : (
+            <p className="mt-3 font-serif text-xs italic text-indigo-800/80">
+              (Traduction BDS indisponible pour ce passage)
+            </p>
+          )}
         </div>
 
-        {/* 3. Segond 21 */}
-        {comparaison?.s21 && (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4 shadow-xs">
+        {/* 3. La Bible de Darby (1890) */}
+        <div className="feuille rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-amber-200/80 pb-2">
+            <span className="font-serif text-xs font-bold text-amber-950 flex items-center gap-1.5">
+              <span>🏛️</span> Bible de J.N. Darby (1890)
+            </span>
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-3xs font-bold text-amber-800">
+              Littérale d&apos;érudit
+            </span>
+          </div>
+          {texteDarby ? (
+            <p className="mt-3 font-serif text-sm leading-relaxed text-encre-950">
+              « {texteDarby} »
+            </p>
+          ) : enChargement ? (
+            <div className="mt-3 flex items-center gap-2 text-2xs text-amber-700 italic">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Chargement de la version Darby...
+            </div>
+          ) : null}
+        </div>
+
+        {/* 4. Parole de Vie (2017) / Segond 21 */}
+        {(textePdv || enChargement) && (
+          <div className="feuille rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-xs">
             <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
-              <span className="font-serif text-xs font-bold text-emerald-950">
-                Segond 21 (S21)
+              <span className="font-serif text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                <span>✨</span> Parole de Vie (PDV 2017)
               </span>
-              <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-2xs font-semibold text-emerald-800">
-                Moderne
+              <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-3xs font-bold text-emerald-800">
+                Français accessible
               </span>
             </div>
-            <p className="mt-3 font-serif text-sm leading-relaxed text-slate-900">
-              « {comparaison.s21} »
-            </p>
+            {textePdv ? (
+              <p className="mt-3 font-serif text-sm leading-relaxed text-slate-900">
+                « {textePdv} »
+              </p>
+            ) : (
+              <div className="mt-3 flex items-center gap-2 text-2xs text-emerald-700 italic">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Chargement Parole de Vie...
+              </div>
+            )}
           </div>
         )}
 
-        {/* 4. Nouvelle Français Courant */}
-        {comparaison?.nfc && (
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-xs">
+        {/* 5. Nouvelle Bible Segond (NBS 2002) */}
+        {(texteNbs || enChargement) && (
+          <div className="feuille rounded-2xl border border-slate-300 bg-slate-50/80 p-4 shadow-xs">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-              <span className="font-serif text-xs font-bold text-slate-800">
-                Nouvelle Français Courant (NFC)
+              <span className="font-serif text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <span>🕊️</span> Nouvelle Bible Segond (NBS 2002)
               </span>
-              <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-2xs font-semibold text-slate-700">
-                Courante
+              <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-3xs font-bold text-slate-700">
+                Étude approfondie
               </span>
             </div>
-            <p className="mt-3 font-serif text-sm leading-relaxed text-slate-900">
-              « {comparaison.nfc} »
-            </p>
+            {texteNbs ? (
+              <p className="mt-3 font-serif text-sm leading-relaxed text-slate-900">
+                « {texteNbs} »
+              </p>
+            ) : (
+              <div className="mt-3 flex items-center gap-2 text-2xs text-slate-600 italic">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Chargement NBS...
+              </div>
+            )}
           </div>
         )}
       </div>
     </div>
   );
 }
+

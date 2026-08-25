@@ -278,7 +278,7 @@ export default function BulleVerset() {
         ref={boite}
         role="dialog"
         aria-label={titre}
-        className="bulle-papier fixed z-[99999] rounded-2xl p-4 shadow-2xl transition-all duration-200"
+        className="bulle-papier feuille fixed z-[99999] rounded-3xl p-5 shadow-2xl transition-all duration-200 border-2 border-or-400/60"
         style={{
           position: 'fixed',
           left: `${posGauche}px`,

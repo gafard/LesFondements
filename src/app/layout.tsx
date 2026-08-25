@@ -82,6 +82,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" data-scroll-behavior="smooth">
+      <head>
+        {/*
+          Chrome n'émet « beforeinstallprompt » qu'une fois, peu après le
+          chargement — souvent avant que React n'ait hydraté, et bien avant
+          qu'un composant chargé paresseusement ne s'abonne. L'événement était
+          donc manqué, et le centre annonçait « installation impossible »
+          alors qu'elle l'était. On l'attrape ici, au plus tôt, et
+          `application.ts` vient le chercher quand il démarre.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__lfInvite=e;});",
+          }}
+        />
+      </head>
       <body className={`${inter.variable} ${caveat.variable} ${inter.className}`}>
         <AuthProvider>
           <ParcoursProvider>

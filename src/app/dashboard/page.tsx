@@ -455,70 +455,194 @@ function DashboardContent() {
           currentStep={group.currentStep}
         />
 
-        {/* ══ Outils de la table ══ */}
+        {/* ══ Établi Vivant : Les 8 Objets & Instruments du Disciple ══ */}
         <section className="space-y-4">
-          <h3 className="font-serif text-lg font-bold text-encre-950 px-1">Vos outils de disciple</h3>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
-            <CarteOutil
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2">
+              <span className="punaise inline-block relative !top-0 !left-0 shrink-0" />
+              <h3 className="font-serif text-xl font-bold text-encre-950">
+                Instruments de votre table d&apos;étude
+              </h3>
+            </div>
+            <span className="text-3xs font-bold uppercase tracking-wider text-or-700 font-serif italic">
+              Objets du disciple
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-4 pt-1">
+            {/* 1. La Photo Polaroid : Ma cellule */}
+            <Link
               href="/groupes"
-              icone={Users}
-              titre="Ma cellule"
-              sous="Prière & échanges"
-              color="border-indigo-200"
-            />
-            <CarteOutil
+              className="objet-table objet-polaroid relative rounded-3xl p-4 sm:p-5 -rotate-2 flex flex-col justify-between overflow-hidden group"
+            >
+              <span className="trombone -top-3 left-6 rotate-6" />
+              <div className="aspect-[4/3] rounded-2xl bg-amber-50/80 border border-parchemin-300 flex items-center justify-center p-3 text-center overflow-hidden relative shadow-inner">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-indigo-700 shadow-xs group-hover:scale-110 transition-transform">
+                  <Users className="h-5 w-5" />
+                </div>
+                <span className="absolute bottom-1 right-2 text-3xs font-serif italic text-encre-400">
+                  {group.name}
+                </span>
+              </div>
+              <div className="mt-3 text-center">
+                <h4 className="manuscrit text-base font-bold text-encre-950">Notre Cellule</h4>
+                <p className="text-3xs text-encre-500 font-serif italic">Prière & Partage</p>
+              </div>
+            </Link>
+
+            {/* 2. Le Paquet de fiches bristol : Mémorisation */}
+            <Link
               href="/memorisation"
-              icone={Brain}
-              titre="Mémorisation"
-              sous="Versets & Récitation"
-              color="border-amber-200"
-            />
-            <CarteOutil
+              className="objet-table objet-paquet-bristol relative rounded-3xl p-4 sm:p-5 rotate-1 flex flex-col justify-between overflow-hidden group"
+            >
+              {/* Anneau métallique doré */}
+              <div className="absolute top-3 left-4 flex items-center gap-1">
+                <div className="h-3.5 w-3.5 rounded-full border-2 border-amber-600/60 bg-parchemin-200/50 shadow-xs" />
+              </div>
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-or-700">Fiches Bristol</span>
+                  <Brain className="h-4 w-4 text-or-600 group-hover:scale-110 transition-transform" />
+                </div>
+                <p className="font-serif text-xs font-bold text-encre-900 line-clamp-2 leading-snug">
+                  {versetAncre?.reference ? `« ${versetAncre.reference} »` : '« Ta parole est une lampe… »'}
+                </p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-parchemin-300 flex items-center justify-between text-3xs text-encre-600">
+                <span className="manuscrit font-bold text-xs text-or-800">Mémorisation</span>
+                <span className="font-semibold text-or-900">Réciter →</span>
+              </div>
+            </Link>
+
+            {/* 3. Le Carnet Moleskine Cuir : Journal */}
+            <Link
               href="/journal"
-              icone={PenLine}
-              titre="Journal"
-              sous="Mes méditations"
-              color="border-emerald-200"
-            />
-            <CarteOutil
+              className="objet-table objet-carnet-cuir relative rounded-3xl p-4 sm:p-5 -rotate-1 flex flex-col justify-between overflow-hidden group text-parchemin-100"
+            >
+              {/* Ruban marque-page qui dépasse */}
+              <span className="absolute -top-1 right-6 h-6 w-3 bg-or-400 rounded-b-xs shadow-xs" />
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-or-300/80">Carnet Privé</span>
+                  <PenLine className="h-4 w-4 text-or-300 group-hover:scale-110 transition-transform" />
+                </div>
+                <h4 className="manuscrit text-lg font-bold text-parchemin-100">Journal</h4>
+                <p className="text-3xs text-parchemin-200/70 font-serif italic mt-0.5">Méditations & prières</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-white/10 flex items-center justify-between text-3xs text-or-300/90 font-medium">
+                <span>{journal.length} entrée{journal.length > 1 ? 's' : ''}</span>
+                <span>Ouvrir →</span>
+              </div>
+            </Link>
+
+            {/* 4. La Cassette Audio Vintage : Témoignages */}
+            <Link
               href="/temoignages"
-              icone={Heart}
-              titre="Témoignages"
-              sous="Audio & Récits"
-              color="border-rose-200"
-            />
-            <CarteOutil
-              href="/carnet-export"
-              icone={Printer}
-              titre="Carnet de Disciple"
-              sous="Imprimer en PDF"
-              color="border-or-300"
-            />
+              className="objet-table objet-cassette relative rounded-3xl p-4 sm:p-5 rotate-2 flex flex-col justify-between overflow-hidden group text-parchemin-100"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-3xs font-mono uppercase tracking-widest text-or-400">AUDIO TAPE</span>
+                <Heart className="h-4 w-4 text-rose-400 group-hover:scale-110 transition-transform" />
+              </div>
+              {/* Deux bobines de cassette */}
+              <div className="my-2 rounded-xl bg-black/60 p-2 border border-white/10 flex items-center justify-around">
+                <div className="h-5 w-5 rounded-full border-2 border-dashed border-white/40 bg-neutral-900 flex items-center justify-center">
+                  <div className="h-1.5 w-1.5 rounded-full bg-white/70" />
+                </div>
+                <div className="h-1 flex-1 mx-2 bg-white/15 rounded-full" />
+                <div className="h-5 w-5 rounded-full border-2 border-dashed border-white/40 bg-neutral-900 flex items-center justify-center">
+                  <div className="h-1.5 w-1.5 rounded-full bg-white/70" />
+                </div>
+              </div>
+              <div className="rounded-lg bg-parchemin-100 p-1.5 text-center shadow-xs">
+                <h4 className="manuscrit text-xs font-bold text-encre-950">Récits & Témoignages</h4>
+              </div>
+            </Link>
+
+            {/* 5. Le Sablier en Laiton : Pause Sanctuaire */}
             <button
               type="button"
               onClick={() => setPauseOuverte(true)}
-              className="feuille rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center border border-amber-300"
+              className="objet-table objet-sablier relative rounded-3xl p-4 sm:p-5 -rotate-1 flex flex-col justify-between text-left group border border-amber-300"
             >
-              <Hourglass className="h-5 w-5 text-or-700 mb-2" />
-              <h4 className="manuscrit text-sm font-bold text-encre-900">Pause Sanctuaire</h4>
-              <p className="text-2xs text-encre-500 mt-0.5">Silence & Méditation</p>
+              <span className="ruban -top-2.5 left-6 rotate-2 rounded-[2px]" />
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-amber-800">Recueillement</span>
+                  <Hourglass className="h-4 w-4 text-amber-700 group-hover:rotate-180 transition-transform duration-500" />
+                </div>
+                <h4 className="manuscrit text-base sm:text-lg font-bold text-encre-950">Pause Sanctuaire</h4>
+                <p className="text-3xs text-encre-600 font-serif italic mt-0.5">Sablier de silence</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-amber-300/60 flex items-center justify-between text-3xs font-bold text-amber-900">
+                <span>Prendre 5 min</span>
+                <span>Lancer ⌛</span>
+              </div>
             </button>
+
+            {/* 6. Le Livret Broché : Carnet PDF */}
+            <Link
+              href="/carnet-export"
+              className="objet-table objet-livret-pdf relative rounded-3xl p-4 sm:p-5 rotate-1 flex flex-col justify-between overflow-hidden group"
+            >
+              <span className="attache-pince -top-3 right-6" />
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-or-700">Format A4</span>
+                  <Printer className="h-4 w-4 text-or-600 group-hover:scale-110 transition-transform" />
+                </div>
+                <h4 className="manuscrit text-base font-bold text-encre-950">Carnet PDF</h4>
+                <p className="text-3xs text-encre-500 font-serif italic mt-0.5">Imprimer pour classeur</p>
+              </div>
+              <div className="mt-4 flex items-center justify-between">
+                <span className="timbre px-2 py-0.5 text-3xs font-bold text-or-800">
+                  Prêt à relier
+                </span>
+                <span className="text-3xs text-encre-700 font-semibold">Télécharger →</span>
+              </div>
+            </Link>
+
+            {/* 7. La Boussole de Pèlerin : Mode Retraite */}
             <button
               type="button"
               onClick={() => setHorsLigneOuvert(true)}
-              className="feuille rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center border border-indigo-200"
+              className="objet-table objet-boussole relative rounded-3xl p-4 sm:p-5 -rotate-2 flex flex-col justify-between text-left group text-parchemin-100"
             >
-              <WifiOff className="h-5 w-5 text-indigo-700 mb-2" />
-              <h4 className="manuscrit text-sm font-bold text-encre-900">Mode Retraite</h4>
-              <p className="text-2xs text-encre-500 mt-0.5">Parcours hors-ligne</p>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-or-300/80">Pèlerinage</span>
+                  <Compass className="h-4 w-4 text-or-300 group-hover:rotate-45 transition-transform duration-300" />
+                </div>
+                <h4 className="manuscrit text-base font-bold text-parchemin-100">Mode Retraite</h4>
+                <p className="text-3xs text-parchemin-200/70 font-serif italic mt-0.5">100% hors-ligne</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-white/10 flex items-center justify-between text-3xs text-or-300 font-medium">
+                <span>Synchronisé</span>
+                <span>Ouvrir 🧭</span>
+              </div>
             </button>
-            <CarteOutil
+
+            {/* 8. Le Parchemin & Sceau de Cire : Attestation */}
+            <Link
               href="/certificat"
-              icone={Award}
-              titre="Attestation"
-              sous="Fin de parcours"
-              color="border-amber-300"
-            />
+              className="objet-table objet-parchemin-sceau relative rounded-3xl p-4 sm:p-5 rotate-2 flex flex-col justify-between overflow-hidden group"
+            >
+              {/* Sceau de cire rouge officiel */}
+              <div className="absolute top-3 right-4 h-6 w-6 rounded-full bg-gradient-to-br from-red-600 to-red-800 border border-amber-300/80 shadow-xs flex items-center justify-center text-amber-200 text-3xs font-bold group-hover:scale-110 transition-transform">
+                ✓
+              </div>
+              <div>
+                <span className="text-3xs font-bold uppercase tracking-wider text-or-800 block mb-1">
+                  Parchemin Scellé
+                </span>
+                <h4 className="manuscrit text-base font-bold text-encre-950">Attestation</h4>
+                <p className="text-3xs text-encre-600 font-serif italic mt-0.5">Sceau de fin</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-parchemin-300 flex items-center justify-between text-3xs font-bold text-or-900">
+                <span>20 Fondements</span>
+                <span>Consulter →</span>
+              </div>
+            </Link>
           </div>
         </section>
 
@@ -644,31 +768,6 @@ function Etape({ faite, texte }: { faite: boolean; texte: string }) {
   );
 }
 
-function CarteOutil({
-  href,
-  icone: Icone,
-  titre,
-  sous,
-  color,
-}: {
-  href: string;
-  icone: LucideIcon;
-  titre: string;
-  sous: string;
-  color?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`feuille rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center border ${color || 'border-parchemin-300'}`}
-    >
-      <Icone className="h-5 w-5 text-or-700 mb-2" />
-      <h4 className="manuscrit text-sm font-bold text-encre-900">{titre}</h4>
-      <p className="text-2xs text-encre-500 mt-0.5">{sous}</p>
-    </Link>
-  );
-}
-
 export default function Page() {
   return (
     <ParcoursGate>
@@ -676,3 +775,4 @@ export default function Page() {
     </ParcoursGate>
   );
 }
+

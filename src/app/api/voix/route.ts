@@ -20,7 +20,33 @@ import { NextResponse } from 'next/server';
 /** Au-delà, ce n'est plus un passage cliqué : on refuse plutôt que de facturer. */
 const LONGUEUR_MAX = 1500;
 
+/**
+ * Cette route dépense de l'argent à chaque appel non mis en cache. Sans
+ * garde, il suffirait de connaître l'adresse pour vider le quota du projet.
+ *
+ * On vérifie l'origine, ce qui écarte les appels depuis une autre page. Ce
+ * n'est pas une authentification — un client fabriqué à la main passe encore
+ * — mais c'est ce qui peut se faire sans vérifier un jeton Firebase dans un
+ * Worker. La vraie borne reste la longueur maximale et le cache du client.
+ */
+function origineAdmise(requete: Request): boolean {
+  const attendue = process.env.NEXT_PUBLIC_SITE_URL;
+  const origine = requete.headers.get('origin');
+  // Pas d'origine : appel direct (curl, outil). On refuse.
+  if (!origine) return false;
+  if (!attendue) return true; // configuration incomplète : on ne bloque pas le développement
+  try {
+    return new URL(origine).host === new URL(attendue).host || new URL(origine).hostname === 'localhost';
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(requete: Request) {
+  if (!origineAdmise(requete)) {
+    return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
+  }
+
   const cle = process.env.ELEVENLABS_API_KEY;
   const voix = process.env.ELEVENLABS_VOICE_ID;
   const modele = process.env.ELEVENLABS_MODEL_ID ?? 'eleven_multilingual_v2';

@@ -71,8 +71,7 @@ const SECONDAIRES: Destination[] = [
   { href: '/transformation', label: 'Mon chemin parcouru', court: 'Chemin', icon: TrendingUp },
   { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
   { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
-  { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Tag },
-  { href: '/ressources', label: 'Autour du parcours', court: 'Ressources', icon: BookMarked },
+  { href: '/ressources', label: 'Bibliothèque & Contact', court: 'Ressources', icon: BookMarked },
   { href: '/certificat', label: 'Mon attestation', court: 'Attestation', icon: Award },
 ];
 

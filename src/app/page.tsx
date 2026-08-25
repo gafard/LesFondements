@@ -110,17 +110,17 @@ export default function Home() {
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
-                href="/login"
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold shadow-lg"
+                href="/fiches/1"
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold text-slate-950 shadow-lg hover:scale-105 transition-all"
               >
-                Rejoindre ou créer une cellule
+                Explorer la Fiche 1 (Accès libre)
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/fiches"
+                href="/login"
                 className="inline-flex items-center gap-2 rounded-full border border-encre-200 bg-encre-950 px-6 py-3.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-encre-800"
               >
-                Découvrir le sentier
+                Rejoindre ou créer une cellule
               </Link>
             </div>
 
@@ -168,15 +168,15 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <p className="manuscrit mb-2 text-xl text-or-800">
-            Avant la première fiche
+            Une marche personnelle et fraternelle
           </p>
           <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
-            Le parcours ne
-            <span className="italic text-or-600"> s&apos;ouvre pas seul.</span>
+            La Fiche 1 s&apos;ouvre librement.
+            <br />
+            <span className="italic text-or-600">Le parcours se vit ensemble.</span>
           </h2>
           <p className="mt-4 text-xs sm:text-sm leading-relaxed text-encre-700">
-            Tant qu&apos;il n&apos;y a pas de groupe, les fiches restent fermées. C&apos;est la
-            règle du livret, et c&apos;est ce qui fait tenir les cinq mois.
+            Découvrez la première étape sans barrière. Pour vivre les 20 semaines et forger une foi solide, rassemblez vos compagnons de route.
           </p>
         </div>
 
@@ -270,7 +270,7 @@ export default function Home() {
 
         <div className="mx-auto mt-10 max-w-2xl rounded-3xl border border-[#ded6c8] bg-white/80 px-6 py-5 text-center shadow-2xs backdrop-blur-md">
           <p className="font-serif text-sm sm:text-base italic leading-relaxed text-slate-800">
-            « Une fiche à la fois : vous la préparez dans le calme, vous la vivez ensemble, puis la suivante s&apos;ouvre. »
+            « La Fiche 1 s&apos;explore librement. Dès la Fiche 2, vous la préparez chez vous, vous la vivez ensemble en cellule, puis la suivante s&apos;ouvre. »
           </p>
         </div>
       </section>
@@ -455,7 +455,14 @@ export default function Home() {
 
             <div className="mt-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
               <span>Basé sur le livret original</span>
-              <span className="text-amber-300 font-semibold">moneglisepreferee.net</span>
+              <a
+                href="https://leparcoursdesfondements.files.wordpress.com/2012/01/livret-vf-12-03-2015.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-300 font-semibold hover:underline"
+              >
+                Livret PDF original ↗
+              </a>
             </div>
           </div>
 

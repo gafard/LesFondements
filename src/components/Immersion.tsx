@@ -361,6 +361,40 @@ export default function Immersion({
     return resoudrePiste(manifeste, scene.piste, section);
   }, [manifeste, scene]);
 
+  const basculerLectureOuPause = useCallback(() => {
+    const el = audioRef.current;
+    if (!lecture) {
+      setLecture(true);
+      if (pisteCourante && el) {
+        if (!el.src.endsWith(pisteCourante.url)) {
+          el.src = pisteCourante.url;
+        }
+        el.currentTime = 0;
+        const p = el.play();
+        if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
+      } else {
+        const texte = texteDeLaScene(scene);
+        if (texte) lireAVoixHaute(texte);
+        setAudioEnCours(true);
+      }
+      return;
+    }
+
+    if (audioEnCours) {
+      el?.pause();
+      arreterLecture();
+      setAudioEnCours(false);
+    } else {
+      if (pisteCourante && el) {
+        const p = el.play();
+        if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
+      } else {
+        const texte = texteDeLaScene(scene);
+        if (texte) lireAVoixHaute(texte);
+        setAudioEnCours(true);
+      }
+    }
+  }, [lecture, audioEnCours, pisteCourante, scene, texteDeLaScene]);
 
   useEffect(() => {
     if (!lecture || pisteCourante) {
@@ -376,16 +410,22 @@ export default function Immersion({
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
-    el.currentTime = 0;
     if (lecture && pisteCourante) {
-      void el
-        .play()
-        .then(() => setAudioEnCours(true))
-        .catch(() => setAudioEnCours(false));
+      if (!el.src.endsWith(pisteCourante.url)) {
+        el.src = pisteCourante.url;
+      }
+      el.currentTime = 0;
+      const p = el.play();
+      if (p) {
+        p.then(() => setAudioEnCours(true)).catch(() => {
+          setAudioEnCours(false);
+        });
+      }
     } else {
       el.pause();
+      setAudioEnCours(false);
     }
-  }, [pisteCourante, lecture]);
+  }, [pisteCourante, lecture, index]);
 
   // ── Gestes tactiles ─────────────────────────────────────────
   const debutTouche = (event: React.TouchEvent) => {
@@ -441,6 +481,28 @@ export default function Immersion({
               <span style={{ width: `${Math.round(progression * 100)}%` }} />
             </div>
           </div>
+
+          <button
+            onClick={() => {
+              if (lecture) {
+                setLecture(false);
+                audioRef.current?.pause();
+                arreterLecture();
+                setAudioEnCours(false);
+              } else {
+                basculerLectureOuPause();
+              }
+            }}
+            aria-label={lecture ? 'Désactiver la voix off' : 'Activer la voix off'}
+            title={lecture ? 'Désactiver la voix off' : 'Écouter la voix off'}
+            className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/10 shadow-2xl backdrop-blur-xl transition-all ${
+              lecture
+                ? 'bg-or-400 text-encre-950 shadow-or-400/20'
+                : 'bg-encre-950/60 text-parchemin-100/70 hover:text-parchemin-100'
+            }`}
+          >
+            {lecture ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+          </button>
 
           <button
             onClick={() => setFeuille(true)}
@@ -539,51 +601,55 @@ export default function Immersion({
             </button>
 
             {/* Centre : Audio ou indicateur de scène */}
-            {lecture && pisteCourante ? (
-              <div className="flex flex-1 items-center gap-2.5 min-w-0 px-1 sm:px-3">
-                <button
-                  onClick={() => {
-                    const el = audioRef.current;
-                    if (!el) return;
-                    if (el.paused) void el.play();
-                    else el.pause();
-                  }}
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-or-400 text-encre-950 transition-transform active:scale-95 shadow-xs"
-                  aria-label={audioEnCours ? 'Mettre en pause' : 'Lire'}
-                >
-                  {audioEnCours ? (
-                    <Pause className="h-3.5 w-3.5 fill-current" />
-                  ) : (
-                    <Play className="h-3.5 w-3.5 fill-current ml-0.5" />
-                  )}
-                </button>
+            <div className="flex flex-1 items-center gap-2.5 min-w-0 px-1 sm:px-3">
+              <button
+                onClick={basculerLectureOuPause}
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-or-400 text-encre-950 transition-transform active:scale-95 shadow-xs"
+                aria-label={audioEnCours ? 'Mettre en pause' : 'Écouter'}
+                title={audioEnCours ? 'Mettre en pause' : 'Écouter'}
+              >
+                {audioEnCours ? (
+                  <Pause className="h-3.5 w-3.5 fill-current" />
+                ) : (
+                  <Play className="h-3.5 w-3.5 fill-current ml-0.5" />
+                )}
+              </button>
 
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/15">
+              <div className="flex-1 flex flex-col justify-center min-w-0">
+                <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
                   <span
                     className="block h-full rounded-full bg-or-400 transition-[width] duration-200"
-                    style={{ width: `${Math.round(audioAvancement * 100)}%` }}
+                    style={{
+                      width: `${
+                        lecture && pisteCourante
+                          ? Math.round(audioAvancement * 100)
+                          : Math.round(progression * 100)
+                      }%`,
+                    }}
                   />
                 </div>
+                <div className="flex items-center justify-between mt-1 text-3xs text-parchemin-100/50">
+                  <span className="truncate">
+                    {lecture ? (pisteCourante ? 'Voix Studio' : 'Synthèse') : 'Mode lecture'}
+                  </span>
+                  <span className="shrink-0 ml-2">
+                    {index + 1} / {scenario.length}
+                  </span>
+                </div>
+              </div>
 
-                <button
-                  onClick={() => setEnchainer(!enchainer)}
-                  title="Passer automatiquement à la scène suivante"
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-3xs font-bold transition-colors ${
-                    enchainer
-                      ? 'bg-or-400 text-encre-950'
-                      : 'bg-white/10 text-parchemin-100/60 hover:bg-white/18'
-                  }`}
-                >
-                  Auto
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-1 items-center justify-center text-center px-2">
-                <span className="text-2xs font-semibold text-parchemin-100/40">
-                  {index + 1} / {scenario.length}
-                </span>
-              </div>
-            )}
+              <button
+                onClick={() => setEnchainer(!enchainer)}
+                title="Passer automatiquement à la scène suivante après la voix"
+                className={`shrink-0 rounded-full px-2.5 py-1 text-3xs font-bold transition-colors ${
+                  enchainer
+                    ? 'bg-or-400 text-encre-950'
+                    : 'bg-white/10 text-parchemin-100/60 hover:bg-white/18'
+                }`}
+              >
+                Auto
+              </button>
+            </div>
 
             {/* Bouton Suivant / Action */}
             {scene.type === 'cloture' ? (
@@ -649,25 +715,22 @@ export default function Immersion({
         onQuitter={onQuitter}
       />
 
-      {/* Audio element background */}
-      {pisteCourante && (
-        <audio
-          ref={audioRef}
-          src={pisteCourante.url}
-          preload="auto"
-          onPlay={() => setAudioEnCours(true)}
-          onPause={() => setAudioEnCours(false)}
-          onTimeUpdate={(event) => {
-            const el = event.currentTarget;
-            if (el.duration) setAudioAvancement(el.currentTime / el.duration);
-          }}
-          onEnded={() => {
-            setAudioEnCours(false);
-            setAudioAvancement(1);
-            if (enchainer) aller(1);
-          }}
-        />
-      )}
+      {/* Audio element permanent */}
+      <audio
+        ref={audioRef}
+        preload="auto"
+        onPlay={() => setAudioEnCours(true)}
+        onPause={() => setAudioEnCours(false)}
+        onTimeUpdate={(event) => {
+          const el = event.currentTarget;
+          if (el.duration) setAudioAvancement(el.currentTime / el.duration);
+        }}
+        onEnded={() => {
+          setAudioEnCours(false);
+          setAudioAvancement(1);
+          if (enchainer) aller(1);
+        }}
+      />
     </div>
   );
 }
@@ -748,21 +811,34 @@ function FeuilleOptions({
         <span className="mx-auto mb-5 block h-1 w-10 rounded-full bg-white/20" />
 
         {/* ── Ambiance ── */}
-        <p className="mb-2 text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/35">
-          Ambiance
-        </p>
-        <div className="flex gap-2">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/35">
+            Fond Sonore & Musique
+          </p>
+          <span className="text-3xs text-or-400/80 font-medium">
+            {AMBIANCES.find((a) => a.valeur === ambiance)?.label}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {AMBIANCES.map((option) => (
             <button
               key={option.valeur}
               onClick={() => setAmbiance(option.valeur)}
-              className={`flex-1 rounded-2xl px-3 py-3 text-xs font-bold transition-colors ${
+              className={`rounded-2xl p-2.5 text-left transition-all flex flex-col justify-between ${
                 ambiance === option.valeur
-                  ? 'bg-or-400 text-encre-950'
-                  : 'bg-white/8 text-parchemin-100/65 hover:bg-white/14'
+                  ? 'bg-or-400 text-encre-950 shadow-md ring-1 ring-or-300'
+                  : 'bg-white/8 text-parchemin-100/70 hover:bg-white/14'
               }`}
             >
-              {option.label}
+              <span className="text-xs font-bold truncate block">{option.label}</span>
+              <span
+                className={`text-[10px] mt-0.5 line-clamp-1 ${
+                  ambiance === option.valeur ? 'text-encre-900/80' : 'text-parchemin-100/40'
+                }`}
+              >
+                {option.description}
+              </span>
             </button>
           ))}
         </div>

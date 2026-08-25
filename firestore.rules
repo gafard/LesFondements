@@ -147,5 +147,18 @@ service cloud.firestore {
         allow read, write: if connecte() && moi() == userId;
       }
     }
+
+    // Témoignages du tableau de liège communautaire
+    match /temoignages/{temoignageId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if connecte() || true;
+    }
+
+    // Retours d'expérience, besoins et messages envoyés à l'équipe
+    match /retours/{retourId} {
+      allow create: if true;
+      allow read, update, delete: if connecte();
+    }
   }
 }
