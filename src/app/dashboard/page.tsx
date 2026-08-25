@@ -20,6 +20,10 @@ import {
   Hourglass,
   Printer,
   LogOut,
+  Search,
+  TrendingUp,
+  BookMarked,
+  Shield,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -638,6 +642,82 @@ function DashboardContent() {
               <div className="mt-4 pt-2 border-t border-parchemin-300 flex items-center justify-between text-3xs font-bold text-or-900">
                 <span>20 Fondements</span>
                 <span>Consulter →</span>
+              </div>
+            </Link>
+
+            {/* 9. La Loupe d'Étude : Retrouver mes écrits */}
+            <Link
+              href="/recherche"
+              className="objet-table relative rounded-3xl p-4 sm:p-5 -rotate-1 flex flex-col justify-between overflow-hidden group bg-[#faf6ee] border border-parchemin-300"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-or-700">Index & Notes</span>
+                  <Search className="h-4 w-4 text-or-600 group-hover:scale-110 transition-transform" />
+                </div>
+                <h4 className="manuscrit text-base font-bold text-encre-950">Mes Écrits</h4>
+                <p className="text-3xs text-encre-500 font-serif italic mt-0.5">Rechercher mes notes</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-parchemin-300 flex items-center justify-between text-3xs text-encre-700 font-semibold">
+                <span>Tout retrouver</span>
+                <span>Chercher 🔍</span>
+              </div>
+            </Link>
+
+            {/* 10. Le Tracé de Croissance : Mon chemin parcouru */}
+            <Link
+              href="/transformation"
+              className="objet-table relative rounded-3xl p-4 sm:p-5 rotate-1 flex flex-col justify-between overflow-hidden group bg-[#f5f8f5] border border-emerald-200"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-emerald-800">Croissance</span>
+                  <TrendingUp className="h-4 w-4 text-emerald-700 group-hover:scale-110 transition-transform" />
+                </div>
+                <h4 className="manuscrit text-base font-bold text-encre-950">Chemin Parcouru</h4>
+                <p className="text-3xs text-emerald-700 font-serif italic mt-0.5">Transformation spirituelle</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-emerald-200 flex items-center justify-between text-3xs text-emerald-800 font-semibold">
+                <span>Évolution</span>
+                <span>Voir 📈</span>
+              </div>
+            </Link>
+
+            {/* 11. Le Rayonnage Relié : Bibliothèque & Contact */}
+            <Link
+              href="/ressources"
+              className="objet-table relative rounded-3xl p-4 sm:p-5 -rotate-2 flex flex-col justify-between overflow-hidden group bg-[#fbf6f0] border border-amber-300"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-amber-800">Ouvrages Clés</span>
+                  <BookMarked className="h-4 w-4 text-amber-700 group-hover:scale-110 transition-transform" />
+                </div>
+                <h4 className="manuscrit text-base font-bold text-encre-950">Bibliothèque</h4>
+                <p className="text-3xs text-encre-600 font-serif italic mt-0.5">Livres référencés</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-amber-200 flex items-center justify-between text-3xs text-amber-900 font-semibold">
+                <span>Étude approfondie</span>
+                <span>Ouvrir 📚</span>
+              </div>
+            </Link>
+
+            {/* 12. Le Mémo Pastoral A4 : Guide des Cellules */}
+            <Link
+              href="/guide-pastoral"
+              className="objet-table relative rounded-3xl p-4 sm:p-5 rotate-1 flex flex-col justify-between overflow-hidden group bg-or-50/80 border border-or-300"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xs font-bold uppercase tracking-wider text-or-800">Accompagnement</span>
+                  <Shield className="h-4 w-4 text-or-700 group-hover:scale-110 transition-transform" />
+                </div>
+                <h4 className="manuscrit text-base font-bold text-encre-950">Guide Pastoral</h4>
+                <p className="text-3xs text-encre-600 font-serif italic mt-0.5">Prendre soin (A4)</p>
+              </div>
+              <div className="mt-4 pt-2 border-t border-or-200 flex items-center justify-between text-3xs text-or-900 font-semibold">
+                <span>Prière en équipe</span>
+                <span>Imprimer 🛡️</span>
               </div>
             </Link>
           </div>

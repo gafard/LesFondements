@@ -660,6 +660,32 @@ export async function createGroup(input: CreateGroupInput): Promise<ParcoursGrou
   return group;
 }
 
+export interface UpdateGroupInput {
+  groupId: string;
+  name?: string;
+  description?: string;
+  capacity?: number;
+  meeting?: GroupMeetingPlan;
+  visibility?: GroupVisibility;
+}
+
+export async function updateGroupSettings(input: UpdateGroupInput): Promise<ParcoursGroup> {
+  const group = await getGroup(input.groupId);
+  if (!group) throw new Error("Ce groupe n'existe plus.");
+
+  const maj: ParcoursGroup = {
+    ...group,
+    ...(input.name ? { name: input.name.trim() } : {}),
+    ...(input.description !== undefined ? { description: input.description.trim() } : {}),
+    ...(input.capacity ? { capacity: input.capacity } : {}),
+    ...(input.meeting ? { meeting: input.meeting } : {}),
+    ...(input.visibility ? { visibility: input.visibility } : {}),
+  };
+
+  await writeGroup(maj);
+  return maj;
+}
+
 export interface JoinRequestInput {
   groupId: string;
   user: { uid: string; displayName: string; email: string | null; photoURL?: string | null };

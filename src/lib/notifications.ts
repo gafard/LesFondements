@@ -217,46 +217,54 @@ export async function envoyerNotificationTest(options?: {
   url?: string;
 }): Promise<{ success: boolean; error?: string }> {
   if (!verifierSupportNotifications()) {
-    return { success: false, error: 'Notifications non supportées.' };
+    return { success: false, error: 'Notifications non supportées par ce navigateur.' };
   }
 
-  const titre = options?.title || 'Les Fondements · Notification Worker';
+  if (Notification.permission === 'denied') {
+    return {
+      success: false,
+      error: 'Les notifications sont bloquées. Autorisez-les dans les paramètres de votre navigateur ou de votre téléphone.',
+    };
+  }
+
+  if (Notification.permission === 'default') {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      return { success: false, error: 'Veuillez autoriser les notifications lorsque le navigateur vous le demande.' };
+    }
+  }
+
+  const titre = options?.title || 'Les Fondements · Rappel du Disciple';
   const corps = options?.body || '« Ta parole est une lampe à mes pieds et une lumière sur mon sentier. » (Ps 119:105)';
   const url = options?.url || '/dashboard';
 
   try {
     const reg = await navigator.serviceWorker.ready;
-    const subscription = await reg.pushManager.getSubscription();
 
-    if (subscription) {
-      const token = await jetonFirebase();
-      if (!token) throw new Error('Reconnectez-vous pour tester le rappel.');
-      const res = await fetch('/api/notifications/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          subscription: subscription.toJSON(),
-          payload: {
-            title: titre,
-            body: corps,
-            url,
-            tag: 'test-push-' + Date.now(),
-          },
-        }),
-      });
-
-      if (res.ok) {
-        return { success: true };
-      }
-    }
-
-    // Repli direct par le Service Worker si l'envoi réseau distant échoue
+    // Déclenchement direct par le Service Worker (immédiat & garanti sur l'appareil)
     await reg.showNotification(titre, {
       body: corps,
       icon: '/icon-192.png',
       badge: '/icon-192.png',
+      tag: 'test-notification-' + Date.now(),
       data: { url },
     });
+
+    // Envoi parallèle via le Worker distant si abonnement actif
+    const subscription = await reg.pushManager.getSubscription();
+    if (subscription) {
+      const token = await jetonFirebase();
+      if (token) {
+        void fetch('/api/notifications/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            subscription: subscription.toJSON(),
+            payload: { title: titre, body: corps, url },
+          }),
+        }).catch(() => {});
+      }
+    }
 
     return { success: true };
   } catch (err: unknown) {

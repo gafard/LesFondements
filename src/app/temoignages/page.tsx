@@ -305,6 +305,13 @@ export default function TemoignagesPage() {
     }
   };
 
+  /**
+   * On ne décroche que son propre témoignage. Les règles Firestore le
+   * refusaient déjà — depuis peu — mais un bouton qui propose ce qui sera
+   * rejeté laisse croire à une panne plutôt qu'à une limite voulue.
+   */
+  const estLeMien = (t: TemoignageItem) => !!user?.uid && t.auteurId === user.uid;
+
   const supprimerTemoignage = async (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (window.confirm('Voulez-vous décrocher et supprimer ce témoignage du tableau de liège communautaire ?')) {
@@ -326,7 +333,14 @@ export default function TemoignagesPage() {
   };
 
   const voterAmen = async (id: string) => {
-    const res = await voterAmenDistant(id, user?.uid);
+    // Dire « amen » compte pour tout le groupe : les règles exigent donc un
+    // compte, faute de quoi le même visiteur pourrait voter sans fin. Sans
+    // ce garde, le clic aurait paru fonctionner puis se serait perdu.
+    if (!user) {
+      setModalConnexion(true);
+      return;
+    }
+    const res = await voterAmenDistant(id, user.uid);
     setTemoignages((prev) =>
       prev.map((t) => (t.id === id ? { ...t, amens: res.amens, aVote: res.aVote } : t))
     );
@@ -676,7 +690,8 @@ export default function TemoignagesPage() {
                       Fiche {metaFiche.id}
                     </span>
                   )}
-                  {/* Bouton Décrocher / Supprimer ce post-it vedette */}
+                  {/* Décrocher — seulement le sien */}
+                  {estLeMien(temoignageActif) && (
                   <button
                     type="button"
                     onClick={(e) => supprimerTemoignage(temoignageActif.id, e)}
@@ -685,6 +700,7 @@ export default function TemoignagesPage() {
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
+                  )}
                 </div>
               </div>
 
@@ -771,6 +787,7 @@ export default function TemoignagesPage() {
                           F.{meta.id}
                         </span>
                       )}
+                      {estLeMien(item) && (
                       <button
                         type="button"
                         onClick={(e) => supprimerTemoignage(item.id, e)}
@@ -779,6 +796,7 @@ export default function TemoignagesPage() {
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
+                      )}
                     </div>
                   </div>
 

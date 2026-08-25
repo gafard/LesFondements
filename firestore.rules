@@ -150,9 +150,31 @@ service cloud.firestore {
 
     // Témoignages du tableau de liège communautaire
     match /temoignages/{temoignageId} {
+      // Le mur est la vitrine du parcours : il se lit sans compte.
       allow read: if true;
-      allow create, update: if true;
-      allow delete: if connecte() || true;
+
+      // On ne dépose que sous son propre nom. Sans cette condition, le
+      // témoignage de quelqu'un pouvait être signé par un autre.
+      allow create: if connecte()
+        && request.resource.data.auteurId == moi();
+
+      allow update: if connecte() && (
+        // Son auteur corrige son texte.
+        resource.data.auteurId == moi()
+        // Ou quelqu'un dit « amen » : seuls ces deux champs bougent, et on
+        // ne peut s'ajouter ou se retirer que soi-même de la liste. Sans
+        // cette borne, un « amen » pouvait réécrire tout le document.
+        || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amens', 'amensVotants'])
+          && request.resource.data.amensVotants.diff(resource.data.amensVotants)
+               .affectedKeys().hasOnly([moi()])
+        )
+      );
+
+      // On ne supprime que le sien. La règle précédente disait
+      // « connecte() || true » : le « || true » annulait la vérification, et
+      // n'importe qui — même sans compte — pouvait vider le mur.
+      allow delete: if connecte() && resource.data.auteurId == moi();
     }
 
     // Retours d'expérience, besoins et messages envoyés à l'équipe

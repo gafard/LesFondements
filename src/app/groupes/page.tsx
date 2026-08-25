@@ -35,6 +35,7 @@ import {
   X,
   HeartHandshake,
   Printer,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -57,6 +58,7 @@ import {
   subscribe,
   toggleAmen,
   togglePrayed,
+  updateGroupSettings,
 } from '@/lib/parcoursStore';
 import { FICHES_META } from '@/data/fichesMeta';
 import {
@@ -65,10 +67,13 @@ import {
 } from '@/lib/types';
 import type {
   AttendanceMode,
+  GroupMeetingMode,
   GroupMember,
   GroupPost,
   GroupPostKind,
+  GroupRhythm,
   GroupSession,
+  ParcoursGroup,
 } from '@/lib/types';
 
 const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
@@ -92,6 +97,7 @@ function CelluleContent() {
   const [sessions, setSessions] = useState<GroupSession[]>([]);
   const [codeCopie, setCodeCopie] = useState(false);
   const [inviteOuvert, setInviteOuvert] = useState(false);
+  const [reglagesOuvert, setReglagesOuvert] = useState(false);
 
   const chargerPosts = useCallback(() => {
     if (!group) return;
@@ -213,6 +219,17 @@ function CelluleContent() {
                   <Video className="h-3.5 w-3.5 text-or-300" />
                   Lien visio
                 </a>
+              )}
+
+              {isLeader && (
+                <button
+                  onClick={() => setReglagesOuvert(true)}
+                  title="Modifier les paramètres de la cellule (nom, date de rencontre, mode, lieu/visio)"
+                  className="verre inline-flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-2xs font-bold text-parchemin-100 transition-colors hover:bg-white/14"
+                >
+                  <Settings className="h-3.5 w-3.5 text-or-300" />
+                  <span>Paramètres</span>
+                </button>
               )}
 
               {enRencontre ? (
@@ -400,6 +417,17 @@ function CelluleContent() {
 
         {onglet === 'guide' && <OngletGuide />}
       </div>
+
+      {reglagesOuvert && group && (
+        <ModalReglagesCellule
+          group={group}
+          onFermer={() => setReglagesOuvert(false)}
+          onEnregistre={() => {
+            setReglagesOuvert(false);
+            void refresh();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -1503,6 +1531,226 @@ function OngletGuide() {
         >
           {tourne ? 'Mettre en pause' : 'Démarrer le tour'}
         </button>
+      </div>
+    </div>
+  );
+}
+
+function ModalReglagesCellule({
+  group,
+  onFermer,
+  onEnregistre,
+}: {
+  group: ParcoursGroup;
+  onFermer: () => void;
+  onEnregistre: () => void;
+}) {
+  const [nom, setNom] = useState(group.name);
+  const [description, setDescription] = useState(group.description);
+  const [weekday, setWeekday] = useState(group.meeting.weekday);
+  const [time, setTime] = useState(group.meeting.time);
+  const [rhythm, setRhythm] = useState<GroupRhythm>(group.meeting.rhythm || 'hebdomadaire');
+  const [mode, setMode] = useState<GroupMeetingMode>(group.meeting.mode || 'presentiel');
+  const [callLink, setCallLink] = useState(group.meeting.callLink || '');
+  const [capacity, setCapacity] = useState(group.capacity || 6);
+  const [enSauvegarde, setEnSauvegarde] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nom.trim()) {
+      setErreur('Le nom de la cellule est requis.');
+      return;
+    }
+    setEnSauvegarde(true);
+    setErreur(null);
+    try {
+      await updateGroupSettings({
+        groupId: group.id,
+        name: nom.trim(),
+        description: description.trim(),
+        capacity: Number(capacity),
+        meeting: {
+          ...group.meeting,
+          weekday: Number(weekday),
+          time: time.trim(),
+          rhythm,
+          mode,
+          callLink: callLink.trim() || undefined,
+        },
+      });
+      onEnregistre();
+    } catch (err: unknown) {
+      setErreur(err instanceof Error ? err.message : 'Erreur lors de l’enregistrement');
+    } finally {
+      setEnSauvegarde(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+      <div className="feuille relative max-w-lg w-full rounded-3xl border-2 border-or-400 bg-[#fffdfa] p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+        <span className="punaise-bois absolute -top-2.5 left-10" />
+        <div className="flex items-center justify-between border-b border-parchemin-300 pb-3 mb-5">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-or-100 flex items-center justify-center text-or-800 font-bold">
+              <Settings className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="font-serif text-xl font-bold text-encre-950">Paramètres de la Cellule</h3>
+              <p className="text-3xs text-encre-500 font-serif italic">Réservé à l&apos;animateur</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onFermer}
+            className="rounded-full p-1.5 text-encre-400 hover:bg-parchemin-200 hover:text-encre-800"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {erreur && (
+          <div className="mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700">
+            {erreur}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4 text-left">
+          <div>
+            <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+              Nom de la cellule
+            </label>
+            <input
+              type="text"
+              value={nom}
+              onChange={(e) => setNom(e.target.value)}
+              className="w-full rounded-xl border border-parchemin-300 bg-white px-3.5 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+              Description & Vision fraternelle
+            </label>
+            <textarea
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full rounded-xl border border-parchemin-300 bg-white px-3.5 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+                Jour de rencontre
+              </label>
+              <select
+                value={weekday}
+                onChange={(e) => setWeekday(Number(e.target.value))}
+                className="w-full rounded-xl border border-parchemin-300 bg-white px-3 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+              >
+                {JOURS.map((j, idx) => (
+                  <option key={j} value={idx}>
+                    {j.charAt(0).toUpperCase() + j.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+                Heure (ex: 19:30)
+              </label>
+              <input
+                type="text"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                placeholder="19:30"
+                className="w-full rounded-xl border border-parchemin-300 bg-white px-3 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+                Fréquence
+              </label>
+              <select
+                value={rhythm}
+                onChange={(e) => setRhythm(e.target.value as GroupRhythm)}
+                className="w-full rounded-xl border border-parchemin-300 bg-white px-3 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+              >
+                <option value="hebdomadaire">Hebdomadaire</option>
+                <option value="bimensuel">Bimensuelle</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+                Mode de rencontre
+              </label>
+              <select
+                value={mode}
+                onChange={(e) => setMode(e.target.value as GroupMeetingMode)}
+                className="w-full rounded-xl border border-parchemin-300 bg-white px-3 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+              >
+                <option value="presentiel">Sur place (Maison)</option>
+                <option value="ligne">En ligne (Visio)</option>
+                <option value="hybride">Hybride (Maison + Visio)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+              Lien Visio (Google Meet, Zoom...) ou Adresse
+            </label>
+            <input
+              type="text"
+              value={callLink}
+              onChange={(e) => setCallLink(e.target.value)}
+              placeholder="https://meet.google.com/abc-defg-hij"
+              className="w-full rounded-xl border border-parchemin-300 bg-white px-3.5 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+            />
+            <p className="mt-1 text-3xs text-encre-400 font-serif italic">
+              Ce lien sera accessible en un clic par tous les membres le soir de la rencontre.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
+              Capacité maximale (recommandé : 5 à 7 personnes)
+            </label>
+            <input
+              type="number"
+              min={2}
+              max={15}
+              value={capacity}
+              onChange={(e) => setCapacity(Number(e.target.value))}
+              className="w-full rounded-xl border border-parchemin-300 bg-white px-3.5 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
+            />
+          </div>
+
+          <div className="pt-3 border-t border-parchemin-300 flex items-center justify-end gap-2.5">
+            <button
+              type="button"
+              onClick={onFermer}
+              className="rounded-full px-4 py-2 text-2xs font-bold text-encre-600 hover:bg-parchemin-200"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={enSauvegarde}
+              className="bouton-or rounded-full px-6 py-2.5 text-xs font-bold shadow-md disabled:opacity-50"
+            >
+              {enSauvegarde ? 'Enregistrement…' : 'Enregistrer les modifications'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
