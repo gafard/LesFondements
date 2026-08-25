@@ -1,5 +1,8 @@
 // Service Worker pour Les Fondements PWA & Push Notifications
-const CACHE_NAME = 'lesfondements-v4';
+// Le numéro doit changer à chaque modification de ce fichier. Sans quoi les
+// navigateurs gardent l'ancienne coquille et ses réponses périmées : le
+// service worker se met bien à jour, mais continue de servir le vieux cache.
+const CACHE_NAME = 'lesfondements-v5';
 const ASSETS_A_METTRE_EN_CACHE = [
   '/icon-192.png',
   '/icon-512.png',
