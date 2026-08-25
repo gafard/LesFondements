@@ -1169,7 +1169,7 @@ export async function openMeeting(groupId: string, uid: string): Promise<GroupSe
   const actifs = members.filter((m) => m.status === 'actif');
   if (actifs.length < 2) {
     throw new Error(
-      'Une rencontre ne se clôt pas seul : le parcours se vit à plusieurs. Invitez au moins une personne.'
+      'Une rencontre ne s’ouvre pas seul : le parcours se vit à plusieurs. Invitez au moins une personne avant de commencer.'
     );
   }
 

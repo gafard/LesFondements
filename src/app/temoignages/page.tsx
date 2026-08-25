@@ -11,6 +11,8 @@ import {
   Play,
   Pause,
   Sparkles,
+  Wand2,
+  Loader2,
   Check,
   Trash2,
   RotateCcw,
@@ -42,11 +44,14 @@ export default function TemoignagesPage() {
   const [soucisPartage, setSoucisPartage] = useState<string | null>(null);
   const [audioEnLecture, setAudioEnLecture] = useState<string | null>(null);
   const [enPublication, setEnPublication] = useState(false);
+  const [enTranscription, setEnTranscription] = useState(false);
+  const [messageTranscription, setMessageTranscription] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioFichierRef = useRef<Blob | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   // ── Synchronisation Temps Réel (Cloud Firestore + Cache Local) ──
   useEffect(() => {
@@ -61,7 +66,35 @@ export default function TemoignagesPage() {
     return () => desabonner();
   }, [user?.uid]);
 
-  // ── Enregistrement vocal universel (WebM / MP4 / AAC) ──
+  // ── Transcription IA via Groq Whisper ──
+  const transcrireAvecGroq = async (blob: Blob) => {
+    try {
+      setEnTranscription(true);
+      setMessageTranscription('Transcription IA via Whisper en cours…');
+      const formData = new FormData();
+      formData.append('file', blob, 'temoignage.webm');
+
+      const reponse = await fetch('/api/temoignages/transcription', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (reponse.ok) {
+        const data = (await reponse.json()) as { text?: string };
+        if (data.text?.trim()) {
+          setTexteTemoignage((prev) => (prev.trim() ? `${prev} ${data.text}` : data.text || ''));
+          setMessageTranscription('✨ Paroles transcrites avec succès !');
+        }
+      }
+    } catch {
+      setMessageTranscription('Transcription Groq indisponible.');
+    } finally {
+      setEnTranscription(false);
+      setTimeout(() => setMessageTranscription(null), 3000);
+    }
+  };
+
+  // ── Enregistrement vocal universel (WebM / MP4 / AAC) + Web Speech en direct ──
   const demarrerEnregistrement = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -86,14 +119,41 @@ export default function TemoignagesPage() {
 
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType || 'audio/webm' });
-        // Le blob part sur R2 au moment de publier. En attendant, une adresse
-        // locale suffit pour se réécouter — l'encoder en base64 pour le
-        // stocker dans Firestore était ce qui plafonnait les témoignages à
-        // trois minutes et les laissait sur un seul appareil.
         audioFichierRef.current = audioBlob;
         setAudioBlobUrl(URL.createObjectURL(audioBlob));
         stream.getTracks().forEach((track) => track.stop());
+
+        // Si le texte est encore vide, tenter automatiquement Whisper
+        if (!texteTemoignage.trim()) {
+          void transcrireAvecGroq(audioBlob);
+        }
       };
+
+      // Démarrage Web Speech Recognition en direct
+      if (typeof window !== 'undefined') {
+        const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (SpeechRec) {
+          try {
+            const recog = new SpeechRec();
+            recog.lang = 'fr-FR';
+            recog.continuous = true;
+            recog.interimResults = true;
+            recog.onresult = (evt: any) => {
+              let directText = '';
+              for (let i = 0; i < evt.results.length; i++) {
+                directText += evt.results[i][0].transcript + ' ';
+              }
+              if (directText.trim()) {
+                setTexteTemoignage(directText.trim());
+              }
+            };
+            recog.start();
+            recognitionRef.current = recog;
+          } catch {
+            /* Speech recognition fallback */
+          }
+        }
+      }
 
       mediaRecorder.start();
       setEnEnregistrement(true);
@@ -106,6 +166,12 @@ export default function TemoignagesPage() {
     if (mediaRecorderRef.current && enEnregistrement) {
       mediaRecorderRef.current.stop();
       setEnEnregistrement(false);
+    }
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      recognitionRef.current = null;
     }
   };
 
@@ -418,45 +484,89 @@ export default function TemoignagesPage() {
               />
             </div>
 
-            {/* Enregistreur Audio */}
+            {/* Enregistreur Audio & Transcription IA */}
             <div className="mb-6 rounded-2xl border border-or-300 bg-or-50/60 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Mic className="h-4 w-4 text-or-700" />
-                  <span className="text-xs font-bold text-or-950">Mémo vocal (Optionnel)</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Mic className="h-4 w-4 text-or-700" />
+                    <span className="text-xs font-bold text-or-950">Mémo vocal &amp; Dictée</span>
+                  </div>
+                  <p className="text-3xs text-encre-600 mt-0.5">
+                    Parlez au micro : vos paroles s&apos;écrivent en direct sur le post-it !
+                  </p>
                 </div>
 
                 {!enEnregistrement ? (
                   <button
                     type="button"
                     onClick={demarrerEnregistrement}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-or-600 px-3.5 py-1.5 text-2xs font-bold text-white hover:bg-or-700 shadow-xs"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full bg-or-600 px-4 py-2 text-2xs font-bold text-white hover:bg-or-700 shadow-xs transition-transform active:scale-95"
                   >
-                    <Mic className="h-3 w-3" /> Enregistrer ma voix
+                    <Mic className="h-3.5 w-3.5" /> Enregistrer ma voix
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={arreterEnregistrement}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-3.5 py-1.5 text-2xs font-bold text-white animate-pulse shadow-xs"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full bg-rose-600 px-4 py-2 text-2xs font-bold text-white animate-pulse shadow-xs"
                   >
-                    <MicOff className="h-3 w-3" /> Terminer l’enregistrement
+                    <MicOff className="h-3.5 w-3.5" /> Terminer l’enregistrement
                   </button>
                 )}
               </div>
 
+              {/* Animation pendant l'enregistrement */}
+              {enEnregistrement && (
+                <div className="mt-3 flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-2.5 text-2xs font-semibold text-rose-800 animate-fadeIn">
+                  <span className="h-2 w-2 rounded-full bg-rose-600 animate-ping" />
+                  <span>Enregistrement en cours... Parlez clairement, le texte se dicte automatiquement.</span>
+                </div>
+              )}
+
+              {/* Message / État de la transcription Groq */}
+              {messageTranscription && (
+                <div className="mt-3 flex items-center gap-2 rounded-xl bg-amber-100/80 border border-or-400 p-2.5 text-2xs font-bold text-encre-900 animate-fadeIn">
+                  {enTranscription ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-or-700 shrink-0" />
+                  ) : (
+                    <Sparkles className="h-3.5 w-3.5 text-or-700 shrink-0" />
+                  )}
+                  <span>{messageTranscription}</span>
+                </div>
+              )}
+
               {audioBlobUrl && (
-                <div className="mt-3 flex items-center justify-between gap-2 text-2xs font-semibold text-emerald-800 bg-emerald-50/80 p-2 rounded-xl border border-emerald-200">
-                  <span className="flex items-center gap-1.5">
-                    <Check className="h-3.5 w-3.5 text-emerald-600" /> Audio prêt à être épinglé !
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setAudioBlobUrl(null)}
-                    className="text-rose-700 hover:text-rose-900 inline-flex items-center gap-1 hover:underline text-2xs font-bold"
-                  >
-                    <Trash2 className="h-3 w-3" /> Effacer l&apos;audio
-                  </button>
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-2xs font-semibold text-emerald-900 bg-emerald-50/90 p-3 rounded-xl border border-emerald-200">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>Mémo vocal prêt à être diffusé</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={enTranscription}
+                      onClick={() => audioFichierRef.current && void transcrireAvecGroq(audioFichierRef.current)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 text-3xs font-bold shadow-2xs transition-colors disabled:opacity-50"
+                      title="Relancer une transcription IA haute fidélité avec Whisper"
+                    >
+                      {enTranscription ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Wand2 className="h-3 w-3 text-amber-300" />
+                      )}
+                      <span>Transcrire via Whisper IA</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setAudioBlobUrl(null)}
+                      className="text-rose-700 hover:text-rose-900 inline-flex items-center gap-1 hover:underline text-3xs font-bold"
+                    >
+                      <Trash2 className="h-3 w-3" /> Supprimer
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

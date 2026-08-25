@@ -55,7 +55,7 @@ function RencontreContent() {
   const [prieresRecap, setPrieresRecap] = useState('');
   const [prochainPas, setProchainPas] = useState('');
   const [confirmerCloture, setConfirmerCloture] = useState(false);
-  const [soucisCloture, setSoucisCloture] = useState<string | null>(null);
+  const [souciRencontre, setSouciRencontre] = useState<string | null>(null);
   const [cloture, setCloture] = useState(false);
   const [saisie, setSaisie] = useState('');
   const [questions, setQuestions] = useState<{ id: string; texte: string }[]>([]);
@@ -121,7 +121,7 @@ function RencontreContent() {
         .map((ligne) => ligne.trim())
         .filter(Boolean);
     const resume = notes.trim();
-    setSoucisCloture(null);
+    setSouciRencontre(null);
     try {
       await closeMeeting(group.id, user.uid, {
       notes: resume || undefined,
@@ -141,7 +141,7 @@ function RencontreContent() {
       setConfirmerCloture(false);
     } catch (erreur) {
       // L'erreur était avalée : rien ne se passait, sans un mot.
-      setSoucisCloture(
+      setSouciRencontre(
         erreur instanceof Error ? erreur.message : 'La rencontre n’a pas pu être clôturée.'
       );
       setConfirmerCloture(false);
@@ -229,13 +229,31 @@ function RencontreContent() {
                 : 'Ouvrez-la quand le groupe est prêt : le déroulé se synchronisera pour tout le monde, sur place comme en visio.'
               : `${group.leaderName} ouvrira la rencontre au moment venu. Vous serez au même endroit du déroulé que les autres.`}
           </p>
+          {souciRencontre && (
+            <p className="mx-auto mt-5 max-w-md rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-2xs leading-relaxed text-amber-100">
+              {souciRencontre}
+            </p>
+          )}
+
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {isLeader && (
               actifs.length >= 2 ? (
                 <button
                   onClick={async () => {
-                    await openMeeting(group.id, user.uid);
-                    await refresh();
+                    // Le bouton n'apparaît qu'à deux, mais quelqu'un peut
+                    // partir entre l'affichage et le clic : sans ce garde,
+                    // le refus du magasin ne s'afficherait nulle part.
+                    setSouciRencontre(null);
+                    try {
+                      await openMeeting(group.id, user.uid);
+                      await refresh();
+                    } catch (erreur) {
+                      setSouciRencontre(
+                        erreur instanceof Error
+                          ? erreur.message
+                          : 'La rencontre n’a pas pu être ouverte.'
+                      );
+                    }
                   }}
                   className="bouton-or inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold"
                 >
@@ -541,9 +559,9 @@ function RencontreContent() {
               </div>
             )}
 
-            {soucisCloture && (
+            {souciRencontre && (
               <div className="rounded-3xl border border-amber-400/30 bg-amber-400/10 px-4 py-3">
-                <p className="text-2xs leading-relaxed text-amber-100">{soucisCloture}</p>
+                <p className="text-2xs leading-relaxed text-amber-100">{souciRencontre}</p>
               </div>
             )}
 
