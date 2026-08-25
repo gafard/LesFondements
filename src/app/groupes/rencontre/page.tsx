@@ -53,6 +53,7 @@ function RencontreContent() {
   const [prieresRecap, setPrieresRecap] = useState('');
   const [prochainPas, setProchainPas] = useState('');
   const [confirmerCloture, setConfirmerCloture] = useState(false);
+  const [soucisCloture, setSoucisCloture] = useState<string | null>(null);
   const [cloture, setCloture] = useState(false);
   const [saisie, setSaisie] = useState('');
   const [questions, setQuestions] = useState<{ id: string; texte: string }[]>([]);
@@ -118,7 +119,9 @@ function RencontreContent() {
         .map((ligne) => ligne.trim())
         .filter(Boolean);
     const resume = notes.trim();
-    await closeMeeting(group.id, user.uid, {
+    setSoucisCloture(null);
+    try {
+      await closeMeeting(group.id, user.uid, {
       notes: resume || undefined,
       prayerFocus: lignes(prieresRecap),
       recap: resume
@@ -131,9 +134,16 @@ function RencontreContent() {
           }
         : undefined,
     });
-    await refresh();
-    setCloture(true);
-    setConfirmerCloture(false);
+      await refresh();
+      setCloture(true);
+      setConfirmerCloture(false);
+    } catch (erreur) {
+      // L'erreur était avalée : rien ne se passait, sans un mot.
+      setSoucisCloture(
+        erreur instanceof Error ? erreur.message : 'La rencontre n’a pas pu être clôturée.'
+      );
+      setConfirmerCloture(false);
+    }
     void suivants;
   };
 
@@ -508,8 +518,24 @@ function RencontreContent() {
               )}
             </section>
 
+            {soucisCloture && (
+              <div className="rounded-3xl border border-amber-400/30 bg-amber-400/10 px-4 py-3">
+                <p className="text-2xs leading-relaxed text-amber-100">{soucisCloture}</p>
+              </div>
+            )}
+
             {/* Commandes de l'animateur */}
-            {isLeader ? (
+            {isLeader && actifs.length < 2 ? (
+              /* Le blocage ne vivait que sur l'écran de démarrage. Une session
+                 créée d'office laissait ensuite dérouler toute la rencontre et
+                 clore la fiche — donc avancer le parcours seul. */
+              <div className="verre rounded-3xl p-4 text-center">
+                <p className="text-xs leading-relaxed text-parchemin-100/80">
+                  Vous êtes seul dans ce groupe. Une rencontre ne se clôt pas seul — invitez au
+                  moins une personne pour ouvrir la fiche suivante.
+                </p>
+              </div>
+            ) : isLeader ? (
               <div className="verre flex flex-wrap items-center justify-between gap-3 rounded-3xl p-4">
                 <button
                   onClick={() => void avancer(-1)}

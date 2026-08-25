@@ -111,6 +111,15 @@ export default function EcouteContinueFiche({
     setIndexPiste(idx);
     const piste = playlist[idx];
 
+    // Une piste sans rien à jouer — un chapitre biblique dont le CDN n'a pas
+    // rendu d'adresse — arrêtait toute l'écoute en silence. On passe à la
+    // suivante plutôt que de laisser le lecteur figé.
+    if (!piste?.urlAudio && !piste?.texte) {
+      if (idx + 1 < playlist.length) jouerPiste(idx + 1);
+      else setEnLecture(false);
+      return;
+    }
+
     if (piste?.urlAudio && audioRef.current) {
       arreterLecture();
       audioRef.current.src = piste.urlAudio;
@@ -152,12 +161,16 @@ export default function EcouteContinueFiche({
     jouerPiste(indexPiste - 1);
   };
 
+  // À la fermeture : on coupe les sources et on remet le lecteur à plat.
+  // Le faire dans le corps de l'effet déclenchait un rendu en cascade ; le
+  // nettoyage est l'endroit prévu pour ça.
   useEffect(() => {
-    if (!ouvert) {
+    if (!ouvert) return;
+    return () => {
       arreterLecture();
       audioRef.current?.pause();
       setEnLecture(false);
-    }
+    };
   }, [ouvert]);
 
   if (!ouvert) return null;
@@ -167,7 +180,12 @@ export default function EcouteContinueFiche({
       <audio
         ref={audioRef}
         onEnded={pisteSuivante}
-        onError={() => setEnLecture(false)}
+        // Un chapitre indisponible ne doit pas clore la séance : on passe au
+        // suivant, comme une platine qui saute un sillon rayé.
+        onError={() => {
+          if (indexPiste + 1 < playlist.length) jouerPiste(indexPiste + 1);
+          else setEnLecture(false);
+        }}
       />
 
       {/* Lecteur flottant style platine acajou */}

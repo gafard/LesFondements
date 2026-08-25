@@ -194,12 +194,32 @@ export function abonnerTemoignages(
 /**
  * Publie un témoignage (audio ou texte) sur Firestore et met à jour le cache local.
  */
-export async function publierTemoignage(temoignage: TemoignageItem): Promise<boolean> {
+/**
+ * Un document Firestore ne peut dépasser 1 Mio, et l'audio y voyage en
+ * base64 — qui gonfle d'un tiers. Au-delà, l'écriture est refusée et le
+ * témoignage ne quitte jamais l'appareil.
+ */
+const LIMITE_DOCUMENT = 1_048_576;
+/** On garde de la marge pour les autres champs et l'encodage. */
+const LIMITE_AUDIO = 700_000;
+
+export type IssuePublication =
+  | { partage: true }
+  | { partage: false; raison: 'trop_long' | 'hors_ligne' | 'refus' };
+
+export async function publierTemoignage(temoignage: TemoignageItem): Promise<IssuePublication> {
   const actuels = lireLocal();
   const maj = [temoignage, ...actuels.filter((t) => t.id !== temoignage.id)];
   ecrireLocal(maj);
 
-  if (!hasRemoteBackend()) return true;
+  if (!hasRemoteBackend()) return { partage: false, raison: 'hors_ligne' };
+
+  // Vérifié avant l'envoi : sinon Firestore refuse, et l'échec passait
+  // inaperçu — le témoignage restait sur le seul appareil de son auteur.
+  const poids = (temoignage.audioUrl?.length ?? 0) + (temoignage.texte?.length ?? 0);
+  if ((temoignage.audioUrl?.length ?? 0) > LIMITE_AUDIO || poids > LIMITE_DOCUMENT) {
+    return { partage: false, raison: 'trop_long' };
+  }
 
   try {
     const [db, { doc, setDoc }] = await Promise.all([
@@ -222,10 +242,10 @@ export async function publierTemoignage(temoignage: TemoignageItem): Promise<boo
       attache: temoignage.attache || 'punaise-bois',
       rotation: temoignage.rotation || '-rotate-2',
     });
-    return true;
+    return { partage: true };
   } catch (err) {
     console.error('Erreur publication témoignage sur Firestore :', err);
-    return false;
+    return { partage: false, raison: 'refus' };
   }
 }
 

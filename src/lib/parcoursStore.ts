@@ -1162,9 +1162,15 @@ export async function openMeeting(groupId: string, uid: string): Promise<GroupSe
   if (!group || !session) return null;
 
   // Règle du Discipulat : Une cellule exige au moins 2 personnes pour tenir une rencontre
+  // Le compte vaut pour tous les groupes, y compris ceux de démonstration :
+  // l'exemption qui les épargnait ouvrait la porte à faire le parcours entier
+  // seul — ce que la règle fondatrice du livret exclut. Leurs compagnons
+  // fictifs étant « actifs », le compte les laisse passer de lui-même.
   const actifs = members.filter((m) => m.status === 'actif');
-  if (!group.demo && actifs.length < 2) {
-    throw new Error('Une rencontre fraternelle exige au moins deux disciples réunis.');
+  if (actifs.length < 2) {
+    throw new Error(
+      'Une rencontre ne se clôt pas seul : le parcours se vit à plusieurs. Invitez au moins une personne.'
+    );
   }
 
   const updated: GroupSession = {
@@ -1225,9 +1231,15 @@ export async function closeMeeting(
   ]);
   if (!group || !session) return null;
 
+  // Sans exemption pour les groupes de démonstration : celle-ci permettait de
+  // clore rencontre après rencontre en étant seul, donc de dérouler les vingt
+  // fiches sans personne — exactement ce que la règle du livret exclut. Les
+  // compagnons fictifs comptant comme actifs, la démonstration reste jouable.
   const actifs = members.filter((m) => m.status === 'actif');
-  if (!group.demo && actifs.length < 2) {
-    throw new Error('Une rencontre ne peut être clôturée qu’avec au moins deux participants.');
+  if (actifs.length < 2) {
+    throw new Error(
+      'Une rencontre ne se clôt pas seul : le parcours se vit à plusieurs. Invitez au moins une personne.'
+    );
   }
 
   await writeSession({

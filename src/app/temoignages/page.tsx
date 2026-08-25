@@ -39,6 +39,7 @@ export default function TemoignagesPage() {
   const [couleurChoisie, setCouleurChoisie] = useState<'rose' | 'jaune' | 'vert' | 'blanc' | 'orange'>('rose');
   const [enEnregistrement, setEnEnregistrement] = useState(false);
   const [audioBlobUrl, setAudioBlobUrl] = useState<string | null>(null);
+  const [soucisPartage, setSoucisPartage] = useState<string | null>(null);
   const [audioEnLecture, setAudioEnLecture] = useState<string | null>(null);
   const [enPublication, setEnPublication] = useState(false);
 
@@ -135,9 +136,20 @@ export default function TemoignagesPage() {
     setAudioBlobUrl(null);
     setFormulaireOuvert(false);
 
-    // 2. Cloud broadcast to all devices
-    await publierDistant(nouveau);
+    // 2. Diffusion aux autres appareils. Le résultat était ignoré : un
+    // témoignage refusé par Firestore restait sur le seul appareil de son
+    // auteur, qui le voyait bien et le croyait partagé.
+    const issue = await publierDistant(nouveau);
     setEnPublication(false);
+    if (!issue.partage) {
+      setSoucisPartage(
+        issue.raison === 'trop_long'
+          ? 'Votre témoignage est enregistré ici, mais il est trop long pour être partagé — un enregistrement doit rester sous les trois minutes environ. Reprenez-le plus court pour que le groupe l’entende.'
+          : issue.raison === 'hors_ligne'
+            ? 'Votre témoignage est gardé sur cet appareil. Il sera partagé dès que la connexion reviendra.'
+            : 'Votre témoignage est gardé ici, mais il n’a pas pu être partagé. Réessayez dans un moment.'
+      );
+    }
   };
 
   const supprimerTemoignage = async (id: string, e?: React.MouseEvent) => {
@@ -272,6 +284,24 @@ export default function TemoignagesPage() {
         </div>
 
         {/* ══ Formulaire de dépôt en Post-it ══ */}
+        {soucisPartage && (
+          <div className="postit postit-jaune pose-2 relative mx-auto mb-8 max-w-2xl rounded-2xl px-5 py-4 shadow-md">
+            <span className="ruban -top-3 left-8 -rotate-2 rounded-[2px]" />
+            <p className="manuscrit pt-1 text-xl font-bold text-encre-950">
+              Gardé ici, pas encore partagé
+            </p>
+            <p className="mt-1 font-serif text-xs italic leading-relaxed text-encre-800">
+              {soucisPartage}
+            </p>
+            <button
+              onClick={() => setSoucisPartage(null)}
+              className="mt-2 text-2xs font-bold text-encre-500 underline underline-offset-2 hover:text-encre-800"
+            >
+              J’ai compris
+            </button>
+          </div>
+        )}
+
         {formulaireOuvert && (
           <form
             onSubmit={publier}
