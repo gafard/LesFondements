@@ -174,6 +174,16 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
           </div>
         )}
 
+        {/* Conseil Android */}
+        {diagnostic?.estAndroid && !active && (
+          <div className="mt-3 flex items-start gap-2.5 rounded-2xl bg-amber-50 p-3.5 text-2xs text-amber-900 border border-amber-200">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="leading-relaxed font-serif">
+              <strong>Conseil Android :</strong> Cliquez sur <strong>« M’inscrire »</strong> ci-dessous puis choisissez <strong>« Autoriser »</strong>. Si la notification de test ne s’affiche pas, vérifiez dans <em>Paramètres Android &gt; Applications &gt; Chrome (ou Les Fondements) &gt; Notifications : Activé</em>.
+            </p>
+          </div>
+        )}
+
         {/* Corps */}
         <div className="mt-5 space-y-5">
           {!supporte ? (

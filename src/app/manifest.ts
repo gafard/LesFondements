@@ -8,21 +8,19 @@ export default function manifest(): MetadataRoute.Manifest {
       'Les 20 fiches du parcours des fondements, préparées seul et partagées en petit groupe.',
     lang: 'fr',
     dir: 'ltr',
-    // On entre dans l'application, pas sur la page de présentation.
+    id: '/dashboard',
     start_url: '/dashboard',
     scope: '/',
     display: 'standalone',
+    display_override: ['window-controls-overlay', 'standalone', 'minimal-ui'],
     orientation: 'any',
     background_color: '#f8f3e9',
     theme_color: '#07162b',
+    prefer_related_applications: false,
     categories: ['education', 'lifestyle', 'books'],
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-      // Android découpe l'icône à sa guise — cercle, goutte, écusson. La
-      // version « maskable » place le dessin dans la zone sûre, sur le fond
-      // de marque, pour qu'aucune découpe ne l'ampute. Réutiliser l'icône
-      // ordinaire ici revenait à laisser le système rogner le logo.
       { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
     // Android montre ces captures dans sa fiche d'installation : sans elles,

@@ -31,6 +31,7 @@ import {
 } from '@/lib/memorisation';
 
 import RecitationVocale from '@/components/RecitationVocale';
+import EpreuveMemoire from '@/components/EpreuveMemoire';
 import { Mic } from 'lucide-react';
 
 interface Carte {
@@ -51,7 +52,16 @@ function MemorisationContent() {
   const [cartes, setCartes] = useState<Carte[] | null>(null);
   const [index, setIndex] = useState(0);
   const [retournee, setRetournee] = useState(false);
-  const [modeRecitation, setModeRecitation] = useState(false);
+  /**
+   * Deux gestes distincts, et il ne fallait pas les confondre.
+   *
+   * « Lire à voix haute » garde le texte sous les yeux : c'est utile quand
+   * on découvre un verset. « Se mettre à l'épreuve » le retourne avant de
+   * parler — c'est la seule des deux qui mesure quelque chose, parce que
+   * reconnaître un texte affiché donne l'impression de le savoir sans qu'on
+   * le sache.
+   */
+  const [mode, setMode] = useState<'aucun' | 'lecture' | 'epreuve'>('aucun');
   const [filtre, setFiltre] = useState<number | 'toutes' | 'dues'>('dues');
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [memoire, setMemoire] = useState<EtatMemoire>({});
@@ -123,7 +133,7 @@ function MemorisationContent() {
     const record = await enregistrerRevision(user.uid, carte.reference, quality, scoreVocal);
     setMemoire((current) => ({ ...current, [cleMemoire(carte.reference)]: record }));
     setScoreVocal(0);
-    setModeRecitation(false);
+    setMode('aucun');
     window.setTimeout(() => aller(1), 260);
   };
 
@@ -346,20 +356,36 @@ function MemorisationContent() {
                           {audioEnCours ? 'Pause' : 'Écouter (Audio)'}
                         </button>
 
-                        <button
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setModeRecitation((v) => !v);
-                          }}
-                          className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-2xs font-bold transition-colors ${
-                            modeRecitation
-                              ? 'bg-or-600 text-white shadow-xs'
-                              : 'bg-or-100 text-or-800 hover:bg-or-200'
-                          }`}
-                        >
-                          <Mic className="h-3.5 w-3.5" />
-                          {modeRecitation ? 'Masquer la récitation' : 'Réciter au micro'}
-                        </button>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setMode((v) => (v === 'epreuve' ? 'aucun' : 'epreuve'));
+                            }}
+                            className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-2xs font-bold transition-colors ${
+                              mode === 'epreuve'
+                                ? 'bg-or-600 text-white shadow-xs'
+                                : 'bg-or-100 text-or-800 hover:bg-or-200'
+                            }`}
+                          >
+                            <Mic className="h-3.5 w-3.5" />
+                            {mode === 'epreuve' ? 'Fermer l’épreuve' : 'Me mettre à l’épreuve'}
+                          </button>
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setMode((v) => (v === 'lecture' ? 'aucun' : 'lecture'));
+                            }}
+                            title="Le verset reste affiché — pour le découvrir, pas pour se tester"
+                            className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-2xs font-bold transition-colors ${
+                              mode === 'lecture'
+                                ? 'bg-encre-950 text-parchemin-100'
+                                : 'border border-parchemin-400 text-encre-600 hover:bg-parchemin-100'
+                            }`}
+                          >
+                            {mode === 'lecture' ? 'Fermer' : 'Lire à voix haute'}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -367,7 +393,18 @@ function MemorisationContent() {
               </div>
             </button>
 
-            {modeRecitation && (carte.texte || carte.copie) && (
+            {mode === 'epreuve' && (carte.texte || carte.copie) && (
+              <div className="mt-4">
+                <EpreuveMemoire
+                  key={carte.reference}
+                  reference={carte.reference}
+                  texte={carte.texte || carte.copie}
+                  onScore={setScoreVocal}
+                />
+              </div>
+            )}
+
+            {mode === 'lecture' && (carte.texte || carte.copie) && (
               <div className="mt-4">
                 <RecitationVocale
                   reference={carte.reference}

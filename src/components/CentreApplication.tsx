@@ -179,26 +179,40 @@ export default function CentreApplication({
             </>
           ) : installable ? (
             <>
-              <p className="flex items-center gap-2.5 text-sm text-parchemin-100">
+              <p className="flex items-center gap-2.5 text-sm text-parchemin-100 font-bold">
                 <Smartphone className="h-4 w-4 shrink-0 text-or-300" />
-                Installer l’application
+                Installer l’application autonome (PWA)
               </p>
-              <p className="mt-1.5 text-2xs leading-relaxed text-parchemin-100/60">
-                Elle s’ouvre alors sans barre de navigateur, et fonctionne hors connexion.
+              <p className="mt-1.5 text-2xs leading-relaxed text-parchemin-100/70">
+                Elle s’ouvre en plein écran (sans barre d’adresse ni macaron de navigateur) et fonctionne 100% hors-ligne.
               </p>
               <button
                 onClick={() => void installer()}
-                className="bouton-or mt-3 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold"
+                className="bouton-or mt-3 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold shadow-md hover:scale-105 transition-all"
               >
                 <Download className="h-3.5 w-3.5" />
-                Installer
+                Installer sur cet appareil
               </button>
             </>
           ) : (
-            <p className="text-2xs leading-relaxed text-parchemin-100/55">
-              Votre navigateur ne propose pas l’installation pour l’instant. Elle apparaîtra ici
-              dès qu’elle sera possible.
-            </p>
+            <div className="space-y-2">
+              <p className="flex items-center gap-2.5 text-sm text-parchemin-100 font-bold">
+                <Smartphone className="h-4 w-4 shrink-0 text-or-300" />
+                Installer sur Android
+              </p>
+              <p className="text-2xs leading-relaxed text-parchemin-100/75 font-serif">
+                1. Dans votre navigateur Chrome, appuyez sur le menu <strong className="text-or-300">⋮ (3 points en haut à droite)</strong>.<br />
+                2. Choisissez <strong className="text-or-300">« Installer l’application »</strong>.<br />
+                3. L’icône officielle s’ajoutera à votre écran d’accueil comme une vraie application sans macaron Chrome !
+              </p>
+              <button
+                onClick={() => void installer()}
+                className="bouton-or mt-1 inline-flex items-center gap-2 rounded-full px-4 py-2 text-2xs font-bold"
+              >
+                <Download className="h-3 w-3" />
+                Tenter l’installation directe
+              </button>
+            </div>
           )}
         </div>
 
