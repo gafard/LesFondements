@@ -7,5 +7,15 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
-  }
+  },
+  // Les témoignages audio. Un document Firestore plafonne à 1 Mio et l'audio
+  // y voyageait en base64 : au-delà d'environ trois minutes, l'écriture était
+  // refusée et le témoignage ne quittait jamais l'appareil de son auteur.
+  // R2 sert dix gigaoctets et sa bande passante sortante gratuitement.
+  "r2_buckets": [
+    {
+      "binding": "TEMOIGNAGES",
+      "bucket_name": "lesfondements-temoignages"
+    }
+  ]
 }

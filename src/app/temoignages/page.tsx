@@ -44,6 +44,7 @@ export default function TemoignagesPage() {
   const [enPublication, setEnPublication] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioFichierRef = useRef<Blob | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
@@ -85,11 +86,12 @@ export default function TemoignagesPage() {
 
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType || 'audio/webm' });
-        const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
-        reader.onloadend = () => {
-          setAudioBlobUrl(reader.result as string);
-        };
+        // Le blob part sur R2 au moment de publier. En attendant, une adresse
+        // locale suffit pour se réécouter — l'encoder en base64 pour le
+        // stocker dans Firestore était ce qui plafonnait les témoignages à
+        // trois minutes et les laissait sur un seul appareil.
+        audioFichierRef.current = audioBlob;
+        setAudioBlobUrl(URL.createObjectURL(audioBlob));
         stream.getTracks().forEach((track) => track.stop());
       };
 
@@ -112,6 +114,32 @@ export default function TemoignagesPage() {
     if (!texteTemoignage.trim() && !audioBlobUrl) return;
 
     setEnPublication(true);
+    setSoucisPartage(null);
+
+    // L'audio va sur R2 ; le document ne portera plus qu'un lien.
+    let adresseAudio: string | undefined;
+    if (audioFichierRef.current) {
+      try {
+        const reponse = await fetch('/api/temoignages/audio', {
+          method: 'POST',
+          headers: { 'Content-Type': audioFichierRef.current.type || 'audio/webm' },
+          body: audioFichierRef.current,
+        });
+        if (reponse.ok) {
+          ({ url: adresseAudio } = (await reponse.json()) as { url: string });
+        } else {
+          const detail = (await reponse.json().catch(() => null)) as { error?: string } | null;
+          setSoucisPartage(
+            detail?.error ??
+              'Votre voix n’a pas pu être déposée. Le texte sera partagé, l’enregistrement reste ici.'
+          );
+        }
+      } catch {
+        setSoucisPartage(
+          'Votre voix n’a pas pu être déposée — la connexion a manqué. Le texte sera partagé.'
+        );
+      }
+    }
 
     const nouveau: TemoignageItem = {
       id: 'tem_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
@@ -119,7 +147,7 @@ export default function TemoignagesPage() {
       auteurId: user?.uid,
       ficheId: ficheSelectionnee,
       texte: texteTemoignage.trim() || 'Témoignage audio partagé avec la communauté.',
-      audioUrl: audioBlobUrl || undefined,
+      audioUrl: adresseAudio,
       amens: 1,
       amensVotants: user?.uid ? [user.uid] : [],
       aVote: true,
@@ -134,6 +162,7 @@ export default function TemoignagesPage() {
     setTemoignageActif(nouveau);
     setTexteTemoignage('');
     setAudioBlobUrl(null);
+    audioFichierRef.current = null;
     setFormulaireOuvert(false);
 
     // 2. Diffusion aux autres appareils. Le résultat était ignoré : un
