@@ -148,6 +148,15 @@ export interface GroupSession {
   closedBy?: string;
   /** Étape du déroulé animé en direct (voir MEETING_FLOW). */
   liveStage: number;
+  /**
+   * Les écrans du groupe sont baissés.
+   *
+   * Aux moments de confession ou de prière, cinq visages éclairés par cinq
+   * téléphones ne se regardent pas. L'animateur peut éteindre le contenu
+   * pour tout le monde à la fois : l'application se tait, et ce qui doit se
+   * dire se dit les yeux levés.
+   */
+  ecransBaisses?: boolean;
   /** Membre à qui la parole est donnée pendant le tour de partage. */
   speakingUid?: string | null;
   attendance: Record<string, AttendanceMode>;

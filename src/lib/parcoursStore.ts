@@ -1215,6 +1215,23 @@ export async function setSessionAttendance(
  * L'animateur clôt la fiche. C'est le seul événement qui ouvre la suivante :
  * « chaque parcours finit avant un nouveau parcours ».
  */
+/**
+ * Baisse ou relève les écrans de tout le groupe.
+ *
+ * L'application devient volontairement moins utile : c'est le but. Elle
+ * cesse d'être un texte à lire pour redevenir un temps à vivre.
+ */
+export async function baisserLesEcrans(
+  groupId: string,
+  baisses: boolean
+): Promise<GroupSession | null> {
+  const session = await getCurrentSession(groupId);
+  if (!session) return null;
+  const suivante: GroupSession = { ...session, ecransBaisses: baisses };
+  await writeSession(suivante);
+  return suivante;
+}
+
 export async function closeMeeting(
   groupId: string,
   uid: string,

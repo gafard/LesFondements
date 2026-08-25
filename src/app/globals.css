@@ -1185,3 +1185,44 @@
 
 
 
+
+/* ── Écran baissé ────────────────────────────────────────────
+   Aux moments de confession, cinq visages éclairés par cinq téléphones
+   ne se regardent pas. L'animateur éteint le contenu pour tous.
+
+   Le fondu est lent à dessein : une coupure nette passerait pour une
+   panne, et l'assemblée chercherait le réseau au lieu de se parler. */
+.ecran-baisse {
+  animation: descendre-le-voile 1400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  background:
+    radial-gradient(120% 90% at 50% 62%, rgba(245, 220, 114, 0.14), transparent 62%),
+    #060d18;
+}
+
+@keyframes descendre-le-voile {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Une flamme qui respire : la seule chose qui bouge encore. */
+.flamme {
+  width: 14px;
+  height: 26px;
+  border-radius: 50% 50% 45% 45%;
+  background: linear-gradient(to top, #f7b733 0%, #f5dc72 45%, #fff6d0 100%);
+  filter: blur(0.4px);
+  transform-origin: 50% 100%;
+  animation: vaciller 2600ms ease-in-out infinite;
+  box-shadow: 0 0 22px 8px rgba(245, 220, 114, 0.22);
+}
+
+@keyframes vaciller {
+  0%, 100% { transform: scaleY(1) rotate(-1deg); opacity: 0.94; }
+  40%      { transform: scaleY(1.08) rotate(1.5deg); opacity: 1; }
+  70%      { transform: scaleY(0.96) rotate(-0.5deg); opacity: 0.9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ecran-baisse { animation-duration: 1ms; }
+  .flamme { animation: none; }
+}

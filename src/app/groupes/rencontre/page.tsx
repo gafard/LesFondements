@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
+  EyeOff,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -30,6 +31,7 @@ import {
   MEETING_FLOW,
   MEETING_FLOW_LENGTH,
   addPost,
+  baisserLesEcrans,
   closeMeeting,
   getPosts,
   openMeeting,
@@ -518,6 +520,27 @@ function RencontreContent() {
               )}
             </section>
 
+            {/* Les écrans baissés couvrent tout le reste. */}
+            {session?.ecransBaisses && (
+              <div className="ecran-baisse fixed inset-0 z-[95] flex flex-col items-center justify-center px-8 text-center">
+                <span className="flamme" />
+                <p className="manuscrit mt-10 text-4xl font-bold text-parchemin-100/90">
+                  Partager et prier ensemble
+                </p>
+                <p className="mt-3 max-w-xs text-2xs leading-relaxed text-parchemin-100/40">
+                  Le travail de préparation s’arrête ici. Levez les yeux.
+                </p>
+                {isLeader && (
+                  <button
+                    onClick={() => void baisserLesEcrans(group.id, false).then(refresh)}
+                    className="mt-12 rounded-full border border-white/15 px-6 py-3 text-2xs font-bold text-parchemin-100/55 transition-colors hover:bg-white/8 hover:text-parchemin-100"
+                  >
+                    Relever les écrans
+                  </button>
+                )}
+              </div>
+            )}
+
             {soucisCloture && (
               <div className="rounded-3xl border border-amber-400/30 bg-amber-400/10 px-4 py-3">
                 <p className="text-2xs leading-relaxed text-amber-100">{soucisCloture}</p>
@@ -543,6 +566,15 @@ function RencontreContent() {
                   className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2.5 text-2xs font-bold text-parchemin-100 transition-colors hover:bg-white/18 disabled:opacity-30"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" /> Étape précédente
+                </button>
+
+                {/* L'application se tait au moment où elle gênerait. */}
+                <button
+                  onClick={() => void baisserLesEcrans(group.id, true).then(refresh)}
+                  title="Éteindre le contenu pour tout le groupe"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2.5 text-2xs font-bold text-parchemin-100/75 transition-colors hover:bg-white/18 hover:text-parchemin-100"
+                >
+                  <EyeOff className="h-3.5 w-3.5" /> Baisser les écrans
                 </button>
 
                 {stage < MEETING_FLOW_LENGTH - 1 ? (
