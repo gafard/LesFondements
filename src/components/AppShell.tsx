@@ -20,7 +20,6 @@ import {
   PenLine,
   Printer,
   Search,
-  Tag,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -183,7 +182,7 @@ function ColonneLaterale({
         ))}
       </nav>
 
-      <p className="mb-1 mt-6 px-3 text-2xs font-bold uppercase tracking-[0.16em] text-parchemin-100/30">
+      <p className="mb-1 mt-6 px-3 text-2xs font-bold uppercase tracking-[0.16em] text-parchemin-100/55">
         Aller plus loin
       </p>
       <nav className="space-y-0.5">
@@ -225,6 +224,15 @@ function ColonneLaterale({
         <LogOut className="h-4 w-4" strokeWidth={1.75} />
         Se déconnecter
       </button>
+
+      <div className="mt-3 pt-3 border-t border-white/10 text-[9px] leading-snug text-parchemin-100/35">
+        <p className="font-serif italic">
+          Contenu adapté du livret original (2015)
+        </p>
+        <p className="mt-0.5 text-[8px] text-parchemin-100/25">
+          Prototype numérique non officiel
+        </p>
+      </div>
     </aside>
   );
 }

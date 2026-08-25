@@ -94,7 +94,7 @@ export default function RejoindreParCode() {
           </div>
         ) : group === null ? (
           <div className="animate-reveal rounded-3xl border border-white/12 bg-white/[0.05] p-8 text-center">
-            <SearchX className="mx-auto h-9 w-9 text-parchemin-100/30" strokeWidth={1.5} />
+            <SearchX className="mx-auto h-9 w-9 text-parchemin-100/55" strokeWidth={1.5} />
             <h1 className="mt-5 font-serif text-2xl font-bold text-parchemin-100">
               Ce code ne mène à aucun groupe
             </h1>

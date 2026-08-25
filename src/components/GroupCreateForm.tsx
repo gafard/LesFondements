@@ -138,7 +138,7 @@ export default function GroupCreateForm({
   };
 
   const fieldClass =
-    'w-full rounded-2xl verre px-4 py-3.5 text-sm text-parchemin-100 placeholder:text-parchemin-100/35 outline-none transition-colors focus:border-or-400/50';
+    'w-full rounded-2xl verre px-4 py-3.5 text-sm text-parchemin-100 placeholder:text-parchemin-100/50 outline-none transition-colors focus:border-or-400/50';
   const legendClass =
     'block text-2xs font-bold uppercase tracking-[0.18em] text-or-300/80 mb-2.5';
 

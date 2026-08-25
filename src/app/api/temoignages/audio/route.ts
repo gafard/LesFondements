@@ -1,4 +1,5 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { verifierFirebaseToken } from '@/lib/firebaseToken';
 
 /**
  * Le dépôt des témoignages audio.
@@ -28,6 +29,15 @@ function typeAdmis(type: string): boolean {
 }
 
 export async function POST(requete: Request) {
+  // Déposer exige un compte. Sans cette garde, n'importe qui pouvait écrire
+  // dix mégaoctets dans le seau à chaque appel, autant de fois qu'il voulait.
+  // La lecture reste ouverte : le mur des témoignages est public.
+  try {
+    await verifierFirebaseToken(requete);
+  } catch {
+    return Response.json({ error: 'Authentification requise' }, { status: 401 });
+  }
+
   const { env } = getCloudflareContext();
   const bucket = env.TEMOIGNAGES;
   if (!bucket) {

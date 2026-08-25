@@ -435,7 +435,7 @@ export default function OnboardingPage() {
                   value={code}
                   onChange={(event) => setCode(event.target.value.toUpperCase())}
                   placeholder="FOND-XXXXX"
-                  className="verre flex-1 rounded-2xl px-4 py-3.5 font-mono text-sm tracking-[0.18em] text-parchemin-100 placeholder:tracking-normal placeholder:font-sans placeholder:text-parchemin-100/30 outline-none focus:border-or-400/50"
+                  className="verre flex-1 rounded-2xl px-4 py-3.5 font-mono text-sm tracking-[0.18em] text-parchemin-100 placeholder:tracking-normal placeholder:font-sans placeholder:text-parchemin-100/50 outline-none focus:border-or-400/50"
                 />
                 <button
                   type="button"
@@ -484,7 +484,7 @@ export default function OnboardingPage() {
               </div>
             ) : matches.length === 0 ? (
               <div className="mt-8 rounded-3xl border border-white/12 bg-white/[0.05] p-8 text-center">
-                <MapPin className="mx-auto h-8 w-8 text-parchemin-100/30" strokeWidth={1.5} />
+                <MapPin className="mx-auto h-8 w-8 text-parchemin-100/55" strokeWidth={1.5} />
                 <h3 className="mt-4 font-serif text-lg font-bold text-parchemin-100">
                   Personne encore, dans votre coin
                 </h3>
@@ -588,7 +588,7 @@ export default function OnboardingPage() {
                   onChange={(event) => setMessage(event.target.value)}
                   rows={4}
                   placeholder="Qui vous êtes, où vous en êtes, pourquoi ce parcours maintenant. Trois lignes suffisent."
-                  className="verre w-full resize-none rounded-2xl px-4 py-3.5 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+                  className="verre w-full resize-none rounded-2xl px-4 py-3.5 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
                   maxLength={400}
                 />
               </div>

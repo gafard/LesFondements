@@ -149,7 +149,7 @@ export default function PlacePicker({
                 placeholder="Ou tapez votre ville — Lyon, Abidjan, Montréal…"
                 className={`w-full rounded-2xl py-3.5 pl-10 pr-9 text-sm outline-none transition-all ${
                   nuit
-                    ? 'verre text-parchemin-100 placeholder:text-parchemin-100/35 focus:border-or-400/50'
+                    ? 'verre text-parchemin-100 placeholder:text-parchemin-100/50 focus:border-or-400/50'
                     : 'border border-parchemin-400 bg-white text-encre-900 placeholder:text-encre-300 focus:border-or-400'
                 }`}
               />

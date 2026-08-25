@@ -383,7 +383,11 @@ export default function PanneauEtude() {
               onStrong={ouvrirStrong}
             />
           ) : onglet === 'comparer' ? (
-            <OngletComparer passage={passage} verset={versetActif} />
+            <OngletComparer
+              key={`comparer:${passage.reference.chapitre}:${versetActif}`}
+              passage={passage}
+              verset={versetActif}
+            />
           ) : onglet === 'renvois' ? (
             <OngletRenvois
               key={`renvois:${passage.reference.chapitre}:${versetActif}`}
@@ -937,10 +941,6 @@ function OngletComparer({ passage, verset }: { passage: Passage; verset: number 
 
   const versetActuel = passage.versets.find((v) => v.v === numVerset);
   const texteLsg = versetActuel ? versetActuel.t : comparaisonPrechargee?.lsg || '';
-
-  useEffect(() => {
-    setVersetSelectionne(verset ?? 1);
-  }, [verset]);
 
   // Chargement des véritables traductions en direct (BDS, Darby, PDV, NBS)
   useEffect(() => {

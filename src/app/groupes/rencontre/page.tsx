@@ -334,7 +334,7 @@ function RencontreContent() {
                   ? 'bg-or-400 text-encre-950'
                   : index < stage
                     ? 'bg-white/12 text-parchemin-100/70'
-                    : 'bg-white/[0.06] text-parchemin-100/35'
+                    : 'bg-white/[0.06] text-parchemin-100/55'
               } ${isLeader ? 'cursor-pointer' : 'cursor-default'}`}
             >
               {index < stage ? (
@@ -420,7 +420,7 @@ function RencontreContent() {
                       onChange={(event) => setSaisie(event.target.value)}
                       rows={3}
                       placeholder="Garder une trace de ce qui vient d’être dit, pour le groupe…"
-                      className="verre w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+                      className="verre w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
                     />
                     <div className="mt-2 flex justify-end">
                       <button
@@ -445,7 +445,7 @@ function RencontreContent() {
                     onChange={(event) => setSaisie(event.target.value)}
                     rows={3}
                     placeholder="Mon pas concret pour la semaine…"
-                    className="verre mt-4 w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+                    className="verre mt-4 w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
                   />
                   <div className="mt-2 flex justify-end">
                     <button
@@ -505,7 +505,7 @@ function RencontreContent() {
                     onChange={(event) => setSaisie(event.target.value)}
                     rows={2}
                     placeholder="Ajouter un sujet entendu ce soir…"
-                    className="verre w-full resize-none rounded-2xl px-4 py-3 text-sm text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+                    className="verre w-full resize-none rounded-2xl px-4 py-3 text-sm text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
                   />
                   <div className="flex justify-end">
                     <button
@@ -703,7 +703,7 @@ function RencontreContent() {
               onChange={(event) => setNotes(event.target.value)}
               rows={3}
               placeholder="En quelques phrases : ce que le groupe a compris et vécu…"
-              className="verre mt-4 w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+              className="verre mt-4 w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
             />
 
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -713,7 +713,7 @@ function RencontreContent() {
                 rows={3}
                 placeholder={'Pépites retenues\nUne idée par ligne'}
                 aria-label="Pépites retenues"
-                className="verre w-full resize-none rounded-2xl px-4 py-3 text-xs leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+                className="verre w-full resize-none rounded-2xl px-4 py-3 text-xs leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
               />
               <textarea
                 value={prieresRecap}
@@ -721,7 +721,7 @@ function RencontreContent() {
                 rows={3}
                 placeholder={'Sujets de prière\nUn sujet par ligne'}
                 aria-label="Sujets de prière"
-                className="verre w-full resize-none rounded-2xl px-4 py-3 text-xs leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/35 focus:border-or-400/50"
+                className="verre w-full resize-none rounded-2xl px-4 py-3 text-xs leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
               />
             </div>
             <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3.5">
@@ -731,7 +731,7 @@ function RencontreContent() {
                 onChange={(event) => setProchainPas(event.target.value)}
                 placeholder="Le prochain pas concret du groupe"
                 aria-label="Prochain pas concret"
-                className="min-w-0 flex-1 bg-transparent py-3 text-xs text-parchemin-100 outline-none placeholder:text-parchemin-100/35"
+                className="min-w-0 flex-1 bg-transparent py-3 text-xs text-parchemin-100 outline-none placeholder:text-parchemin-100/50"
               />
             </div>
 
@@ -776,7 +776,7 @@ function GroupePresence({
         {titre} · {membres.length}
       </p>
       {membres.length === 0 ? (
-        <p className="mt-1.5 text-2xs text-parchemin-100/30">Personne pour l&apos;instant</p>
+        <p className="mt-1.5 text-2xs text-parchemin-100/55">Personne pour l&apos;instant</p>
       ) : (
         <ul className="mt-1.5 space-y-1">
           {membres.map((nom) => (

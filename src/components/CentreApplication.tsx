@@ -203,7 +203,7 @@ export default function CentreApplication({
         </div>
 
         {/* ── Paquets hors connexion ── */}
-        <p className="mb-2 text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/35">
+        <p className="mb-2 text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/55">
           Emporter hors connexion
         </p>
         <div className="space-y-2">

@@ -65,7 +65,9 @@ function FicheContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const ficheId = Number.parseInt(String(params.id), 10);
+  const rawId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const parsedId = rawId ? Number.parseInt(rawId, 10) : NaN;
+  const ficheId = Number.isFinite(parsedId) ? parsedId : 1;
   const cleReprise = searchParams.get('reprendre');
   const sceneDemandee = Number.parseInt(searchParams.get('scene') ?? '0', 10);
   const sceneInitiale = Number.isFinite(sceneDemandee) ? sceneDemandee : 0;
@@ -760,11 +762,28 @@ function FicheContent() {
             sections: fiche.sections.map((s, idx) => ({
               index: idx,
               titre: s.titre || '',
+              blocs: s.blocs.map((b, bIdx) => ({
+                index: bIdx,
+                texte: b.texte,
+                type: b.type,
+              })),
               texte: s.blocs
                 .map((b) => b.texte)
                 .filter(Boolean)
                 .join(' '),
             })),
+            resume: fiche.resume.map((r, idx) => ({
+              index: idx,
+              titre: r.titre,
+              points: r.points,
+              texte: [r.titre, ...r.points].join('. '),
+            })),
+            questions: fiche.resume.flatMap((r) =>
+              r.questions.map((q, qIdx) => ({
+                index: qIdx,
+                texte: q,
+              }))
+            ),
             lectures: fiche.resume.flatMap((r) => r.lectures),
           }}
           ouvert={ecouteContinueOuverte}
@@ -1051,7 +1070,9 @@ function ChargementLecture({ titre }: { titre: string }) {
 
 export default function Page() {
   const params = useParams();
-  const ficheId = Number.parseInt(String(params?.id), 10);
+  const rawId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const parsedId = rawId ? Number.parseInt(rawId, 10) : 1;
+  const ficheId = Number.isFinite(parsedId) ? parsedId : 1;
   const acces = ficheId === 1 ? 'decouverte' : 'groupe';
 
   return (

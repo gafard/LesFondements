@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, Hourglass, Loader2, Lock, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, Hourglass, Loader2, Lock, Users } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import { useDeclarerFondSombre } from '@/lib/fondSombre';
@@ -38,11 +38,22 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
   const { user, loading: authLoading } = useAuth();
   const { gate, group } = useParcours();
 
+  // Les hooks passent avant toute sortie anticipée : un `return` placé plus
+  // haut faisait varier leur nombre d'une route à l'autre, ce que React
+  // n'admet pas — « Rendered fewer hooks than expected » au premier
+  // changement d'état.
   useEffect(() => {
-    if (!authLoading && !user && acces !== 'decouverte') {
+    // Le mode découverte n'exige pas de compte : on ne renvoie pas vers la
+    // connexion quelqu'un venu regarder la fiche 1.
+    if (acces !== 'decouverte' && !authLoading && !user) {
       router.replace('/login');
     }
-  }, [authLoading, user, router, acces]);
+  }, [acces, authLoading, user, router]);
+
+  // Le mode découverte (Fiche 1 & Lettre du Père) est en accès libre et immédiat
+  if (acces === 'decouverte') {
+    return <>{children}</>;
+  }
 
   if (authLoading || gate.state === 'chargement') {
     return (
@@ -54,9 +65,6 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
       </div>
     );
   }
-
-  // Le mode découverte (Fiche 1 & Lettre du Père) est en accès libre et immédiat
-  if (acces === 'decouverte') return <>{children}</>;
 
   if (!user) return null;
 
@@ -137,13 +145,23 @@ function EcranFerme({
           </p>
         </div>
 
-        <Link
-          href={action.href}
-          className="bouton-or mt-8 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
-        >
-          {action.label}
-          <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-        </Link>
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            href="/fiches/1"
+            className="bouton-or w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-bold shadow-lg"
+          >
+            <BookOpen className="h-4 w-4" />
+            Explorer la Fiche 1 (Accès libre)
+          </Link>
+
+          <Link
+            href={action.href}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white px-7 py-3.5 text-xs font-bold transition-colors"
+          >
+            {action.label}
+            <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+          </Link>
+        </div>
       </div>
     </div>
   );

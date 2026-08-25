@@ -47,3 +47,17 @@ export const getFirebaseDb = () => {
 
   return dbPromise;
 };
+
+/**
+ * Le jeton d'identité de la personne connectée, pour les routes qui
+ * l'exigent. Rend `null` si personne n'est connecté ou si Firebase n'est pas
+ * joignable — à l'appelant de décider ce qu'il en fait.
+ */
+export async function jetonFirebase(): Promise<string | null> {
+  try {
+    const auth = await getFirebaseAuth();
+    return (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    return null;
+  }
+}

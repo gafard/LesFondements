@@ -422,8 +422,9 @@ export default function Immersion({
         });
       }
     } else {
+      // `onPause` de l'élément met déjà l'état à jour : le refaire ici
+      // dupliquait la vérité et déclenchait un rendu en cascade.
       el.pause();
-      setAudioEnCours(false);
     }
   }, [pisteCourante, lecture, index]);
 
@@ -470,11 +471,11 @@ export default function Immersion({
           <div className="immersion-console-haute min-w-0 flex-1 rounded-full border border-white/10 px-4 py-2 shadow-2xl backdrop-blur-xl">
             <p className="truncate text-2xs font-bold text-parchemin-100/70">
               Fiche {fiche.id}
-              <span className="mx-1.5 text-parchemin-100/25">·</span>
+              <span className="mx-1.5 text-parchemin-100/55">·</span>
               <span className="text-parchemin-100">{moment?.titre ?? 'Lecture'}</span>
-              <span className="mx-1.5 text-parchemin-100/25">·</span>
+              <span className="mx-1.5 text-parchemin-100/55">·</span>
               {rangMoment + 1}/{moments.length}
-              <span className="mx-1.5 text-parchemin-100/25">·</span>
+              <span className="mx-1.5 text-parchemin-100/55">·</span>
               {moment?.minutes ?? 1} min
             </p>
             <div className="rail mt-1.5">
@@ -559,7 +560,7 @@ export default function Immersion({
         className="absolute inset-0 z-10 overflow-y-auto px-3 pb-32 pt-28 sm:px-8 sm:pt-36"
       >
         <div className="immersion-page-nuit mx-auto min-h-[calc(100svh-12rem)] max-w-4xl rounded-[1.75rem] border border-white/10 px-5 py-5 shadow-2xl sm:px-10 sm:py-8">
-          <div className="mb-2 flex items-center justify-between border-b border-white/8 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-parchemin-100/35">
+          <div className="mb-2 flex items-center justify-between border-b border-white/8 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-parchemin-100/55">
             <span>Atelier intérieur</span>
             <span>{Math.round(progression * 100)} % parcouru</span>
           </div>
@@ -812,7 +813,7 @@ function FeuilleOptions({
 
         {/* ── Ambiance ── */}
         <div className="flex items-center justify-between mb-2">
-          <p className="text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/35">
+          <p className="text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/55">
             Fond Sonore & Musique
           </p>
           <span className="text-3xs text-or-400/80 font-medium">
@@ -899,7 +900,7 @@ function FeuilleOptions({
         </div>
 
         {/* ── Sommaire par moments ── */}
-        <p className="mb-2 mt-6 text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/35">
+        <p className="mb-2 mt-6 text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/55">
           Les moments de cette fiche
         </p>
         <div className="space-y-1">
@@ -916,7 +917,7 @@ function FeuilleOptions({
               }`}
             >
               <span className="truncate">{m.titre}</span>
-              <span className="shrink-0 text-2xs font-bold text-parchemin-100/35">
+              <span className="shrink-0 text-2xs font-bold text-parchemin-100/55">
                 {rang < rangMoment ? <Check className="h-3.5 w-3.5 text-or-400" /> : `${m.minutes} min`}
               </span>
             </button>
@@ -1272,7 +1273,7 @@ function SceneSilence() {
         </span>
       </button>
 
-      <p className="mt-8 text-2xs text-parchemin-100/35">
+      <p className="mt-8 text-2xs text-parchemin-100/55">
         {secondes === 0
           ? 'Vous pouvez continuer.'
           : encours
@@ -1329,7 +1330,7 @@ function SceneVerset({
           onChange={(event) => onEnregistrer(event.target.value)}
           rows={4}
           placeholder={texte ? 'Recopiez-le, mot après mot…' : 'Recopiez le verset…'}
-          className="ligne-manuscrite verre w-full rounded-2xl px-5 py-4 text-base text-parchemin-100 outline-none placeholder:font-sans placeholder:text-parchemin-100/25 focus:border-or-400/50"
+          className="ligne-manuscrite verre w-full rounded-2xl px-5 py-4 text-base text-parchemin-100 outline-none placeholder:font-sans placeholder:text-parchemin-100/50 focus:border-or-400/50"
         />
 
         {aPartager && (
@@ -1414,10 +1415,10 @@ function ChampEcriture({
         onChange={(event) => changer(event.target.value)}
         rows={lignes}
         placeholder={placeholder}
-        className="verre w-full resize-none rounded-3xl px-5 py-4 text-base leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/30 focus:border-or-400/50"
+        className="verre w-full resize-none rounded-3xl px-5 py-4 text-base leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
       />
       <div className="mt-2 flex items-center justify-between">
-        <span className="text-2xs text-parchemin-100/25">
+        <span className="text-2xs text-parchemin-100/55">
           {valeur.trim() ? `${valeur.trim().split(/\s+/).length} mots` : ''}
         </span>
         {sauvegarde && (

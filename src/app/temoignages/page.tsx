@@ -12,7 +12,6 @@ import {
   Pause,
   Sparkles,
   Check,
-  MessageSquare,
   Trash2,
   RotateCcw,
 } from 'lucide-react';
@@ -26,6 +25,7 @@ import {
   type TemoignageItem,
 } from '@/lib/temoignagesStore';
 import { useAuth } from '@/lib/AuthContext';
+import { jetonFirebase } from '@/lib/firebase';
 import { FICHES_META } from '@/data/fichesMeta';
 import { lireAVoixHaute, lectureDisponible } from '@/lib/ambiance';
 
@@ -120,9 +120,13 @@ export default function TemoignagesPage() {
     let adresseAudio: string | undefined;
     if (audioFichierRef.current) {
       try {
+        const jeton = await jetonFirebase();
         const reponse = await fetch('/api/temoignages/audio', {
           method: 'POST',
-          headers: { 'Content-Type': audioFichierRef.current.type || 'audio/webm' },
+          headers: {
+            'Content-Type': audioFichierRef.current.type || 'audio/webm',
+            ...(jeton ? { Authorization: `Bearer ${jeton}` } : {}),
+          },
           body: audioFichierRef.current,
         });
         if (reponse.ok) {

@@ -184,7 +184,7 @@ export default function InvitePanel({ group, inviter, tone = 'nuit' }: InvitePan
             placeholder={emails.length ? 'Ajouter…' : 'sarah@exemple.com'}
             className={`min-w-[9rem] flex-1 bg-transparent py-1 text-sm outline-none ${
               nuit
-                ? 'text-parchemin-100 placeholder:text-parchemin-100/35'
+                ? 'text-parchemin-100 placeholder:text-parchemin-100/50'
                 : 'text-encre-900 placeholder:text-encre-300'
             }`}
           />

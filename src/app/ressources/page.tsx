@@ -3,14 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-  BookMarked,
   HeartHandshake,
   Quote,
   ScrollText,
   MessageSquareHeart,
   Send,
   CheckCircle2,
-  Sparkles,
   BookOpen,
   Library,
   Layers,
@@ -21,7 +19,7 @@ import {
   Lightbulb,
   MessageCircle,
 } from 'lucide-react';
-import { chargerLivret, type Bloc, type Livret, type ReferenceBiblio } from '@/lib/livret';
+import { chargerLivret, type Bloc, type Livret } from '@/lib/livret';
 import { useAuth } from '@/lib/AuthContext';
 import { hasRemoteBackend } from '@/lib/parcoursStore';
 import { getFirebaseDb } from '@/lib/firebase';
@@ -241,10 +239,11 @@ export default function RessourcesPage() {
     void chargerLivret().then(setLivret);
   }, []);
 
-  useEffect(() => {
-    if (user?.displayName && !nom) setNom(user.displayName);
-    if (user?.email && !email) setEmail(user.email);
-  }, [user, nom, email]);
+  // Les champs se pré-remplissent à l'affichage plutôt que par un effet :
+  // recopier `user` dans l'état déclenchait un rendu en cascade, et écrasait
+  // ce que la personne venait de taper si `user` changeait entre-temps.
+  const nomAffiche = nom || user?.displayName || '';
+  const emailAffiche = email || user?.email || '';
 
   const onglets: { id: Onglet; label: string; icon: typeof ScrollText }[] = [
     { id: 'presentation', label: 'Mode d’emploi', icon: ScrollText },
@@ -476,7 +475,7 @@ export default function RessourcesPage() {
                 
                 <div className="mb-4 flex items-center justify-between border-b border-amber-900/40 pb-2 relative z-10">
                   <span className="font-serif italic text-xs text-amber-200/70">
-                    Rayonnage des 20 ouvrages de théologie pratique
+                    Bibliothèque des principaux ouvrages référencés dans le parcours
                   </span>
                   <span className="text-3xs font-bold uppercase tracking-widest text-amber-400/80">
                     Bibliothèque du Disciple
@@ -766,7 +765,7 @@ export default function RessourcesPage() {
                       type="text"
                       required
                       placeholder="Samuel M."
-                      value={nom}
+                      value={nomAffiche}
                       onChange={(e) => setNom(e.target.value)}
                       className="w-full px-4 py-2.5 text-xs rounded-xl border border-parchemin-300 bg-white focus:outline-none focus:ring-2 focus:ring-or-400 text-encre-900"
                     />
@@ -779,7 +778,7 @@ export default function RessourcesPage() {
                       type="email"
                       required
                       placeholder="samuel@exemple.com"
-                      value={email}
+                      value={emailAffiche}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-4 py-2.5 text-xs rounded-xl border border-parchemin-300 bg-white focus:outline-none focus:ring-2 focus:ring-or-400 text-encre-900"
                     />
@@ -805,7 +804,7 @@ export default function RessourcesPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                   <div className="flex items-center gap-2 text-2xs text-encre-600">
                     <Mail className="h-3.5 w-3.5 text-or-700" />
-                    <span>Transmis directement à l&apos;équipe éditoriale des Fondements</span>
+                    <span>Retour concernant le Parcours des Fondements · Fonction expérimentale de cette adaptation numérique</span>
                   </div>
 
                   <button
@@ -830,10 +829,10 @@ export default function RessourcesPage() {
             <div className="rounded-2xl border border-or-300/80 bg-amber-50/60 p-5 text-xs leading-relaxed text-encre-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <p className="font-bold text-encre-950">
-                  Livret et téléchargement officiel
+                  Télécharger le livret original (PDF)
                 </p>
                 <p className="text-2xs text-encre-600 mt-0.5">
-                  Téléchargeable en version PDF originale et disponible sur le portail moneglisepreferee.net
+                  Livret complet original (édition 2015) mis à disposition sur le portail moneglisepreferee.net
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">

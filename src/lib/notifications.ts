@@ -2,6 +2,8 @@
  * Gestionnaire client des notifications Web Push propulsé par Cloudflare Workers
  */
 
+import { jetonFirebase } from './firebase';
+
 export interface NotificationPreferences {
   goutteDeRosee: boolean; // Méditation & Verset du matin
   heureMatin: string;      // ex: "07:30"
@@ -60,16 +62,6 @@ export function diagnostiquerEnvironnement(): DiagnosticPWA {
 
 const CLE_STOCKAGE_PREFS = 'lf.notifPreferences';
 const CLE_STOCKAGE_SUB = 'lf.pushSubscription';
-
-async function jetonFirebase(): Promise<string | null> {
-  try {
-    const { getFirebaseAuth } = await import('./firebase');
-    const auth = await getFirebaseAuth();
-    return (await auth.currentUser?.getIdToken()) ?? null;
-  } catch {
-    return null;
-  }
-}
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);

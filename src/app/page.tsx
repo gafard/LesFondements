@@ -134,7 +134,7 @@ export default function Home() {
             <figure className="hero-photo-tiree absolute inset-x-5 top-4 rotate-2 sm:inset-x-10 lg:inset-x-5">
               <div className="relative aspect-[4/3] overflow-hidden bg-encre-950">
                 <Image
-                  src="/hero-community-v2.png"
+                  src="/hero-community-v2.jpg"
                   alt="Petit groupe africain réuni autour d’un livre ouvert relié par un ruban doré"
                   fill
                   priority
@@ -453,15 +453,22 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mt-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
-              <span>Basé sur le livret original</span>
+            <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-300">
+              <div>
+                <p className="font-semibold text-amber-200">
+                  Le Parcours des Fondements — Contenu adapté du livret original
+                </p>
+                <p className="text-2xs text-slate-400 mt-0.5">
+                  Conception originale : Damien Pradel &amp; contributeurs mentionnés dans l&apos;édition originale · Adaptation numérique indépendante : Gafard Gnane (Prototype d&apos;étude présenté aux auteurs)
+                </p>
+              </div>
               <a
                 href="https://leparcoursdesfondements.files.wordpress.com/2012/01/livret-vf-12-03-2015.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-amber-300 font-semibold hover:underline"
+                className="text-amber-300 font-semibold hover:underline text-2xs shrink-0 inline-flex items-center gap-1"
               >
-                Livret PDF original ↗
+                Télécharger le livret original (PDF) ↗
               </a>
             </div>
           </div>

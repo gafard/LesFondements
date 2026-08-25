@@ -49,13 +49,13 @@ export const metadata: Metadata = {
     description: '20 semaines pour apprendre, partager, pratiquer et transmettre.',
     locale: 'fr_FR',
     type: 'website',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Les Fondements' }],
+    images: [{ url: '/og.jpg', width: 1200, height: 630, alt: 'Les Fondements' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Les Fondements',
     description: 'Une foi enracinée. Une vie transformée.',
-    images: ['/og.png'],
+    images: ['/og.jpg'],
   },
 };
 

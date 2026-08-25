@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, BookOpen, Loader2, Lock, Mail, User, UserCheck } from 'lucide-react';
+import { ArrowRight, BookOpen, Loader2, Lock, Mail, User } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 
 function LoginContent() {
@@ -20,8 +20,6 @@ function LoginContent() {
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
-    signInAsGuest,
-    isFirebaseConfigured,
   } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -78,17 +76,6 @@ function LoginContent() {
     }
   };
 
-  const handleGuest = async () => {
-    setLoading(true);
-    try {
-      await signInAsGuest(name || 'Ami·e du parcours');
-      router.replace(suite);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="nuit nuit-grain relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-20 lg:py-28">
@@ -96,7 +83,7 @@ function LoginContent() {
       {/* Background Illustrated Community Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
-          src="/hero-community-v2.png"
+          src="/hero-community-v2.jpg"
           alt="Petit groupe africain réuni autour de la Parole"
           fill
           sizes="100vw"
@@ -120,22 +107,10 @@ function LoginContent() {
           {/* LEFT EDITORIAL COLUMN (DESKTOP)                                   */}
           {/* ═════════════════════════════════════════════════════════════════ */}
           <div className="hidden lg:block lg:col-span-6 space-y-6 text-[#fff8e8]">
-            <Link href="/" className="inline-flex items-center gap-3 group">
-              <Image
-                src="/logo-transparent.png"
-                alt="Les Fondements Logo"
-                width={40}
-                height={40}
-                className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                priority
-              />
-              <span className="text-xl font-serif font-bold text-white tracking-tight">Les Fondements</span>
-            </Link>
-
-            <div className="space-y-3 pt-2">
-              <p className="text-xs font-serif italic text-amber-300/90 tracking-wide">
+            <div className="space-y-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-or-400/15 border border-or-300/30 px-3 py-1 text-3xs font-bold uppercase tracking-wider text-or-300 font-serif">
                 Parcours d’affermissement spirituel • 20 étapes
-              </p>
+              </span>
               <h2 className="font-serif text-3xl xl:text-4xl font-bold leading-tight text-[#fff8e8]">
                 Enracinez votre foi.<br />
                 Vivez-la <span className="text-amber-300 italic">en communauté.</span>
@@ -284,7 +259,7 @@ function LoginContent() {
               <span className="w-full border-t border-white/10" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-[#0a1b33] px-3 text-2xs font-bold uppercase tracking-[0.18em] text-parchemin-100/35">
+              <span className="bg-[#0a1b33] px-3 text-2xs font-bold uppercase tracking-[0.18em] text-parchemin-100/55">
                 ou
               </span>
             </div>

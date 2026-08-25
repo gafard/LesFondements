@@ -7,15 +7,38 @@ import { getAudioChapitre } from '@/lib/bibleVersions';
 import { analyserReference } from '@/lib/reference';
 import { chargerManifesteVoix, type Manifeste } from '@/lib/voix';
 
+export interface BlocEcoute {
+  index?: number;
+  texte?: string;
+  type?: string;
+}
+
+export interface SectionEcoute {
+  index?: number;
+  titre: string;
+  texte?: string;
+  blocs?: BlocEcoute[];
+}
+
+export interface ResumeEcoute {
+  index?: number;
+  titre: string;
+  points?: string[];
+  texte?: string;
+}
+
+export interface QuestionEcoute {
+  index?: number;
+  texte: string;
+}
+
 export interface FicheEcoute {
   id: number;
   titre: string;
   sousTitre?: string;
-  sections?: {
-    index?: number;
-    titre: string;
-    texte: string;
-  }[];
+  sections?: SectionEcoute[];
+  resume?: ResumeEcoute[];
+  questions?: QuestionEcoute[];
   lectures?: string[];
 }
 
@@ -28,7 +51,7 @@ interface EcouteContinueFicheProps {
 interface PisteAudio {
   id?: string;
   titre: string;
-  type: 'enseignement' | 'bible';
+  type: 'enseignement' | 'bible' | 'resume' | 'question';
   source?: 'eleven' | 'humaine' | 'tts' | 'studio';
   texte?: string;
   urlAudio?: string;
@@ -48,7 +71,7 @@ export default function EcouteContinueFiche({
     void chargerManifesteVoix().then(setManifeste);
   }, []);
 
-  // Construire la playlist continue avec ElevenLabs en priorité
+  // Construire la playlist continue intégrale avec ElevenLabs et synthèse vocale
   const playlist = useMemo<PisteAudio[]>(() => {
     const list: PisteAudio[] = [];
 
@@ -63,26 +86,92 @@ export default function EcouteContinueFiche({
       texte: `${fiche.titre}. ${fiche.sousTitre || ''}.`,
     });
 
-    // 2. Sections d'enseignement
+    // 2. Sections et paragraphes d'enseignement complets
     if (fiche.sections) {
-      fiche.sections.forEach((sec, idx) => {
-        const secIndex = sec.index ?? idx;
-        const secTrack =
-          manifeste?.pistes[`f${fiche.id}.s${secIndex}`] ||
-          manifeste?.pistes[`f${fiche.id}.s${secIndex}.b0`];
+      fiche.sections.forEach((sec, sIdx) => {
+        const secIndex = sec.index ?? sIdx;
+        const secTitreTrack = manifeste?.pistes[`f${fiche.id}.s${secIndex}`];
 
-        list.push({
-          id: `f${fiche.id}.s${secIndex}`,
-          titre: `Section ${idx + 1} : ${sec.titre || `Partie ${idx + 1}`}`,
-          type: 'enseignement',
-          source: secTrack ? 'eleven' : 'tts',
-          urlAudio: secTrack?.url,
-          texte: `${sec.titre}. ${sec.texte}`,
-        });
+        // Annonce du titre de section
+        if (sec.titre) {
+          list.push({
+            id: `f${fiche.id}.s${secIndex}`,
+            titre: `Section ${sIdx + 1} : ${sec.titre}`,
+            type: 'enseignement',
+            source: secTitreTrack ? 'eleven' : 'tts',
+            urlAudio: secTitreTrack?.url,
+            texte: sec.titre,
+          });
+        }
+
+        // Paragraphes de la section
+        if (sec.blocs && sec.blocs.length > 0) {
+          sec.blocs.forEach((bloc, bIdx) => {
+            if (!bloc.texte?.trim()) return;
+            const blocIndex = bloc.index ?? bIdx;
+            const blocTrack = manifeste?.pistes[`f${fiche.id}.s${secIndex}.b${blocIndex}`];
+
+            list.push({
+              id: `f${fiche.id}.s${secIndex}.b${blocIndex}`,
+              titre: `${sec.titre || `Section ${sIdx + 1}`} · §${bIdx + 1}`,
+              type: 'enseignement',
+              source: blocTrack ? 'eleven' : 'tts',
+              urlAudio: blocTrack?.url,
+              texte: bloc.texte,
+            });
+          });
+        } else if (sec.texte?.trim()) {
+          list.push({
+            id: `f${fiche.id}.s${secIndex}.texte`,
+            titre: `Section ${sIdx + 1} : ${sec.titre}`,
+            type: 'enseignement',
+            source: 'tts',
+            texte: sec.texte,
+          });
+        }
       });
     }
 
-    // 3. Chapitre biblique en audio studio
+    // 3. Résumé & Partage (si présent)
+    if (fiche.resume && fiche.resume.length > 0) {
+      fiche.resume.forEach((res, rIdx) => {
+        const resIndex = res.index ?? rIdx;
+        const resTrack = manifeste?.pistes[`f${fiche.id}.r${resIndex}`];
+        const texteResume = res.texte || [res.titre, ...(res.points || [])].join('. ');
+
+        if (texteResume.trim()) {
+          list.push({
+            id: `f${fiche.id}.r${resIndex}`,
+            titre: `Résumé : ${res.titre}`,
+            type: 'resume',
+            source: resTrack ? 'eleven' : 'tts',
+            urlAudio: resTrack?.url,
+            texte: texteResume,
+          });
+        }
+      });
+    }
+
+    // 4. Questions de réflexion (si présentes)
+    if (fiche.questions && fiche.questions.length > 0) {
+      fiche.questions.forEach((q, qIdx) => {
+        const qIndex = q.index ?? qIdx;
+        const qTrack = manifeste?.pistes[`f${fiche.id}.q${qIndex}`];
+
+        if (q.texte.trim()) {
+          list.push({
+            id: `f${fiche.id}.q${qIndex}`,
+            titre: `Question ${qIdx + 1}`,
+            type: 'question',
+            source: qTrack ? 'eleven' : 'tts',
+            urlAudio: qTrack?.url,
+            texte: q.texte,
+          });
+        }
+      });
+    }
+
+    // 5. Chapitre biblique en audio studio
     if (fiche.lectures && fiche.lectures.length > 0) {
       const premiereRef = fiche.lectures[0];
       const parsed = analyserReference(premiereRef);
@@ -166,9 +255,12 @@ export default function EcouteContinueFiche({
   // nettoyage est l'endroit prévu pour ça.
   useEffect(() => {
     if (!ouvert) return;
+    // On capture le lecteur maintenant : au moment du nettoyage, la ref peut
+    // déjà pointer ailleurs, et l'ancien continuerait de jouer.
+    const lecteur = audioRef.current;
     return () => {
       arreterLecture();
-      audioRef.current?.pause();
+      lecteur?.pause();
       setEnLecture(false);
     };
   }, [ouvert]);

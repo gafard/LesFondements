@@ -467,7 +467,7 @@ export default function LettreDuPere() {
                   Ton Père qui t&apos;aime, Dieu Tout-Puissant.
                 </p>
                 <p className="mt-3 font-serif text-2xs italic text-encre-400 max-w-md mx-auto">
-                  Source : Father&apos;s Love Letter • Father Heart Communications Copyright 1999-2008
+                  Source : Father&apos;s Love Letter • Father Heart Communications Copyright 1999-2008 • Traduction C. Buffet
                 </p>
               </div>
             </div>
