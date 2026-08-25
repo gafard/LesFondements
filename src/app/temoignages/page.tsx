@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import {
   Heart,
   Plus,
@@ -16,6 +17,7 @@ import {
   Check,
   Trash2,
   RotateCcw,
+  Lock,
 } from 'lucide-react';
 import {
   abonnerTemoignages,
@@ -61,6 +63,7 @@ export default function TemoignagesPage() {
   const [temoignages, setTemoignages] = useState<TemoignageItem[]>(TEMOIGNAGES_INITIAUX);
   const [temoignageActif, setTemoignageActif] = useState<TemoignageItem>(TEMOIGNAGES_INITIAUX[0]);
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
+  const [modalConnexion, setModalConnexion] = useState(false);
   const [ficheSelectionnee, setFicheSelectionnee] = useState<number>(1);
   const [texteTemoignage, setTexteTemoignage] = useState('');
   const [couleurChoisie, setCouleurChoisie] = useState<'rose' | 'jaune' | 'vert' | 'blanc' | 'orange'>('rose');
@@ -91,11 +94,14 @@ export default function TemoignagesPage() {
     return () => desabonner();
   }, [user?.uid]);
 
-  // ── Transcription IA via Groq Whisper ──
-  const transcrireAvecGroq = async (blob: Blob) => {
+  // ── Mettre la voix par écrit ──
+  // Le nom du fournisseur et celui du modèle n'ont rien à faire dans
+  // l'interface : ce qui compte pour la personne, c'est que ce qu'elle vient
+  // de dire s'écrive. Le « comment » reste ici, dans le code.
+  const mettreParEcrit = async (blob: Blob) => {
     try {
       setEnTranscription(true);
-      setMessageTranscription('Transcription IA via Whisper en cours…');
+      setMessageTranscription('On met vos mots par écrit…');
       const formData = new FormData();
       formData.append('file', blob, 'temoignage.webm');
 
@@ -110,19 +116,19 @@ export default function TemoignagesPage() {
         const data = (await reponse.json()) as { text?: string };
         if (data.text?.trim()) {
           setTexteTemoignage((prev) => (prev.trim() ? `${prev} ${data.text}` : data.text || ''));
-          setMessageTranscription('✨ Paroles transcrites avec succès !');
+          setMessageTranscription('Vos paroles sont écrites — relisez-les avant de publier.');
         }
       } else {
         // Le refus était avalé : le bouton semblait ne rien faire du tout.
         const detail = (await reponse.json().catch(() => null)) as { error?: string } | null;
         setMessageTranscription(
           reponse.status === 503
-            ? 'La transcription automatique n’est pas encore activée sur ce serveur.'
-            : detail?.error ?? 'La transcription n’a pas abouti. Votre voix reste enregistrée.'
+            ? 'La mise par écrit n’est pas encore activée sur ce serveur.'
+            : detail?.error ?? 'Vos mots n’ont pas pu être écrits. Votre voix, elle, est bien gardée.'
         );
       }
     } catch {
-      setMessageTranscription('Transcription Groq indisponible.');
+      setMessageTranscription('La mise par écrit n’a pas répondu. Votre voix est gardée.');
     } finally {
       setEnTranscription(false);
       setTimeout(() => setMessageTranscription(null), 3000);
@@ -158,9 +164,9 @@ export default function TemoignagesPage() {
         setAudioBlobUrl(URL.createObjectURL(audioBlob));
         stream.getTracks().forEach((track) => track.stop());
 
-        // Si le texte est encore vide, tenter automatiquement Whisper
+        // Si rien n'a été écrit à la voix, on tente la mise par écrit
         if (!texteTemoignage.trim()) {
-          void transcrireAvecGroq(audioBlob);
+          void mettreParEcrit(audioBlob);
         }
       };
 
@@ -421,7 +427,7 @@ export default function TemoignagesPage() {
 
             {/* Bouton pour Épingler son témoignage */}
             <button
-              onClick={() => setFormulaireOuvert((v) => !v)}
+              onClick={ouvrirFormulaire}
               className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-6 py-3.5 text-xs font-bold text-parchemin-100 shadow-2xl transition-all hover:bg-encre-900 hover:scale-105 active:scale-95 border border-or-400/40 shrink-0"
             >
               <Plus className="h-4 w-4 text-or-400" strokeWidth={2.5} />
@@ -449,7 +455,7 @@ export default function TemoignagesPage() {
           </div>
         )}
 
-        {formulaireOuvert && (
+        {formulaireOuvert && user && (
           <form
             onSubmit={publier}
             className="feuille relative mx-auto mb-10 max-w-2xl rounded-3xl border-2 border-or-400/80 bg-[#fffdfa] p-6 sm:p-8 shadow-2xl animate-fadeIn"
@@ -465,6 +471,9 @@ export default function TemoignagesPage() {
                 <h3 className="manuscrit text-2xl font-bold text-encre-950">
                   Déposer une pépite ou un témoignage
                 </h3>
+                <p className="text-3xs text-encre-600 mt-0.5">
+                  Épinglé au nom de : <strong className="text-or-950">{user.displayName || user.email}</strong>
+                </p>
               </div>
               <button
                 type="button"
@@ -572,7 +581,7 @@ export default function TemoignagesPage() {
                 </div>
               )}
 
-              {/* Message / État de la transcription Groq */}
+              {/* Où en est la mise par écrit */}
               {messageTranscription && (
                 <div className="mt-3 flex items-center gap-2 rounded-xl bg-amber-100/80 border border-or-400 p-2.5 text-2xs font-bold text-encre-900 animate-fadeIn">
                   {enTranscription ? (
@@ -588,23 +597,23 @@ export default function TemoignagesPage() {
                 <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-2xs font-semibold text-emerald-900 bg-emerald-50/90 p-3 rounded-xl border border-emerald-200">
                   <div className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span>Mémo vocal prêt à être diffusé</span>
+                    <span>Votre voix est enregistrée</span>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
                       disabled={enTranscription}
-                      onClick={() => audioFichierRef.current && void transcrireAvecGroq(audioFichierRef.current)}
+                      onClick={() => audioFichierRef.current && void mettreParEcrit(audioFichierRef.current)}
                       className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 text-3xs font-bold shadow-2xs transition-colors disabled:opacity-50"
-                      title="Relancer une transcription IA haute fidélité avec Whisper"
+                      title="Écrire automatiquement ce que vous venez de dire"
                     >
                       {enTranscription ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
                       ) : (
                         <Wand2 className="h-3 w-3 text-amber-300" />
                       )}
-                      <span>Transcrire via Whisper IA</span>
+                      <span>Mettre par écrit</span>
                     </button>
 
                     <button
@@ -798,7 +807,7 @@ export default function TemoignagesPage() {
             <span className="text-2xl">🎙️</span>
             <span className="text-2xl">💬</span>
             <span className="text-xs font-serif italic text-encre-800">
-              Récits vocaux & témoignages écrits vérifiés
+              Récits vocaux &amp; témoignages écrits vérifiés
             </span>
           </div>
 
@@ -811,6 +820,39 @@ export default function TemoignagesPage() {
         </div>
 
       </div>
+
+      {/* ══ Modal : Connexion Requise pour Témoigner ══ */}
+      {modalConnexion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="feuille relative max-w-md w-full rounded-3xl border-2 border-or-400 bg-white p-7 text-center shadow-2xl">
+            <span className="punaise-bois absolute -top-3 left-1/2 -translate-x-1/2" />
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-or-100 text-or-800 mb-4 border border-or-300">
+              <Lock className="h-6 w-6" />
+            </div>
+            <h3 className="font-serif text-2xl font-bold text-encre-950">
+              Compte requis pour témoigner
+            </h3>
+            <p className="mt-2 text-xs leading-relaxed text-encre-600 font-serif">
+              Le mur des témoignages est en <strong>libre lecture</strong> pour tout le monde. Pour déposer votre propre récit ou mémo vocal, veuillez vous connecter afin que votre témoignage soit signé de votre nom.
+            </p>
+            <div className="mt-6 flex flex-col gap-2.5">
+              <Link
+                href="/login"
+                className="bouton-or inline-flex items-center justify-center gap-2 rounded-full py-3.5 text-xs font-bold shadow-md"
+              >
+                Se connecter ou créer un compte
+              </Link>
+              <button
+                type="button"
+                onClick={() => setModalConnexion(false)}
+                className="rounded-full py-2 text-2xs font-bold text-encre-500 hover:text-encre-800"
+              >
+                Continuer la lecture
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
