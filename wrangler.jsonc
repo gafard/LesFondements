@@ -16,6 +16,14 @@
     {
       "binding": "TEMOIGNAGES",
       "bucket_name": "lesfondements-temoignages"
+    },
+    // Les passages lus à la demande. Un même verset se disait une fois par
+    // appareil : le cache ne vivait que dans le navigateur, et ElevenLabs
+    // refacturait le même son à chaque nouveau visiteur. Gravé ici, il n'est
+    // payé qu'une fois pour tout le monde.
+    {
+      "binding": "VOIX",
+      "bucket_name": "lesfondements-voix"
     }
   ]
 }

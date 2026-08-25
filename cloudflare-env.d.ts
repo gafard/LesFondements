@@ -10,5 +10,7 @@ declare namespace globalThis {
   interface CloudflareEnv {
     /** Le seau des témoignages audio. */
     TEMOIGNAGES?: R2Bucket;
+    /** Les passages lus à la demande, gravés une fois pour tous. */
+    VOIX?: R2Bucket;
   }
 }

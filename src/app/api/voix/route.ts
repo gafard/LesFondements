@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 /**
  * La voix de studio, à la demande.
@@ -13,9 +14,31 @@ import { NextResponse } from 'next/server';
  * Cette route donne la même voix aux deux. La clé reste ici, côté serveur :
  * elle ne doit jamais partir dans le navigateur.
  *
- * Attention : chaque appel non mis en cache est facturé au caractère par
- * ElevenLabs. D'où la borne stricte ci-dessous, et le cache côté client.
+ * Chaque génération est facturée au caractère. Le premier réglage ne gardait
+ * l'audio que dans le navigateur : le même verset était donc refacturé pour
+ * chaque appareil, et chaque nouveau visiteur repayait ce que quelqu'un avait
+ * déjà fait dire. Or un passage rend toujours le même son.
+ *
+ * Il est désormais gravé sur R2, dont la bande passante sortante est
+ * gratuite : ElevenLabs n'est appelé qu'à la toute première demande, pour
+ * tout le monde et une seule fois.
  */
+
+/** L'empreinte d'un texte : le même passage retrouve toujours son fichier. */
+async function empreinte(texte: string): Promise<string> {
+  const octets = new TextEncoder().encode(texte);
+  const condense = await crypto.subtle.digest('SHA-256', octets);
+  return Array.from(new Uint8Array(condense))
+    .slice(0, 16)
+    .map((o) => o.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/** Les en-têtes d'un son qui ne changera jamais. */
+const ENTETES_AUDIO = {
+  'Content-Type': 'audio/mpeg',
+  'Cache-Control': 'public, max-age=31536000, immutable',
+};
 
 /** Au-delà, ce n'est plus un passage cliqué : on refuse plutôt que de facturer. */
 const LONGUEUR_MAX = 1500;
@@ -74,6 +97,20 @@ export async function POST(requete: Request) {
     );
   }
 
+  // Déjà dit une fois ? On le ressert sans rien dépenser.
+  const { env } = getCloudflareContext();
+  const seau = env.VOIX;
+  const clef = `${voix}/${await empreinte(texte)}.mp3`;
+
+  if (seau) {
+    const grave = await seau.get(clef);
+    if (grave) {
+      return new Response(grave.body, {
+        headers: { ...ENTETES_AUDIO, 'X-Voix-Origine': 'grave' },
+      });
+    }
+  }
+
   const reponse = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${voix}?output_format=mp3_44100_128`,
     {
@@ -95,12 +132,18 @@ export async function POST(requete: Request) {
     );
   }
 
-  return new Response(reponse.body, {
-    headers: {
-      'Content-Type': 'audio/mpeg',
-      // Le même passage rend toujours le même son : il peut être gardé
-      // longtemps, en bordure comme dans le navigateur.
-      'Cache-Control': 'public, max-age=31536000, immutable',
-    },
+  // On garde le son avant de le rendre : la prochaine demande, d'où qu'elle
+  // vienne, ne coûtera plus rien.
+  const audio = await reponse.arrayBuffer();
+  if (seau) {
+    try {
+      await seau.put(clef, audio, { httpMetadata: { contentType: 'audio/mpeg' } });
+    } catch {
+      /* le dépôt a échoué : on sert quand même, ce sera regénéré plus tard */
+    }
+  }
+
+  return new Response(audio, {
+    headers: { ...ENTETES_AUDIO, 'X-Voix-Origine': 'genere' },
   });
 }
