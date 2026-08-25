@@ -33,11 +33,12 @@ import {
   LogOut,
   Video,
   X,
+  HeartHandshake,
+  Printer,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
-import InvitePanel from '@/components/InvitePanel';
 import {
   addPost,
   addReply,
@@ -677,6 +678,23 @@ function Ligne({ label, valeur, couleur }: { label: string; valeur: number; coul
 
 // ══ Onglet : les membres ═══════════════════════════════════════
 
+function genererBinomes(membres: GroupMember[]): GroupMember[][] {
+  if (membres.length < 2) return [];
+  const paires: GroupMember[][] = [];
+  const copie = [...membres];
+  while (copie.length > 3) {
+    paires.push([copie.shift()!, copie.shift()!]);
+  }
+  if (copie.length === 3) {
+    paires.push(copie);
+  } else if (copie.length === 2) {
+    paires.push(copie);
+  } else if (copie.length === 1 && paires.length > 0) {
+    paires[paires.length - 1].push(copie[0]);
+  }
+  return paires;
+}
+
 function OngletMembres({
   onInviter,
   inviteOuvert,
@@ -770,12 +788,55 @@ function OngletMembres({
         </ul>
       </div>
 
-      {inviteOuvert && (
-        <InvitePanel
-          group={group}
-          inviter={{ uid: user.uid, displayName: user.displayName || 'Un membre' }}
-          tone="clair"
-        />
+      {/* ══ Binômes & Trinômes de Prière (Attelage Fraternel) ══ */}
+      {actifs.length >= 2 && (
+        <div className="rounded-3xl border border-or-300 bg-[#fdfbf7] p-6 shadow-sm space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <HeartHandshake className="h-5 w-5 text-or-700" />
+              <h3 className="font-serif text-lg font-bold text-encre-950">
+                Attelage fraternel de la semaine
+              </h3>
+            </div>
+            <Link
+              href="/guide-pastoral"
+              target="_blank"
+              className="text-3xs font-bold text-or-800 hover:underline flex items-center gap-1"
+            >
+              <Printer className="h-3 w-3" /> Fiche prière (A4)
+            </Link>
+          </div>
+
+          <p className="text-2xs text-encre-600 leading-relaxed">
+            <em>« Le faire en équipe, à 2 ou 3 »</em> (Guide pastoral, p. 160).
+            Pour veiller les uns sur les autres et prier en binôme cette semaine :
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-3 pt-1">
+            {genererBinomes(actifs).map((groupe, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl border border-parchemin-300 bg-white p-3.5 flex items-center gap-3 shadow-2xs"
+              >
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-or-100 font-serif font-bold text-xs text-or-900 shrink-0">
+                  {idx + 1}
+                </div>
+                <div>
+                  <span className="text-3xs uppercase tracking-wider font-bold text-or-800 block">
+                    {groupe.length === 2 ? 'Binôme de prière' : 'Trinôme de prière'}
+                  </span>
+                  <p className="text-xs font-bold text-encre-950">
+                    {groupe.map((m) => m.displayName).join(' & ')}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="pt-1 text-3xs text-encre-400 font-serif italic">
+            Aucune note personnelle n’est enregistrée. Seuls les prénoms sont reliés pour organiser le soin mutuel en vérité.
+          </p>
+        </div>
       )}
 
       {!isLeader && (
@@ -1371,6 +1432,21 @@ function OngletGuide() {
                 C&apos;est le cas cette semaine : prévoyez ce temps à part.
               </span>
             )}
+          </div>
+
+          <div className="rounded-2xl border border-or-300 bg-or-100/80 p-4">
+            <strong className="mb-1 block text-or-950">Fiche Mémo Pastoral (A4)</strong>
+            <p className="text-2xs text-or-900 mb-2.5">
+              Le guide complet « Prendre soin les uns des autres » (p. 160-162) prêt à imprimer pour votre Bible.
+            </p>
+            <Link
+              href="/guide-pastoral"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 rounded-full bg-encre-950 px-3.5 py-1.5 text-2xs font-bold text-parchemin-100 shadow-xs hover:bg-encre-800 transition-colors"
+            >
+              <Printer className="h-3 w-3 text-or-300" />
+              Imprimer la fiche prière (A4)
+            </Link>
           </div>
 
           <div className="rounded-2xl border border-parchemin-400 bg-parchemin-50 p-4">

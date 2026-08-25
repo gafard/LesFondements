@@ -29,6 +29,7 @@ import PauseSanctuaire from '@/components/PauseSanctuaire';
 import AnnotationsFiche from '@/components/AnnotationsFiche';
 import TexteSurlignable, { type SelectionTexte } from '@/components/TexteSurlignable';
 import EcouteContinueFiche from '@/components/EcouteContinueFiche';
+import GuidePastoralCellule from '@/components/GuidePastoralCellule';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
 import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswers } from '@/lib/firestore';
 import {
@@ -681,6 +682,9 @@ function FicheContent() {
             </p>
           )}
         </div>
+
+        {/* ══ Annexe Pastorale d'accompagnement (Fiches 7, 8 & 15) ══ */}
+        <GuidePastoralCellule ficheId={ficheId} />
 
         <div className="mt-6 flex items-center justify-between gap-3">
           {precedente ? (

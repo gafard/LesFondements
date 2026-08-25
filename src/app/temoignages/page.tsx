@@ -31,6 +31,31 @@ import { jetonFirebase } from '@/lib/firebase';
 import { FICHES_META } from '@/data/fichesMeta';
 import { lireAVoixHaute, lectureDisponible } from '@/lib/ambiance';
 
+/**
+ * La reconnaissance vocale du navigateur n'est pas standardisée : elle vit
+ * sous deux noms et n'a pas de types fournis. On décrit ici le peu qu'on en
+ * utilise, plutôt que de laisser `any` masquer une faute de frappe sur un
+ * nom de propriété.
+ */
+interface ResultatDicte {
+  readonly length: number;
+  [index: number]: { readonly 0: { readonly transcript: string } };
+}
+
+interface MoteurDictee {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((evenement: { results: ResultatDicte }) => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+type FenetreAvecDictee = Window & {
+  SpeechRecognition?: new () => MoteurDictee;
+  webkitSpeechRecognition?: new () => MoteurDictee;
+};
+
 export default function TemoignagesPage() {
   const { user } = useAuth();
   const [temoignages, setTemoignages] = useState<TemoignageItem[]>(TEMOIGNAGES_INITIAUX);
@@ -51,7 +76,7 @@ export default function TemoignagesPage() {
   const audioFichierRef = useRef<Blob | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<MoteurDictee | null>(null);
 
   // ── Synchronisation Temps Réel (Cloud Firestore + Cache Local) ──
   useEffect(() => {
@@ -74,8 +99,10 @@ export default function TemoignagesPage() {
       const formData = new FormData();
       formData.append('file', blob, 'temoignage.webm');
 
+      const jeton = await jetonFirebase();
       const reponse = await fetch('/api/temoignages/transcription', {
         method: 'POST',
+        headers: jeton ? { Authorization: `Bearer ${jeton}` } : undefined,
         body: formData,
       });
 
@@ -85,6 +112,14 @@ export default function TemoignagesPage() {
           setTexteTemoignage((prev) => (prev.trim() ? `${prev} ${data.text}` : data.text || ''));
           setMessageTranscription('✨ Paroles transcrites avec succès !');
         }
+      } else {
+        // Le refus était avalé : le bouton semblait ne rien faire du tout.
+        const detail = (await reponse.json().catch(() => null)) as { error?: string } | null;
+        setMessageTranscription(
+          reponse.status === 503
+            ? 'La transcription automatique n’est pas encore activée sur ce serveur.'
+            : detail?.error ?? 'La transcription n’a pas abouti. Votre voix reste enregistrée.'
+        );
       }
     } catch {
       setMessageTranscription('Transcription Groq indisponible.');
@@ -131,14 +166,15 @@ export default function TemoignagesPage() {
 
       // Démarrage Web Speech Recognition en direct
       if (typeof window !== 'undefined') {
-        const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const fenetre = window as FenetreAvecDictee;
+        const SpeechRec = fenetre.SpeechRecognition ?? fenetre.webkitSpeechRecognition;
         if (SpeechRec) {
           try {
             const recog = new SpeechRec();
             recog.lang = 'fr-FR';
             recog.continuous = true;
             recog.interimResults = true;
-            recog.onresult = (evt: any) => {
+            recog.onresult = (evt) => {
               let directText = '';
               for (let i = 0; i < evt.results.length; i++) {
                 directText += evt.results[i][0].transcript + ' ';
@@ -175,8 +211,20 @@ export default function TemoignagesPage() {
     }
   };
 
+  const ouvrirFormulaire = () => {
+    if (!user) {
+      setModalConnexion(true);
+      return;
+    }
+    setFormulaireOuvert((v) => !v);
+  };
+
   const publier = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      setModalConnexion(true);
+      return;
+    }
     if (!texteTemoignage.trim() && !audioBlobUrl) return;
 
     setEnPublication(true);

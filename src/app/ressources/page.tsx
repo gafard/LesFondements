@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Mail,
   HelpCircle,
+  Printer,
   Lightbulb,
   MessageCircle,
 } from 'lucide-react';
@@ -393,7 +394,15 @@ export default function RessourcesPage() {
                 Cette annexe accompagne particulièrement les fiches 7, 8 et 15. Le livret la donne aux responsables
                 avant les temps de prière personnels — mais elle concerne la vie et l&apos;amour fraternel de tout le groupe.
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Link
+                  href="/guide-pastoral"
+                  target="_blank"
+                  className="timbre inline-flex items-center gap-1.5 rounded-lg bg-or-300 px-3.5 py-1.5 text-2xs font-bold text-or-950 hover:bg-or-400 transition-colors shadow-2xs"
+                >
+                  <Printer className="h-3 w-3" />
+                  Imprimer la Fiche Bible (A4)
+                </Link>
                 {[7, 8, 15].map((id) => (
                   <Link
                     key={id}
