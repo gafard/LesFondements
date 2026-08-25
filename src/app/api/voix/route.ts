@@ -105,7 +105,9 @@ export async function POST(requete: Request) {
   if (seau) {
     const grave = await seau.get(clef);
     if (grave) {
-      return new Response(grave.body, {
+      // Même flux, deux descriptions : voir la note dans la route des
+      // témoignages audio.
+      return new Response(grave.body as unknown as ReadableStream, {
         headers: { ...ENTETES_AUDIO, 'X-Voix-Origine': 'grave' },
       });
     }

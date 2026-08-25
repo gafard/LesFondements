@@ -168,6 +168,10 @@ export async function activerNotifications(
         subscription: subJson,
         userId: userId || 'anonyme',
         preferences,
+        // Le serveur ne sait pas quelle heure il est chez vous. C'est ce
+        // décalage qui lui permet de servir « 7 h 30 » à chacun chez lui,
+        // sans avoir à tenir une table des fuseaux et de leurs changements.
+        decalage: new Date().getTimezoneOffset(),
       }),
     });
     if (!response.ok) throw new Error('L’appareil n’a pas pu être vérifié.');
@@ -193,6 +197,19 @@ export async function desactiverNotifications(): Promise<boolean> {
     const reg = await navigator.serviceWorker.ready;
     const subscription = await reg.pushManager.getSubscription();
     if (subscription) {
+      // On prévient le serveur avant de rompre : sans quoi son abonnement
+      // resterait en base et il continuerait d'essayer de réveiller un
+      // appareil qui n'écoute plus.
+      const token = await jetonFirebase();
+      if (token) {
+        await fetch('/api/notifications/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ endpoint: subscription.endpoint }),
+        }).catch(() => {
+          /* le serveur l'oubliera de lui-même au premier envoi refusé */
+        });
+      }
       await subscription.unsubscribe();
     }
     localStorage.removeItem(CLE_STOCKAGE_SUB);

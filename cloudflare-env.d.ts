@@ -6,11 +6,17 @@
  * ceux du DOM et faisaient échouer la compilation ailleurs. On ne déclare
  * donc que ce qu'on utilise.
  */
-declare namespace globalThis {
+import type { KVNamespace, R2Bucket } from '@cloudflare/workers-types';
+
+declare global {
   interface CloudflareEnv {
     /** Le seau des témoignages audio. */
     TEMOIGNAGES?: R2Bucket;
     /** Les passages lus à la demande, gravés une fois pour tous. */
     VOIX?: R2Bucket;
+    /** Les abonnements aux rappels, et l'heure du dernier envoi. */
+    RAPPELS?: KVNamespace;
   }
 }
+
+export {};

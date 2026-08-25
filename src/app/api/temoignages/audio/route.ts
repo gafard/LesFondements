@@ -76,7 +76,10 @@ export async function GET(requete: Request) {
   const objet = await bucket.get(nom);
   if (!objet) return new Response('Introuvable', { status: 404 });
 
-  return new Response(objet.body, {
+  // Le flux de R2 et celui du DOM sont le même objet à l'exécution ; seuls
+  // leurs types divergent, workerd et le navigateur les décrivant chacun de
+  // son côté. On le dit ici plutôt que d'imposer les types Workers partout.
+  return new Response(objet.body as unknown as ReadableStream, {
     headers: {
       'Content-Type': objet.httpMetadata?.contentType ?? 'audio/webm',
       // Le fichier ne change jamais : il peut être gardé longtemps.

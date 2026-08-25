@@ -1,7 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "parcours",
-  "main": ".open-next/worker.js",
+  // Enveloppe le worker d'OpenNext pour lui ajouter `scheduled()`, dont il
+  // a besoin pour que le déclencheur cron trouve quelqu'un.
+  "main": "worker-entree.mjs",
   "compatibility_date": "2026-08-23",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
@@ -12,6 +14,21 @@
   // y voyageait en base64 : au-delà d'environ trois minutes, l'écriture était
   // refusée et le témoignage ne quittait jamais l'appareil de son auteur.
   // R2 sert dix gigaoctets et sa bande passante sortante gratuitement.
+  // Les abonnements aux rappels. Ils ne vivaient nulle part : la route
+  // d'abonnement répondait « persisted: false » et aucune notification
+  // programmée ne pouvait donc partir.
+  "kv_namespaces": [
+    {
+      "binding": "RAPPELS",
+      "id": "cf3ce09265a54d079d6d39aad94c48b1"
+    }
+  ],
+  // L'ordonnanceur : chaque quart d'heure, le worker regarde qui doit être
+  // réveillé. Les heures choisies par les gens sont locales — un passage au
+  // quart d'heure suffit à les servir toutes.
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  },
   "r2_buckets": [
     {
       "binding": "TEMOIGNAGES",
