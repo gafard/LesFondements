@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
+  MonitorPlay,
   EyeOff,
   ArrowLeft,
   ArrowRight,
@@ -585,6 +586,19 @@ function RencontreContent() {
                 >
                   <ArrowLeft className="h-3.5 w-3.5" /> Étape précédente
                 </button>
+
+                {/* Ouvrir la projection : sur la télé du salon, ou par une
+                    diffusion d'onglet. Nouvel onglet, pour que l'animateur
+                    garde la commande sur son appareil. */}
+                <a
+                  href="/groupes/rencontre/ecran"
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Afficher la rencontre sur un écran partagé"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2.5 text-2xs font-bold text-parchemin-100/75 transition-colors hover:bg-white/18 hover:text-parchemin-100"
+                >
+                  <MonitorPlay className="h-3.5 w-3.5" /> Projeter
+                </a>
 
                 {/* L'application se tait au moment où elle gênerait. */}
                 <button

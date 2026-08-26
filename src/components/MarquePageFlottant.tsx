@@ -35,10 +35,11 @@ export default function MarquePageFlottant() {
 
   return (
     <div
-      // Sur l'accueil mobile, « Continuer » est déjà l'action dominante de
-      // l'écran de lancement : le ruban ferait doublon et le chevaucherait.
-      className={`group fixed right-4 top-0 z-50 sm:right-10 ${
-        pathname === '/' ? 'hidden lg:block' : ''
+      // Le marque-page en ruban est conçu pour l'esthétique grand écran (bureau).
+      // Sur mobile, il chevauchait les menus, boutons d'action et en-têtes d'écran.
+      // On l'affiche donc uniquement à partir de 'md' (tablette/ordinateur).
+      className={`group fixed right-6 top-0 z-50 hidden md:block sm:right-10 ${
+        pathname === '/' || pathname === passage.url ? '!hidden' : ''
       }`}
       data-testid="bookmark-ribbon"
     >

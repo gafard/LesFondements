@@ -19,7 +19,6 @@ import {
   Search,
   Bookmark,
   Users,
-  Play,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -36,6 +35,7 @@ import PlacePicker from '@/components/PlacePicker';
 import GroupMatchCard from '@/components/GroupMatchCard';
 import GroupCreateForm from '@/components/GroupCreateForm';
 import InvitePanel from '@/components/InvitePanel';
+import LecteurVideoOnboarding from '@/components/LecteurVideoOnboarding';
 import type { AttendanceMode, GroupMatch, ParcoursGroup, PlaceRef } from '@/lib/types';
 
 type Etape = 'intro' | 'situer' | 'chemin' | 'rejoindre' | 'demande' | 'creer' | 'inviter' | 'attente';
@@ -243,25 +243,13 @@ export default function OnboardingPage() {
             </p>
 
             {/* ══ Vidéo d'introduction officielle (50 secondes) ══ */}
-            <div className="mx-auto mt-8 max-w-lg overflow-hidden rounded-3xl border-2 border-or-400/40 bg-black/60 shadow-2xl shadow-or-500/10">
-              <div className="relative aspect-video w-full">
-                <iframe
-                  src="https://www.youtube-nocookie.com/embed/NmoWMq5z28g?rel=0&modestbranding=1"
-                  title="Comprendre l'esprit du parcours en 50 secondes"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0 h-full w-full border-0"
-                />
-              </div>
-              <div className="flex items-center justify-between border-t border-white/10 bg-white/[0.04] px-4 py-2.5 text-3xs text-parchemin-100/70">
-                <span className="flex items-center gap-1.5 font-bold text-or-300">
-                  <Play className="h-3 w-3 fill-or-300" />
-                  Présentation du parcours (50s)
-                </span>
-                <span className="font-serif italic text-parchemin-100/50">
-                  « Poser des piliers solides »
-                </span>
-              </div>
+            <div className="mx-auto mt-8 max-w-lg">
+              <LecteurVideoOnboarding
+                src="/video/onboarding.mp4"
+                poster="/hero-community-v2.jpg"
+                titre="Présentation du parcours (50s)"
+                sousTitre="« Poser des piliers solides »"
+              />
             </div>
 
             <div className="mx-auto mt-8 max-w-lg encadre-nuit text-sm leading-relaxed">

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import EcranLancement from '@/components/EcranLancement';
+import LecteurVideoOnboarding from '@/components/LecteurVideoOnboarding';
 import Image from 'next/image';
 import {
   ArrowRight,
@@ -272,6 +273,33 @@ export default function Home() {
           <p className="font-serif text-sm sm:text-base italic leading-relaxed text-slate-800">
             « La Fiche 1 s&apos;explore librement. Dès la Fiche 2, vous la préparez chez vous, vous la vivez ensemble en cellule, puis la suivante s&apos;ouvre. »
           </p>
+        </div>
+      </section>
+
+      {/* ==================================================================== */}
+      {/* SECTION VIDÉO : COMPRENDRE EN 50 SECONDES                            */}
+      {/* ==================================================================== */}
+      <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="feuille relative overflow-hidden rounded-4xl border-2 border-or-400/70 bg-[#112340] p-6 sm:p-10 shadow-2xl text-center text-parchemin-100">
+          <span className="punaise-bois absolute -top-3 left-1/2 -translate-x-1/2" />
+          <span className="text-3xs font-bold uppercase tracking-[0.22em] text-or-400 font-serif block mb-1">
+            Vidéo Officielle
+          </span>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-2">
+            Comprendre Les Fondements en 50 secondes
+          </h2>
+          <p className="mx-auto max-w-lg text-xs sm:text-sm text-parchemin-100/70 font-serif italic mb-6">
+            « Deux temps, une cellule de partage et vingt étapes pour forger des racines inébranlables. »
+          </p>
+
+          <div className="mx-auto mt-6 max-w-2xl">
+            <LecteurVideoOnboarding
+              src="/video/onboarding.mp4"
+              poster="/hero-community-v2.jpg"
+              titre="Présentation du parcours (50s)"
+              sousTitre="« Poser des piliers solides »"
+            />
+          </div>
         </div>
       </section>
 
