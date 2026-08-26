@@ -27,6 +27,7 @@ function EcranContent() {
   useDeclarerFondSombre();
   const { group, session, members } = useParcours();
   const [heure, setHeure] = useState<string>('');
+  const [aide, setAide] = useState(false);
 
   // La projection dure une heure et demie sans qu'on la touche : sans ce
   // verrou, l'écran s'éteindrait au milieu du temps de prière.
@@ -77,6 +78,44 @@ function EcranContent() {
     <div className="nuit nuit-grain fixed inset-0 z-50 flex flex-col px-10 py-8 text-parchemin-100">
       <span className="vitrail left-[-12rem] top-[-10rem] h-[36rem] w-[36rem] bg-or-400/10 animate-souffle" />
 
+      {/* Écrit en français simple : la personne qui anime une cellule n'a
+          pas à connaître le mot « diffusion d'onglet » pour s'en servir. */}
+      {aide && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-encre-950/92 px-10 backdrop-blur-sm">
+          <div className="max-w-3xl">
+            <h2 className="font-serif text-4xl font-bold text-parchemin-100">
+              Trois façons de mettre la rencontre sur la télé
+            </h2>
+            <ol className="mt-8 space-y-6 text-2xl leading-relaxed text-parchemin-100/80">
+              <li>
+                <strong className="text-or-200">Le câble.</strong> Reliez votre ordinateur à la
+                télé avec un câble HDMI. C’est le plus sûr : ça marche toujours.
+              </li>
+              <li>
+                <strong className="text-or-200">Sans fil.</strong> Sur Android ou avec une
+                Chromecast : ouvrez cette page dans Chrome, touchez les trois points en haut à
+                droite, puis <em>Diffuser</em>. Sur iPhone ou Mac : ouvrez le centre de contrôle
+                et choisissez <em>Recopie de l’écran</em>.
+              </li>
+              <li>
+                <strong className="text-or-200">Directement sur la télé.</strong> Si votre télé a
+                un navigateur, tapez-y l’adresse de cette page.
+              </li>
+            </ol>
+            <p className="mt-8 rounded-2xl bg-or-400/10 px-6 py-4 text-xl leading-relaxed text-or-100">
+              Dans tous les cas, vous continuez à faire avancer la rencontre depuis votre
+              téléphone. La télé ne fait que suivre.
+            </p>
+            <button
+              onClick={() => setAide(false)}
+              className="bouton-or mt-8 rounded-full px-8 py-4 text-lg font-bold"
+            >
+              J’ai compris
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Bandeau ── */}
       <header className="relative z-10 flex items-baseline justify-between border-b border-white/10 pb-5">
         <div>
@@ -125,9 +164,13 @@ function EcranContent() {
             {enLigne.length > 1 ? 'nous rejoignent' : 'nous rejoint'} en ligne
           </p>
         )}
-        <p className="flex items-center gap-2 text-sm text-parchemin-100/25">
-          <MonitorPlay className="h-4 w-4" /> Cet écran suit la rencontre — il ne la commande pas
-        </p>
+        <button
+          onClick={() => setAide((v) => !v)}
+          className="flex items-center gap-2 text-sm text-parchemin-100/35 transition-colors hover:text-parchemin-100/70"
+        >
+          <MonitorPlay className="h-4 w-4" />
+          {aide ? 'Masquer' : 'Comment mettre ceci sur la télé ?'}
+        </button>
       </footer>
     </div>
   );
