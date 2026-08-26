@@ -126,10 +126,30 @@ graph TD
 
 ## 🕊️ 4. Les Expériences & Innovations Spirituelles
 
-### 🎙️ 1. Récitation à Voix Haute Interactive (Reconnaissance Vocale Locale)
-- **Principe** : L'utilisateur récite le verset dans son microphone. Le texte biblique s'illumine mot à mot en vert au fur et à mesure de sa proclamation.
-- **Confidentialité Totale** : Utilisation exclusive de la `Web Speech Recognition API` du navigateur. Aucun flux audio n'est envoyé vers un serveur tiers.
-- **Score & Encouragement** : Calcul en temps réel de la fidélité de récitation avec feedback bienveillant (*« Magnifique proclamation ! »*).
+### 🎙️ 1. Mémorisation : deux gestes, à ne pas confondre
+
+**« Lire à voix haute »** (`RecitationVocale`) garde le verset affiché et
+illumine les mots au fur et à mesure. C'est utile pour découvrir un texte.
+Ce n'est **pas** une épreuve de mémoire : le mot suivant est même surligné,
+donc soufflé. Reconnaître un texte qu'on a sous les yeux donne le sentiment
+de le savoir sans qu'on le sache.
+*Reconnaissance vocale du navigateur, aucun audio ne quitte l'appareil.*
+
+**« Me mettre à l'épreuve »** (`EpreuveMemoire`) est la seule des deux qui
+mesure quelque chose. Quatre temps : lire, recopier de sa main, l'écran se
+retourne, réciter dans le vide. Le texte ne revient qu'après, avec les
+écarts surlignés.
+*L'audio part vers `/api/memorisation/recitation`, qui appelle Whisper —
+voir la section Sécurité.*
+
+La comparaison (`src/lib/recitation.ts`) pardonne ce qui n'est pas de la
+personne : accents, ponctuation, élisions transcrites liées ou séparées, et
+la confusion la plus fréquente en français — l'infinitif entendu pour le
+participe. Les mots de trois lettres n'ont aucune tolérance, sans quoi
+« ton » et « son » se confondraient.
+
+Un bouton **« je l'avais bien dit »** relève le score à 100 % : sur un
+verset appris pour la vie intérieure, une machine n'a pas à trancher seule.
 
 ### ⏳ 2. Pause Sanctuaire (Minuteur de Recueillement)
 - **Ambiance Visuelle & Sonore** : Un sablier ou une bougie animée discrète accompagnée de bruitages ambiants Web Audio (*souffle chaud, pluie douce, carillon discret*).
@@ -176,7 +196,22 @@ graph TD
 | **`/certificat`** | **Attestation d'Achèvement** : Diplôme sur parchemin avec sceau doré officiel, date et signatures. |
 | **`/temoignages`** | **Mur de Témoignages** : Lettres de reconnaissance et partages d'impact de disciples punaisés sur la table. |
 | **`/onboarding`** | **Parcours d'Accueil** : Choix du rythme, création ou adhésion à une cellule de disciples. |
-| **`/login`** | **Connexion & Inscription** : Authentification Google, Email/Mot de passe ou mode Découverte. |
+| **`/login`** | **Connexion & Inscription** : Authentification Google ou Email/Mot de passe. |
+| **`/groupes/rencontre/ecran`** | **Projection sur écran commun** : vue en lecture seule pour une télé ou un vidéoprojecteur. N'affiche que ce que le groupe partage à voix haute — étape, durée, qui a la parole, qui suit en visio. Jamais le journal ni les réponses personnelles. |
+| **`/guide-pastoral`** | **Annexe pastorale du livret** : repères pour prendre soin les uns des autres. Imprimable. Ouverte à tous, et liée depuis les fiches 7, 8 et 15 — « ce n'est pas réservé à une élite », dit le texte. |
+
+### Routes serveur
+
+| Route | Rôle | Garde |
+|---|---|---|
+| **`/api/voix`** | Lit un passage quelconque avec la voix du parcours. Le résultat est **gravé dans R2** : ElevenLabs n'est appelé qu'à la toute première demande, pour tous. L'en-tête `X-Voix-Origine` dit `grave` ou `genere`. | Origine + 1500 caractères |
+| **`/api/memorisation/recitation`** | Écoute une récitation (Whisper). **Sans amorce et à température zéro** : souffler le verset attendu au modèle lui ferait produire ce verset même en cas de bafouillage, et l'épreuve donnerait toujours raison. | Jeton Firebase |
+| **`/api/temoignages/audio`** | Dépose un témoignage audio dans R2. Firestore ne garde qu'une adresse — un document plafonne à 1 Mio, l'audio en base64 y dépassait dès trois minutes. | Jeton Firebase + 10 Mo |
+| **`/api/temoignages/transcription`** | Met un témoignage par écrit (Whisper). | Jeton Firebase |
+| **`/api/notifications/subscribe`** | Enregistre l'appareil et ses préférences dans KV, avec son décalage horaire. | Jeton Firebase |
+| **`/api/notifications/cron`** | Réveil des rappels, appelé toutes les quinze minutes par le déclencheur Cloudflare. | Secret partagé |
+| **`/api/notifications/send`** | Envoi de test vers un appareil. | Jeton Firebase |
+| **`/api/notifications/vapid-key`** | Rend la clé publique VAPID — publique par nature. | — |
 
 ---
 
@@ -192,16 +227,50 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=les-fondements.firebasestorage.app
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 NEXT_PUBLIC_FIREBASE_APP_ID=1:...
 
-# Clés VAPID pour les Notifications Push Web
+# Notifications push (VAPID). La paire se fabrique soi-même, aucun
+# fournisseur ne la délivre : `webpush.generateVAPIDKeys()`.
+# La publique part dans le navigateur — c'est sa raison d'être.
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=...
 VAPID_PRIVATE_KEY=...
+# Contact transmis aux services de push. La spécification accepte une URL
+# autant qu'un « mailto: » : l'adresse du site évite d'avoir à posséder un
+# domaine de courrier.
+VAPID_SUBJECT=https://parcours.lesfondements.workers.dev
+
+# Protège le réveil des rappels — la route est publique par nature, et
+# permettrait sinon de réveiller tout le monde à trois heures du matin.
+CRON_SECRET=...
+
+# Transcription et écoute des récitations (Whisper hébergé par Groq).
+GROQ_API_KEY=gsk_...
 ```
+
+Les secrets de production ne vivent pas dans un fichier : ils sont posés sur
+le worker.
+
+```bash
+firebase deploy --only firestore:rules   # sans « npx » : voir plus bas
+npx wrangler secret put CRON_SECRET
+npx wrangler secret put VAPID_PRIVATE_KEY
+npx wrangler secret put VAPID_SUBJECT
+npx wrangler secret put GROQ_API_KEY
+npx wrangler secret put ELEVENLABS_API_KEY
+npx wrangler secret put ELEVENLABS_VOICE_ID
+```
+
+> `npx firebase` échoue : npx cherche le paquet `firebase`, qui est le SDK
+> client, pas la CLI. Appelez `firebase` directement.
 
 Pour la génération de voix off ElevenLabs en local (`.env.voice.local`) :
 ```env
 ELEVENLABS_API_KEY=sk_...
 ELEVENLABS_VOICE_ID=yG4Uc56cLYQyZFnWaYv2
 ELEVENLABS_MODEL_ID=eleven_multilingual_v2
+# Débit des enregistrements. 128 kbps par défaut ; `mp3_44100_64` divise le
+# corpus par deux. Le débit fait partie de l'empreinte : en changer rend
+# obsolètes exactement les pistes concernées, et une relance sans `--force`
+# régénère celles-là seules au lieu de tout refacturer.
+ELEVENLABS_FORMAT=mp3_44100_128
 ```
 
 ### 2. Commandes Utiles
@@ -221,7 +290,29 @@ npx wrangler deploy
 npx firebase-tools deploy --only firestore:rules,firestore:indexes
 ```
 
-### 3. Pipeline de Génération Audio ElevenLabs
+### 3. Ce que le worker a sous la main
+
+| Liaison | Ressource | Ce qu'elle porte |
+|---|---|---|
+| `TEMOIGNAGES` | seau R2 | les témoignages audio |
+| `VOIX` | seau R2 | les passages lus à la demande, gravés une fois pour tous |
+| `RAPPELS` | KV | les abonnements aux rappels, avec leur décalage horaire |
+| `ASSETS` | statiques | les 100 Mo du corpus et des voix |
+
+Un déclencheur `*/15 * * * *` réveille le worker toutes les quinze minutes
+pour les rappels.
+
+**`worker-entree.mjs` enveloppe le worker d'OpenNext**, qui n'exporte que
+`fetch`. Un déclencheur cron appelle `scheduled()` : sans cette enveloppe,
+il se serait réveillé toutes les quinze minutes pour ne trouver personne —
+sans qu'aucune requête n'échoue, donc sans que rien ne le signale. C'est
+pourquoi `main` pointe sur ce fichier et non sur `.open-next/worker.js`.
+
+Les types de liaison sont écrits à la main dans `cloudflare-env.d.ts` :
+`wrangler types` amène les types du moteur workerd, qui entrent en conflit
+avec ceux du DOM et cassent la compilation ailleurs.
+
+### 4. Pipeline de Génération Audio ElevenLabs
 ```bash
 # 1. Estimer le volume de caractères à synthétiser
 npm run voix:estimation
@@ -229,7 +320,10 @@ npm run voix:estimation
 # 2. Générer l'audio d'une fiche spécifique (ex: Fiche 1)
 node --env-file=.env.voice.local scripts/generer-voix.mjs --fiches 1
 
-# 3. Régénérer le manifeste global après ajout de nouveaux fichiers MP3
+# 3. N'enregistrer que les 53 versets du livret
+npm run voix:generer -- --versets
+
+# 4. Régénérer le manifeste global après ajout de nouveaux fichiers MP3
 npm run voix:manifeste
 ```
 
@@ -238,5 +332,33 @@ npm run voix:manifeste
 ## 🔒 7. Sécurité, Confidentialité & Résilience
 
 1. **Règles Firestore Granulaires** : Chaque disciple ne peut modifier que ses propres réponses et notes de journal. Les partages au sein d'une cellule ne sont lisibles que par les membres authentifiés de ce groupe précis.
-2. **Confidentialité Vocale & Microphone** : La reconnaissance vocale pour la mémorisation s'exécute **intégralement dans le navigateur** via les API natives. Aucun enregistrement audio n'est envoyé sur des serveurs externes.
-3. **Architecture Local-First & Zéro Coût** : L'ensemble du corpus biblique et des données du livret est servi statiquement depuis l'Edge Cloudflare. L'application reste réactive et fluide même sans connexion Internet.
+2. **Le micro : deux cas, et il faut les distinguer.**
+   - *« Lire à voix haute »* reste entièrement dans le navigateur : aucun
+     audio ne quitte l'appareil.
+   - *« Me mettre à l'épreuve »*, la **mise par écrit** d'un témoignage et
+     la **voix de studio** envoient bien de l'audio ou du texte vers un
+     tiers — Groq pour Whisper, ElevenLabs pour la voix. C'est le prix d'une
+     transcription correcte en français, mais ce n'est plus « rien ne
+     sort » : il faut le dire aux gens, pas le taire.
+   - Les trois routes exigent un compte, et les témoignages audio vivent
+     dans un seau R2 dont les noms sont imprévisibles : l'adresse d'un
+     témoignage ne se devine pas à partir de celle d'un autre.
+3. **Ce qui appartient à la personne, et à elle seule.** Le journal, les
+   réponses aux questions et les versets mémorisés vivent sous
+   `users/{uid}` : les règles Firestore n'en autorisent la lecture qu'à leur
+   auteur — pas même à l'animateur du groupe. Les binômes de prière ne
+   portent que des identifiants et une date, et les règles refusent tout
+   champ supplémentaire : ce document ne pourra jamais devenir un dossier
+   sur quelqu'un, par construction et non par bonne volonté.
+
+4. **Ce que le mur des témoignages autorise.** Sa lecture est publique —
+   c'est la vitrine du parcours. Mais on n'y dépose que sous son propre nom,
+   et seul l'auteur corrige ou décroche le sien. Le « amen » ne peut toucher
+   que deux champs, et chacun ne s'ajoute ou ne se retire que lui-même.
+
+5. **Les routes qui coûtent de l'argent sont gardées.** `/api/voix` grave
+   ses réponses dans R2 pour n'appeler ElevenLabs qu'une fois par passage,
+   et vérifie l'origine. Les routes Whisper exigent un jeton. Sans quoi il
+   suffirait de connaître une adresse pour vider un quota.
+
+6. **Architecture Local-First & Zéro Coût** : L'ensemble du corpus biblique et des données du livret est servi statiquement depuis l'Edge Cloudflare. L'application reste réactive et fluide même sans connexion Internet.

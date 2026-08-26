@@ -42,14 +42,21 @@ L'application dispose d'un pipeline audio complet :
 
 1. **Écoute Continue mains-libres** : Diffusion enchaînée de l'introduction, des sections d'enseignement et du chapitre biblique complet.
 2. **Priorité Voix Studio ElevenLabs** : Chargement direct des enregistrements MP3 (`public/voix/eleven/`) avec bascule transparente sur le Web Speech TTS en secours.
-3. **Récitation vocale interactive** : Reconnaissance vocale locale en direct dans le navigateur pour la mémorisation mot à mot des versets proclamés (100% privé, sans serveur externe).
-4. **Pause Sanctuaire** : Minuteur de recueillement avec sablier animé, bougie et ambiances Web Audio (*souffle, pluie, silence*).
+3. **Voix de studio à la demande** : n'importe quel passage cliqué est lu avec la voix du parcours. Le son est **gravé dans R2** à la première demande — ElevenLabs n'est appelé qu'une fois par passage, pour tout le monde.
+4. **Deux gestes de mémorisation, à ne pas confondre** :
+   - *Lire à voix haute* — le verset reste affiché, la reconnaissance se fait dans le navigateur, aucun audio ne sort de l'appareil.
+   - *Me mettre à l'épreuve* — le verset se retourne avant qu'on parle, et la récitation part vers Whisper. C'est la seule des deux qui mesure quelque chose.
+5. **Pause Sanctuaire** : Minuteur de recueillement avec sablier animé, bougie et ambiances Web Audio (*souffle, pluie, silence*).
 
 ```bash
 npm run voix:estimation   # Estime le nombre de caractères sans coût
 node --env-file=.env.voice.local scripts/generer-voix.mjs --fiches 1 # Génère l'audio ElevenLabs
+npm run voix:generer -- --versets   # N'enregistre que les 53 versets du livret
 npm run voix:manifeste    # Régénère le catalogue après ajout de pistes MP3
 ```
+
+> Le débit se règle par `ELEVENLABS_FORMAT` et fait partie de l'empreinte :
+> en changer ne régénère que les pistes concernées, sans tout refacturer.
 
 ---
 
@@ -57,7 +64,7 @@ npm run voix:manifeste    # Régénère le catalogue après ajout de pistes MP3
 
 Chaque référence scripturaire dans le livret est immédiatement cliquable :
 
-- **Louis Segond 1910** : 31 099 versets complets en JSON statique (chargement par livre).
+- **Louis Segond 1910** : 31 103 versets complets en JSON statique (chargement par livre) — le compte du canon, après avoir rétabli quatre versets fondus dans leur voisin à l'import.
 - **Lexiques Strong Hébreu / Grec** : 14 627 définitions avec racines, translittération et morphologie.
 - **Treasury of Scripture Knowledge** : 29 169 versets de renvois croisés.
 - **Bible thématique de Nave** : 5 313 thèmes de méditation.
