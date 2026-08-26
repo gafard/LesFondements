@@ -61,6 +61,7 @@ import {
   updateGroupSettings,
 } from '@/lib/parcoursStore';
 import { FICHES_META } from '@/data/fichesMeta';
+import BinomesPriere from '@/components/BinomesPriere';
 import {
   LONGUEUR_REPONSE,
   REPONSES_MAX,
@@ -872,6 +873,8 @@ function OngletMembres({
           Tout membre peut inviter : le groupe grandit par les relations, pas par un annuaire.
         </p>
       )}
+
+      <BinomesPriere />
 
       <QuitterLeGroupe />
     </div>

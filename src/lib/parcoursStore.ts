@@ -18,6 +18,7 @@ import {
   PARCOURS_TOTAL_STEPS,
   REPONSES_MAX,
   type AttendanceMode,
+  type Binome,
   type GroupInvite,
   type GroupMatch,
   type GroupMember,
@@ -1121,6 +1122,102 @@ async function writeSession(session: GroupSession): Promise<void> {
   else all.push(session);
   lsSet(KEY.sessions(session.groupId), all);
   emit(`sessions:${session.groupId}`);
+}
+
+/**
+ * Les rencontres qu'une personne a manquées, et ce qui s'y est dit.
+ *
+ * La vie est chaotique : un enfant malade, un embouteillage, et l'on rate le
+ * mardi soir. L'animateur clôture quand même — il le faut, sinon le groupe
+ * entier s'arrête. Mais celui qui n'était pas là revenait sans rien savoir
+ * de ce qui s'était partagé, et décrochait pour de bon.
+ *
+ * On lui rend le fil : le résumé, les prières, le pas décidé ensemble. Pas
+ * pour remplacer la présence — rien ne la remplace — mais pour qu'une absence
+ * ne devienne pas une sortie.
+ */
+export async function recapsManques(
+  groupId: string,
+  uid: string
+): Promise<GroupSession[]> {
+  const sessions = await getSessions(groupId);
+  return sessions
+    .filter((session) => {
+      if (session.status !== 'terminee' || !session.recap) return false;
+      // Absent, ou jamais annoncé : dans les deux cas, il n'y était pas.
+      const presence = session.attendance?.[uid];
+      return !presence || presence === 'absent';
+    })
+    .sort((a, b) => b.step - a.step);
+}
+
+/**
+ * Les attelages de prière du groupe.
+ *
+ * Volontairement pauvres : des identifiants et une date. Tout ce qui
+ * ressemblerait à un dossier sur quelqu'un est absent par construction, et
+ * doit le rester.
+ */
+export async function getBinomes(groupId: string): Promise<Binome[]> {
+  const client = await getClient();
+  if (client) {
+    try {
+      const snap = await client.f.getDocs(
+        client.f.collection(client.db, 'groups', groupId, 'binomes')
+      );
+      const binomes = snap.docs.map((d) => d.data() as Binome);
+      lsSet(`lf.binomes.${groupId}`, binomes);
+      return binomes;
+    } catch (error) {
+      noterEchec('Lecture des binômes', error);
+    }
+  }
+  return lsGet<Binome[]>(`lf.binomes.${groupId}`, []);
+}
+
+export async function creerBinome(
+  groupId: string,
+  membres: string[],
+  creePar: string
+): Promise<Binome | null> {
+  // Le livret est net : « à 2 ou 3. Pas trop sinon ça fuse dans tous les
+  // sens, pas trop peu non plus. »
+  if (membres.length < 2 || membres.length > 3) return null;
+
+  const binome: Binome = {
+    id: `b${Date.now().toString(36)}`,
+    groupId,
+    membres,
+    creeLe: Date.now(),
+    creePar,
+  };
+
+  const client = await getClient();
+  if (client) {
+    try {
+      await client.f.setDoc(
+        client.f.doc(client.db, 'groups', groupId, 'binomes', binome.id),
+        binome
+      );
+    } catch (error) {
+      noterEchec('Création du binôme', error);
+    }
+  }
+  lsSet(`lf.binomes.${groupId}`, [...(await getBinomes(groupId)), binome]);
+  return binome;
+}
+
+export async function defaireBinome(groupId: string, id: string): Promise<void> {
+  const client = await getClient();
+  if (client) {
+    try {
+      await client.f.deleteDoc(client.f.doc(client.db, 'groups', groupId, 'binomes', id));
+    } catch (error) {
+      noterEchec('Suppression du binôme', error);
+    }
+  }
+  const restants = (await getBinomes(groupId)).filter((b) => b.id !== id);
+  lsSet(`lf.binomes.${groupId}`, restants);
 }
 
 export function getCachedSession(groupId: string): GroupSession | null {

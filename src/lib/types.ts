@@ -137,6 +137,27 @@ export interface GroupInvite {
 
 export type SessionStatus = 'planifiee' | 'ouverte' | 'terminee';
 
+/**
+ * Qui veille sur qui, et rien de plus.
+ *
+ * Le livret demande deux choses : prier « en équipe, à 2 ou 3 », et savoir
+ * « qui fait quoi » pour ne pas court-circuiter le travail d'un autre. Il
+ * met en garde, dans la même page, contre le regard qui inventorie — « non
+ * pas pour tout savoir de lui, ou le manipuler ».
+ *
+ * On note donc l'attelage, jamais son contenu. Aucun sujet, aucune note,
+ * aucun état d'avancement : des noms, et la date où le groupe s'est mis
+ * d'accord. C'est la différence entre organiser le soin et ficher les gens.
+ */
+export interface Binome {
+  id: string;
+  groupId: string;
+  /** Les deux ou trois qui prient ensemble. Jamais moins de deux. */
+  membres: string[];
+  creeLe: number;
+  creePar: string;
+}
+
 export interface GroupSession {
   id: string;
   groupId: string;

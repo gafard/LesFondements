@@ -88,6 +88,21 @@ service cloud.firestore {
         allow delete: if estAnimateur(groupId);
       }
 
+      // Les attelages de prière : qui veille sur qui. Le document ne porte
+      // que des identifiants et une date — rien de ce qu'on pourrait dire
+      // d'une personne. C'est voulu, et les règles ne doivent pas laisser
+      // ajouter autre chose.
+      match /binomes/{binomeId} {
+        allow read: if estMembre(groupId);
+        allow create: if estAnimateur(groupId)
+          && request.resource.data.keys().hasOnly(['id', 'groupId', 'membres', 'creeLe', 'creePar'])
+          && request.resource.data.membres.size() >= 2
+          && request.resource.data.membres.size() <= 3;
+        allow delete: if estAnimateur(groupId);
+        // Un attelage ne se modifie pas : on le défait et on en refait un.
+        allow update: if false;
+      }
+
       match /sessions/{sessionId} {
         allow read: if estMembre(groupId);
         allow create: if estAnimateur(groupId)

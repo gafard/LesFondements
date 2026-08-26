@@ -33,6 +33,7 @@ import YearHeatmap from '@/components/YearHeatmap';
 import ModernIcon from '@/components/ModernIcon';
 import NotificationCenter from '@/components/NotificationCenter';
 import EdificeFondements from '@/components/EdificeFondements';
+import RecapManque from '@/components/RecapManque';
 import PauseSanctuaire from '@/components/PauseSanctuaire';
 import TelechargementHorsLigne from '@/components/TelechargementHorsLigne';
 import { getCachedJournalEntries, getJournalEntries, timestampToDate } from '@/lib/firestore';
@@ -449,6 +450,10 @@ function DashboardContent() {
           </div>
           <YearHeatmap />
         </div>
+
+        {/* Ce qui s'est dit pendant une absence : en haut, avant le reste,
+            parce que c'est ce qu'on a manqué qui doit se rattraper d'abord. */}
+        <RecapManque />
 
         {/* ══ L'Édifice des Fondements (Temple architectural de 20 pierres) ══ */}
         <EdificeFondements

@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import {
+  Mic,
   ArrowRight,
   BookOpen,
   Check,
@@ -43,6 +44,7 @@ import { useDeclarerFondSombre } from '@/lib/fondSombre';
 import Illumination from '@/components/Illumination';
 import { MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
+import EpreuveMemoire from '@/components/EpreuveMemoire';
 import {
   encoderAnnotations,
   lireAnnotationsAvecMigration,
@@ -450,6 +452,33 @@ function FicheContent() {
         {/* ══ Résumé et partage ══ */}
         {onglet === 'partage' && (
           <div className="mt-8 space-y-8">
+            {/* Le livret donne son annexe pastorale avant les temps de prière
+                des fiches 7, 8 et 15. Elle est ouverte à tous : « ce n'est pas
+                réservé à une élite », dit le texte — l'animateur y trouve
+                seulement ce qui le concerne en premier. */}
+            {[7, 8, 15].includes(fiche.id) && (
+              <Link
+                href="/guide-pastoral"
+                className="postit postit-vert pose-4 relative block rounded-3xl p-5 shadow-md transition-transform hover:-translate-y-0.5"
+              >
+                <span className="ruban -top-3 left-9 -rotate-2 rounded-[2px]" />
+                <p className="text-3xs font-black uppercase tracking-[0.16em] text-emerald-900">
+                  Avant de prier les uns pour les autres
+                </p>
+                <p className="manuscrit mt-1 text-2xl font-bold text-encre-950">
+                  Prendre soin, sans se prendre pour le berger
+                </p>
+                <p className="mt-1 font-serif text-xs italic leading-relaxed text-encre-800">
+                  Le livret donne quelques repères pour cette fiche : prier à deux ou trois,
+                  chercher la racine plutôt que le symptôme, et se rappeler que les brebis
+                  sont au Seigneur — pas à nous.
+                </p>
+                <span className="mt-2 inline-block text-2xs font-bold text-emerald-900 underline underline-offset-2">
+                  Ouvrir le guide pastoral
+                </span>
+              </Link>
+            )}
+
             {enPreparation && (
               <div className="postit postit-bleu pose-3 relative rounded-3xl p-5 shadow-md">
                 <span className="ruban -top-3 left-10 -rotate-2 rounded-[2px]" />
@@ -912,6 +941,7 @@ function CarteVerset({
   ancre?: string;
 }) {
   const texte = texteDuVerset(reference);
+  const [epreuve, setEpreuve] = useState(false);
   const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
   const pose = poses[index % poses.length];
   const postitColors = ['postit', 'postit-bleu', 'postit-rose', 'postit-vert'];
@@ -950,6 +980,25 @@ function CarteVerset({
           className="manuscrit w-full rounded-xl border border-encre-950/10 bg-white/70 px-3.5 py-2 text-base text-encre-950 outline-none placeholder:text-encre-400 placeholder:font-sans focus:bg-white focus:ring-1 focus:ring-or-400"
         />
       </div>
+
+      {/* L'épreuve vivait dans une page qu'il fallait aller chercher. Elle se
+          propose ici, sur le verset qu'on vient justement de recopier — au
+          moment où l'on sait si on le sait. */}
+      {texte && (
+        <div className="mt-3">
+          {epreuve ? (
+            <EpreuveMemoire reference={reference} texte={texte} />
+          ) : (
+            <button
+              onClick={() => setEpreuve(true)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-encre-950/12 px-3.5 py-1.5 text-2xs font-bold text-encre-600 transition-colors hover:bg-white/60 hover:text-encre-900"
+            >
+              <Mic className="h-3 w-3" />
+              Le réciter sans regarder
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

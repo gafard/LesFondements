@@ -58,14 +58,14 @@ export const PAQUETS: Paquet[] = [
   {
     cle: 'fiche',
     nom: 'La fiche en cours',
-    description: 'La page, son texte et sa voix. De quoi préparer la semaine sans réseau.',
+    description: 'La page, son texte et sa voix. De quoi lire et écouter sans réseau — réciter au micro demandera une connexion.',
     poids: '≈ 3 Mo',
     urls: async (fiche) => [`/fiches/${fiche}`, ...(await pistesDeLaFiche(fiche))],
   },
   {
     cle: 'parcours',
     nom: 'Le parcours complet',
-    description: 'Les vingt fiches et les pages de l’application, sans les voix.',
+    description: 'Les vingt fiches et les pages de l’application, sans les voix. La lecture et l’écriture fonctionnent hors connexion.',
     poids: '≈ 2 Mo',
     urls: async () => [
       ...PAGES,
