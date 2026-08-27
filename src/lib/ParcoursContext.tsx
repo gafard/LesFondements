@@ -163,9 +163,10 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
   // Le calendrier push suit le vrai groupe, même si la personne ne rouvre
   // jamais le panneau de réglages après un changement de créneau ou d'étape.
   useEffect(() => {
-    if (!user || !group || membership?.status !== 'actif') return;
-    void synchroniserNotifications(chargerPreferencesLocales(), { groupId: group.id });
-  }, [user, group, membership?.status]);
+    if (!user || loadedUid !== user.uid) return;
+    const groupId = group && membership?.status === 'actif' ? group.id : undefined;
+    void synchroniserNotifications(chargerPreferencesLocales(), { groupId });
+  }, [user, loadedUid, group, membership?.status]);
 
   /**
    * Groupes d'exemple (mode local, sans backend) : leur animateur n'existe
