@@ -1,7 +1,9 @@
 import 'server-only';
 
 /** Vérifie un jeton Firebase sans embarquer de compte de service dans le Worker. */
-export async function verifierFirebaseToken(request: Request): Promise<{ uid: string; email?: string }> {
+export async function verifierFirebaseToken(
+  request: Request
+): Promise<{ uid: string; email?: string; token: string }> {
   const authorization = request.headers.get('authorization') ?? '';
   const token = authorization.startsWith('Bearer ') ? authorization.slice(7).trim() : '';
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
@@ -22,5 +24,5 @@ export async function verifierFirebaseToken(request: Request): Promise<{ uid: st
   };
   const user = data.users?.[0];
   if (!response.ok || !user?.localId) throw new Error('UNAUTHENTICATED');
-  return { uid: user.localId, email: user.email };
+  return { uid: user.localId, email: user.email, token };
 }

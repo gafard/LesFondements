@@ -14,7 +14,7 @@ import opennext from './.open-next/worker.js';
 
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from './.open-next/worker.js';
 
-export default {
+const worker = {
   fetch: opennext.fetch,
 
   async scheduled(evenement, env, ctx) {
@@ -38,3 +38,5 @@ export default {
     void evenement;
   },
 };
+
+export default worker;

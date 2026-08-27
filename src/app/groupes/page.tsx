@@ -1551,6 +1551,9 @@ function ModalReglagesCellule({
   const [nom, setNom] = useState(group.name);
   const [description, setDescription] = useState(group.description);
   const [weekday, setWeekday] = useState(group.meeting.weekday);
+  const [nextMeetingDate, setNextMeetingDate] = useState(
+    group.meeting.nextMeetingDate || group.meeting.firstMeetingDate || ''
+  );
   const [time, setTime] = useState(group.meeting.time);
   const [rhythm, setRhythm] = useState<GroupRhythm>(group.meeting.rhythm || 'hebdomadaire');
   const [mode, setMode] = useState<GroupMeetingMode>(group.meeting.mode || 'presentiel');
@@ -1558,6 +1561,17 @@ function ModalReglagesCellule({
   const [capacity, setCapacity] = useState(group.capacity || 6);
   const [enSauvegarde, setEnSauvegarde] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
+
+  const onDateChange = (dateStr: string) => {
+    setNextMeetingDate(dateStr);
+    if (dateStr) {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        setWeekday(d.getDay());
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1577,6 +1591,7 @@ function ModalReglagesCellule({
           ...group.meeting,
           weekday: Number(weekday),
           time: time.trim(),
+          nextMeetingDate: nextMeetingDate || undefined,
           rhythm,
           mode,
           callLink: callLink.trim() || undefined,
@@ -1645,32 +1660,28 @@ function ModalReglagesCellule({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
-                Jour de rencontre
+                Date de la prochaine séance
               </label>
-              <select
-                value={weekday}
-                onChange={(e) => setWeekday(Number(e.target.value))}
+              <input
+                type="date"
+                min={new Date().toISOString().split('T')[0]}
+                value={nextMeetingDate}
+                onChange={(e) => onDateChange(e.target.value)}
                 className="w-full rounded-xl border border-parchemin-300 bg-white px-3 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
-              >
-                {JOURS.map((j, idx) => (
-                  <option key={j} value={idx}>
-                    {j.charAt(0).toUpperCase() + j.slice(1)}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div>
               <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1">
-                Heure (ex: 19:30)
+                Heure de rendez-vous
               </label>
               <input
-                type="text"
+                type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                placeholder="19:30"
+                placeholder="20:00"
                 className="w-full rounded-xl border border-parchemin-300 bg-white px-3 py-2.5 text-xs text-encre-950 font-medium focus:border-or-500 focus:outline-hidden"
                 required
               />

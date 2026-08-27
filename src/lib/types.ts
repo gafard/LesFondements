@@ -48,6 +48,10 @@ export interface GroupMeetingPlan {
   /** « 20:00 » */
   time: string;
   timezone: string;
+  /** Date précise de la 1ère rencontre ou de lancement (ex: '2026-09-03') */
+  firstMeetingDate?: string;
+  /** Date précise de la prochaine séance programmée (ex: '2026-09-03') */
+  nextMeetingDate?: string;
   /** Lien visio (Meet, Zoom, Jitsi…) utilisé par les membres à distance */
   callLink?: string;
   /** Adresse du lieu physique, visible des seuls membres approuvés */

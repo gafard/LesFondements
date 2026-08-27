@@ -33,6 +33,9 @@ import {
   jouerAmbiance,
   lectureDisponible,
   lireAVoixHaute,
+  getGenreVoix,
+  setGenreVoix,
+  type GenreVoix,
   type Ambiance,
 } from '@/lib/ambiance';
 import { texteDuVerset } from '@/data/versets';
@@ -43,6 +46,11 @@ import {
   type Manifeste,
   type Piste,
 } from '@/lib/voix';
+import {
+  chargerManifesteVivienne,
+  pisteVivienne,
+  type ManifesteVivienne,
+} from '@/lib/voixVivienne';
 import type { Bloc, FicheLivret, ResumeSection } from '@/lib/livret';
 import { memoriserPassage } from '@/lib/marquePage';
 import { decouperEnMoments, momentDe, type Moment } from '@/lib/moments';
@@ -182,7 +190,9 @@ export default function Immersion({
   );
   const [ambiance, setAmbiance] = useState<Ambiance>('silence');
   const [lecture, setLecture] = useState(false);
+  const [genreVoixLocal, setGenreVoixLocal] = useState<GenreVoix>(() => getGenreVoix());
   const [manifeste, setManifeste] = useState<Manifeste | null>(null);
+  const [manifesteVivienne, setManifesteVivienne] = useState<ManifesteVivienne | null>(null);
   const [enchainer, setEnchainer] = useState(false);
   const [cloture, setCloture] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
@@ -336,6 +346,13 @@ export default function Immersion({
   // ── Ambiance et voix ────────────────────────────────────────
   useEffect(() => {
     void chargerManifesteVoix().then(setManifeste);
+    void chargerManifesteVivienne().then((vivienne) => {
+      setManifesteVivienne(vivienne);
+      if (!vivienne && getGenreVoix() === 'feminin') {
+        setGenreVoix('masculin');
+        setGenreVoixLocal('masculin');
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -352,14 +369,25 @@ export default function Immersion({
 
   /**
    * La voix off de la scène : l'enregistrement du paragraphe s'il existe,
-   * sinon celui de la section entière. Rien ne remplace le silence : quand
-   * aucune piste n'est disponible, on retombe sur la synthèse du navigateur.
+   * sinon celui de la section entière. Vivienne n'est résolue qu'à travers
+   * son manifeste final : les fichiers en cours de génération sont ignorés.
    */
   const pisteCourante: Piste | null = useMemo(() => {
     if (!scene.piste) return null;
+    if (genreVoixLocal === 'feminin') {
+      const url = pisteVivienne(manifesteVivienne, scene.piste);
+      if (!url) return null;
+      return {
+        id: scene.piste,
+        url,
+        source: 'eleven',
+        empreinte: 'vivienne',
+        voix: 'fr-FR-VivienneMultilingualNeural',
+      };
+    }
     const section = scene.piste.replace(/\.b\d+$/, '');
     return resoudrePiste(manifeste, scene.piste, section);
-  }, [manifeste, scene]);
+  }, [manifeste, manifesteVivienne, scene, genreVoixLocal]);
 
   const basculerLectureOuPause = useCallback(() => {
     const el = audioRef.current;
@@ -374,7 +402,7 @@ export default function Immersion({
         if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
       } else {
         const texte = texteDeLaScene(scene);
-        if (texte) lireAVoixHaute(texte);
+        if (texte) lireAVoixHaute(texte, { genre: genreVoixLocal });
         setAudioEnCours(true);
       }
       return;
@@ -390,11 +418,11 @@ export default function Immersion({
         if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
       } else {
         const texte = texteDeLaScene(scene);
-        if (texte) lireAVoixHaute(texte);
+        if (texte) lireAVoixHaute(texte, { genre: genreVoixLocal });
         setAudioEnCours(true);
       }
     }
-  }, [lecture, audioEnCours, pisteCourante, scene, texteDeLaScene]);
+  }, [lecture, audioEnCours, pisteCourante, scene, texteDeLaScene, genreVoixLocal]);
 
   useEffect(() => {
     if (!lecture || pisteCourante) {
@@ -402,11 +430,11 @@ export default function Immersion({
       return;
     }
     const texte = texteDeLaScene(scene);
-    if (texte) lireAVoixHaute(texte);
+    if (texte) lireAVoixHaute(texte, { genre: genreVoixLocal });
     return () => arreterLecture();
-  }, [lecture, scene, texteDeLaScene, pisteCourante]);
+  }, [lecture, scene, texteDeLaScene, pisteCourante, genreVoixLocal]);
 
-  // Lecture de la piste audio studio / ElevenLabs
+  // Lecture de la piste audio studio / ElevenLabs / Vivienne
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
@@ -416,14 +444,8 @@ export default function Immersion({
       }
       el.currentTime = 0;
       const p = el.play();
-      if (p) {
-        p.then(() => setAudioEnCours(true)).catch(() => {
-          setAudioEnCours(false);
-        });
-      }
+      if (p) p.then(() => setAudioEnCours(true)).catch(() => {});
     } else {
-      // `onPause` de l'élément met déjà l'état à jour : le refaire ici
-      // dupliquait la vérité et déclenchait un rendu en cascade.
       el.pause();
     }
   }, [pisteCourante, lecture, index]);
@@ -700,6 +722,12 @@ export default function Immersion({
         setAmbiance={setAmbiance}
         lecture={lecture}
         setLecture={setLecture}
+        genreVoix={genreVoixLocal}
+        setGenreVoix={(g) => {
+          setGenreVoix(g);
+          setGenreVoixLocal(g);
+        }}
+        vivienneDisponible={!!manifesteVivienne}
         voixDisponible={lectureDisponible() || !!manifeste}
         taille={taille}
         setTaille={setTaille}
@@ -744,11 +772,6 @@ export default function Immersion({
 /**
  * Tout ce qui n'est pas la scène : ambiance, voix, sommaire, note, confort
  * de lecture, sortie.
- *
- * Ces commandes vivaient toutes dans la barre haute, visibles en
- * permanence. Sur un téléphone, cela faisait sept objets à l'écran pour un
- * texte qu'on venait méditer — l'inverse de l'immersion. Elles glissent
- * maintenant depuis le bas, à la demande, et se referment.
  */
 function FeuilleOptions({
   ouverte,
@@ -757,6 +780,9 @@ function FeuilleOptions({
   setAmbiance,
   lecture,
   setLecture,
+  genreVoix,
+  setGenreVoix,
+  vivienneDisponible,
   voixDisponible,
   taille,
   setTaille,
@@ -772,6 +798,9 @@ function FeuilleOptions({
   setAmbiance: (valeur: Ambiance) => void;
   lecture: boolean;
   setLecture: (valeur: boolean) => void;
+  genreVoix: GenreVoix;
+  setGenreVoix: (valeur: GenreVoix) => void;
+  vivienneDisponible: boolean;
   voixDisponible: boolean;
   taille: number;
   setTaille: (valeur: number) => void;
@@ -857,12 +886,65 @@ function FeuilleOptions({
                 ) : (
                   <VolumeX className="h-4 w-4 text-parchemin-100/50" />
                 )}
-                Voix
+                Lecture Vocale
               </span>
               <span className="text-2xs font-bold text-parchemin-100/45">
                 {lecture ? 'Active' : 'Coupée'}
               </span>
             </button>
+          )}
+
+          {/* Le sélecteur n'existe que lorsque toutes les pistes Vivienne ont
+              passé la vérification de publication. */}
+          {vivienneDisponible && (
+          <div className="rounded-2xl bg-white/6 p-3 border border-white/8">
+            <p className="text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/60 mb-2">
+              Timbre de la narration
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setGenreVoix('masculin')}
+                className={`rounded-xl p-2.5 text-left transition-all flex flex-col justify-between ${
+                  genreVoix === 'masculin'
+                    ? 'bg-or-400 text-encre-950 shadow-md ring-1 ring-or-300'
+                    : 'bg-white/8 text-parchemin-100/70 hover:bg-white/14'
+                }`}
+              >
+                <span className="text-xs font-bold flex items-center gap-1.5">
+                  🧔 Masculin
+                </span>
+                <span
+                  className={`text-[10px] mt-0.5 ${
+                    genreVoix === 'masculin' ? 'text-encre-900/80 font-medium' : 'text-parchemin-100/40'
+                  }`}
+                >
+                  Studio posé
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGenreVoix('feminin')}
+                className={`rounded-xl p-2.5 text-left transition-all flex flex-col justify-between ${
+                  genreVoix === 'feminin'
+                    ? 'bg-or-400 text-encre-950 shadow-md ring-1 ring-or-300'
+                    : 'bg-white/8 text-parchemin-100/70 hover:bg-white/14'
+                }`}
+              >
+                <span className="text-xs font-bold flex items-center gap-1.5">
+                  👩 Féminin
+                </span>
+                <span
+                  className={`text-[10px] mt-0.5 ${
+                    genreVoix === 'feminin' ? 'text-encre-900/80 font-medium' : 'text-parchemin-100/40'
+                  }`}
+                >
+                  Vivienne (Doux)
+                </span>
+              </button>
+            </div>
+          </div>
           )}
 
           <div className="flex items-center justify-between rounded-2xl bg-white/8 px-4 py-2.5">

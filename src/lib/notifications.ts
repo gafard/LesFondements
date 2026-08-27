@@ -12,6 +12,13 @@ export interface NotificationPreferences {
   vieDeGroupe: boolean;    // Célébration d'étape clôturée & nouvelles pépites
 }
 
+export interface ContexteNotifications {
+  /** Le serveur relit le calendrier réel dans Firestore à partir de cet id. */
+  groupId?: string;
+}
+
+export type TypeEvenementGroupe = 'rencontre_ouverte' | 'etape_debloquee' | 'pepite';
+
 export const PREFERENCES_DEFAUT: NotificationPreferences = {
   goutteDeRosee: true,
   heureMatin: '07:30',
@@ -62,6 +69,16 @@ export function diagnostiquerEnvironnement(): DiagnosticPWA {
 
 const CLE_STOCKAGE_PREFS = 'lf.notifPreferences';
 const CLE_STOCKAGE_SUB = 'lf.pushSubscription';
+
+/** Identifiant IANA, avec prise en charge automatique des changements d'heure. */
+export function fuseauIanaLocal(): string {
+  try {
+    const fuseau = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return fuseau || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+}
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -114,9 +131,41 @@ export async function obtenirAbonnementActif(): Promise<PushSubscription | null>
   }
 }
 
+async function enregistrerAppareil(
+  subscription: PushSubscription,
+  preferences: NotificationPreferences,
+  contexte: ContexteNotifications = {}
+): Promise<{ success: boolean; error?: string }> {
+  const token = await jetonFirebase();
+  if (!token) return { success: false, error: 'Reconnectez-vous pour activer cet appareil.' };
+  const subJson = subscription.toJSON();
+  const response = await fetch('/api/notifications/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+      subscription: subJson,
+      preferences,
+      timezone: fuseauIanaLocal(),
+      calendrier: contexte.groupId ? { groupId: contexte.groupId } : null,
+    }),
+  });
+  const resultat = (await response.json().catch(() => ({}))) as { error?: string };
+  if (!response.ok) {
+    return { success: false, error: resultat.error || 'L’appareil n’a pas pu être vérifié.' };
+  }
+  sauvegarderPreferencesLocales(preferences);
+  try {
+    localStorage.setItem(CLE_STOCKAGE_SUB, JSON.stringify(subJson));
+  } catch {
+    /* ignorer */
+  }
+  return { success: true };
+}
+
 export async function activerNotifications(
   userId?: string,
-  preferences: NotificationPreferences = PREFERENCES_DEFAUT
+  preferences: NotificationPreferences = PREFERENCES_DEFAUT,
+  contexte: ContexteNotifications = {}
 ): Promise<{ success: boolean; error?: string }> {
   if (!verifierSupportNotifications()) {
     return { success: false, error: 'Les notifications ne sont pas supportées par ce navigateur.' };
@@ -149,38 +198,43 @@ export async function activerNotifications(
       });
     }
 
-    // 4. Transmission de l'abonnement à l'API Worker
-    const subJson = subscription.toJSON();
-    const token = await jetonFirebase();
-    if (!token) return { success: false, error: 'Reconnectez-vous pour activer cet appareil.' };
-    const response = await fetch('/api/notifications/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        subscription: subJson,
-        userId: userId || 'anonyme',
-        preferences,
-        // Le serveur ne sait pas quelle heure il est chez vous. C'est ce
-        // décalage qui lui permet de servir « 7 h 30 » à chacun chez lui,
-        // sans avoir à tenir une table des fuseaux et de leurs changements.
-        decalage: new Date().getTimezoneOffset(),
-      }),
-    });
-    if (!response.ok) throw new Error('L’appareil n’a pas pu être vérifié.');
-
-    // 5. Sauvegarde locale
-    sauvegarderPreferencesLocales(preferences);
-    try {
-      localStorage.setItem(CLE_STOCKAGE_SUB, JSON.stringify(subJson));
-    } catch {
-      /* ignorer */
-    }
-
-    return { success: true };
+    // 4. Transmission de l'abonnement et du contexte de groupe au Worker.
+    void userId;
+    return enregistrerAppareil(subscription, preferences, contexte);
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     return { success: false, error: errorMsg };
   }
+}
+
+/**
+ * Met à jour préférences, fuseau et calendrier sans redemander la permission.
+ * Appelée à chaque changement de groupe et de réglage.
+ */
+export async function synchroniserNotifications(
+  preferences: NotificationPreferences,
+  contexte: ContexteNotifications = {}
+): Promise<{ success: boolean; error?: string }> {
+  const subscription = await obtenirAbonnementActif();
+  if (!subscription) return { success: false, error: 'Aucun appareil inscrit.' };
+  return enregistrerAppareil(subscription, preferences, contexte);
+}
+
+/** Signale au moteur un événement avéré du groupe ; le serveur le revalide. */
+export async function publierEvenementGroupe(input: {
+  groupId: string;
+  type: TypeEvenementGroupe;
+  sourceId: string;
+}): Promise<void> {
+  const token = await jetonFirebase();
+  if (!token) return;
+  await fetch('/api/notifications/group-event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(input),
+  }).catch(() => {
+    /* l'action principale reste valide si la notification ne part pas */
+  });
 }
 
 export async function desactiverNotifications(): Promise<boolean> {

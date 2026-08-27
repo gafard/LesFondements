@@ -1,6 +1,7 @@
 import { preparerPourLaVoix } from './prononciation.mjs';
 import { urlVoixStudio, voixStudioEcartee, voixStudioPossible } from './voixStudio';
 import { chargerManifesteVoix } from './voix';
+import { chargerManifesteVivienne, pisteVivienne } from './voixVivienne';
 
 /**
  * Ambiance sonore de l'immersion, entièrement synthétisée.
@@ -102,7 +103,7 @@ function construireSouffle(ctx: AudioContext, master: GainNode): Contexte {
   const noeuds: AudioNode[] = [];
   const sources: AudioScheduledSourceNode[] = [];
 
-  // Un accord très grave, à la limite de l'audible : ré – la – ré.
+  // Un accord très grave et feutré : ré – la – ré.
   const fondamentales = [73.42, 110.0, 146.83];
   fondamentales.forEach((frequence, index) => {
     const osc = ctx.createOscillator();
@@ -110,14 +111,14 @@ function construireSouffle(ctx: AudioContext, master: GainNode): Contexte {
     osc.frequency.value = frequence;
 
     const gain = ctx.createGain();
-    gain.gain.value = index === 0 ? 0.09 : 0.045;
+    gain.gain.value = index === 0 ? 0.03 : 0.015;
 
     // Chaque voix respire à son propre rythme : le son ne « boucle » jamais.
     const lfo = ctx.createOscillator();
     lfo.type = 'sine';
     lfo.frequency.value = 0.045 + index * 0.017;
     const lfoGain = ctx.createGain();
-    lfoGain.gain.value = index === 0 ? 0.035 : 0.02;
+    lfoGain.gain.value = index === 0 ? 0.015 : 0.008;
     lfo.connect(lfoGain).connect(gain.gain);
 
     osc.connect(gain).connect(master);
@@ -127,15 +128,15 @@ function construireSouffle(ctx: AudioContext, master: GainNode): Contexte {
     noeuds.push(gain, lfoGain);
   });
 
-  // Un voile de bruit très filtré, pour donner de l'air.
+  // Un voile de souffle très discret
   const bruit = ctx.createBufferSource();
   bruit.buffer = tamponBruitRose(ctx, 6);
   bruit.loop = true;
   const passeBas = ctx.createBiquadFilter();
   passeBas.type = 'lowpass';
-  passeBas.frequency.value = 420;
+  passeBas.frequency.value = 350;
   const gainBruit = ctx.createGain();
-  gainBruit.gain.value = 0.05;
+  gainBruit.gain.value = 0.02;
   bruit.connect(passeBas).connect(gainBruit).connect(master);
   bruit.start();
   sources.push(bruit);
@@ -154,21 +155,21 @@ function construirePluie(ctx: AudioContext, master: GainNode): Contexte {
 
   const passeHaut = ctx.createBiquadFilter();
   passeHaut.type = 'highpass';
-  passeHaut.frequency.value = 500;
+  passeHaut.frequency.value = 600;
 
   const passeBas = ctx.createBiquadFilter();
   passeBas.type = 'lowpass';
-  passeBas.frequency.value = 6200;
+  passeBas.frequency.value = 3800;
 
   const gain = ctx.createGain();
-  gain.gain.value = 0.22;
+  gain.gain.value = 0.06;
 
-  // Une averse n'est jamais parfaitement régulière.
+  // Averse douce et lointaine
   const lfo = ctx.createOscillator();
   lfo.type = 'sine';
-  lfo.frequency.value = 0.08;
+  lfo.frequency.value = 0.06;
   const lfoGain = ctx.createGain();
-  lfoGain.gain.value = 0.05;
+  lfoGain.gain.value = 0.02;
   lfo.connect(lfoGain).connect(gain.gain);
   lfo.start();
 
@@ -181,9 +182,40 @@ function construirePluie(ctx: AudioContext, master: GainNode): Contexte {
   return { ctx, master, noeuds, sources };
 }
 
+let volumeDefini = 0.5;
+let voixActive = false;
+
+function calculerVolumeMusique(): number {
+  const facteurDucking = voixActive ? 0.22 : 1.0;
+  return Math.max(0, Math.min(1, volumeDefini * 0.14 * facteurDucking));
+}
+
+function calculerVolumeSynthese(): number {
+  const facteurDucking = voixActive ? 0.30 : 1.0;
+  return Math.max(0, Math.min(1, volumeDefini * 0.25 * facteurDucking));
+}
+
+export function activerDuckingVoix(actif: boolean): void {
+  voixActive = actif;
+  if (audioMusiqueActif) {
+    audioMusiqueActif.volume = calculerVolumeMusique();
+  }
+  if (actifContextGlobal) {
+    const { ctx, master } = actifContextGlobal;
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.linearRampToValueAtTime(
+      calculerVolumeSynthese(),
+      ctx.currentTime + (actif ? 0.3 : 1.2)
+    );
+  }
+}
+
+let actifContextGlobal: Contexte | null = null;
+
 /** Démarre (ou remplace) l'ambiance. Un fondu évite toute cassure. */
 export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<void> {
   if (typeof window === 'undefined') return;
+  volumeDefini = volume;
   if (ambiance === ambianceActuelle && (actif || audioMusiqueActif)) {
     reglerVolume(volume);
     return;
@@ -198,7 +230,7 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
     try {
       const audio = new Audio(FICHIERS_MUSIQUE[ambiance]);
       audio.loop = true;
-      audio.volume = Math.max(0, Math.min(1, volume * 0.32));
+      audio.volume = calculerVolumeMusique();
       void audio.play().catch(() => {});
       audioMusiqueActif = audio;
     } catch {
@@ -221,20 +253,22 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
   master.connect(ctx.destination);
 
   actif = ambiance === 'pluie' ? construirePluie(ctx, master) : construireSouffle(ctx, master);
+  actifContextGlobal = actif;
 
-  // Fondu d'entrée de trois secondes : le son s'installe sans se faire remarquer.
-  master.gain.linearRampToValueAtTime(volume * 0.5, ctx.currentTime + 3);
+  // Fondu d'entrée doux de trois secondes
+  master.gain.linearRampToValueAtTime(calculerVolumeSynthese(), ctx.currentTime + 3);
 }
 
 export function reglerVolume(volume: number): void {
+  volumeDefini = volume;
   if (audioMusiqueActif) {
-    audioMusiqueActif.volume = Math.max(0, Math.min(1, volume * 0.32));
+    audioMusiqueActif.volume = calculerVolumeMusique();
   }
   if (!actif) return;
   const { ctx, master } = actif;
   master.gain.cancelScheduledValues(ctx.currentTime);
   master.gain.linearRampToValueAtTime(
-    Math.max(0, Math.min(1, volume)) * 0.5,
+    calculerVolumeSynthese(),
     ctx.currentTime + 0.4
   );
 }
@@ -282,17 +316,43 @@ export function ambianceEnCours(): Ambiance {
 // Lecture à voix haute
 // ─────────────────────────────────────────────────────────────
 
-let voixFr: SpeechSynthesisVoice | null = null;
+export type GenreVoix = 'masculin' | 'feminin';
 
-function choisirVoix(): SpeechSynthesisVoice | null {
-  if (voixFr) return voixFr;
+const CLE_GENRE_VOIX = 'lesfondements_genre_voix';
+
+export function getGenreVoix(): GenreVoix {
+  if (typeof window === 'undefined') return 'masculin';
+  try {
+    const stocke = localStorage.getItem(CLE_GENRE_VOIX);
+    return stocke === 'feminin' ? 'feminin' : 'masculin';
+  } catch {
+    return 'masculin';
+  }
+}
+
+export function setGenreVoix(genre: GenreVoix): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(CLE_GENRE_VOIX, genre);
+  } catch {}
+}
+
+function choisirVoix(genre: GenreVoix = getGenreVoix()): SpeechSynthesisVoice | null {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
   const voix = window.speechSynthesis.getVoices();
-  voixFr =
-    voix.find((v) => v.lang.startsWith('fr') && /thomas|amelie|amélie|audrey/i.test(v.name)) ??
+  if (genre === 'feminin') {
+    return (
+      voix.find((v) => v.lang.startsWith('fr') && /vivienne|amelie|amélie|audrey|denise|julie|celine/i.test(v.name)) ??
+      voix.find((v) => v.lang.startsWith('fr') && /female|femme/i.test(v.name)) ??
+      voix.find((v) => v.lang.startsWith('fr')) ??
+      null
+    );
+  }
+  return (
+    voix.find((v) => v.lang.startsWith('fr') && /henri|thomas|paul|nicolas|male|homme/i.test(v.name)) ??
     voix.find((v) => v.lang.startsWith('fr')) ??
-    null;
-  return voixFr;
+    null
+  );
 }
 
 export function lectureDisponible(): boolean {
@@ -307,70 +367,92 @@ let jeton = 0;
 
 /**
  * L'enregistrement déjà produit pour cette piste, s'il existe.
- *
- * Les versets du livret sont gravés une fois pour toutes par
- * `scripts/generer-voix.mjs` : les rejouer ne coûte rien et fonctionne hors
- * connexion. On les préfère donc toujours à un appel à la demande.
  */
-async function urlDePiste(id?: string): Promise<string | null> {
+async function urlDePiste(id?: string, genre: GenreVoix = getGenreVoix()): Promise<string | null> {
   if (!id) return null;
+  if (genre === 'feminin') {
+    return pisteVivienne(await chargerManifesteVivienne(), id);
+  }
   const manifeste = await chargerManifesteVoix();
-  return manifeste?.pistes[id]?.url ?? null;
+  return manifeste?.pistes[id]?.url ?? `/voix/eleven/${id}.mp3`;
 }
 
 export function lireAVoixHaute(
   texte: string,
   options: {
     vitesse?: number;
+    genre?: GenreVoix;
     onFin?: () => void;
     onErreur?: () => void;
     /** Piste prégénérée à préférer, ex. `pisteId.verset('Ps 37:4')`. */
     piste?: string;
   } = {}
 ): boolean {
+  const genre = options.genre ?? getGenreVoix();
   const dit = preparerPourLaVoix(texte);
   arreterLecture();
 
-  // La voix de studio d'abord : c'est celle du reste du parcours. On ne
-  // l'attend pas pour répondre — l'appelant a besoin d'un booléen tout de
-  // suite — et si elle échoue, le navigateur prend le relais.
+  // Atténuation automatique de la musique pendant que la voix parle
+  activerDuckingVoix(true);
+
+  const onFinOriginal = options.onFin;
+  const onErreurOriginal = options.onErreur;
+
+  const onFinWrap = () => {
+    activerDuckingVoix(false);
+    onFinOriginal?.();
+  };
+
+  const onErreurWrap = () => {
+    activerDuckingVoix(false);
+    onErreurOriginal?.();
+  };
+
+  const optionsEnveloppees = {
+    ...options,
+    genre,
+    onFin: onFinWrap,
+    onErreur: onErreurWrap,
+  };
+
   // Une piste gravée d'abord ; la voix de studio à la demande ensuite ; la
   // synthèse du navigateur en dernier recours.
   if (options.piste || voixStudioPossible()) {
     const mien = jeton;
-    void urlDePiste(options.piste)
+    void urlDePiste(options.piste, genre)
       .then((gravee) => gravee ?? (voixStudioPossible() ? urlVoixStudio(dit) : null))
       .then((url) => {
         if (mien !== jeton) return; // arrêté entre-temps
         if (!url) {
           if (voixStudioPossible()) voixStudioEcartee();
-          lireAvecLeNavigateur(dit, options);
+          lireAvecLeNavigateur(dit, optionsEnveloppees);
           return;
         }
         const audio = new Audio(url);
         audio.playbackRate = options.vitesse ?? 1;
-        audio.onended = () => options.onFin?.();
+        audio.volume = 1.0; // Voix à 100% de clarté
+        audio.onended = () => optionsEnveloppees.onFin();
         audio.onerror = () => {
-          if (mien === jeton) lireAvecLeNavigateur(dit, options);
+          if (mien === jeton) lireAvecLeNavigateur(dit, optionsEnveloppees);
         };
         lecteur = audio;
         void audio.play().catch(() => {
-          if (mien === jeton) lireAvecLeNavigateur(dit, options);
+          if (mien === jeton) lireAvecLeNavigateur(dit, optionsEnveloppees);
         });
       })
       .catch(() => {
-        if (mien === jeton) lireAvecLeNavigateur(dit, options);
+        if (mien === jeton) lireAvecLeNavigateur(dit, optionsEnveloppees);
       });
     return true;
   }
 
-  return lireAvecLeNavigateur(dit, options);
+  return lireAvecLeNavigateur(dit, optionsEnveloppees);
 }
 
 /** La synthèse du navigateur : le repli, jamais le premier choix. */
 function lireAvecLeNavigateur(
   dit: string,
-  options: { vitesse?: number; onFin?: () => void; onErreur?: () => void }
+  options: { vitesse?: number; genre?: GenreVoix; onFin?: () => void; onErreur?: () => void }
 ): boolean {
   if (!lectureDisponible()) {
     options.onErreur?.();
@@ -394,8 +476,9 @@ function lireAvecLeNavigateur(
     const enonce = new SpeechSynthesisUtterance(morceau.trim());
     enonce.lang = 'fr-FR';
     enonce.rate = options.vitesse ?? 0.92;
-    enonce.pitch = 1;
-    const voix = choisirVoix();
+    enonce.pitch = options.genre === 'feminin' ? 1.05 : 1;
+    enonce.volume = 1.0;
+    const voix = choisirVoix(options.genre);
     if (voix) enonce.voice = voix;
     if (index === morceaux.length - 1 && options.onFin) enonce.onend = options.onFin;
     if (options.onErreur) enonce.onerror = options.onErreur;
@@ -409,6 +492,7 @@ export function arreterLecture(): void {
   // Un jeton qui s'incrémente : toute lecture de studio encore en vol se
   // verra périmée à son arrivée et ne démarrera pas.
   jeton += 1;
+  activerDuckingVoix(false);
   if (lecteur) {
     lecteur.pause();
     lecteur = null;

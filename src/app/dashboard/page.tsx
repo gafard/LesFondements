@@ -35,7 +35,7 @@ import NotificationCenter from '@/components/NotificationCenter';
 import EdificeFondements from '@/components/EdificeFondements';
 import RecapManque from '@/components/RecapManque';
 import PauseSanctuaire from '@/components/PauseSanctuaire';
-import TelechargementHorsLigne from '@/components/TelechargementHorsLigne';
+import { ouvrirCentre } from '@/lib/centre';
 import { getCachedJournalEntries, getJournalEntries, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
 import { getCachedPosts, getPosts, nextMeetingDate, subscribe } from '@/lib/parcoursStore';
@@ -53,7 +53,6 @@ function DashboardContent() {
   const { group, members, membership, session, isLeader } = useParcours();
   const [notifOuvert, setNotifOuvert] = useState(false);
   const [pauseOuverte, setPauseOuverte] = useState(false);
-  const [horsLigneOuvert, setHorsLigneOuvert] = useState(false);
   const [journal, setJournal] = useState<JournalEntry[]>(() =>
     user ? getCachedJournalEntries(user.uid).slice(0, 3) : []
   );
@@ -608,22 +607,22 @@ function DashboardContent() {
               </div>
             </Link>
 
-            {/* 7. La Boussole de Pèlerin : Mode Retraite */}
+            {/* 7. Point d'entrée unique vers l'installation et les paquets. */}
             <button
               type="button"
-              onClick={() => setHorsLigneOuvert(true)}
+              onClick={ouvrirCentre}
               className="objet-table objet-boussole relative rounded-3xl p-4 sm:p-5 -rotate-2 flex flex-col justify-between text-left group text-parchemin-100"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-3xs font-bold uppercase tracking-wider text-or-300/80">Pèlerinage</span>
+                  <span className="text-3xs font-bold uppercase tracking-wider text-or-300/80">Sur cet appareil</span>
                   <Compass className="h-4 w-4 text-or-300 group-hover:rotate-45 transition-transform duration-300" />
                 </div>
-                <h4 className="manuscrit text-base font-bold text-parchemin-100">Mode Retraite</h4>
-                <p className="text-3xs text-parchemin-200/70 font-serif italic mt-0.5">100% hors-ligne</p>
+                <h4 className="manuscrit text-base font-bold text-parchemin-100">L’application</h4>
+                <p className="text-3xs text-parchemin-200/70 font-serif italic mt-0.5">Installer & emporter</p>
               </div>
               <div className="mt-4 pt-2 border-t border-white/10 flex items-center justify-between text-3xs text-or-300 font-medium">
-                <span>Synchronisé</span>
+                <span>Centre unique</span>
                 <span>Ouvrir 🧭</span>
               </div>
             </button>
@@ -729,7 +728,6 @@ function DashboardContent() {
         </section>
 
         <PauseSanctuaire ouvert={pauseOuverte} onFermer={() => setPauseOuverte(false)} />
-        <TelechargementHorsLigne ouvert={horsLigneOuvert} onFermer={() => setHorsLigneOuvert(false)} />
 
         {/* ══ Journal Spirituel Récent (Cahier ouvert) ══ */}
         <div className="feuille feuille-dechiree relative rounded-3xl p-6 sm:p-8 shadow-md">
@@ -857,4 +855,3 @@ export default function Page() {
     </ParcoursGate>
   );
 }
-

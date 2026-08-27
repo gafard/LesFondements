@@ -32,6 +32,7 @@ import {
   type PlaceRef,
   type UserProfile,
 } from './types';
+import { publierEvenementGroupe } from './notifications';
 import { distanceKm, nearestPlace } from './geo';
 import { marquerSynchronisation } from './syncState';
 
@@ -1265,7 +1266,21 @@ export async function getCurrentSession(groupId: string): Promise<GroupSession |
 
 /** Prochaine occurrence du créneau hebdomadaire (ou bimensuel) du groupe. */
 export function nextMeetingDate(meeting: GroupMeetingPlan, from: number = Date.now()): Date {
-  const [hours, minutes] = meeting.time.split(':').map((n) => parseInt(n, 10));
+  const [hours, minutes] = (meeting.time || '20:00').split(':').map((n) => parseInt(n, 10));
+
+  // Si une date précise (prochaine rencontre ou 1ère rencontre) a été explicitement fixée
+  const dateFixee = meeting.nextMeetingDate || meeting.firstMeetingDate;
+  if (dateFixee) {
+    const parts = dateFixee.split('-');
+    if (parts.length === 3) {
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), hours || 20, minutes || 0, 0, 0);
+      // Si la date est aujourd'hui ou dans le futur, on la retourne directement
+      if (d.getTime() >= from - 3600000 * 2) {
+        return d;
+      }
+    }
+  }
+
   const date = new Date(from);
   date.setHours(hours || 20, minutes || 0, 0, 0);
   const cadence = meeting.rhythm === 'bimensuel' ? 14 : 7;
@@ -1305,6 +1320,11 @@ export async function openMeeting(groupId: string, uid: string): Promise<GroupSe
   };
   await writeSession(updated);
   await writeGroup({ ...group, stepPhase: 'rencontre' });
+  void publierEvenementGroupe({
+    groupId,
+    type: 'rencontre_ouverte',
+    sourceId: updated.id,
+  });
   void uid;
   return updated;
 }
@@ -1406,6 +1426,11 @@ export async function closeMeeting(
     completedAt: isLast ? Date.now() : group.completedAt,
   };
   await writeGroup(updated);
+  void publierEvenementGroupe({
+    groupId,
+    type: 'etape_debloquee',
+    sourceId: session.id,
+  });
 
   // Chaque membre est remis en préparation sur la nouvelle fiche.
   if (!isLast) {
@@ -1537,6 +1562,13 @@ export async function addPost(input: {
     amenBy: [],
   };
   await writePost(post);
+  if (post.kind === 'pepite') {
+    void publierEvenementGroupe({
+      groupId: post.groupId,
+      type: 'pepite',
+      sourceId: post.id,
+    });
+  }
   return post;
 }
 

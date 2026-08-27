@@ -97,7 +97,7 @@ export default function LettreDuPere() {
   useEffect(() => {
     const musique = new Audio('/audio/lettre-du-pere-piano.mp3');
     musique.loop = true;
-    musique.volume = 0.32;
+    musique.volume = 0.12;
     musiqueAudioRef.current = musique;
 
     audioRef.current = new Audio();

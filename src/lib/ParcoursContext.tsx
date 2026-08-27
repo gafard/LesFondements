@@ -21,6 +21,7 @@ import {
   type ParcoursGate,
 } from './parcoursStore';
 import type { GroupMember, GroupSession, ParcoursGroup, UserProfile } from './types';
+import { chargerPreferencesLocales, synchroniserNotifications } from './notifications';
 
 interface ParcoursContextValue {
   profile: UserProfile | null;
@@ -158,6 +159,13 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
     () => (user ? members.find((m) => m.uid === user.uid) ?? null : null),
     [members, user]
   );
+
+  // Le calendrier push suit le vrai groupe, même si la personne ne rouvre
+  // jamais le panneau de réglages après un changement de créneau ou d'étape.
+  useEffect(() => {
+    if (!user || !group || membership?.status !== 'actif') return;
+    void synchroniserNotifications(chargerPreferencesLocales(), { groupId: group.id });
+  }, [user, group, membership?.status]);
 
   /**
    * Groupes d'exemple (mode local, sans backend) : leur animateur n'existe

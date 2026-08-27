@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { verifierFirebaseToken } from '@/lib/firebaseToken';
+import { lireDocumentFirestore, verifierMembreActif } from '@/lib/firestoreRest';
 import { PREFERENCES_DEFAUT, type NotificationPreferences } from '@/lib/notifications';
-import { enregistrerAbonnement, oublierAbonnement } from '@/lib/rappels';
+import {
+  enregistrerAbonnement,
+  fuseauIanaValide,
+  lireAbonnement,
+  oublierAbonnement,
+  type CalendrierGroupe,
+} from '@/lib/rappels';
+import type { ParcoursGroup } from '@/lib/types';
 
 /**
  * S'abonner aux rappels — et cette fois, en garder trace.
@@ -13,18 +21,68 @@ import { enregistrerAbonnement, oublierAbonnement } from '@/lib/rappels';
  * quelqu'un à 7 h 30 sans jamais pouvoir le faire.
  */
 
+function preferencesValides(entree?: Partial<NotificationPreferences>): NotificationPreferences {
+  const heure = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(entree?.heureMatin ?? '')
+    ? entree!.heureMatin!
+    : PREFERENCES_DEFAUT.heureMatin;
+  return {
+    goutteDeRosee: entree?.goutteDeRosee ?? PREFERENCES_DEFAUT.goutteDeRosee,
+    heureMatin: heure,
+    rappel48h: entree?.rappel48h ?? PREFERENCES_DEFAUT.rappel48h,
+    jourDeRencontre: entree?.jourDeRencontre ?? PREFERENCES_DEFAUT.jourDeRencontre,
+    vieDeGroupe: entree?.vieDeGroupe ?? PREFERENCES_DEFAUT.vieDeGroupe,
+  };
+}
+
+async function calendrierAutorise(
+  token: string,
+  uid: string,
+  groupId?: string
+): Promise<CalendrierGroupe | undefined> {
+  if (!groupId || groupId.length > 100) return undefined;
+  await verifierMembreActif(token, groupId, uid);
+  const groupe = await lireDocumentFirestore<ParcoursGroup>(token, 'groups', groupId);
+  if (!groupe?.meeting || groupe.id !== groupId) throw new Error('FORBIDDEN');
+  const timezone = groupe.meeting.timezone;
+  if (!fuseauIanaValide(timezone)) throw new Error('INVALID_TIMEZONE');
+  return {
+    groupId,
+    groupName: String(groupe.name || 'Votre groupe').slice(0, 100),
+    currentStep: Math.max(1, Math.min(20, Number(groupe.currentStep) || 1)),
+    rhythm: groupe.meeting.rhythm === 'bimensuel' ? 'bimensuel' : 'hebdomadaire',
+    weekday: Math.max(0, Math.min(6, Number(groupe.meeting.weekday) || 0)),
+    time: /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(groupe.meeting.time)
+      ? groupe.meeting.time
+      : '20:00',
+    timezone,
+    ...(groupe.meeting.firstMeetingDate
+      ? { firstMeetingDate: groupe.meeting.firstMeetingDate }
+      : {}),
+    ...(groupe.meeting.nextMeetingDate
+      ? { nextMeetingDate: groupe.meeting.nextMeetingDate }
+      : {}),
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { uid } = await verifierFirebaseToken(req);
+    const { uid, token } = await verifierFirebaseToken(req);
     const corps = (await req.json()) as {
       subscription?: { endpoint?: string; keys?: { p256dh: string; auth: string } };
       preferences?: Partial<NotificationPreferences>;
-      decalage?: number;
+      timezone?: string;
+      calendrier?: { groupId?: string } | null;
     };
 
     const abonnement = corps.subscription;
     if (!abonnement?.endpoint || !abonnement.keys?.p256dh || !abonnement.keys.auth) {
       return NextResponse.json({ error: 'Abonnement push incomplet' }, { status: 400 });
+    }
+    if (!fuseauIanaValide(corps.timezone)) {
+      return NextResponse.json(
+        { error: 'Fuseau horaire IANA invalide (ex. Africa/Lome ou Europe/Paris).' },
+        { status: 400 }
+      );
     }
 
     const { env } = getCloudflareContext();
@@ -36,23 +94,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const [precedent, calendrier] = await Promise.all([
+      lireAbonnement(env.RAPPELS, abonnement.endpoint),
+      calendrierAutorise(token, uid, corps.calendrier?.groupId),
+    ]);
+    const preferences = preferencesValides(corps.preferences);
+    const maintenant = Date.now();
+    const reprendVieDeGroupe = !precedent?.preferences?.vieDeGroupe && preferences.vieDeGroupe;
+
     await enregistrerAbonnement(env.RAPPELS, {
       endpoint: abonnement.endpoint,
       keys: abonnement.keys,
       uid,
-      preferences: { ...PREFERENCES_DEFAUT, ...corps.preferences },
-      // Le décalage vient du navigateur : c'est lui qui sait à quelle heure
-      // il est chez la personne.
-      decalage: Number.isFinite(corps.decalage) ? Number(corps.decalage) : 0,
-      inscritLe: Date.now(),
+      preferences,
+      timezone: corps.timezone,
+      ...(calendrier ? { calendrier } : {}),
+      inscritLe: precedent?.uid === uid ? precedent.inscritLe : maintenant,
+      evenementsDepuis:
+        precedent?.uid === uid && !reprendVieDeGroupe ? precedent.evenementsDepuis : maintenant,
+      dedup: precedent?.uid === uid ? precedent.dedup ?? {} : {},
     });
 
     return NextResponse.json({ success: true, persisted: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    const statut = message === 'UNAUTHENTICATED' ? 401 : 500;
+    const statut = message === 'UNAUTHENTICATED' ? 401 : message === 'FORBIDDEN' ? 403 : 500;
     return NextResponse.json(
-      { error: statut === 401 ? 'Authentification requise' : message },
+      {
+        error:
+          statut === 401
+            ? 'Authentification requise'
+            : statut === 403
+              ? 'Ce calendrier de groupe ne vous est pas accessible.'
+              : message,
+      },
       { status: statut }
     );
   }

@@ -22,7 +22,7 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://les-fondements.workers.dev'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://parcours.lesfondements.workers.dev'),
   title: {
     default: 'Les Fondements — Une foi enracinée',
     template: '%s | Les Fondements',

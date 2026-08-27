@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import {
   ArrowLeft,
@@ -38,7 +37,7 @@ import InvitePanel from '@/components/InvitePanel';
 import LecteurVideoOnboarding from '@/components/LecteurVideoOnboarding';
 import type { AttendanceMode, GroupMatch, ParcoursGroup, PlaceRef } from '@/lib/types';
 
-type Etape = 'intro' | 'situer' | 'chemin' | 'rejoindre' | 'demande' | 'creer' | 'inviter' | 'attente';
+type Etape = 'intro' | 'situer' | 'chemin' | 'rejoindre' | 'demande' | 'creer' | 'inviter' | 'attente' | 'prologue';
 
 const ETAPES_VISIBLES: Etape[] = ['situer', 'chemin', 'rejoindre', 'demande'];
 
@@ -67,7 +66,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (loading) return;
-    if (gate.state === 'ouvert' && etape !== 'inviter') router.replace('/dashboard');
+    if (gate.state === 'ouvert' && etape !== 'inviter' && etape !== 'prologue') router.replace('/dashboard');
   }, [gate.state, loading, router, etape]);
 
   // Synchronisation des états locaux sur les données chargées, pendant le
@@ -241,16 +240,6 @@ export default function OnboardingPage() {
               rencontres où l&apos;on met des mots dessus, à cinq ou six, autour d&apos;une table ou
               d&apos;un écran.
             </p>
-
-            {/* ══ Vidéo d'introduction officielle (50 secondes) ══ */}
-            <div className="mx-auto mt-8 max-w-lg">
-              <LecteurVideoOnboarding
-                src="/video/onboarding.mp4"
-                poster="/hero-community-v2.jpg"
-                titre="Présentation du parcours (50s)"
-                sousTitre="« Poser des piliers solides »"
-              />
-            </div>
 
             <div className="mx-auto mt-8 max-w-lg encadre-nuit text-sm leading-relaxed">
               « Un nombre de 5-6 participants semble être un bon équilibre. »
@@ -714,12 +703,13 @@ export default function OnboardingPage() {
             </div>
 
             <div className="mt-8 flex flex-col items-center gap-3">
-              <Link
-                href="/dashboard"
-                className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
+              <button
+                type="button"
+                onClick={() => setEtape('prologue')}
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold shadow-xl hover:scale-105 transition-all"
               >
                 Entrer dans le parcours <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-              </Link>
+              </button>
               <p className="text-2xs text-parchemin-100/45">
                 Vous pourrez inviter d&apos;autres personnes à tout moment depuis l&apos;espace du
                 groupe.
@@ -768,12 +758,13 @@ export default function OnboardingPage() {
             </div>
 
             <div className="mt-8 flex flex-col items-center gap-3">
-              <Link
-                href="/dashboard"
+              <button
+                type="button"
+                onClick={() => setEtape('prologue')}
                 className="inline-flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 text-xs font-bold text-parchemin-100 transition-colors hover:bg-white/18"
               >
-                Voir mon espace
-              </Link>
+                🎬 Découvrir le prologue (50s)
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -784,6 +775,55 @@ export default function OnboardingPage() {
                 className="text-2xs font-bold text-parchemin-100/45 transition-colors hover:text-parchemin-100/80"
               >
                 Choisir un autre groupe
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* ═══════════ PROLOGUE (LANCEMENT VIDÉO EN FIN D'ONBOARDING) ═══════════ */}
+        {etape === 'prologue' && (
+          <section className="animate-reveal text-center">
+            <span className="mx-auto grid h-16 w-16 animate-halo place-items-center rounded-full bg-or-400/15 text-or-300">
+              <Compass className="h-8 w-8" strokeWidth={1.75} />
+            </span>
+
+            <h1 className="mt-6 font-serif text-3xl font-bold text-parchemin-100 sm:text-4xl">
+              Votre voyage <span className="titre-or">commence.</span>
+            </h1>
+
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-parchemin-100/75">
+              Voici 50 secondes pour poser les fondations de votre cœur avant d&apos;ouvrir la première fiche.
+            </p>
+
+            {/* Lecteur vidéo qui se lance automatiquement dès l'arrivée */}
+            <div className="mx-auto mt-7 max-w-xl">
+              <LecteurVideoOnboarding
+                src="/video/onboarding.mp4"
+                poster="/video/onboarding_poster.jpg"
+                autoPlay={true}
+                titre="Prologue officiel (50s)"
+                sousTitre="« Poser des piliers solides »"
+                onVideoEnded={() => {
+                  router.push('/dashboard');
+                }}
+              />
+            </div>
+
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard')}
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold shadow-xl hover:scale-105 transition-all"
+              >
+                Accéder à ma table d&apos;étude
+                <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard')}
+                className="text-2xs font-bold text-parchemin-100/40 hover:text-parchemin-100/70 transition-colors"
+              >
+                Passer la vidéo
               </button>
             </div>
           </section>

@@ -31,6 +31,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+firestore-debug.log
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -48,3 +49,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# laboratoires locaux de synthèse vocale (jamais servis en production)
+/models/
+/public/demo-audio/
+/generate_demo.py
+/generate_kokoro.py
+/texte_demo.txt

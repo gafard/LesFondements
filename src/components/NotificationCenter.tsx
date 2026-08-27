@@ -19,17 +19,21 @@ import {
 import {
   verifierSupportNotifications,
   obtenirEtatPermission,
+  obtenirAbonnementActif,
   chargerPreferencesLocales,
   sauvegarderPreferencesLocales,
   activerNotifications,
   desactiverNotifications,
   envoyerNotificationTest,
+  fuseauIanaLocal,
+  synchroniserNotifications,
   diagnostiquerEnvironnement,
   NotificationPreferences,
   PREFERENCES_DEFAUT,
   DiagnosticPWA,
 } from '@/lib/notifications';
 import { useAuth } from '@/lib/AuthContext';
+import { useParcours } from '@/lib/ParcoursContext';
 
 interface NotificationCenterProps {
   ouvert: boolean;
@@ -38,6 +42,7 @@ interface NotificationCenterProps {
 
 export default function NotificationCenter({ ouvert, onFermer }: NotificationCenterProps) {
   const { user } = useAuth();
+  const { group } = useParcours();
   const [supporte, setSupporte] = useState(true);
   const [active, setActive] = useState(false);
   const [chargement, setChargement] = useState(false);
@@ -53,8 +58,10 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
       setDiagnostic(diagnostiquerEnvironnement());
       if (sup) {
         const perm = obtenirEtatPermission();
-        setActive(perm === 'granted');
         setPrefs(chargerPreferencesLocales());
+        void obtenirAbonnementActif().then((abonnement) => {
+          setActive(perm === 'granted' && !!abonnement);
+        });
       }
     }, 0);
     return () => window.clearTimeout(timer);
@@ -72,7 +79,7 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
       setActive(false);
       setMessageSucces('Les notifications ont été désactivées sur cet appareil.');
     } else {
-      const res = await activerNotifications(user?.uid, prefs);
+      const res = await activerNotifications(user?.uid, prefs, { groupId: group?.id });
       if (res.success) {
         setActive(true);
         setMessageSucces('✨ Cet appareil est connecté et prêt à recevoir vos rappels spirituels.');
@@ -87,6 +94,11 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
     const nouvelles = { ...prefs, [cle]: valeur };
     setPrefs(nouvelles);
     sauvegarderPreferencesLocales(nouvelles);
+    if (active) {
+      void synchroniserNotifications(nouvelles, { groupId: group?.id }).then((resultat) => {
+        if (!resultat.success) setMessageErreur(resultat.error ?? 'Préférences non synchronisées.');
+      });
+    }
   };
 
   const tester = async () => {
@@ -161,6 +173,17 @@ export default function NotificationCenter({ ouvert, onFermer }: NotificationCen
             <span className={active ? 'text-emerald-700 font-bold' : 'text-encre-500'}>
               {active ? '🟢 Service Push Actif' : '⚪ En attente d’activation'}
             </span>
+            <span>•</span>
+            <span>{fuseauIanaLocal()}</span>
+          </div>
+        )}
+
+        {group && (
+          <div className="mt-3 rounded-2xl border border-or-200 bg-or-50/65 px-3.5 py-3 text-2xs text-encre-700">
+            <p className="font-bold text-encre-900">Calendrier relié à {group.name}</p>
+            <p className="mt-0.5 font-serif italic">
+              {group.meeting.time} · {group.meeting.timezone} · fiche {group.currentStep}
+            </p>
           </div>
         )}
 

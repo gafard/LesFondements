@@ -74,6 +74,16 @@ interface GroupCreateFormProps {
   onBack?: () => void;
 }
 
+function calculerProchaineDate(jourCible: number): string {
+  const d = new Date();
+  const diff = (jourCible + 7 - d.getDay()) % 7;
+  d.setDate(d.getDate() + (diff === 0 ? 7 : diff));
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export default function GroupCreateForm({
   defaultPlace,
   leader,
@@ -86,6 +96,7 @@ export default function GroupCreateForm({
   const [mode, setMode] = useState<GroupMeetingMode>('hybride');
   const [rhythm, setRhythm] = useState<GroupRhythm>('hebdomadaire');
   const [weekday, setWeekday] = useState(4);
+  const [firstMeetingDate, setFirstMeetingDate] = useState<string>(() => calculerProchaineDate(4));
   const [time, setTime] = useState('20:00');
   const [venue, setVenue] = useState('');
   const [callLink, setCallLink] = useState('');
@@ -96,6 +107,22 @@ export default function GroupCreateForm({
 
   const needsVenue = mode !== 'ligne';
   const needsLink = mode !== 'presentiel';
+
+  const onDateChange = (dateStr: string) => {
+    setFirstMeetingDate(dateStr);
+    if (dateStr) {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        setWeekday(d.getDay());
+      }
+    }
+  };
+
+  const onWeekdaySelect = (dayValue: number) => {
+    setWeekday(dayValue);
+    setFirstMeetingDate(calculerProchaineDate(dayValue));
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -126,6 +153,8 @@ export default function GroupCreateForm({
           rhythm,
           weekday,
           time,
+          firstMeetingDate: firstMeetingDate || undefined,
+          nextMeetingDate: firstMeetingDate || undefined,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Paris',
           venue: needsVenue ? venue.trim() || undefined : undefined,
           callLink: needsLink ? callLink.trim() || undefined : undefined,
@@ -217,17 +246,26 @@ export default function GroupCreateForm({
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className={legendClass}>
-            <CalendarDays className="mr-1 inline h-3 w-3" /> Jour de la rencontre
+            <CalendarDays className="mr-1 inline h-3 w-3" /> Date de la 1ère rencontre
           </label>
-          <div className="flex flex-wrap gap-1.5">
+          <input
+            type="date"
+            min={new Date().toISOString().split('T')[0]}
+            value={firstMeetingDate}
+            onChange={(e) => onDateChange(e.target.value)}
+            className={fieldClass}
+            required
+          />
+          <div className="mt-2 flex flex-wrap gap-1.5 items-center">
+            <span className="text-3xs text-parchemin-100/50 mr-0.5">Jour fixe :</span>
             {WEEKDAYS.map((day) => (
               <button
                 key={day.value}
                 type="button"
-                onClick={() => setWeekday(day.value)}
-                className={`h-10 w-11 rounded-xl text-2xs font-bold transition-all ${
+                onClick={() => onWeekdaySelect(day.value)}
+                className={`h-7 px-2 rounded-lg text-3xs font-bold transition-all ${
                   weekday === day.value
-                    ? 'bg-or-400 text-encre-950'
+                    ? 'bg-or-400 text-encre-950 shadow-xs ring-1 ring-or-300'
                     : 'verre text-parchemin-100/70 hover:bg-white/12'
                 }`}
               >
@@ -239,15 +277,16 @@ export default function GroupCreateForm({
 
         <div>
           <label className={legendClass}>
-            <Clock className="mr-1 inline h-3 w-3" /> Heure
+            <Clock className="mr-1 inline h-3 w-3" /> Heure de rendez-vous
           </label>
           <input
             type="time"
             value={time}
             onChange={(event) => setTime(event.target.value)}
             className={fieldClass}
+            required
           />
-          <div className="mt-2.5 flex gap-2">
+          <div className="mt-2 flex gap-2">
             {(['hebdomadaire', 'bimensuel'] as GroupRhythm[]).map((option) => (
               <button
                 key={option}
@@ -265,6 +304,27 @@ export default function GroupCreateForm({
           </div>
         </div>
       </div>
+
+      {firstMeetingDate && (
+        <div className="rounded-2xl border border-or-400/30 bg-or-500/10 px-4 py-3 text-xs text-or-200/90 flex items-center gap-3">
+          <CalendarDays className="h-5 w-5 text-or-300 shrink-0" />
+          <div>
+            <p className="font-bold text-parchemin-100">
+              1ère rencontre le{' '}
+              {new Intl.DateTimeFormat('fr-FR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              }).format(new Date(firstMeetingDate + 'T12:00:00'))}{' '}
+              à {time}
+            </p>
+            <p className="text-3xs text-parchemin-100/60">
+              Puis {rhythm === 'hebdomadaire' ? 'chaque semaine' : 'une semaine sur deux'} à la même heure.
+            </p>
+          </div>
+        </div>
+      )}
 
       {rhythm === 'hebdomadaire' ? (
         <p className="rounded-xl border border-or-300/20 bg-or-400/8 px-3.5 py-2.5 text-2xs leading-relaxed text-or-100/80">

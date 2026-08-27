@@ -26,6 +26,69 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/groups/$(groupId)).data.leaderId == moi();
     }
 
+    function ajouteMoi(apres, avant) {
+      return apres is list
+        && avant is list
+        && apres.size() == avant.size() + 1
+        && apres.toSet().size() == apres.size()
+        && avant.toSet().size() == avant.size()
+        && apres.hasAll(avant)
+        && apres.removeAll(avant).hasOnly([moi()]);
+    }
+
+    function retireMoi(apres, avant) {
+      return apres is list
+        && avant is list
+        && apres.size() + 1 == avant.size()
+        && apres.toSet().size() == apres.size()
+        && avant.toSet().size() == avant.size()
+        && avant.hasAll(apres)
+        && avant.removeAll(apres).hasOnly([moi()]);
+    }
+
+    function listePersonnelleOuInchangee(apres, avant) {
+      return apres == avant || ajouteMoi(apres, avant) || retireMoi(apres, avant);
+    }
+
+    function annuaireValide() {
+      return request.resource.data.keys().hasOnly([
+          'id', 'name', 'description', 'inviteCode', 'visibility', 'capacity',
+          'membersCount', 'leaderId', 'leaderName', 'place', 'meeting',
+          'language', 'createdAt', 'currentStep', 'stepPhase', 'stepOpenedAt',
+          'closedSteps', 'completedAt', 'archived', 'demo'
+        ])
+        && request.resource.data.id is string
+        && request.resource.data.inviteCode == ''
+        && request.resource.data.leaderId == ''
+        && request.resource.data.place is map
+        && request.resource.data.place.keys().hasOnly([
+          'lat', 'lng', 'label', 'city', 'region', 'country', 'countryCode', 'precise'
+        ])
+        && request.resource.data.place.precise == false
+        && request.resource.data.meeting is map
+        && request.resource.data.meeting.keys().hasOnly([
+          'mode', 'rhythm', 'weekday', 'time', 'timezone'
+        ]);
+    }
+
+    function ajoutReponseValide() {
+      let avant = resource.data.get('replies', []);
+      let apres = request.resource.data.replies;
+      let ajout = apres.removeAll(avant);
+      return avant is list
+        && apres is list
+        && avant.size() < 20
+        && apres.size() == avant.size() + 1
+        && apres.hasAll(avant)
+        && ajout.size() == 1
+        && ajout[0] is map
+        && ajout[0].keys().hasOnly(['id', 'authorId', 'authorName', 'content', 'createdAt'])
+        && ajout[0].authorId == moi()
+        && ajout[0].content is string
+        && ajout[0].content.size() > 0
+        && ajout[0].content.size() <= 200;
+    }
+
     match /profiles/{userId} {
       allow read, write: if connecte() && moi() == userId;
     }
@@ -34,15 +97,21 @@ service cloud.firestore {
     // visio, code d'invitation ni identifiant privé de l'animateur.
     match /groupDirectory/{groupId} {
       allow read: if connecte();
-      allow create, update, delete: if estCreateur(groupId) || estAnimateur(groupId);
+      allow create, update: if (estCreateur(groupId) || estAnimateur(groupId))
+        && request.resource.data.id == groupId
+        && annuaireValide();
+      allow delete: if estCreateur(groupId) || estAnimateur(groupId);
     }
 
     // Résolution d'un code d'invitation vers un identifiant de groupe. Le
     // document ne contient aucune donnée personnelle.
     match /groupInvites/{code} {
       allow read: if connecte();
-      allow create, update: if estCreateur(request.resource.data.groupId)
-        || estAnimateur(request.resource.data.groupId);
+      allow create, update: if request.resource.data.keys().hasOnly(['groupId', 'code', 'updatedAt'])
+        && request.resource.data.code == code
+        && request.resource.data.groupId is string
+        && (estCreateur(request.resource.data.groupId)
+          || estAnimateur(request.resource.data.groupId));
       allow delete: if estAnimateur(resource.data.groupId);
     }
 
@@ -51,14 +120,27 @@ service cloud.firestore {
       // les membres approuvés peuvent le consulter.
       allow read: if estMembre(groupId);
       allow create: if connecte()
+        && request.resource.data.id == groupId
         && request.resource.data.leaderId == moi()
-        && request.resource.data.membersCount == 1;
-      allow update: if estAnimateur(groupId)
+        && request.resource.data.membersCount == 1
+        && request.resource.data.currentStep == 1
+        && request.resource.data.closedSteps.size() == 0
+        && request.resource.data.keys().hasOnly([
+          'id', 'name', 'description', 'inviteCode', 'visibility', 'capacity',
+          'membersCount', 'leaderId', 'leaderName', 'place', 'meeting',
+          'language', 'createdAt', 'currentStep', 'stepPhase', 'stepOpenedAt',
+          'closedSteps', 'completedAt', 'archived', 'demo'
+        ]);
+      allow update: if (estAnimateur(groupId)
+          && request.resource.data.id == resource.data.id
+          && request.resource.data.leaderId == resource.data.leaderId
+          && request.resource.data.createdAt == resource.data.createdAt)
         // Un membre qui s'en va décrémente le compteur. Il ne peut toucher
-        // qu'à ce champ, et seulement pour le faire baisser.
+        // qu'à ce champ, d'une seule unité, sans jamais passer sous zéro.
         || (estMembre(groupId)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['membersCount'])
-          && request.resource.data.membersCount < resource.data.membersCount);
+          && request.resource.data.membersCount == resource.data.membersCount - 1
+          && request.resource.data.membersCount >= 0);
       allow delete: if estAnimateur(groupId);
 
       match /members/{memberId} {
@@ -74,7 +156,10 @@ service cloud.firestore {
             || (request.resource.data.role == 'membre'
               && request.resource.data.status == 'en_attente')
           );
-        allow update: if estAnimateur(groupId)
+        allow update: if (estAnimateur(groupId)
+            && request.resource.data.uid == resource.data.uid
+            && request.resource.data.groupId == resource.data.groupId
+            && request.resource.data.joinedAt == resource.data.joinedAt)
           || (connecte()
             && moi() == memberId
             && request.resource.data.diff(resource.data).affectedKeys()
@@ -107,11 +192,16 @@ service cloud.firestore {
         allow read: if estMembre(groupId);
         allow create: if estAnimateur(groupId)
           || (estMembre(groupId)
+            && request.resource.data.id == sessionId
             && request.resource.data.groupId == groupId
+            && request.resource.data.step == get(/databases/$(database)/documents/groups/$(groupId)).data.currentStep
             && request.resource.data.status == 'planifiee'
             && request.resource.data.liveStage == 0
             && request.resource.data.attendance.size() == 0);
-        allow update: if estAnimateur(groupId)
+        allow update: if (estAnimateur(groupId)
+            && request.resource.data.id == resource.data.id
+            && request.resource.data.groupId == resource.data.groupId
+            && request.resource.data.step == resource.data.step)
           || (estMembre(groupId)
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendance'])
             && request.resource.data.attendance.diff(resource.data.attendance).affectedKeys().hasOnly([moi()]));
@@ -122,13 +212,27 @@ service cloud.firestore {
         allow read: if estMembre(groupId);
         allow create: if estMembre(groupId)
           && request.resource.data.authorId == moi()
-          && request.resource.data.groupId == groupId;
+          && request.resource.data.groupId == groupId
+          && request.resource.data.id == postId
+          && request.resource.data.keys().hasOnly([
+            'id', 'groupId', 'authorId', 'authorName', 'kind', 'step',
+            'questionId', 'reference', 'content', 'createdAt', 'prayedBy',
+            'amenBy', 'answered', 'answeredAt', 'replies'
+          ])
+          && request.resource.data.content is string
+          && request.resource.data.content.size() > 0
+          && request.resource.data.content.size() <= 4000
+          && request.resource.data.prayedBy.size() == 0
+          && request.resource.data.amenBy.size() == 0
+          && request.resource.data.get('replies', []).size() == 0;
         allow update: if estMembre(groupId) && (
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['prayedBy', 'amenBy'])
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['prayedBy', 'amenBy'])
+            && listePersonnelleOuInchangee(request.resource.data.prayedBy, resource.data.prayedBy)
+            && listePersonnelleOuInchangee(request.resource.data.amenBy, resource.data.amenBy))
           // Répondre brièvement. Seul ce champ bouge : le message d'origine
           // ne peut pas être réécrit au passage.
           || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['replies'])
-            && request.resource.data.replies.size() <= 20)
+            && ajoutReponseValide())
           || ((resource.data.authorId == moi() || estAnimateur(groupId))
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answered', 'answeredAt']))
         );
@@ -143,10 +247,16 @@ service cloud.firestore {
           || estMembre(resource.data.groupId));
       allow create: if connecte()
         && request.resource.data.invitedBy == moi()
-        && estMembre(request.resource.data.groupId);
+        && estMembre(request.resource.data.groupId)
+        && request.resource.data.status == 'envoye'
+        && request.resource.data.keys().hasOnly([
+          'id', 'groupId', 'email', 'invitedBy', 'invitedByName', 'createdAt', 'status'
+        ]);
       allow update: if connecte()
         && (request.auth.token.email == resource.data.email
-          || estAnimateur(resource.data.groupId));
+          || estAnimateur(resource.data.groupId))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['envoye', 'accepte', 'expire'];
       allow delete: if connecte() && estAnimateur(resource.data.groupId);
     }
 
@@ -171,18 +281,38 @@ service cloud.firestore {
       // On ne dépose que sous son propre nom. Sans cette condition, le
       // témoignage de quelqu'un pouvait être signé par un autre.
       allow create: if connecte()
-        && request.resource.data.auteurId == moi();
+        && request.resource.data.auteurId == moi()
+        && request.resource.data.id == temoignageId
+        && request.resource.data.keys().hasOnly([
+          'id', 'auteur', 'auteurId', 'ficheId', 'texte', 'audioUrl', 'amens',
+          'amensVotants', 'date', 'couleur', 'attache', 'rotation'
+        ])
+        && request.resource.data.texte is string
+        && request.resource.data.texte.size() <= 5000
+        && (request.resource.data.audioUrl == null
+          || (request.resource.data.audioUrl is string
+            && request.resource.data.audioUrl.size() <= 700000))
+        && request.resource.data.amens == 1
+        && request.resource.data.amensVotants == [moi()];
 
       allow update: if connecte() && (
         // Son auteur corrige son texte.
-        resource.data.auteurId == moi()
+        (resource.data.auteurId == moi()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'texte', 'audioUrl', 'ficheId', 'couleur', 'attache', 'rotation'
+          ]))
         // Ou quelqu'un dit « amen » : seuls ces deux champs bougent, et on
         // ne peut s'ajouter ou se retirer que soi-même de la liste. Sans
         // cette borne, un « amen » pouvait réécrire tout le document.
         || (
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amens', 'amensVotants'])
-          && request.resource.data.amensVotants.diff(resource.data.amensVotants)
-               .affectedKeys().hasOnly([moi()])
+          && (
+            (ajouteMoi(request.resource.data.amensVotants, resource.data.amensVotants)
+              && request.resource.data.amens == resource.data.amens + 1)
+            || (retireMoi(request.resource.data.amensVotants, resource.data.amensVotants)
+              && request.resource.data.amens == resource.data.amens - 1
+              && request.resource.data.amens >= 0)
+          )
         )
       );
 
@@ -194,8 +324,22 @@ service cloud.firestore {
 
     // Retours d'expérience, besoins et messages envoyés à l'équipe
     match /retours/{retourId} {
-      allow create: if true;
-      allow read, update, delete: if connecte();
+      allow create: if request.resource.data.keys().hasOnly([
+          'uid', 'nom', 'email', 'categorie', 'message', 'date', 'dateIso'
+        ])
+        && request.resource.data.nom is string
+        && request.resource.data.nom.size() <= 120
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.categorie in ['suggestion', 'temoignage', 'aide', 'theologie']
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 5000
+        && ((connecte() && request.resource.data.uid == moi())
+          || (!connecte() && request.resource.data.uid == null));
+      // Les messages sont une boîte de dépôt, pas un annuaire lisible depuis
+      // le navigateur. Leur consultation passera par un outil administrateur.
+      allow read, update, delete: if false;
     }
   }
 }

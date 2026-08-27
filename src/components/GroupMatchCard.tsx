@@ -89,9 +89,20 @@ export default function GroupMatchCard({ match, onSelect, selected }: GroupMatch
         </span>
         <span className="inline-flex items-center gap-1.5">
           <CalendarDays className="h-3.5 w-3.5 text-or-300/80" strokeWidth={2} />
-          {group.meeting.rhythm === 'bimensuel' ? 'Un ' : 'Chaque '}
-          {WEEKDAYS[group.meeting.weekday]}
-          {group.meeting.rhythm === 'bimensuel' ? ' sur deux' : ''}
+          {group.meeting.firstMeetingDate ? (
+            <span>
+              1ère séance le{' '}
+              {new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(
+                new Date(group.meeting.firstMeetingDate + 'T12:00:00')
+              )}
+            </span>
+          ) : (
+            <span>
+              {group.meeting.rhythm === 'bimensuel' ? 'Un ' : 'Chaque '}
+              {WEEKDAYS[group.meeting.weekday]}
+              {group.meeting.rhythm === 'bimensuel' ? ' sur deux' : ''}
+            </span>
+          )}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Clock className="h-3.5 w-3.5 text-or-300/80" strokeWidth={2} />

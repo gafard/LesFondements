@@ -93,6 +93,15 @@ export function demarrerApplication(): void {
   if (demarre || typeof window === 'undefined') return;
   demarre = true;
 
+  // Migration définitive de l'ancien téléchargement monolithique v3. Les
+  // paquets sélectifs du Centre de l'application utilisent un autre cache.
+  try {
+    localStorage.removeItem('lf.horsLignePret');
+    if ('caches' in window) void caches.delete('lesfondements-v3');
+  } catch {
+    /* stockage indisponible : aucun ancien état ne peut alors être conservé */
+  }
+
   // L'invite a peut-être déjà été émise et retenue par le script du
   // document : ce module démarre au premier abonnement, souvent trop tard.
   const dejaCaptee = (window as unknown as { __lfInvite?: EvenementInstallation }).__lfInvite;
