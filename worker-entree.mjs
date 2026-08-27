@@ -15,7 +15,14 @@ import opennext from './.open-next/worker.js';
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from './.open-next/worker.js';
 
 const worker = {
-  fetch: opennext.fetch,
+  async fetch(requete, env, ctx) {
+    const reponse = await opennext.fetch(requete, env, ctx);
+    const signee = new Response(reponse.body, reponse);
+    // Injecté par la commande de déploiement depuis `git rev-parse HEAD` :
+    // la production révèle ainsi exactement le code qu'elle exécute.
+    if (env.BUILD_COMMIT) signee.headers.set('X-LesFondements-Commit', env.BUILD_COMMIT);
+    return signee;
+  },
 
   async scheduled(evenement, env, ctx) {
     // Le réveil passe par la route HTTP plutôt que d'appeler la logique en
