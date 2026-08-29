@@ -19,7 +19,6 @@ import {
   Quote,
   Heart,
   Users,
-  Hourglass,
   Sunrise,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
@@ -318,7 +317,7 @@ function FicheContent() {
 
               <div className="mt-7 flex flex-wrap gap-2.5">
                 <Link
-                  href={`/aujourdhui?fiche=${fiche.id}`}
+                  href={`/aujourdhui?fiche=${fiche.id}&retour=fiche`}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-or-300 px-6 py-3.5 text-xs font-bold text-encre-950 shadow-md transition hover:-translate-y-0.5 hover:bg-or-200"
                 >
                   <Sunrise className="h-4 w-4" strokeWidth={2} />

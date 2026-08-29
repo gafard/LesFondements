@@ -54,7 +54,7 @@ export default function RituelDuJourCard({ userId, ficheId }: { userId: string; 
           </span>
           <div className="min-w-0">
             <p className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-or-300">
-              Un temps à part
+              Ma préparation
               <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-parchemin-100/80">
                 <Clock3 className="h-3 w-3" /> 3–5 min
               </span>

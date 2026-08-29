@@ -37,11 +37,13 @@ export interface Moment {
  */
 const TEMPS: { cle: string; titre: string; types: string[] }[] = [
   { cle: 'entrer', titre: 'Entrer', types: ['seuil'] },
-  { cle: 'ecouter', titre: 'Écouter', types: ['ouverture-section', 'bloc'] },
-  { cle: 'mediter', titre: 'Méditer', types: ['silence'] },
-  { cle: 'memoriser', titre: 'Mémoriser', types: ['resume', 'verset', 'lecture'] },
+  { cle: 'lire', titre: 'Lire & écouter', types: ['ouverture-section', 'bloc'] },
+  { cle: 'mediter', titre: 'Méditer', types: ['silence', 'meditation'] },
+  { cle: 'prier', titre: 'Prier', types: ['priere'] },
+  { cle: 'memoriser', titre: 'Mémoriser', types: ['ancrage-verset', 'resume', 'verset', 'lecture'] },
   { cle: 'ecrire', titre: 'Écrire', types: ['question'] },
-  { cle: 'conclure', titre: 'Conclure', types: ['pas', 'cloture'] },
+  { cle: 'vivre', titre: 'Vivre', types: ['pas'] },
+  { cle: 'conclure', titre: 'Conclure', types: ['cloture'] },
 ];
 
 /** Mots lus par minute à voix haute, posément. Aligné sur `dureeLecture`. */
@@ -55,6 +57,9 @@ const MOTS_PAR_MINUTE = 180;
 const MINUTES_FIXES: Record<string, number> = {
   seuil: 1,
   silence: 3,
+  meditation: 7,
+  priere: 5,
+  'ancrage-verset': 5,
   verset: 2,
   lecture: 3,
   question: 2,

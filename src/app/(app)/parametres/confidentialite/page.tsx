@@ -47,7 +47,7 @@ export default function ReglagesConfidentialitePage() {
             <BarChart3 className="mt-1 h-5 w-5 shrink-0 text-or-700" aria-hidden="true" />
             <div>
               <h2 className="font-serif text-xl font-bold">Mesure d’usage anonyme</h2>
-              <p className="mt-2 text-sm leading-relaxed text-encre-700">Partage uniquement des jalons limités — dont l’ouverture d’un temps à part — sans identité, groupe, localisation ou contenu écrit.</p>
+              <p className="mt-2 text-sm leading-relaxed text-encre-700">Partage uniquement des jalons limités — dont l’ouverture du parcours du jour — sans identité, groupe, localisation ou contenu écrit.</p>
             </div>
           </div>
           <fieldset className="mt-5 grid gap-3 sm:grid-cols-2">

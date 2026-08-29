@@ -25,29 +25,38 @@ test('fiche 1 : une réponse est sauvegardée automatiquement', async ({ page })
     .toContain('dix minutes');
 });
 
-test('temps à part : le texte du livret mène à un pas personnel privé', async ({ page }) => {
-  await page.goto('/aujourdhui');
-  await expect(page.getByRole('heading', { name: 'Ma semaine sur la table' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Dieu règne' })).toBeVisible();
-  await expect(page.getByText('Texte du livret', { exact: true })).toBeVisible();
+test('temps du jour : lire, méditer, prier et mémoriser restent dans la même immersion', async ({ page }) => {
+  await page.goto('/aujourdhui?fiche=1&section=0&scene=7');
+  await expect(page.locator('.immersion-bureau')).toBeVisible();
+  await expect(page.getByText('Méditer la Parole', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Laisser « Dieu règne »/ })).toBeVisible();
 
-  await page.getByPlaceholder('Aujourd’hui, je choisis de…').fill(
+  await page.locator('textarea').first().fill('Dieu règne même lorsque je ne maîtrise pas la situation.');
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Répondre à Dieu avec tes propres mots' })).toBeVisible();
+  await page.getByPlaceholder('Ma prière aujourd’hui…').fill('Père, apprends-moi à te faire confiance.');
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Mémoriser la Parole', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByPlaceholder('Aujourd’hui, je…').fill(
     'Commencer ma journée par reconnaître que Dieu règne.'
   );
-  await page.getByRole('button', { name: 'Terminer ce moment' }).click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: 'J’ai préparé' }).click();
+  await expect(page.getByRole('heading', { name: 'La Parole est semée.' })).toBeVisible();
 
-  await expect(page.getByRole('heading', { name: 'Un amour relationnel et inconditionnel' })).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate((uid) => {
         const donnees = JSON.parse(localStorage.getItem(`lesfondements_prog_${uid}`) || '{}');
-        const brut = donnees['1']?.answers?.['rituel:v1'];
-        if (!brut) return null;
-        const rituel = JSON.parse(brut);
-        return rituel.moments?.['resume-1']?.pas;
+        return {
+          termine: donnees['1']?.answers?.['temps-apart:0'],
+          pas: donnees['1']?.answers?.['pas:f1-s1'],
+        };
       }, UTILISATEUR.uid)
     )
-    .toContain('Dieu règne');
+    .toEqual({ termine: '1', pas: 'Commencer ma journée par reconnaître que Dieu règne.' });
 });
 
 test('absence : le choix reste associé au membre', async ({ page }) => {

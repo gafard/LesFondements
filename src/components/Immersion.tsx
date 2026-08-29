@@ -21,17 +21,11 @@ import {
   Volume2,
   VolumeX,
   X,
+  Copy,
+  Download,
   Flame,
-  Clock3,
-  BookA,
   Mic,
   MicOff,
-  Download,
-  Copy,
-  Brain,
-  MousePointerClick,
-  NotebookPen,
-  LockKeyhole,
 } from 'lucide-react';
 import ShareableVerseCard from '@/components/ShareableVerseCard';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
@@ -50,7 +44,7 @@ import {
   type GenreVoix,
   type Ambiance,
 } from '@/lib/ambiance';
-import { texteDuVerset, VERSETS_CONNUS, normaliserReference } from '@/data/versets';
+import { normaliserReference, texteDuVerset, VERSETS_CONNUS } from '@/data/versets';
 import {
   chargerManifesteVoix,
   pisteId,
@@ -81,41 +75,91 @@ import meditationData from '@/data/meditation-questions.json';
 // Le scénario : la fiche devient une suite de moments
 // ─────────────────────────────────────────────────────────────
 
+interface QuestionMeditation {
+  id: string;
+  fonction?: string;
+  question: string;
+}
+
+interface SectionMeditation {
+  sectionTitre: string;
+  versets: string[];
+  questions: QuestionMeditation[];
+}
+
+interface FicheMeditation {
+  ficheId: number;
+  sections: SectionMeditation[];
+}
+
 type Scene = { piste?: string } & (
   | { type: 'seuil' }
   | { type: 'ouverture-section'; titre: string; rang: number; total: number }
   | { type: 'bloc'; bloc: Bloc; sousTitre: string | null; section: string | null }
   | { type: 'silence' }
-  | { type: 'meditation'; sectionTitre: string; questions: Array<{ id: string; fonction?: string; question: string }> }
-  | { type: 'priere'; questions: Array<{ id: string; question: string }> }
+  | { type: 'meditation'; sectionTitre: string; questions: QuestionMeditation[] }
+  | { type: 'priere'; id: string; questions: QuestionMeditation[] }
   | { type: 'ancrage-verset'; reference: string; texte: string }
   | { type: 'resume'; section: ResumeSection }
   | { type: 'verset'; reference: string; texte: string | null }
   | { type: 'lecture'; texte: string }
   | { type: 'question'; id: string; texte: string; section?: string }
-  | { type: 'pas' }
+  | { type: 'pas'; id?: string }
   | { type: 'cloture' }
 );
+
+const MEDITATIONS = meditationData as FicheMeditation[];
 
 function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | null): Scene[] {
   if (sectionCibleIndex !== undefined && sectionCibleIndex !== null && sectionCibleIndex >= 0) {
     const section = fiche.sections[sectionCibleIndex];
     if (!section) return [{ type: 'seuil', piste: pisteId.seuil(fiche.id) }, { type: 'cloture' }];
 
-    const scenes: Scene[] = [];
-    
-    // 1. Ouverture de la section
+    const meditation = MEDITATIONS
+      .find((element) => element.ficheId === fiche.id)
+      ?.sections[sectionCibleIndex];
+    const idSection = `f${fiche.id}-s${sectionCibleIndex + 1}`;
+    const questions = meditation?.questions.length
+      ? meditation.questions
+      : [
+          {
+            id: `${idSection}-q1`,
+            fonction: 'decouvrir-dieu',
+            question: 'Qu’est-ce que ce texte te révèle sur Dieu, son caractère ou sa manière d’agir ?',
+          },
+          {
+            id: `${idSection}-q2`,
+            fonction: 'recevoir',
+            question: 'Quelle vérité es-tu invité à accueillir personnellement aujourd’hui ?',
+          },
+          {
+            id: `${idSection}-q3`,
+            fonction: 'repondre',
+            question: 'Quelle réponse simple et concrète peux-tu donner à Dieu ?',
+          },
+        ];
+    const reference = meditation?.versets[0]
+      ?? fiche.resume.find((resume) => resume.titre === section.titre)?.versets[0]
+      ?? fiche.resume.flatMap((resume) => resume.versets)[0]
+      ?? 'Ps 46:11';
+    const texte = VERSETS_CONNUS[normaliserReference(reference)]
+      ?? texteDuVerset(reference)
+      ?? 'Arrêtez, et sachez que je suis Dieu.';
+
+    const scenes: Scene[] = [
+      { type: 'seuil', piste: pisteId.seuil(fiche.id) },
+    ];
+
     if (section.titre) {
       scenes.push({
         type: 'ouverture-section',
         titre: section.titre,
         rang: sectionCibleIndex + 1,
-        total: fiche.sections.length,
+        total: fiche.sections.filter((element) => element.titre).length,
         piste: pisteId.section(fiche.id, sectionCibleIndex),
       });
     }
 
-    // 2. Paragraphes de la section avec la voix studio
     let sousTitre: string | null = null;
     section.blocs.forEach((bloc, indexBloc) => {
       if (bloc.type === 'sous-titre') {
@@ -132,50 +176,19 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
       sousTitre = null;
     });
 
-    // 3. Silence sacré / recueillement
-    scenes.push({ type: 'silence' });
-
-    // 4. Méditation théocentrique
-    const ficheQuestions = (meditationData as any[]).find((f) => f.ficheId === fiche.id);
-    const secQuestions = ficheQuestions?.sections?.[sectionCibleIndex]?.questions || [
-      { id: `f${fiche.id}-s${sectionCibleIndex}-q1`, fonction: 'contempler', question: "Qu'est-ce que ce texte te révèle sur la grandeur et le caractère de Dieu ?" },
-      { id: `f${fiche.id}-s${sectionCibleIndex}-q2`, fonction: 'recevoir', question: "Quelle vérité es-tu invité à accueillir et garder dans ton cœur ?" },
-      { id: `f${fiche.id}-s${sectionCibleIndex}-q3`, fonction: 'vivre', question: "Si cela est vrai, qu'est-ce que cela change dans ta relation avec Lui ?" },
-    ];
-
-    scenes.push({
-      type: 'meditation',
-      sectionTitre: section.titre || `Étape ${sectionCibleIndex + 1}`,
-      questions: secQuestions,
-    });
-
-    // 5. Sanctuaire de Prière
-    scenes.push({
-      type: 'priere',
-      questions: secQuestions,
-    });
-
-    // 6. Ancrage du Verset & Fond d'écran
-    const resumeSec = fiche.resume[sectionCibleIndex];
-    const refVerset = resumeSec?.versets?.[0] || 'Ps 46:11';
-    const txtVerset = VERSETS_CONNUS[normaliserReference(refVerset)] || texteDuVerset(refVerset) || "Arrêtez, et sachez que je suis Dieu : Je domine sur les nations, je domine sur la terre.";
-
-    scenes.push({
-      type: 'ancrage-verset',
-      reference: refVerset,
-      texte: txtVerset,
-    });
-
-    // 7. Mon pas de vie pour aujourd'hui
-    scenes.push({ type: 'pas' });
-
-    // 8. Clôture de la section
-    scenes.push({ type: 'cloture' });
+    scenes.push(
+      { type: 'silence' },
+      { type: 'meditation', sectionTitre: section.titre || fiche.titre, questions },
+      { type: 'priere', id: idSection, questions },
+      { type: 'ancrage-verset', reference, texte },
+      { type: 'pas', id: idSection },
+      { type: 'cloture' },
+    );
     return scenes;
   }
 
-  // Comportement intégral original (toutes les sections)
   const scenes: Scene[] = [{ type: 'seuil', piste: pisteId.seuil(fiche.id) }];
+
   const sectionsAvecTitre = fiche.sections.filter((s) => s.titre);
   fiche.sections.forEach((section, indexSection) => {
     if (section.titre) {
@@ -198,6 +211,8 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
         bloc,
         sousTitre,
         section: section.titre,
+        // L'identifiant suit la position dans le livret : c'est le même
+        // calcul que dans scripts/generer-voix.mjs.
         piste: pisteId.bloc(fiche.id, indexSection, indexBloc),
       });
       sousTitre = null;
@@ -223,6 +238,8 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
     section.lectures.forEach((texte) => scenes.push({ type: 'lecture', texte }));
   });
 
+  // Les questions sont numérotées d'un seul tenant, résumés puis questions
+  // libres — dans le même ordre que la génération des voix.
   let rangQuestion = 0;
   fiche.resume.forEach((section, indexSection) => {
     section.questions.forEach((texte, index) => {
@@ -261,6 +278,7 @@ interface ImmersionProps {
   onQuitter: () => void;
   dejaPreparee?: boolean;
   indexInitial?: number;
+  /** Limite le temps du jour à une section, tout en gardant une immersion continue. */
   sectionIndex?: number | null;
 }
 
@@ -274,12 +292,15 @@ export default function Immersion({
   indexInitial = 0,
   sectionIndex = null,
 }: ImmersionProps) {
-  const scenario = useMemo(() => construireScenario(fiche, sectionIndex), [fiche, sectionIndex]);
+  const scenario = useMemo(
+    () => construireScenario(fiche, sectionIndex),
+    [fiche, sectionIndex]
+  );
   const [index, setIndex] = useState(() =>
     Math.max(0, Math.min(scenario.length - 1, indexInitial))
   );
   const [ambiance, setAmbiance] = useState<Ambiance>('emotional-piano');
-  const [lecture, setLecture] = useState(true);
+  const [lecture, setLecture] = useState(false);
   const [genreVoixLocal, setGenreVoixLocal] = useState<GenreVoix>(() => getGenreVoix());
   const [manifeste, setManifeste] = useState<Manifeste | null>(null);
   const [manifesteVivienne, setManifesteVivienne] = useState<ManifesteVivienne | null>(null);
@@ -287,125 +308,322 @@ export default function Immersion({
   const [cloture, setCloture] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [audioAvancement, setAudioAvancement] = useState(0);
-  const [vitesseVoix, setVitesseVoix] = useState(1);
-  const [tailleTexte, setTailleTexte] = useState<'normale' | 'grande' | 'tres-grande'>('normale');
+  const [noteOuverte, setNoteOuverte] = useState(false);
+  // Le chrome s'efface pour laisser la scène seule ; un toucher le rappelle.
   const [chrome, setChrome] = useState(true);
   const [feuille, setFeuille] = useState(false);
-  const [noteOuverte, setNoteOuverte] = useState(false);
-
+  /** Confort de lecture, de 0,9 à 1,3. */
+  const [taille, setTaille] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const zone = useRef<HTMLDivElement | null>(null);
-  const touchDepart = useRef<number | null>(null);
+  const sourceDuckingAudio = useRef(Symbol('immersion-piste-enregistree'));
+  const enchainerRef = useRef(enchainer);
+  const zone = useRef<HTMLDivElement>(null);
+  const depart = useRef<number | null>(null);
 
-  useEffect(() => {
-    void chargerManifesteVoix().then(setManifeste);
-    void chargerManifesteVivienne().then(setManifesteVivienne);
+  const scene = scenario[index];
+  const progression = (index + 1) / scenario.length;
+
+  const libelleScene = useMemo(() => {
+    switch (scene.type) {
+      case 'seuil': return 'Ouverture de la fiche';
+      case 'ouverture-section': return scene.titre;
+      case 'bloc': return scene.sousTitre ?? scene.section ?? 'Lecture guidée';
+      case 'silence': return 'Temps de silence';
+      case 'meditation': return 'Méditer';
+      case 'priere': return 'Prier';
+      case 'ancrage-verset': return 'Mémoriser';
+      case 'resume': return `L’essentiel — ${scene.section.titre}`;
+      case 'verset': return scene.reference;
+      case 'lecture': return 'Lecture dans votre Bible';
+      case 'question': return 'Écriture personnelle';
+      case 'pas': return sectionIndex === null ? 'Mon pas de la semaine' : 'Mon pas du jour';
+      case 'cloture': return 'Clôture de la fiche';
+    }
+  }, [scene, sectionIndex]);
+
+  const texteDeLaScene = useCallback((courante: Scene): string | null => {
+    switch (courante.type) {
+      case 'bloc':
+        return `${courante.sousTitre ? `${courante.sousTitre}. ` : ''}${courante.bloc.oral ?? courante.bloc.texte}`;
+      case 'ouverture-section':
+        return courante.titre;
+      case 'resume':
+        return `${courante.section.titre}. ${courante.section.points.join(' ')}`;
+      case 'verset':
+        return courante.texte ? `${courante.reference}. ${courante.texte}` : null;
+      case 'question':
+        return courante.texte;
+      case 'meditation':
+        return courante.questions.map((question) => question.question).join(' ');
+      case 'priere':
+        return 'Prends maintenant le temps de répondre à Dieu. Adore-le, remercie-le, puis confie-lui ce que sa Parole a mis en lumière.';
+      case 'ancrage-verset':
+        return `${courante.reference}. ${courante.texte}`;
+      default:
+        return null;
+    }
   }, []);
 
-  const scene = scenario[index] ?? scenario[0];
-  const moments = useMemo(() => decouperEnMoments(scenario), [scenario]);
-  const rangMoment = useMemo(() => momentDe(moments, index), [moments, index]);
+  // ── Les moments ─────────────────────────────────────────────
+  // « 17/55 · 38 min » dit la vérité et décourage. Le scénario se regroupe
+  // en temps nommés — entrer, écouter, méditer, mémoriser, écrire, conclure
+  // — dont chacun se tient d'une traite.
+  const moments = useMemo(
+    () => decouperEnMoments(scenario.map((s) => ({ type: s.type, texte: texteDeLaScene(s) }))),
+    [scenario, texteDeLaScene]
+  );
+  const rangMoment = momentDe(moments, index);
   const moment = moments[rangMoment];
-  const progression = scenario.length > 1 ? index / (scenario.length - 1) : 0;
 
+  // ── Effacement du chrome ────────────────────────────────────
+  // La scène doit pouvoir rester seule. Les commandes s'effacent après
+  // quelques secondes ; un toucher n'importe où les rappelle. Elles
+  // reviennent aussi à chaque changement de scène — le temps de se
+  // repérer — ce que `aller` se charge de faire.
   useEffect(() => {
-    void jouerAmbiance(ambiance, 0.32);
+    if (!chrome || feuille || noteOuverte) return;
+    const minuterie = window.setTimeout(() => setChrome(false), 4000);
+    return () => window.clearTimeout(minuterie);
+  }, [chrome, feuille, noteOuverte, index]);
+
+  // ── L'écran et les commandes du système ─────────────────────
+  // Une immersion dure dix minutes, dont une partie sans toucher l'écran.
+  // Sans ces deux-là, le téléphone s'éteint au milieu d'un silence et la
+  // lecture s'arrête au verrouillage.
+  useEffect(() => {
+    void garderLEcranEveille();
+    const cesser = suivreLaVisibilite();
     return () => {
-      void arreterAmbiance();
-      arreterLecture();
+      cesser();
+      laisserLEcranSEteindre();
+      fairelSilenceAuSysteme();
     };
-  }, [ambiance]);
+  }, []);
 
-  // Audio résolution
-  const pisteCourante = useMemo<Piste | null>(() => {
-    if (!scene.piste) return null;
-    if (genreVoixLocal === 'feminin') {
-      const urlVivienne = pisteVivienne(manifesteVivienne, scene.piste);
-      if (urlVivienne) {
-        return {
-          id: scene.piste,
-          url: urlVivienne,
-          source: 'humaine',
-        };
-      }
-    }
-    return resoudrePiste(manifeste, scene.piste);
-  }, [scene, manifeste, manifesteVivienne, genreVoixLocal]);
-
+  // ── Navigation ──────────────────────────────────────────────
   const aller = useCallback(
     (delta: number) => {
-      setIndex((courant) => {
-        const suivant = courant + delta;
-        if (suivant < 0) return 0;
-        if (suivant >= scenario.length) {
-          setCloture(true);
-          return courant;
-        }
-        return suivant;
-      });
+      // On change de scène : les commandes reviennent le temps de se repérer.
+      setChrome(true);
+      arreterLecture();
+      setIndex((valeur) => Math.max(0, Math.min(scenario.length - 1, valeur + delta)));
     },
     [scenario.length]
   );
 
-  const jouerVoixScene = useCallback(() => {
-    if (!lecture) return;
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    arreterLecture();
+  useEffect(() => {
+    enchainerRef.current = enchainer;
+  }, [enchainer]);
 
-    if (pisteCourante) {
-      const audio = new Audio(pisteCourante.url);
-      audio.playbackRate = vitesseVoix;
-      audioRef.current = audio;
-
-      const source = Symbol('immersion-audio');
-      activerDuckingVoix(true, source);
-      setAudioEnCours(true);
-
-      audio.ontimeupdate = () => {
-        if (audio.duration) setAudioAvancement(audio.currentTime / audio.duration);
-      };
-      audio.onended = () => {
-        activerDuckingVoix(false, source);
+  const lireSceneAvecLeNavigateur = useCallback(
+    (courante: Scene) => {
+      const texte = texteDeLaScene(courante);
+      if (!texte) {
         setAudioEnCours(false);
-        if (enchainer) aller(1);
-      };
-      audio.onerror = () => {
-        activerDuckingVoix(false, source);
-        setAudioEnCours(false);
-      };
-      void audio.play();
-    }
-  }, [lecture, pisteCourante, vitesseVoix, enchainer, aller]);
+        return false;
+      }
+      const demarree = lireAVoixHaute(texte, {
+        genre: genreVoixLocal,
+        onDebut: () => setAudioEnCours(true),
+        onFin: () => {
+          setAudioEnCours(false);
+          setAudioAvancement(1);
+          if (enchainerRef.current) aller(1);
+        },
+        onErreur: () => setAudioEnCours(false),
+      });
+      return demarree;
+    },
+    [aller, genreVoixLocal, texteDeLaScene]
+  );
 
   useEffect(() => {
-    jouerVoixScene();
-  }, [index, jouerVoixScene]);
+    zone.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [index]);
 
-  const basculerLectureOuPause = () => {
+  // Ce qui joue, décrit au système : l'écran verrouillé et les écouteurs
+  // affichent le moment en cours et commandent la navigation.
+  useEffect(() => {
+    annoncerAuSysteme(libelleScene, `Fiche ${fiche.id} · ${moment?.titre ?? ''}`.trim(), {
+      precedent: () => aller(-1),
+      suivant: () => aller(1),
+      jouer: () => void audioRef.current?.play(),
+      pause: () => audioRef.current?.pause(),
+    });
+  }, [libelleScene, fiche.id, moment?.titre, aller]);
+
+  useEffect(() => {
+    etatDeLecture(audioEnCours);
+  }, [audioEnCours]);
+
+  // Un frisson très bref au passage d'un moment : le corps sait qu'une
+  // étape est franchie sans qu'on ait à le lire.
+  useEffect(() => {
+    if (rangMoment > 0) frisson();
+  }, [rangMoment]);
+
+  useEffect(() => {
+    memoriserPassage({
+      url: sectionIndex === null
+        ? `/fiches/${fiche.id}?immersion=1&scene=${index}`
+        : `/aujourdhui?fiche=${fiche.id}&section=${sectionIndex}&scene=${index}`,
+      titre: scene.type === 'verset' || scene.type === 'ancrage-verset'
+        ? scene.reference
+        : `Fiche ${fiche.id}`,
+      sousTitre: libelleScene,
+      type: scene.type === 'verset' || scene.type === 'ancrage-verset' ? 'verset' : 'immersion',
+    });
+  }, [fiche.id, index, libelleScene, scene, sectionIndex]);
+
+  useEffect(() => {
+    const auClavier = (event: KeyboardEvent) => {
+      const cible = event.target as HTMLElement | null;
+      if (cible && ['TEXTAREA', 'INPUT'].includes(cible.tagName)) return;
+      if (event.key === 'ArrowRight' || event.key === ' ') {
+        event.preventDefault();
+        aller(1);
+      } else if (event.key === 'ArrowLeft') {
+        aller(-1);
+      } else if (event.key === 'Escape') {
+        // Quand la feuille est ouverte, Échap la referme — elle a son propre
+        // écouteur. Sinon la touche fait ce qu'on attend d'un plein écran :
+        // elle en sort.
+        if (!feuille) onQuitter();
+      }
+    };
+    window.addEventListener('keydown', auClavier);
+    return () => window.removeEventListener('keydown', auClavier);
+  }, [aller, feuille, onQuitter]);
+
+  // ── Ambiance et voix ────────────────────────────────────────
+  useEffect(() => {
+    void chargerManifesteVoix().then(setManifeste);
+    void chargerManifesteVivienne().then((vivienne) => {
+      setManifesteVivienne(vivienne);
+      if (!vivienne && getGenreVoix() === 'feminin') {
+        setGenreVoix('masculin');
+        setGenreVoixLocal('masculin');
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    void jouerAmbiance(ambiance);
+  }, [ambiance]);
+
+  useEffect(
+    () => () => {
+      activerDuckingVoix(false, sourceDuckingAudio.current);
+      void arreterAmbiance();
+      arreterLecture();
+    },
+    []
+  );
+
+  /**
+   * La voix off de la scène : l'enregistrement du paragraphe s'il existe,
+   * sinon celui de la section entière. Vivienne n'est résolue qu'à travers
+   * son manifeste final : les fichiers en cours de génération sont ignorés.
+   */
+  const pisteCourante: Piste | null = useMemo(() => {
+    if (!scene.piste) return null;
+    if (genreVoixLocal === 'feminin') {
+      const url = pisteVivienne(manifesteVivienne, scene.piste);
+      if (!url) return null;
+      return {
+        id: scene.piste,
+        url,
+        source: 'eleven',
+        empreinte: 'vivienne',
+        voix: 'fr-FR-VivienneMultilingualNeural',
+      };
+    }
+    const section = scene.piste.replace(/\.b\d+$/, '');
+    return resoudrePiste(manifeste, scene.piste, section);
+  }, [manifeste, manifesteVivienne, scene, genreVoixLocal]);
+
+  const basculerLectureOuPause = useCallback(() => {
+    const el = audioRef.current;
+    if (!lecture) {
+      setLecture(true);
+      if (pisteCourante && el) {
+        if (!el.src.endsWith(pisteCourante.url)) {
+          el.src = pisteCourante.url;
+        }
+        el.currentTime = 0;
+        const p = el.play();
+        if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
+      } else {
+        lireSceneAvecLeNavigateur(scene);
+      }
+      return;
+    }
+
     if (audioEnCours) {
-      audioRef.current?.pause();
+      el?.pause();
+      arreterLecture();
       setAudioEnCours(false);
     } else {
-      jouerVoixScene();
+      if (pisteCourante && el) {
+        const p = el.play();
+        if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
+      } else {
+        lireSceneAvecLeNavigateur(scene);
+      }
     }
+  }, [lecture, audioEnCours, pisteCourante, scene, lireSceneAvecLeNavigateur]);
+
+  useEffect(() => {
+    if (!lecture || pisteCourante) {
+      arreterLecture();
+      return;
+    }
+    // La synthèse appelle ses callbacks d'état dès le démarrage. La lancer
+    // après l'effet évite une cascade de rendu synchrone et laisse React
+    // stabiliser la scène courante avant que la voix prenne la main.
+    const minuteur = window.setTimeout(() => lireSceneAvecLeNavigateur(scene), 0);
+    return () => {
+      window.clearTimeout(minuteur);
+      arreterLecture();
+    };
+  }, [lecture, scene, pisteCourante, lireSceneAvecLeNavigateur]);
+
+  // Lecture de la piste audio studio / ElevenLabs / Vivienne
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    if (lecture && pisteCourante) {
+      if (!el.src.endsWith(pisteCourante.url)) {
+        el.src = pisteCourante.url;
+      }
+      el.currentTime = 0;
+      const p = el.play();
+      if (p) p.then(() => setAudioEnCours(true)).catch(() => {});
+    } else {
+      el.pause();
+    }
+  }, [pisteCourante, lecture, index]);
+
+  // ── Gestes tactiles ─────────────────────────────────────────
+  const debutTouche = (event: React.TouchEvent) => {
+    depart.current = event.touches[0]?.clientX ?? null;
+  };
+  const finTouche = (event: React.TouchEvent) => {
+    if (depart.current === null) return;
+    const delta = (event.changedTouches[0]?.clientX ?? 0) - depart.current;
+    if (Math.abs(delta) > 60) aller(delta < 0 ? 1 : -1);
+    depart.current = null;
   };
 
-  const debutTouche = (e: React.TouchEvent) => {
-    touchDepart.current = e.touches[0].clientX;
+  const terminer = async () => {
+    setCloture(true);
+    await onTerminer();
   };
-  const finTouche = (e: React.TouchEvent) => {
-    if (touchDepart.current === null) return;
-    const diff = e.changedTouches[0].clientX - touchDepart.current;
-    if (diff > 50) aller(-1);
-    if (diff < -50) aller(1);
-    touchDepart.current = null;
-  };
+
+  // ── Repères du sommaire ─────────────────────────────────────
 
   return (
-    <div className="immersion-bureau fixed inset-0 z-[60] overflow-hidden nuit nuit-grain text-parchemin-100">
+    <div className="immersion-bureau fixed inset-0 z-[60] overflow-hidden">
       <div className="immersion-sous-main absolute inset-3 sm:inset-6" />
       <span className="immersion-ruban absolute left-5 top-0 z-20 hidden h-24 w-10 items-end justify-center pb-4 text-or-200 sm:flex">
         <Bookmark className="h-4 w-4 fill-current" />
@@ -416,19 +634,25 @@ export default function Immersion({
         style={{ animationDelay: '2.4s' }}
       />
 
-      {/* ── Console Haute ── */}
+      {/* ── Barre haute ─────────────────────────────────────────
+          Trois informations, pas une de plus : où l'on est, dans quel
+          moment, et combien il reste. Tout le reste vit dans la feuille. */}
       <header
-        className="absolute inset-x-0 top-0 z-20 px-4 pt-4 sm:px-8 sm:pt-6"
+        className={`absolute inset-x-0 top-0 z-20 px-4 pt-4 transition-all duration-500 sm:px-8 sm:pt-6 ${
+          chrome ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0'
+        }`}
         style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
       >
         <div className="mx-auto flex max-w-4xl items-center gap-3">
-          <div className="immersion-console-haute min-w-0 flex-1 rounded-full border border-white/10 px-4 py-2 shadow-2xl backdrop-blur-xl bg-encre-950/70">
+          <div className="immersion-console-haute min-w-0 flex-1 rounded-full border border-white/10 px-4 py-2 shadow-2xl backdrop-blur-xl">
             <p className="truncate text-2xs font-bold text-parchemin-100/70">
               Fiche {fiche.id}
               <span className="mx-1.5 text-parchemin-100/55">·</span>
-              <span className="text-or-300 font-bold">{moment?.titre ?? 'Contemplation'}</span>
+              <span className="text-parchemin-100">{moment?.titre ?? 'Lecture'}</span>
               <span className="mx-1.5 text-parchemin-100/55">·</span>
-              {index + 1}/{scenario.length}
+              {rangMoment + 1}/{moments.length}
+              <span className="mx-1.5 text-parchemin-100/55">·</span>
+              {moment?.minutes ?? 1} min
             </p>
             <div className="rail mt-1.5">
               <span style={{ width: `${Math.round(progression * 100)}%` }} />
@@ -443,12 +667,11 @@ export default function Immersion({
                 arreterLecture();
                 setAudioEnCours(false);
               } else {
-                setLecture(true);
-                jouerVoixScene();
+                basculerLectureOuPause();
               }
             }}
-            aria-label={lecture ? 'Désactiver la voix' : 'Activer la voix'}
-            title={lecture ? 'Désactiver la voix' : 'Activer la voix'}
+            aria-label={lecture ? 'Désactiver la voix off' : 'Activer la voix off'}
+            title={lecture ? 'Désactiver la voix off' : 'Écouter la voix off'}
             className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/10 shadow-2xl backdrop-blur-xl transition-all ${
               lecture
                 ? 'bg-or-400 text-encre-950 shadow-or-400/20'
@@ -466,6 +689,8 @@ export default function Immersion({
             <SlidersHorizontal className="h-4 w-4" />
           </button>
 
+          {/* La sortie ne se cache pas dans un menu : on doit pouvoir
+              quitter un plein écran sans avoir à le chercher. */}
           <button
             onClick={onQuitter}
             aria-label="Quitter l’immersion"
@@ -476,21 +701,49 @@ export default function Immersion({
         </div>
       </header>
 
-      {/* ── Scène Active ── */}
+      {noteOuverte && (
+        <aside className="post-it-jaune !absolute right-4 top-28 z-30 w-[min(20rem,calc(100vw-2rem))] -rotate-1 rounded-[4px] p-4 shadow-2xl sm:right-8 sm:top-32">
+          <div className="flex items-center justify-between border-b border-encre-950/10 pb-2">
+            <div>
+              <p className="text-3xs font-black uppercase tracking-[0.18em] text-encre-700">Carnet de bord</p>
+              <p className="font-serif text-sm font-bold text-encre-950">Fiche {fiche.id} · note libre</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNoteOuverte(false)}
+              className="rounded-full p-1.5 text-encre-600 hover:bg-white/35"
+              aria-label="Fermer le carnet de bord"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <textarea
+            value={reponses[`immersion:note:${fiche.id}`] ?? ''}
+            onChange={(event) => onEnregistrer(`immersion:note:${fiche.id}`, event.target.value)}
+            rows={7}
+            placeholder="Ce que je veux garder de cette traversée…"
+            className="manuscrit mt-3 w-full resize-none bg-transparent text-lg leading-relaxed text-encre-950 outline-none placeholder:text-encre-600/55"
+          />
+          <p className="mt-2 inline-flex items-center gap-1 text-3xs font-bold text-emerald-800"><Check className="h-3 w-3" /> Sauvegarde automatique</p>
+        </aside>
+      )}
+
+      {/* ── Scène ── */}
       <div
         ref={zone}
         onTouchStart={debutTouche}
         onTouchEnd={finTouche}
-        className="absolute inset-0 z-10 overflow-y-auto px-3 pb-32 pt-24 sm:px-8 sm:pt-32"
+        tabIndex={0}
+        aria-label="Contenu de l’immersion"
+        className="absolute inset-0 z-10 overflow-y-auto px-3 pb-32 pt-28 sm:px-8 sm:pt-36"
       >
-        <div className="immersion-page-nuit mx-auto min-h-[calc(100svh-11rem)] max-w-4xl rounded-[1.75rem] border border-or-500/20 px-5 py-6 shadow-2xl sm:px-10 sm:py-8 bg-encre-900/70 backdrop-blur-2xl">
-          <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-or-300/70">
-            <span>Atelier intérieur sacré</span>
+        <div className="immersion-page-nuit mx-auto min-h-[calc(100svh-12rem)] max-w-4xl rounded-[1.75rem] border border-white/10 px-5 py-5 shadow-2xl sm:px-10 sm:py-8">
+          <div className="mb-2 flex items-center justify-between border-b border-white/8 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-parchemin-100/55">
+            <span>Atelier intérieur</span>
             <span>{Math.round(progression * 100)} % parcouru</span>
           </div>
-
           {cloture ? (
-            <SceneCloture fiche={fiche} onQuitter={onQuitter} onTerminer={onTerminer} />
+            <SceneCloture fiche={fiche} onQuitter={onQuitter} tempsDuJour={sectionIndex !== null} />
           ) : (
             <div key={index} className="animate-reveal">
               <RenduScene
@@ -499,41 +752,53 @@ export default function Immersion({
                 reponses={reponses}
                 onEnregistrer={onEnregistrer}
                 dejaPreparee={dejaPreparee}
+                tempsDuJour={sectionIndex !== null}
               />
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Barre Basse Navigation / Lecteur ── */}
+      {/* ── Barre basse unifiée (Navigation + Lecteur Audio) ── */}
       {!cloture && (
         <footer
-          className="absolute inset-x-0 bottom-0 z-20 px-3 pb-4 sm:px-8 sm:pb-7"
+          className={`absolute inset-x-0 bottom-0 z-20 px-3 pb-4 transition-all duration-500 sm:px-8 sm:pb-7 ${
+            chrome ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
+          }`}
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="immersion-console mx-auto flex max-w-4xl items-center justify-between gap-2.5 rounded-full border border-white/12 px-4 py-2.5 shadow-2xl bg-encre-950/80 backdrop-blur-xl">
+          <div className="immersion-console mx-auto flex max-w-4xl items-center justify-between gap-2.5 rounded-full border border-white/12 px-3.5 py-2.5 shadow-2xl">
+            {/* Précédent */}
             <button
               onClick={() => aller(-1)}
               disabled={index === 0}
-              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-parchemin-100/80 hover:bg-white/20 disabled:opacity-20 ${
+              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/8 text-parchemin-100/70 transition-colors hover:bg-white/16 hover:text-parchemin-100 disabled:opacity-20 ${
                 index === 0 ? 'invisible pointer-events-none' : ''
               }`}
+              aria-label="Précédent"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
 
-            <div className="flex flex-1 items-center gap-2.5 min-w-0 px-2">
+            {/* Centre : Audio ou indicateur de scène */}
+            <div className="flex flex-1 items-center gap-2.5 min-w-0 px-1 sm:px-3">
               <button
                 onClick={basculerLectureOuPause}
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-r from-or-400 to-or-500 text-encre-950 shadow-md transition-transform active:scale-95"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-or-400 text-encre-950 transition-transform active:scale-95 shadow-xs"
+                aria-label={audioEnCours ? 'Mettre en pause' : 'Écouter'}
+                title={audioEnCours ? 'Mettre en pause' : 'Écouter'}
               >
-                {audioEnCours ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current ml-0.5" />}
+                {audioEnCours ? (
+                  <Pause className="h-3.5 w-3.5 fill-current" />
+                ) : (
+                  <Play className="h-3.5 w-3.5 fill-current ml-0.5" />
+                )}
               </button>
 
               <div className="flex-1 flex flex-col justify-center min-w-0">
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/15">
+                <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
                   <span
-                    className="block h-full rounded-full bg-gradient-to-r from-or-400 to-or-500 transition-[width] duration-200"
+                    className="block h-full rounded-full bg-or-400 transition-[width] duration-200"
                     style={{
                       width: `${
                         lecture && pisteCourante
@@ -543,88 +808,401 @@ export default function Immersion({
                     }}
                   />
                 </div>
-                <div className="flex items-center justify-between mt-1 text-3xs text-parchemin-100/60">
+                <div className="flex items-center justify-between mt-1 text-3xs text-parchemin-100/50">
                   <span className="truncate">
-                    {genreVoixLocal === 'feminin' ? 'Voix Vivienne' : 'Voix Studio'} • Musique active
+                    {lecture ? (pisteCourante ? 'Voix Studio' : 'Synthèse') : 'Mode lecture'}
                   </span>
-                  <span className="shrink-0 ml-2 font-bold text-or-300">
+                  <span className="shrink-0 ml-2">
                     {index + 1} / {scenario.length}
                   </span>
                 </div>
               </div>
+
+              <button
+                onClick={() => setEnchainer(!enchainer)}
+                title="Passer automatiquement à la scène suivante après la voix"
+                className={`shrink-0 rounded-full px-2.5 py-1 text-3xs font-bold transition-colors ${
+                  enchainer
+                    ? 'bg-or-400 text-encre-950'
+                    : 'bg-white/10 text-parchemin-100/60 hover:bg-white/18'
+                }`}
+              >
+                Auto
+              </button>
             </div>
 
-            <button
-              onClick={() => aller(1)}
-              className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2 text-xs font-bold shadow-md"
-            >
-              <span>Suivant</span>
-              <ArrowRight className="h-4 w-4 stroke-[2.5]" />
-            </button>
+            {/* Bouton Suivant / Action */}
+            {scene.type === 'cloture' ? (
+              <button
+                onClick={() => void terminer()}
+                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
+              >
+                <span>{dejaPreparee ? 'Terminer' : 'J’ai préparé'}</span>
+                <Check className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            ) : scene.type === 'seuil' ? (
+              <button
+                onClick={() => aller(1)}
+                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
+              >
+                <span>Entrer</span>
+                <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            ) : (
+              <button
+                onClick={() => aller(1)}
+                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
+              >
+                <span>Continuer</span>
+                <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            )}
           </div>
         </footer>
       )}
 
-      {/* Tiroir Réglages */}
-      {feuille && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-          <div className="w-full max-w-md rounded-3xl border border-or-500/30 bg-encre-950 p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 className="font-serif text-xl font-bold titre-or">Réglages de l&apos;immersion</h3>
-              <button onClick={() => setFeuille(false)} className="p-1 rounded-full text-parchemin-100/60 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-or-300 uppercase tracking-wider block mb-2">Choix de la voix</label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => { setGenreVoixLocal('feminin'); setGenreVoix('feminin'); }}
-                  className={`p-3 rounded-xl border text-xs font-bold transition ${genreVoixLocal === 'feminin' ? 'bg-or-400 text-encre-950 border-or-400' : 'bg-white/5 border-white/10 text-parchemin-100'}`}
-                >
-                  👩 Vivienne
-                </button>
-                <button
-                  onClick={() => { setGenreVoixLocal('masculin'); setGenreVoix('masculin'); }}
-                  className={`p-3 rounded-xl border text-xs font-bold transition ${genreVoixLocal === 'masculin' ? 'bg-or-400 text-encre-950 border-or-400' : 'bg-white/5 border-white/10 text-parchemin-100'}`}
-                >
-                  🧔 Studio
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-or-300 uppercase tracking-wider block mb-2">Ambiance musicale</label>
-              <div className="grid grid-cols-2 gap-2">
-                {AMBIANCES.map((amb) => (
-                  <button
-                    key={amb.valeur}
-                    onClick={() => setAmbiance(amb.valeur)}
-                    className={`p-2.5 rounded-xl border text-2xs font-bold text-left transition ${ambiance === amb.valeur ? 'bg-or-500/20 border-or-400 text-or-300' : 'bg-white/5 border-white/10 text-parchemin-100/70'}`}
-                  >
-                    {amb.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={() => setFeuille(false)}
-              className="bouton-or w-full py-3 rounded-full text-xs font-bold mt-2"
-            >
-              Fermer les réglages
-            </button>
-          </div>
-        </div>
+      {/* Un toucher sur le fond rappelle les commandes effacées. Placé
+          derrière le contenu pour ne jamais voler un clic à un champ. */}
+      {!chrome && (
+        <button
+          type="button"
+          aria-label="Afficher les commandes"
+          onClick={() => setChrome(true)}
+          className="absolute inset-0 z-10 cursor-default"
+        />
       )}
+
+      <FeuilleOptions
+        ouverte={feuille}
+        onFermer={() => setFeuille(false)}
+        ambiance={ambiance}
+        setAmbiance={setAmbiance}
+        lecture={lecture}
+        setLecture={setLecture}
+        genreVoix={genreVoixLocal}
+        setGenreVoix={(g) => {
+          setGenreVoix(g);
+          setGenreVoixLocal(g);
+        }}
+        vivienneDisponible={!!manifesteVivienne}
+        voixDisponible={lectureDisponible() || !!manifeste}
+        taille={taille}
+        setTaille={setTaille}
+        moments={moments}
+        rangMoment={rangMoment}
+        onAllerAuMoment={(m) => {
+          setIndex(moments[m].debut);
+          setFeuille(false);
+        }}
+        onNote={() => {
+          setNoteOuverte(true);
+          setFeuille(false);
+        }}
+        onQuitter={onQuitter}
+      />
+
+      {/* Audio element permanent */}
+      <audio
+        ref={audioRef}
+        preload="auto"
+        onPlay={() => {
+          activerDuckingVoix(true, sourceDuckingAudio.current);
+          setAudioEnCours(true);
+        }}
+        onPause={() => {
+          activerDuckingVoix(false, sourceDuckingAudio.current);
+          setAudioEnCours(false);
+        }}
+        onTimeUpdate={(event) => {
+          const el = event.currentTarget;
+          if (el.duration) setAudioAvancement(el.currentTime / el.duration);
+        }}
+        onEnded={() => {
+          activerDuckingVoix(false, sourceDuckingAudio.current);
+          setAudioEnCours(false);
+          setAudioAvancement(1);
+          if (enchainer) aller(1);
+        }}
+        onError={() => {
+          activerDuckingVoix(false, sourceDuckingAudio.current);
+          if (lecture) lireSceneAvecLeNavigateur(scene);
+        }}
+      />
     </div>
   );
 }
 
+
 // ─────────────────────────────────────────────────────────────
-// Rendu dynamique de chaque scène
+// La feuille d'options
 // ─────────────────────────────────────────────────────────────
+
+/**
+ * Tout ce qui n'est pas la scène : ambiance, voix, sommaire, note, confort
+ * de lecture, sortie.
+ */
+function FeuilleOptions({
+  ouverte,
+  onFermer,
+  ambiance,
+  setAmbiance,
+  lecture,
+  setLecture,
+  genreVoix,
+  setGenreVoix,
+  vivienneDisponible,
+  voixDisponible,
+  taille,
+  setTaille,
+  moments,
+  rangMoment,
+  onAllerAuMoment,
+  onNote,
+  onQuitter,
+}: {
+  ouverte: boolean;
+  onFermer: () => void;
+  ambiance: Ambiance;
+  setAmbiance: (valeur: Ambiance) => void;
+  lecture: boolean;
+  setLecture: (valeur: boolean) => void;
+  genreVoix: GenreVoix;
+  setGenreVoix: (valeur: GenreVoix) => void;
+  vivienneDisponible: boolean;
+  voixDisponible: boolean;
+  taille: number;
+  setTaille: (valeur: number) => void;
+  moments: Moment[];
+  rangMoment: number;
+  onAllerAuMoment: (rang: number) => void;
+  onNote: () => void;
+  onQuitter: () => void;
+}) {
+  useEffect(() => {
+    if (!ouverte) return;
+    const auClavier = (event: KeyboardEvent) => event.key === 'Escape' && onFermer();
+    window.addEventListener('keydown', auClavier);
+    return () => window.removeEventListener('keydown', auClavier);
+  }, [ouverte, onFermer]);
+
+  if (!ouverte) return null;
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Fermer les réglages"
+        onClick={onFermer}
+        className="fixed inset-0 z-[70] cursor-default bg-encre-950/50 backdrop-blur-sm"
+      />
+
+      <div
+        role="dialog"
+        aria-label="Réglages de l’immersion"
+        aria-modal="true"
+        className="fixed inset-x-0 bottom-0 z-[71] mx-auto max-h-[82vh] max-w-lg overflow-y-auto rounded-t-4xl border-t border-white/12 bg-encre-950/95 px-5 pt-3 shadow-2xl backdrop-blur-2xl"
+        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+      >
+        {/* La poignée : on doit voir que ça se tire. */}
+        <span className="mx-auto mb-5 block h-1 w-10 rounded-full bg-white/20" />
+
+        {/* ── Ambiance ── */}
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/55">
+            Fond Sonore & Musique
+          </p>
+          <span className="text-3xs text-or-400/80 font-medium">
+            {AMBIANCES.find((a) => a.valeur === ambiance)?.label}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {AMBIANCES.map((option) => (
+            <button
+              key={option.valeur}
+              onClick={() => setAmbiance(option.valeur)}
+              className={`rounded-2xl p-2.5 text-left transition-all flex flex-col justify-between ${
+                ambiance === option.valeur
+                  ? 'bg-or-400 text-encre-950 shadow-md ring-1 ring-or-300'
+                  : 'bg-white/8 text-parchemin-100/70 hover:bg-white/14'
+              }`}
+            >
+              <span className="text-xs font-bold truncate block">{option.label}</span>
+              <span
+                className={`text-[10px] mt-0.5 line-clamp-1 ${
+                  ambiance === option.valeur ? 'text-encre-900/80' : 'text-parchemin-100/40'
+                }`}
+              >
+                {option.description}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* ── Voix et confort ── */}
+        <div className="mt-6 space-y-2.5">
+          {voixDisponible && (
+            <button
+              onClick={() => setLecture(!lecture)}
+              className="flex w-full items-center justify-between rounded-2xl bg-white/8 px-4 py-3.5 text-left transition-colors hover:bg-white/14"
+            >
+              <span className="flex items-center gap-2.5 text-sm text-parchemin-100">
+                {lecture ? (
+                  <Volume2 className="h-4 w-4 text-or-300" />
+                ) : (
+                  <VolumeX className="h-4 w-4 text-parchemin-100/50" />
+                )}
+                Lecture Vocale
+              </span>
+              <span className="text-2xs font-bold text-parchemin-100/45">
+                {lecture ? 'Active' : 'Coupée'}
+              </span>
+            </button>
+          )}
+
+          {/* Le sélecteur n'existe que lorsque toutes les pistes Vivienne ont
+              passé la vérification de publication. */}
+          {vivienneDisponible && (
+          <div className="rounded-2xl bg-white/6 p-3 border border-white/8">
+            <p className="text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/60 mb-2">
+              Timbre de la narration
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setGenreVoix('masculin')}
+                className={`rounded-xl p-2.5 text-left transition-all flex flex-col justify-between ${
+                  genreVoix === 'masculin'
+                    ? 'bg-or-400 text-encre-950 shadow-md ring-1 ring-or-300'
+                    : 'bg-white/8 text-parchemin-100/70 hover:bg-white/14'
+                }`}
+              >
+                <span className="text-xs font-bold flex items-center gap-1.5">
+                  🧔 Masculin
+                </span>
+                <span
+                  className={`text-[10px] mt-0.5 ${
+                    genreVoix === 'masculin' ? 'text-encre-900/80 font-medium' : 'text-parchemin-100/40'
+                  }`}
+                >
+                  Studio posé
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGenreVoix('feminin')}
+                className={`rounded-xl p-2.5 text-left transition-all flex flex-col justify-between ${
+                  genreVoix === 'feminin'
+                    ? 'bg-or-400 text-encre-950 shadow-md ring-1 ring-or-300'
+                    : 'bg-white/8 text-parchemin-100/70 hover:bg-white/14'
+                }`}
+              >
+                <span className="text-xs font-bold flex items-center gap-1.5">
+                  👩 Féminin
+                </span>
+                <span
+                  className={`text-[10px] mt-0.5 ${
+                    genreVoix === 'feminin' ? 'text-encre-900/80 font-medium' : 'text-parchemin-100/40'
+                  }`}
+                >
+                  Vivienne (Doux)
+                </span>
+              </button>
+            </div>
+          </div>
+          )}
+
+          <div className="flex items-center justify-between rounded-2xl bg-white/8 px-4 py-2.5">
+            <span className="text-sm text-parchemin-100">Taille du texte</span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setTaille(Math.max(0.9, Math.round((taille - 0.1) * 10) / 10))}
+                disabled={taille <= 0.9}
+                aria-label="Réduire le texte"
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-parchemin-100/70 transition-colors hover:bg-white/20 disabled:opacity-25"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+              <span className="w-11 text-center text-2xs font-bold text-parchemin-100/60">
+                {Math.round(taille * 100)}%
+              </span>
+              <button
+                onClick={() => setTaille(Math.min(1.3, Math.round((taille + 0.1) * 10) / 10))}
+                disabled={taille >= 1.3}
+                aria-label="Agrandir le texte"
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-parchemin-100/70 transition-colors hover:bg-white/20 disabled:opacity-25"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <button
+            onClick={onNote}
+            className="flex w-full items-center gap-2.5 rounded-2xl bg-white/8 px-4 py-3.5 text-left text-sm text-parchemin-100 transition-colors hover:bg-white/14"
+          >
+            <StickyNote className="h-4 w-4 text-[#f5dc72]" />
+            Carnet de bord
+          </button>
+        </div>
+
+        {/* ── Sommaire par moments ── */}
+        <p className="mb-2 mt-6 text-3xs font-bold uppercase tracking-[0.18em] text-parchemin-100/55">
+          Les moments de cette fiche
+        </p>
+        <div className="space-y-1">
+          {moments.map((m, rang) => (
+            <button
+              key={m.cle}
+              onClick={() => onAllerAuMoment(rang)}
+              className={`flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-left text-sm transition-colors ${
+                rang === rangMoment
+                  ? 'bg-or-400/15 text-parchemin-100'
+                  : rang < rangMoment
+                    ? 'text-parchemin-100/70 hover:bg-white/8'
+                    : 'text-parchemin-100/40 hover:bg-white/8'
+              }`}
+            >
+              <span className="truncate">{m.titre}</span>
+              <span className="shrink-0 text-2xs font-bold text-parchemin-100/55">
+                {rang < rangMoment ? <Check className="h-3.5 w-3.5 text-or-400" /> : `${m.minutes} min`}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={onQuitter}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 px-4 py-3.5 text-sm font-bold text-parchemin-100/60 transition-colors hover:bg-white/8 hover:text-parchemin-100"
+        >
+          <X className="h-4 w-4" />
+          Quitter l’immersion
+        </button>
+      </div>
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Rendu d'une scène
+// ─────────────────────────────────────────────────────────────
+
+const LIBELLES_ORIENTATION: Record<string, string> = {
+  observer: 'Observer le texte',
+  'decouvrir-dieu': 'Découvrir Dieu',
+  'se-laisser-eclairer': 'Me laisser éclairer',
+  recevoir: 'Recevoir',
+  repondre: 'Répondre',
+};
+
+function libelleOrientation(fonction: string | undefined, index: number): string {
+  if (!fonction) return `Orientation ${index + 1}`;
+  return fonction
+    .split('+')
+    .map((partie) => LIBELLES_ORIENTATION[partie] ?? partie)
+    .join(' · ');
+}
 
 function RenduScene({
   scene,
@@ -632,12 +1210,14 @@ function RenduScene({
   reponses,
   onEnregistrer,
   dejaPreparee,
+  tempsDuJour,
 }: {
   scene: Scene;
   fiche: FicheLivret;
   reponses: Record<string, string>;
   onEnregistrer: (cle: string, valeur: string) => void;
   dejaPreparee?: boolean;
+  tempsDuJour: boolean;
 }) {
   switch (scene.type) {
     case 'seuil':
@@ -646,15 +1226,27 @@ function RenduScene({
     case 'ouverture-section':
       return (
         <div className="relative py-12 text-center sm:py-20">
-          <MotFantome tone="nuit" haut="10%" gauche="50%" taille="clamp(8rem, 24vw, 18rem)" className="-translate-x-1/2">
+          <MotFantome
+            tone="nuit"
+            haut="10%"
+            gauche="50%"
+            taille="clamp(8rem, 24vw, 18rem)"
+            className="-translate-x-1/2"
+          >
             {String(scene.rang)}
           </MotFantome>
+          <TraitOrganique
+            variante={((scene.rang % 4) + 1) as 1 | 2 | 3 | 4}
+            tone="nuit"
+            className="inset-y-0 h-full opacity-70"
+          />
+
           <div className="relative z-10">
             <Pastille tone="nuit">
               <Etincelle taille={12} />
               Partie {scene.rang} sur {scene.total}
             </Pastille>
-            <h2 className="mt-6 font-serif text-4xl font-bold leading-tight titre-or sm:text-5xl">
+            <h2 className="mt-6 font-serif text-4xl font-bold leading-tight text-parchemin-100 sm:text-5xl">
               {scene.titre}
             </h2>
             <span className="mx-auto mt-8 block h-px w-24 bg-gradient-to-r from-transparent via-or-400 to-transparent" />
@@ -670,32 +1262,42 @@ function RenduScene({
 
     case 'meditation':
       return (
-        <div className="py-6 space-y-6">
-          <div className="border-b border-or-500/20 pb-3">
-            <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300">
-              Méditation Théocentrique
-            </span>
-            <h2 className="mt-2 font-serif text-2xl sm:text-3xl font-bold titre-or">
-              Regarder à Dieu & Sa Vérité
-            </h2>
-          </div>
-
-          <div className="space-y-5">
-            {scene.questions.map((q, idx) => (
-              <div key={q.id || idx} className="rounded-2xl p-5 border border-or-500/20 bg-encre-950/60 space-y-3 shadow-md">
-                <span className="text-[10px] font-bold uppercase tracking-[0.14em] px-2.5 py-0.5 rounded bg-or-500/15 border border-or-400/30 text-or-300 inline-block">
-                  Question {idx + 1}
-                </span>
-                <label className="block font-serif text-base font-bold text-parchemin-100 leading-snug">
-                  <TexteAvecReferences tone="nuit">{q.question}</TexteAvecReferences>
+        <div className="py-6 sm:py-9">
+          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+            Méditer la Parole
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
+            Laisser « {scene.sectionTitre} » descendre dans le cœur
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-parchemin-100/65">
+            Avance sans chercher la bonne réponse. Ces orientations sont là pour t&apos;aider à regarder le texte, découvrir Dieu, recevoir, puis lui répondre.
+          </p>
+          <div className="mt-7 space-y-5">
+            {scene.questions.map((question, indexQuestion) => (
+              <div
+                key={question.id}
+                className="rounded-3xl border border-or-400/18 bg-encre-950/38 p-5 sm:p-6"
+              >
+                <p className="text-3xs font-black uppercase tracking-[0.18em] text-or-300/70">
+                  {libelleOrientation(question.fonction, indexQuestion)}
+                </p>
+                <label
+                  htmlFor={`meditation-${question.id}`}
+                  className="mt-3 block font-serif text-lg font-bold leading-relaxed text-parchemin-100 sm:text-xl"
+                >
+                  <TexteAvecReferences tone="nuit">{question.question}</TexteAvecReferences>
                 </label>
                 <textarea
-                  value={reponses[`q:${q.id}`] ?? ''}
-                  onChange={(e) => onEnregistrer(`q:${q.id}`, e.target.value)}
+                  id={`meditation-${question.id}`}
+                  value={reponses[`q:${question.id}`] ?? ''}
+                  onChange={(event) => onEnregistrer(`q:${question.id}`, event.target.value)}
                   rows={3}
-                  placeholder="Ce que l'Esprit dépose dans ton cœur..."
-                  className="w-full rounded-xl border border-or-500/25 bg-encre-950/80 p-3 text-sm text-parchemin-100 outline-none focus:border-or-400 placeholder:text-parchemin-100/30"
+                  placeholder="Ce que je comprends, ce que je reçois…"
+                  className="mt-4 w-full resize-y rounded-2xl border border-or-400/22 bg-encre-950/60 p-4 text-base leading-relaxed text-parchemin-100 outline-none transition-colors placeholder:text-parchemin-100/30 focus:border-or-300"
                 />
+                <p className="mt-2 inline-flex items-center gap-1 text-3xs font-bold text-emerald-300/75">
+                  <Check className="h-3 w-3" /> Sauvegarde automatique
+                </p>
               </div>
             ))}
           </div>
@@ -704,231 +1306,398 @@ function RenduScene({
 
     case 'priere':
       return (
-        <div className="py-6 text-center space-y-6">
-          <div className="inline-flex p-3.5 rounded-full bg-or-500/20 border border-or-400/40 text-or-300 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
-            <Flame className="w-8 h-8 animate-pulse text-or-400" />
-          </div>
-          <h2 className="font-serif text-3xl font-bold titre-or">
-            Le Sanctuaire de Prière
+        <div className="py-8 text-center sm:py-12">
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-or-300/30 bg-or-400/12 text-or-300 shadow-[0_0_28px_rgba(220,168,73,0.12)]">
+            <Flame className="h-7 w-7" strokeWidth={1.5} />
+          </span>
+          <span className="mt-6 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+            Prier la Parole
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
+            Répondre à Dieu avec tes propres mots
           </h2>
-          <p className="text-xs text-parchemin-200/75 max-w-md mx-auto leading-relaxed">
-            Dépose tes découvertes devant ton Père céleste. Parle-lui avec amour et vérité.
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
+            Adore-le pour ce que tu viens de découvrir. Remercie-le, dépose ce qui a été éclairé, puis reste un instant à son écoute.
           </p>
-
-          <div className="space-y-3 text-left max-w-xl mx-auto">
-            {scene.questions.map((q) => {
-              const val = reponses[`q:${q.id}`]?.trim();
-              if (!val) return null;
-              return (
-                <blockquote key={q.id} className="rounded-2xl border border-or-400/30 bg-or-500/10 p-4 shadow-sm">
-                  <p className="font-serif italic text-base text-parchemin-100">« {val} »</p>
-                </blockquote>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-2 pt-2">
-            {['Adorer', 'Remercier', 'Confesser', 'Demander', 'Écouter', 'Remettre'].map((v) => (
-              <span key={v} className="px-3 py-1 rounded-full border border-or-500/30 text-or-200 text-xs font-bold uppercase tracking-wider bg-encre-950/80">
-                {v}
+          <div className="mx-auto mt-6 flex max-w-xl flex-wrap justify-center gap-2">
+            {['Adorer', 'Remercier', 'Confesser', 'Demander', 'Écouter'].map((verbe) => (
+              <span key={verbe} className="rounded-full border border-or-400/22 bg-white/5 px-3 py-1.5 text-3xs font-bold uppercase tracking-[0.12em] text-or-200/80">
+                {verbe}
               </span>
             ))}
+          </div>
+          <div className="mx-auto mt-7 max-w-xl text-left">
+            <ChampEcriture
+              valeur={reponses[`priere:${scene.id}`] ?? ''}
+              onEnregistrer={(valeur) => onEnregistrer(`priere:${scene.id}`, valeur)}
+              placeholder="Ma prière aujourd’hui…"
+              lignes={5}
+            />
           </div>
         </div>
       );
 
     case 'ancrage-verset':
-      return <SceneAncrageVerset reference={scene.reference} texte={scene.texte} />;
-
-    case 'pas':
       return (
-        <div className="py-6 space-y-4">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-or-400">
-            <NotebookPen className="w-4 h-4" /> Poser mon pas de vie
-          </div>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold titre-or leading-snug">
-            Si cette vérité sur Dieu est réelle, comment vas-tu vivre avec Lui aujourd'hui ?
+        <SceneAncrageVerset
+          reference={scene.reference}
+          texte={scene.texte}
+          valeur={reponses[`memo:${scene.reference}`] ?? ''}
+          onEnregistrer={(valeur) => onEnregistrer(`memo:${scene.reference}`, valeur)}
+        />
+      );
+
+    case 'resume':
+      return (
+        <div className="py-6">
+          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+            L&apos;essentiel à retenir
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100">
+            {scene.section.titre}
           </h2>
+          <div className="mt-7 space-y-4">
+            {scene.section.points.map((point, index) => (
+              <p
+                key={index}
+                className="border-l-2 border-or-400/40 pl-4 text-base leading-relaxed text-parchemin-100/85 sm:text-lg"
+              >
+                <TexteAvecReferences tone="nuit">{point}</TexteAvecReferences>
+              </p>
+            ))}
+          </div>
+        </div>
+      );
+
+    case 'verset':
+      return (
+        <SceneVerset
+          reference={scene.reference}
+          texte={scene.texte}
+          valeur={reponses[`v:${scene.reference}`] ?? ''}
+          onEnregistrer={(valeur) => onEnregistrer(`v:${scene.reference}`, valeur)}
+        />
+      );
+
+    case 'lecture':
+      return (
+        <div className="py-10 text-center sm:py-16">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-or-400/12 text-or-300">
+            <BookOpen className="h-6 w-6" strokeWidth={1.5} />
+          </span>
+          <span className="mt-6 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/60">
+            À lire dans votre Bible
+          </span>
+          <p className="mx-auto mt-4 max-w-xl font-serif text-2xl leading-relaxed text-parchemin-100 sm:text-3xl">
+            {scene.texte}
+          </p>
+          <p className="mx-auto mt-6 max-w-sm text-2xs leading-relaxed text-parchemin-100/40">
+            Prenez le livre, pas l&apos;écran. Le livret suppose une Bible ouverte à côté de vous.
+          </p>
+        </div>
+      );
+
+    case 'question':
+      return (
+        <SceneQuestion
+          scene={scene}
+          valeur={reponses[`q:${scene.id}`] ?? ''}
+          onEnregistrer={(valeur) => onEnregistrer(`q:${scene.id}`, valeur)}
+        />
+      );
+
+    case 'pas': {
+      const clePas = scene.id ? `pas:${scene.id}` : `pas:${fiche.id}`;
+      return (
+        <div className="py-8">
+          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+            Avant de refermer
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
+            {tempsDuJour ? 'Un seul pas, pour aujourd’hui.' : 'Un seul pas, pour cette semaine.'}
+          </h2>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
+            Pas dix résolutions : une chose précise, que vous pourrez dire au groupe, et qu&apos;on
+            pourra vous demander la semaine prochaine.
+          </p>
           <ChampEcriture
-            valeur={reponses[`pas:${fiche.id}`] ?? ''}
-            onEnregistrer={(valeur) => onEnregistrer(`pas:${fiche.id}`, valeur)}
-            placeholder="Ex : M'approcher de Lui avec confiance, déposer telle inquiétude, poser tel geste d'obéissance..."
+            valeur={reponses[clePas] ?? ''}
+            onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
+            placeholder={tempsDuJour ? 'Aujourd’hui, je…' : 'Cette semaine, je…'}
             lignes={4}
           />
         </div>
       );
+    }
 
     case 'cloture':
-      return <SceneCloture fiche={fiche} onQuitter={() => {}} />;
-
-    default:
-      return null;
+      return (
+        <div className="py-12 text-center sm:py-20">
+          <span className="mx-auto grid h-16 w-16 animate-halo place-items-center rounded-full bg-or-400/15 text-or-300">
+            <Sparkles className="h-7 w-7" strokeWidth={1.5} />
+          </span>
+          <h2 className="mt-7 font-serif text-4xl font-bold leading-tight text-parchemin-100 sm:text-5xl">
+            {tempsDuJour ? 'Tu as vécu' : 'Vous avez traversé'}
+            <br />
+            <span className="titre-or">{tempsDuJour ? 'ce temps avec Dieu.' : `la fiche ${fiche.id}.`}</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-parchemin-100/65">
+            {dejaPreparee
+              ? 'Vos réponses sont enregistrées. Vous pourrez les relire avant la rencontre.'
+              : 'En validant, votre groupe verra que vous êtes prêt pour la rencontre. Vos réponses, elles, restent les vôtres.'}
+          </p>
+        </div>
+      );
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-// Scène Ancrage du Verset avec les 4 niveaux & Fond d'écran
-// ─────────────────────────────────────────────────────────────
 
-function SceneAncrageVerset({ reference, texte }: { reference: string; texte: string }) {
-  const [niveau, setNiveau] = useState<1 | 2 | 3 | 4>(1);
-  const [copie, setCopie] = useState(false);
-  const [micActif, setMicActif] = useState(false);
-  const [texteMic, setTexteMic] = useState('');
+type NiveauMemoire = 1 | 2 | 3 | 4;
 
-  const words = texte.split(' ');
-  const motsATrous = useMemo(() => {
-    return words.map((w, idx) => ({ word: w, isGap: idx % 3 === 1 && w.length > 2 }));
-  }, [texte]);
+interface ResultatReconnaissance {
+  readonly transcript: string;
+}
 
-  const initiales = useMemo(() => {
-    return words.map((w) => (w.length <= 1 ? w : w[0] + '...')).join(' ');
-  }, [words]);
+interface EvenementReconnaissance {
+  readonly results: {
+    readonly [index: number]: {
+      readonly [index: number]: ResultatReconnaissance;
+    };
+  };
+}
 
-  const toggleMic = () => {
-    if (micActif) { setMicActif(false); return; }
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Reconnaissance vocale non disponible sur ce navigateur.");
+interface ReconnaissanceVocale {
+  lang: string;
+  onstart: (() => void) | null;
+  onresult: ((event: EvenementReconnaissance) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+}
+
+type ConstructeurReconnaissance = new () => ReconnaissanceVocale;
+
+function constructeurReconnaissance(): ConstructeurReconnaissance | null {
+  const navigateur = window as typeof window & {
+    SpeechRecognition?: ConstructeurReconnaissance;
+    webkitSpeechRecognition?: ConstructeurReconnaissance;
+  };
+  return navigateur.SpeechRecognition ?? navigateur.webkitSpeechRecognition ?? null;
+}
+
+function SceneAncrageVerset({
+  reference,
+  texte,
+  valeur,
+  onEnregistrer,
+}: {
+  reference: string;
+  texte: string;
+  valeur: string;
+  onEnregistrer: (valeur: string) => void;
+}) {
+  const [niveau, setNiveau] = useState<NiveauMemoire>(1);
+  const [copiee, setCopiee] = useState(false);
+  const [microActif, setMicroActif] = useState(false);
+  const reconnaissance = useRef<ReconnaissanceVocale | null>(null);
+  const mots = useMemo(() => texte.trim().split(/\s+/), [texte]);
+  const motsATrous = useMemo(
+    () => mots.map((mot, indexMot) => ({ mot, masque: indexMot % 3 === 1 && mot.length > 2 })),
+    [mots]
+  );
+  const initiales = useMemo(
+    () => mots.map((mot) => (mot.length <= 1 ? mot : `${mot[0]}…`)).join(' '),
+    [mots]
+  );
+
+  useEffect(
+    () => () => reconnaissance.current?.stop(),
+    []
+  );
+
+  const basculerMicro = () => {
+    if (microActif) {
+      reconnaissance.current?.stop();
       return;
     }
-    const rec = new SpeechRecognition();
-    rec.lang = 'fr-FR';
-    rec.onstart = () => setMicActif(true);
-    rec.onresult = (e: any) => { setTexteMic(e.results[0][0].transcript); setMicActif(false); };
-    rec.onerror = () => setMicActif(false);
-    rec.onend = () => setMicActif(false);
-    rec.start();
-  };
-
-  const telechargerFondEcran = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1080; canvas.height = 1920;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const grad = ctx.createLinearGradient(0, 0, 0, 1920);
-    grad.addColorStop(0, '#0c0a08'); grad.addColorStop(0.5, '#1e160e'); grad.addColorStop(1, '#090806');
-    ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1920);
-
-    const rad = ctx.createRadialGradient(540, 960, 50, 540, 960, 650);
-    rad.addColorStop(0, 'rgba(217, 119, 6, 0.22)'); rad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = rad; ctx.fillRect(0, 0, 1080, 1920);
-
-    ctx.fillStyle = 'rgba(245, 158, 11, 0.85)'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('LES FONDEMENTS • UN TEMPS À PART', 540, 500);
-
-    ctx.fillStyle = '#f59e0b'; ctx.font = '64px sans-serif'; ctx.fillText('✝', 540, 620);
-    ctx.fillStyle = '#fdf8eb'; ctx.font = 'italic 52px Georgia, serif';
-
-    const wds = `« ${texte} »`.split(' ');
-    let line = '', y = 800;
-    for (let n = 0; n < wds.length; n++) {
-      const test = line + wds[n] + ' ';
-      if (ctx.measureText(test).width > 880 && n > 0) {
-        ctx.fillText(line, 540, y); line = wds[n] + ' '; y += 80;
-      } else { line = test; }
+    const Constructeur = constructeurReconnaissance();
+    if (!Constructeur) {
+      onEnregistrer('Le microphone de récitation n’est pas disponible sur ce navigateur.');
+      return;
     }
-    ctx.fillText(line, 540, y);
-
-    ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 38px sans-serif';
-    ctx.fillText(reference, 540, y + 120);
-
-    const link = document.createElement('a');
-    link.download = `verset-${reference.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const instance = new Constructeur();
+    reconnaissance.current = instance;
+    instance.lang = 'fr-FR';
+    instance.onstart = () => setMicroActif(true);
+    instance.onresult = (event) => onEnregistrer(event.results[0]?.[0]?.transcript ?? '');
+    instance.onerror = () => setMicroActif(false);
+    instance.onend = () => setMicroActif(false);
+    instance.start();
   };
+
+  const copierVerset = () => {
+    void navigator.clipboard?.writeText(`« ${texte} » — ${reference}`);
+    setCopiee(true);
+    window.setTimeout(() => setCopiee(false), 1800);
+  };
+
+  const telechargerFond = () => {
+    const toile = document.createElement('canvas');
+    toile.width = 1080;
+    toile.height = 1920;
+    const contexte = toile.getContext('2d');
+    if (!contexte) return;
+
+    const fond = contexte.createLinearGradient(0, 0, 0, toile.height);
+    fond.addColorStop(0, '#0c1110');
+    fond.addColorStop(0.55, '#1c2b25');
+    fond.addColorStop(1, '#080b0a');
+    contexte.fillStyle = fond;
+    contexte.fillRect(0, 0, toile.width, toile.height);
+
+    contexte.textAlign = 'center';
+    contexte.fillStyle = '#d8aa55';
+    contexte.font = '700 28px sans-serif';
+    contexte.fillText('LES FONDEMENTS', 540, 460);
+    contexte.fillStyle = '#f7f0df';
+    contexte.font = 'italic 50px Georgia, serif';
+
+    const fragments = `« ${texte} »`.split(' ');
+    let ligne = '';
+    let hauteur = 700;
+    fragments.forEach((fragment) => {
+      const essai = `${ligne}${fragment} `;
+      if (contexte.measureText(essai).width > 850 && ligne) {
+        contexte.fillText(ligne.trim(), 540, hauteur);
+        ligne = `${fragment} `;
+        hauteur += 76;
+      } else {
+        ligne = essai;
+      }
+    });
+    contexte.fillText(ligne.trim(), 540, hauteur);
+    contexte.fillStyle = '#d8aa55';
+    contexte.font = '700 36px sans-serif';
+    contexte.fillText(reference, 540, hauteur + 120);
+
+    const lien = document.createElement('a');
+    lien.download = `verset-${reference.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
+    lien.href = toile.toDataURL('image/png');
+    lien.click();
+  };
+
+  const niveaux: Array<{ niveau: NiveauMemoire; titre: string }> = [
+    { niveau: 1, titre: 'Lire' },
+    { niveau: 2, titre: 'Retrouver' },
+    { niveau: 3, titre: 'Initiales' },
+    { niveau: 4, titre: 'Réciter' },
+  ];
 
   return (
-    <div className="py-6 space-y-5 text-center">
-      <div className="flex items-center justify-between border-b border-or-500/20 pb-3">
-        <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300">
-          Ancrer la Parole
-        </span>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => { navigator.clipboard.writeText(`« ${texte} » (${reference})`); setCopie(true); setTimeout(() => setCopie(false), 2000); }}
-            className="p-1 text-or-200/70 hover:text-or-300"
-          >
-            {copie ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+    <div className="py-6 sm:py-9">
+      <div className="flex items-center justify-between gap-4 border-b border-or-400/18 pb-4">
+        <div>
+          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+            Mémoriser la Parole
+          </span>
+          <p className="mt-1 font-serif text-xl font-bold text-or-200">{reference}</p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={copierVerset} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Copier le verset">
+            {copiee ? <Check className="h-4 w-4 text-emerald-300" /> : <Copy className="h-4 w-4" />}
           </button>
-          <button onClick={() => lireAVoixHaute(texte)} className="p-1 text-or-200/70 hover:text-or-300">
-            <Volume2 className="w-4 h-4" />
+          <button type="button" onClick={() => lireAVoixHaute(`${reference}. ${texte}`)} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Écouter le verset">
+            <Volume2 className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <p className="text-xs font-bold uppercase tracking-wider text-or-400">{reference}</p>
-
-      {/* Rendu du niveau */}
-      <div className="min-h-[140px] flex items-center justify-center py-4">
-        {niveau === 1 && <p className="font-serif text-xl sm:text-2xl text-parchemin-100 italic leading-relaxed">« {texte} »</p>}
-        {niveau === 2 && (
-          <p className="font-serif text-lg sm:text-xl leading-loose text-parchemin-100">
-            {motsATrous.map((m, idx) => (
-              <span key={idx} className="mx-1">
-                {m.isGap ? <span className="bg-or-500/25 text-or-300 px-2 py-0.5 rounded font-bold border-b-2 border-or-400">[ ... ]</span> : m.word}
-              </span>
-            ))}
-          </p>
-        )}
-        {niveau === 3 && <p className="font-serif text-lg sm:text-xl text-or-300 tracking-wider font-medium">{initiales}</p>}
-        {niveau === 4 && (
-          <div className="space-y-3 w-full">
-            <button
-              onClick={toggleMic}
-              className={`p-4 rounded-full mx-auto flex items-center justify-center shadow-lg transition ${micActif ? 'bg-rose-600 text-white animate-pulse' : 'bg-or-400 text-encre-950'}`}
-            >
-              {micActif ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-            </button>
-            {texteMic && <p className="text-sm italic text-or-200">« {texteMic} »</p>}
-          </div>
-        )}
-      </div>
-
-      {/* Boutons Niveaux */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-        {[
-          { lvl: 1, title: 'Niveau 1', sub: 'Lecture' },
-          { lvl: 2, title: 'Niveau 2', sub: 'Mots à trous' },
-          { lvl: 3, title: 'Niveau 3', sub: 'Initiales' },
-          { lvl: 4, title: 'Niveau 4', sub: 'Microphone' },
-        ].map((item) => (
+      <div className="mt-7 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {niveaux.map((element) => (
           <button
-            key={item.lvl}
-            onClick={() => setNiveau(item.lvl as any)}
-            className={`p-2 rounded-xl border text-xs font-bold transition ${niveau === item.lvl ? 'bg-or-400 text-encre-950 border-or-400' : 'bg-encre-950/60 border-or-500/20 text-parchemin-100/70'}`}
+            key={element.niveau}
+            type="button"
+            onClick={() => setNiveau(element.niveau)}
+            className={`min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors ${
+              niveau === element.niveau
+                ? 'border-or-300 bg-or-400 text-encre-950'
+                : 'border-white/10 bg-white/5 text-parchemin-100/65 hover:bg-white/10'
+            }`}
           >
-            {item.title}
+            {element.niveau} · {element.titre}
           </button>
         ))}
       </div>
 
-      {/* Bouton Fond d'écran */}
-      <div className="pt-3">
-        <button
-          onClick={telechargerFondEcran}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-or-500/30 bg-or-500/10 text-or-300 text-xs font-bold hover:bg-or-500/20 transition"
-        >
-          <Download className="w-3.5 h-3.5" /> Télécharger comme fond d'écran
-        </button>
+      <div className="mt-7 flex min-h-52 items-center justify-center rounded-3xl border border-or-400/16 bg-encre-950/35 p-6 text-center sm:p-8">
+        {niveau === 1 && (
+          <p className="font-serif text-xl italic leading-relaxed text-parchemin-100 sm:text-2xl">« {texte} »</p>
+        )}
+        {niveau === 2 && (
+          <p className="font-serif text-lg leading-loose text-parchemin-100 sm:text-xl">
+            {motsATrous.map((element, indexMot) => (
+              <span key={`${element.mot}-${indexMot}`} className="mx-1">
+                {element.masque ? (
+                  <span className="rounded border-b border-or-300 bg-or-400/12 px-2 py-0.5 text-or-200">…</span>
+                ) : element.mot}
+              </span>
+            ))}
+          </p>
+        )}
+        {niveau === 3 && (
+          <p className="font-serif text-lg leading-loose tracking-wider text-or-200 sm:text-xl">{initiales}</p>
+        )}
+        {niveau === 4 && (
+          <div className="w-full max-w-xl">
+            <p className="text-sm leading-relaxed text-parchemin-100/60">
+              Le texte disparaît. Récite-le sans prompteur, puis écoute ce que tu as réellement retenu.
+            </p>
+            <button
+              type="button"
+              onClick={basculerMicro}
+              className={`mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full transition-colors ${
+                microActif ? 'animate-pulse bg-rose-600 text-white' : 'bg-or-400 text-encre-950'
+              }`}
+              aria-label={microActif ? 'Arrêter la récitation' : 'Commencer la récitation'}
+            >
+              {microActif ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+            </button>
+            {valeur && <p className="mt-5 rounded-2xl bg-white/6 p-4 font-serif italic text-parchemin-100/75">« {valeur} »</p>}
+          </div>
+        )}
       </div>
+
+      <button type="button" onClick={telechargerFond} className="mx-auto mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-or-400/22 bg-or-400/8 px-5 text-xs font-bold text-or-200 hover:bg-or-400/14">
+        <Download className="h-4 w-4" /> Garder ce verset en fond d&apos;écran
+      </button>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-
 function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
   return (
     <div className="relative py-8 text-center sm:py-12">
-      <MotFantome tone="nuit" haut="-4%" gauche="50%" taille="clamp(11rem, 34vw, 26rem)" className="-translate-x-1/2">
+      <MotFantome
+        tone="nuit"
+        haut="-4%"
+        gauche="50%"
+        taille="clamp(11rem, 34vw, 26rem)"
+        className="-translate-x-1/2"
+      >
         {String(fiche.id).padStart(2, '0')}
       </MotFantome>
-      <Illumination fiche={fiche.id} taille={172} anime className="relative z-10 mx-auto" />
+
+      <Illumination
+        fiche={fiche.id}
+        taille={172}
+        anime
+        className="relative z-10 mx-auto"
+      />
+
       <span className="relative z-10 mt-6 block text-2xs font-bold uppercase tracking-[0.28em] text-or-300/60">
-        Fiche {fiche.id} · Sanctuaire de contemplation
+        Fiche {fiche.id} · page {fiche.page} du livret
       </span>
       <h1 className="relative z-10 mt-4 font-serif text-4xl font-bold leading-[1.08] text-parchemin-100 sm:text-6xl">
         <span className="titre-or">{fiche.titre}</span>
@@ -936,22 +1705,103 @@ function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
       <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-parchemin-100/65 sm:text-base">
         {fiche.sousTitre}
       </p>
+
+      <div className="mx-auto mt-10 max-w-md space-y-2.5 text-left">
+        {[
+          'Mettez votre téléphone en silencieux. Ce moment ne dure qu’une fois.',
+          'Gardez une Bible à portée de main : plusieurs passages sont à lire dedans.',
+          'Vous pouvez vous arrêter et revenir : tout est enregistré au fur et à mesure.',
+        ].map((ligne) => (
+          <p
+            key={ligne}
+            className="flex gap-3 rounded-2xl bg-white/[0.05] px-4 py-3 text-2xs leading-relaxed text-parchemin-100/70"
+          >
+            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-or-400" />
+            {ligne}
+          </p>
+        ))}
+      </div>
     </div>
   );
 }
 
-function SceneBloc({ scene }: { scene: { bloc: Bloc; sousTitre: string | null; section: string | null } }) {
+function SceneBloc({
+  scene,
+}: {
+  scene: { bloc: Bloc; sousTitre: string | null; section: string | null };
+}) {
   const { bloc, sousTitre, section } = scene;
-  if (bloc.type === 'citation') {
+
+  if (bloc.type === 'encadre') {
     return (
-      <blockquote className="my-8 rounded-3xl border border-or-300/30 bg-or-400/8 px-6 py-6 font-serif text-lg italic text-or-100/95 sm:text-xl">
-        <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
-      </blockquote>
+      <div className="py-12 text-center sm:py-20">
+        {section && (
+          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/45">
+            {section}
+          </span>
+        )}
+        <div className="encadre-nuit mx-auto mt-6 max-w-2xl px-6 py-8 sm:px-10 sm:py-10">
+          <p className="font-serif text-xl leading-relaxed sm:text-2xl">
+            <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
+          </p>
+        </div>
+      </div>
     );
   }
+
+  if (bloc.type === 'citation') {
+    return (
+      <div className="py-10 sm:py-16">
+        <Quote className="mx-auto h-7 w-7 text-or-400/50" strokeWidth={1.5} />
+        <blockquote className="mx-auto mt-6 max-w-2xl text-center font-serif text-2xl italic leading-relaxed text-parchemin-100 sm:text-3xl">
+          <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
+        </blockquote>
+      </div>
+    );
+  }
+
+  if (bloc.type === 'liste') {
+    const items = bloc.texte
+      .split(/(?=^|\s)-\s+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    return (
+      <div className="py-8">
+        {sousTitre && (
+          <h3 className="mb-5 font-serif text-2xl font-bold text-or-300">{sousTitre}</h3>
+        )}
+        <ul className="space-y-3.5">
+          {items.map((item, index) => (
+            <li key={index} className="flex gap-3.5 text-base leading-relaxed text-parchemin-100/85">
+              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-or-400" />
+              <TexteAvecReferences tone="nuit">{item}</TexteAvecReferences>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  if (bloc.type === 'aparte') {
+    return (
+      <div className="py-10 sm:py-14">
+        <p className="mx-auto max-w-xl rounded-2xl border border-or-300/25 bg-or-400/8 px-5 py-4 text-center text-sm leading-relaxed text-or-100/85">
+          {bloc.texte.replace(/^>\s*/, '')}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="py-8 sm:py-12">
-      {sousTitre && <h3 className="mb-5 font-serif text-2xl font-bold text-or-300 sm:text-3xl">{sousTitre}</h3>}
+      {sousTitre && (
+        <h3 className="mb-5 font-serif text-2xl font-bold text-or-300 sm:text-3xl">{sousTitre}</h3>
+      )}
+      {!sousTitre && section && (
+        <span className="mb-4 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/40">
+          {section}
+        </span>
+      )}
       <p className="text-lg leading-[1.85] text-parchemin-100/88 sm:text-xl sm:leading-[1.9]">
         <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
       </p>
@@ -961,7 +1811,7 @@ function SceneBloc({ scene }: { scene: { bloc: Bloc; sousTitre: string | null; s
 
 function SceneSilence() {
   const [secondes, setSecondes] = useState(45);
-  const [encours, setEncours] = useState(true);
+  const [encours, setEncours] = useState(false);
 
   useEffect(() => {
     if (!encours || secondes === 0) return;
@@ -974,20 +1824,141 @@ function SceneSilence() {
       <span className="text-2xs font-bold uppercase tracking-[0.28em] text-or-300/55">
         L&apos;exposé est lu
       </span>
-      <h2 className="mt-5 font-serif text-3xl font-bold leading-tight titre-or sm:text-4xl">
+      <h2 className="mt-5 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
         Restez là un instant.
       </h2>
       <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-parchemin-100/60">
-        Avant de répondre à quoi que ce soit. Laissez la Parole s'enraciner dans le silence.
+        Avant de répondre à quoi que ce soit. Ce que vous venez de lire a besoin d&apos;un peu de
+        place.
       </p>
 
       <button
         onClick={() => setEncours((v) => !v)}
-        className="group relative mx-auto mt-10 grid h-36 w-36 place-items-center"
+        className="group relative mx-auto mt-12 grid h-40 w-40 place-items-center"
+        aria-label={encours ? 'Interrompre le temps de silence' : 'Démarrer 45 secondes de silence'}
       >
-        <span className={`absolute inset-0 rounded-full border border-or-400/30 ${encours ? 'animate-souffle' : ''}`} />
-        <span className="font-serif text-4xl font-bold text-or-300">{secondes}s</span>
+        <span
+          className={`absolute inset-0 rounded-full border border-or-400/30 ${
+            encours ? 'animate-souffle' : ''
+          }`}
+        />
+        <span
+          className={`absolute inset-5 rounded-full bg-or-400/10 ${encours ? 'animate-souffle' : ''}`}
+          style={{ animationDelay: '0.6s' }}
+        />
+        <span className="relative font-mono text-3xl font-bold text-or-200">
+          {secondes > 0 ? `0:${secondes.toString().padStart(2, '0')}` : '—'}
+        </span>
       </button>
+
+      <p className="mt-8 text-2xs text-parchemin-100/55">
+        {secondes === 0
+          ? 'Vous pouvez continuer.'
+          : encours
+            ? 'Inspirez lentement. Le compte descend tout seul.'
+            : 'Touchez le cercle pour commencer.'}
+      </p>
+    </div>
+  );
+}
+
+function SceneVerset({
+  reference,
+  texte,
+  valeur,
+  onEnregistrer,
+}: {
+  reference: string;
+  texte: string | null;
+  valeur: string;
+  onEnregistrer: (valeur: string) => void;
+}) {
+  const [carte, setCarte] = useState(false);
+  // Le texte à partager : celui que l'application connaît, sinon celui que la
+  // personne a recopié de sa main.
+  const aPartager = texte ?? (valeur.trim().length > 15 ? valeur.trim() : null);
+
+  return (
+    <div className="py-8">
+      <div className="text-center">
+        <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/60">
+          Verset à écrire et méditer
+        </span>
+        <p className="mt-3 font-serif text-4xl font-bold text-or-300 sm:text-5xl">{reference}</p>
+      </div>
+
+      {texte ? (
+        <blockquote className="mx-auto mt-8 max-w-2xl rounded-3xl border border-or-300/20 bg-or-400/8 px-6 py-6 text-center font-serif text-lg italic leading-relaxed text-parchemin-100 sm:text-xl">
+          {texte}
+        </blockquote>
+      ) : (
+        <p className="mx-auto mt-8 max-w-md text-center text-2xs leading-relaxed text-parchemin-100/45">
+          Ouvrez votre Bible à ce passage et recopiez-le ci-dessous. C&apos;est ainsi que le livret
+          le demande : écrire un verset, c&apos;est déjà le méditer.
+        </p>
+      )}
+
+      <div className="mx-auto mt-7 max-w-2xl">
+        <label className="mb-2.5 flex items-center gap-1.5 text-2xs font-bold uppercase tracking-[0.16em] text-parchemin-100/45">
+          <PenLine className="h-3 w-3" />
+          De votre main
+        </label>
+        <textarea
+          value={valeur}
+          onChange={(event) => onEnregistrer(event.target.value)}
+          rows={4}
+          placeholder={texte ? 'Recopiez-le, mot après mot…' : 'Recopiez le verset…'}
+          className="ligne-manuscrite verre w-full rounded-2xl px-5 py-4 text-base text-parchemin-100 outline-none placeholder:font-sans placeholder:text-parchemin-100/50 focus:border-or-400/50"
+        />
+
+        {aPartager && (
+          <button
+            onClick={() => setCarte(true)}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/8 px-4 py-2 text-2xs font-bold text-parchemin-100/70 transition-colors hover:bg-white/16 hover:text-parchemin-100"
+          >
+            <ImageIcon className="h-3.5 w-3.5" />
+            En faire une carte à partager
+          </button>
+        )}
+      </div>
+
+      {carte && aPartager && (
+        <ShareableVerseCard
+          reference={reference}
+          text={aPartager}
+          translation="Les Fondements"
+          onClose={() => setCarte(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function SceneQuestion({
+  scene,
+  valeur,
+  onEnregistrer,
+}: {
+  scene: { texte: string; section?: string };
+  valeur: string;
+  onEnregistrer: (valeur: string) => void;
+}) {
+  return (
+    <div className="py-8">
+      {scene.section && (
+        <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/45">
+          {scene.section}
+        </span>
+      )}
+      <h2 className="mt-3 font-serif text-2xl font-bold leading-snug text-parchemin-100 sm:text-3xl sm:leading-snug">
+        {scene.texte}
+      </h2>
+      <ChampEcriture
+        valeur={valeur}
+        onEnregistrer={onEnregistrer}
+        placeholder="Écrivez ce qui vient, même si c’est incomplet. Personne d’autre ne le lira."
+        lignes={6}
+      />
     </div>
   );
 }
@@ -1003,15 +1974,37 @@ function ChampEcriture({
   placeholder: string;
   lignes: number;
 }) {
+  const [sauvegarde, setSauvegarde] = useState(false);
+  const minuteur = useRef<number | null>(null);
+
+  const changer = (nouvelle: string) => {
+    onEnregistrer(nouvelle);
+    if (minuteur.current) window.clearTimeout(minuteur.current);
+    minuteur.current = window.setTimeout(() => {
+      setSauvegarde(true);
+      window.setTimeout(() => setSauvegarde(false), 1600);
+    }, 700);
+  };
+
   return (
-    <div className="mt-4">
+    <div className="mt-6">
       <textarea
         value={valeur}
-        onChange={(event) => onEnregistrer(event.target.value)}
+        onChange={(event) => changer(event.target.value)}
         rows={lignes}
         placeholder={placeholder}
-        className="w-full rounded-2xl border border-or-500/30 bg-encre-950/80 p-4 text-base text-parchemin-100 outline-none focus:border-or-400"
+        className="verre w-full resize-none rounded-3xl px-5 py-4 text-base leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
       />
+      <div className="mt-2 flex items-center justify-between">
+        <span className="text-2xs text-parchemin-100/55">
+          {valeur.trim() ? `${valeur.trim().split(/\s+/).length} mots` : ''}
+        </span>
+        {sauvegarde && (
+          <span className="inline-flex items-center gap-1 text-2xs font-bold text-emerald-300/80">
+            <Check className="h-3 w-3" /> Enregistré
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -1019,42 +2012,47 @@ function ChampEcriture({
 function SceneCloture({
   fiche,
   onQuitter,
-  onTerminer,
+  tempsDuJour = false,
 }: {
   fiche: FicheLivret;
   onQuitter: () => void;
-  onTerminer?: () => void;
+  tempsDuJour?: boolean;
 }) {
   return (
-    <div className="animate-reveal py-16 text-center sm:py-24 space-y-6">
+    <div className="animate-reveal py-16 text-center sm:py-24">
       <span className="mx-auto grid h-20 w-20 animate-halo place-items-center rounded-full bg-or-400/15 text-or-300">
         <Check className="h-9 w-9" strokeWidth={2} />
       </span>
-      <h2 className="font-serif text-4xl font-bold leading-tight text-parchemin-100 sm:text-5xl">
-        Temps à part <span className="titre-or">accompli.</span>
+      <h2 className="mt-8 font-serif text-4xl font-bold leading-tight text-parchemin-100 sm:text-5xl">
+        {tempsDuJour ? (
+          <>La Parole est <span className="titre-or">semée.</span></>
+        ) : (
+          <>Fiche {fiche.id} <span className="titre-or">préparée.</span></>
+        )}
       </h2>
-      <p className="mx-auto max-w-md text-sm leading-relaxed text-parchemin-100/65">
-        Tes réflexions, ton verset et ton pas de foi sont précieusement archivés dans ton Carnet Spirituel.
+      <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-parchemin-100/65">
+        {tempsDuJour
+          ? 'Ta lecture, ta méditation, ta prière et ton pas sont enregistrés. Tu pourras les retrouver dans ton carnet.'
+          : 'Votre groupe le voit. Le reste — vos réponses, ce que vous avez écrit — ne regarde que vous, jusqu’à ce que vous décidiez d’en parler.'}
       </p>
       <button
-        onClick={() => {
-          onTerminer?.();
-          onQuitter();
-        }}
-        className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold shadow-xl"
+        onClick={onQuitter}
+        className="bouton-or mt-9 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
       >
-        Valider et revenir à ma semaine
+        {tempsDuJour ? 'Revenir à ma table' : 'Revenir à la fiche'}
       </button>
     </div>
   );
 }
+
+
 
 export function ChargementImmersion() {
   return (
     <div className="nuit fixed inset-0 z-[60] flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <Loader2 className="h-6 w-6 animate-spin text-or-300" />
-        <p className="text-2xs text-parchemin-100/50">Ouverture de l'immersion…</p>
+        <p className="text-2xs text-parchemin-100/50">Ouverture de la fiche…</p>
       </div>
     </div>
   );

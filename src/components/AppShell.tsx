@@ -61,7 +61,7 @@ interface Destination {
 
 const PRINCIPALES: Destination[] = [
   { href: '/dashboard', label: 'Tableau de bord', court: 'Accueil', icon: Home },
-  { href: '/aujourdhui', label: 'Un temps à part', court: 'Aujourd’hui', icon: Sunrise },
+  { href: '/aujourdhui', label: 'Aujourd’hui', court: 'Aujourd’hui', icon: Sunrise },
   { href: '/fiches', label: 'Le parcours', court: 'Parcours', icon: Compass },
   { href: '/groupes', label: 'Ma cellule', court: 'Cellule', icon: Users },
   { href: '/memorisation', label: 'Mémorisation', court: 'Versets', icon: Brain },
