@@ -78,6 +78,7 @@ import meditationData from '@/data/meditation-questions.json';
 interface QuestionMeditation {
   id: string;
   fonction?: string;
+  consigne?: string;
   question: string;
 }
 
@@ -104,7 +105,7 @@ type Scene = { piste?: string } & (
   | { type: 'verset'; reference: string; texte: string | null }
   | { type: 'lecture'; texte: string }
   | { type: 'question'; id: string; texte: string; section?: string }
-  | { type: 'pas'; id?: string }
+  | { type: 'pas'; id?: string; reference?: string }
   | { type: 'cloture' }
 );
 
@@ -181,7 +182,7 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
       { type: 'meditation', sectionTitre: section.titre || fiche.titre, questions },
       { type: 'priere', id: idSection, questions },
       { type: 'ancrage-verset', reference, texte },
-      { type: 'pas', id: idSection },
+      { type: 'pas', id: idSection, reference },
       { type: 'cloture' },
     );
     return scenes;
@@ -336,10 +337,10 @@ export default function Immersion({
       case 'verset': return scene.reference;
       case 'lecture': return 'Lecture dans votre Bible';
       case 'question': return 'Écriture personnelle';
-      case 'pas': return sectionIndex === null ? 'Mon pas de la semaine' : 'Mon pas du jour';
+      case 'pas': return 'Vivre cette vérité';
       case 'cloture': return 'Clôture de la fiche';
     }
-  }, [scene, sectionIndex]);
+  }, [scene]);
 
   const texteDeLaScene = useCallback((courante: Scene): string | null => {
     switch (courante.type) {
@@ -354,9 +355,11 @@ export default function Immersion({
       case 'question':
         return courante.texte;
       case 'meditation':
-        return courante.questions.map((question) => question.question).join(' ');
+        return courante.questions
+          .map((question) => `${question.consigne ? `${question.consigne} ` : ''}${question.question}`)
+          .join(' ');
       case 'priere':
-        return 'Prends maintenant le temps de répondre à Dieu. Adore-le, remercie-le, puis confie-lui ce que sa Parole a mis en lumière.';
+        return 'Relis ce que tu viens d’écrire. Puis parle simplement à Dieu à partir de ce que tu as découvert. Tu peux aussi rester un instant en silence.';
       case 'ancrage-verset':
         return `${courante.reference}. ${courante.texte}`;
       default:
@@ -1188,22 +1191,6 @@ function FeuilleOptions({
 // Rendu d'une scène
 // ─────────────────────────────────────────────────────────────
 
-const LIBELLES_ORIENTATION: Record<string, string> = {
-  observer: 'Observer le texte',
-  'decouvrir-dieu': 'Découvrir Dieu',
-  'se-laisser-eclairer': 'Me laisser éclairer',
-  recevoir: 'Recevoir',
-  repondre: 'Répondre',
-};
-
-function libelleOrientation(fonction: string | undefined, index: number): string {
-  if (!fonction) return `Orientation ${index + 1}`;
-  return fonction
-    .split('+')
-    .map((partie) => LIBELLES_ORIENTATION[partie] ?? partie)
-    .join(' · ');
-}
-
 function RenduScene({
   scene,
   fiche,
@@ -1270,7 +1257,8 @@ function RenduScene({
             Laisser « {scene.sectionTitre} » descendre dans le cœur
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-parchemin-100/65">
-            Avance sans chercher la bonne réponse. Ces orientations sont là pour t&apos;aider à regarder le texte, découvrir Dieu, recevoir, puis lui répondre.
+            Ces repères t&apos;indiquent seulement où regarder. Ils ne te disent pas ce que tu dois
+            trouver. Relis, attends, puis écris ce que tu vois.
           </p>
           <div className="mt-7 space-y-5">
             {scene.questions.map((question, indexQuestion) => (
@@ -1278,12 +1266,20 @@ function RenduScene({
                 key={question.id}
                 className="rounded-3xl border border-or-400/18 bg-encre-950/38 p-5 sm:p-6"
               >
-                <p className="text-3xs font-black uppercase tracking-[0.18em] text-or-300/70">
-                  {libelleOrientation(question.fonction, indexQuestion)}
-                </p>
+                <span
+                  aria-hidden="true"
+                  className="font-serif text-xl italic text-or-300/45"
+                >
+                  {String(indexQuestion + 1).padStart(2, '0')}
+                </span>
+                {question.consigne && (
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-parchemin-100/68 sm:text-base">
+                    <TexteAvecReferences tone="nuit">{question.consigne}</TexteAvecReferences>
+                  </p>
+                )}
                 <label
                   htmlFor={`meditation-${question.id}`}
-                  className="mt-3 block font-serif text-lg font-bold leading-relaxed text-parchemin-100 sm:text-xl"
+                  className="mt-4 block font-serif text-lg font-bold leading-relaxed text-parchemin-100 sm:text-xl"
                 >
                   <TexteAvecReferences tone="nuit">{question.question}</TexteAvecReferences>
                 </label>
@@ -1292,7 +1288,7 @@ function RenduScene({
                   value={reponses[`q:${question.id}`] ?? ''}
                   onChange={(event) => onEnregistrer(`q:${question.id}`, event.target.value)}
                   rows={3}
-                  placeholder="Ce que je comprends, ce que je reçois…"
+                  placeholder="Ce que je vois dans le texte…"
                   className="mt-4 w-full resize-y rounded-2xl border border-or-400/22 bg-encre-950/60 p-4 text-base leading-relaxed text-parchemin-100 outline-none transition-colors placeholder:text-parchemin-100/30 focus:border-or-300"
                 />
                 <p className="mt-2 inline-flex items-center gap-1 text-3xs font-bold text-emerald-300/75">
@@ -1314,18 +1310,12 @@ function RenduScene({
             Prier la Parole
           </span>
           <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-            Répondre à Dieu avec tes propres mots
+            Parle à Dieu à partir de ce que tu as découvert
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
-            Adore-le pour ce que tu viens de découvrir. Remercie-le, dépose ce qui a été éclairé, puis reste un instant à son écoute.
+            Relis ce que tu viens d&apos;écrire. Puis prends le temps de lui répondre avec tes propres
+            mots. Tu peux aussi rester un instant en silence.
           </p>
-          <div className="mx-auto mt-6 flex max-w-xl flex-wrap justify-center gap-2">
-            {['Adorer', 'Remercier', 'Confesser', 'Demander', 'Écouter'].map((verbe) => (
-              <span key={verbe} className="rounded-full border border-or-400/22 bg-white/5 px-3 py-1.5 text-3xs font-bold uppercase tracking-[0.12em] text-or-200/80">
-                {verbe}
-              </span>
-            ))}
-          </div>
           <div className="mx-auto mt-7 max-w-xl text-left">
             <ChampEcriture
               valeur={reponses[`priere:${scene.id}`] ?? ''}
@@ -1411,19 +1401,26 @@ function RenduScene({
       return (
         <div className="py-8">
           <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-            Avant de refermer
+            Vivre cette vérité
           </span>
           <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-            {tempsDuJour ? 'Un seul pas, pour aujourd’hui.' : 'Un seul pas, pour cette semaine.'}
+            {tempsDuJour
+              ? 'Quelle vérité veux-tu garder présente aujourd’hui ?'
+              : 'Quelle vérité veux-tu garder présente cette semaine ?'}
           </h2>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
-            Pas dix résolutions : une chose précise, que vous pourrez dire au groupe, et qu&apos;on
-            pourra vous demander la semaine prochaine.
+            Reviens une dernière fois à ce que tu as découvert de Dieu. Y a-t-il une situation
+            concrète dans laquelle tu veux choisir de vivre à partir de cette vérité ?
           </p>
+          {tempsDuJour && scene.reference && (
+            <p className="mt-3 max-w-xl border-l border-or-400/35 pl-4 font-serif text-base italic leading-relaxed text-parchemin-100/78">
+              Dans quel moment de ta journée aimerais-tu te souvenir de {scene.reference} ?
+            </p>
+          )}
           <ChampEcriture
             valeur={reponses[clePas] ?? ''}
             onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
-            placeholder={tempsDuJour ? 'Aujourd’hui, je…' : 'Cette semaine, je…'}
+            placeholder={tempsDuJour ? 'Aujourd’hui, je veux…' : 'Cette semaine, je veux…'}
             lignes={4}
           />
         </div>

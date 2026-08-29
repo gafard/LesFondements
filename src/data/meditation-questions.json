@@ -13,22 +13,26 @@
           {
             "id": "f1-s1-q1",
             "fonction": "observer+decouvrir-dieu",
-            "question": "Le texte dit qu'un seul mot de la bouche de Dieu crée ou fait disparaître toute chose — et que nous ne sommes rien devant lui. Relis lentement ces deux phrases. Qu'est-ce qu'elles te révèlent sur l'écart entre sa grandeur et notre taille ?"
+            "consigne": "Lis Apocalypse 1:8 lentement une première fois. Puis relis-le, sans chercher immédiatement à répondre.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Dieu parle de lui-même ?"
           },
           {
             "id": "f1-s1-q2",
             "fonction": "se-laisser-eclairer",
-            "question": "Le texte oppose deux réalités : « le monde pourrait sembler s'écrouler » et « l'Éternel règne ». Dans ta vie en ce moment, quelle situation te donne l'impression que les choses s'écroulent — et qu'est-ce que ça change concrètement de savoir que Dieu règne au-dessus de cette situation ?"
+            "consigne": "Lis maintenant Psaume 46:11. Relis-le lentement, puis garde Apocalypse 1:8 et Psaume 46:11 ensemble.",
+            "question": "Qu’est-ce que ces deux passages te font découvrir de Dieu ?"
           },
           {
             "id": "f1-s1-q3",
             "fonction": "recevoir",
-            "question": "Le Psaume 46:11 commence par un ordre : « Arrêtez. » Dans quel domaine de ta vie refuses-tu encore de t'arrêter — parce que tu as peur de ce qui se passera si tu lâches prise ?"
+            "consigne": "Relis Psaume 104:27-30 une seconde fois. Puis rapproche ce passage de cette phrase du livret : « Si nous sommes en vie et le demeurons, mais aussi si nous le connaissons, c’est uniquement par sa grâce. »",
+            "question": "Qu’est-ce qui te frappe lorsque tu gardes ce passage et cette phrase ensemble ?"
           },
           {
             "id": "f1-s1-q4",
             "fonction": "repondre",
-            "question": "Le texte distingue clairement deux types de crainte : la peur du châtiment qui paralyse, et la « sainte crainte » qui est un profond respect. Comment peux-tu, concrètement aujourd'hui, exprimer cette révérence envers Dieu dans ta journée — pas par obligation, mais par émerveillement ?"
+            "consigne": "Prends quelques instants avant de répondre. Reviens librement aux passages et aux phrases qui ont retenu ton attention.",
+            "question": "Si tu devais maintenant exprimer avec tes propres mots ce que tu as découvert de Dieu, qu’écrirais-tu ?"
           }
         ]
       },
@@ -42,27 +46,32 @@
           {
             "id": "f1-s2-q1",
             "fonction": "observer",
-            "question": "Le texte dit que connaître Dieu n'est pas « un formalisme religieux » mais « une communion intime, intense et continue, chaque jour, chaque instant ». Relis ces trois mots : *intime*, *intense*, *continue*. Lequel te semble le plus éloigné de ta réalité actuelle avec Dieu — et pourquoi ?"
+            "consigne": "Lis lentement Jean 17:3 puis Éphésiens 1:17. Relis-les une seconde fois.",
+            "question": "Qu’est-ce qui retient ton attention dans ces deux passages ?"
           },
           {
             "id": "f1-s2-q2",
             "fonction": "decouvrir-dieu",
-            "question": "Le texte affirme : « Quoi que je fasse, en bien ou en mal, cela ne changera jamais l'amour de Dieu pour moi. Il ne m'aime pas moins que le plus grand des saints et pas plus que le pire des meurtriers. » Est-ce que tu crois réellement cela ? Qu'est-ce qui résiste en toi quand tu lis cette phrase ?"
+            "consigne": "Lis 1 Jean 4:16 puis Romains 8:38-39. Ne cherche pas à les résumer trop vite : reste un instant avec les mots du texte.",
+            "question": "Qu’est-ce que ces passages te font découvrir de Dieu ?"
           },
           {
             "id": "f1-s2-q3",
             "fonction": "se-laisser-eclairer",
-            "question": "Le texte cite 1 Jean 4:18 : « l'amour parfait chasse toute crainte ». Quelles sont les craintes qui persistent encore dans ta vie ? Si tu es honnête avec toi-même, est-ce parce que tu doutes encore, quelque part au fond, que Dieu t'aime vraiment ?"
+            "consigne": "Lis lentement Luc 15:11-32. Laisse le récit se dérouler sans chercher d’abord une leçon à en tirer.",
+            "question": "Où ton attention s’arrête-t-elle dans ce récit, et pourquoi ?"
           },
           {
             "id": "f1-s2-q4",
             "fonction": "recevoir",
-            "question": "Le texte dit : « Dieu, le créateur des étoiles, est mon Papa et je suis son enfant bien-aimé : de quoi et de qui aurais-je peur ? » Quelle vérité dans cette phrase dois-tu recevoir et accueillir aujourd'hui pour qu'elle devienne réellement la tienne, et non plus seulement une belle phrase ?"
+            "consigne": "Reviens à Psaume 16:2 et Jacques 4:8. Garde-les un moment à côté de ce que tu viens de lire.",
+            "question": "Qu’est-ce que leur rapprochement fait naître dans ta réflexion ?"
           },
           {
             "id": "f1-s2-q5",
             "fonction": "repondre",
-            "question": "Jacques 4:8 est cité dans le texte : « Approchez-vous de Dieu, et il s'approchera de vous. » Comment vas-tu, concrètement aujourd'hui, faire un pas vers cette intimité avec lui — pas un grand acte spirituel, mais un geste simple et vrai ?"
+            "consigne": "Reprends seulement les mots, les versets ou l’image qui sont restés avec toi.",
+            "question": "Avec tes propres mots, qu’as-tu découvert ou redécouvert de Dieu ?"
           }
         ]
       },
@@ -75,22 +84,26 @@
           {
             "id": "f1-s3-q1",
             "fonction": "observer",
-            "question": "Le texte présente trois visages de Dieu : le Père qui t'a appelé à la vie, le Fils qui t'a rejoint dans ton humanité, et l'Esprit qui vit en toi maintenant. Lequel de ces trois te semble le plus familier dans ta vie quotidienne ? Lequel te semble le plus distant — et à ton avis, pourquoi ?"
+            "consigne": "Lis Marc 12:29, Matthieu 28:19 et 2 Corinthiens 13:13. Garde ces trois passages ensemble, sans chercher à les harmoniser trop vite.",
+            "question": "Qu’est-ce qui retient ton attention ?"
           },
           {
             "id": "f1-s3-q2",
             "fonction": "decouvrir-dieu",
-            "question": "Jésus dit : « Venez à moi, vous tous qui êtes accablés sous le poids d'un lourd fardeau, et je vous donnerai du repos. » Le texte précise qu'il a été « tenté comme nous le sommes, sans commettre de péché ». Qu'est-ce que ça change, pour toi, de savoir que Jésus comprend *exactement* ce que tu traverses — non pas de loin, mais parce qu'il l'a vécu dans sa chair ?"
+            "consigne": "Dans Jean 14 à 17, relève simplement les passages où le Père, le Fils ou l’Esprit sont nommés. Observe les mots employés et les liens entre les phrases.",
+            "question": "Qu’est-ce que tu observes en laissant le texte parler ?"
           },
           {
             "id": "f1-s3-q3",
             "fonction": "se-laisser-eclairer",
-            "question": "Le texte dit que Dieu désire la même communion avec nous que celle qui existe entre le Père, le Fils et l'Esprit. Est-ce que ta relation avec Dieu ressemble à cette communion vivante — ou plutôt à un rapport distant, formel, où tu « fais tes devoirs spirituels » sans vraie connexion ?"
+            "consigne": "Relis Galates 4:5-6, Jean 1:1-3 puis Jean 14:15-18 et 25-26. Ne cherche pas à tout expliquer en une seule fois.",
+            "question": "Dans quel passage ton attention s’arrête-t-elle, et qu’y découvres-tu de Dieu ?"
           },
           {
             "id": "f1-s3-q4",
             "fonction": "recevoir+repondre",
-            "question": "Paul écrit que « Dieu a envoyé dans nos cœurs l'Esprit de son Fils qui crie : Abba, c'est-à-dire \"cher père\" ». Es-tu capable de parler à Dieu avec ce mot d'affection — « Papa » — ou quelque chose te retient ? Si oui, qu'est-ce que c'est, et que faudrait-il pour que cette barrière tombe ?"
+            "consigne": "Reviens librement à l’ensemble de cette section et aux passages que tu as lus.",
+            "question": "Si tu devais maintenant dire avec tes propres mots qui est Dieu, qu’écrirais-tu ?"
           }
         ]
       }

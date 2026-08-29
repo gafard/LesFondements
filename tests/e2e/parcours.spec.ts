@@ -30,16 +30,20 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
   await expect(page.locator('.immersion-bureau')).toBeVisible();
   await expect(page.getByText('Méditer la Parole', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: /Laisser « Dieu règne »/ })).toBeVisible();
+  await expect(page.getByText('Ils ne te disent pas ce que tu dois trouver.', { exact: false })).toBeVisible();
+  await expect(page.getByText('Lis Apocalypse 1:8 lentement une première fois.', { exact: false })).toBeVisible();
+  await expect(page.getByText('Qu’est-ce qui retient ton attention dans la manière dont Dieu parle de lui-même ?')).toBeVisible();
 
   await page.locator('textarea').first().fill('Dieu règne même lorsque je ne maîtrise pas la situation.');
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByRole('heading', { name: 'Répondre à Dieu avec tes propres mots' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de ce que tu as découvert' })).toBeVisible();
   await page.getByPlaceholder('Ma prière aujourd’hui…').fill('Père, apprends-moi à te faire confiance.');
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('Mémoriser la Parole', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await page.getByPlaceholder('Aujourd’hui, je…').fill(
+  await expect(page.getByText('Vivre cette vérité', { exact: true }).first()).toBeVisible();
+  await page.getByPlaceholder('Aujourd’hui, je veux…').fill(
     'Commencer ma journée par reconnaître que Dieu règne.'
   );
   await page.getByRole('button', { name: 'Continuer' }).click();
