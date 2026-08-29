@@ -142,33 +142,47 @@ function AujourdhuiContent() {
   if (completedData) {
     const hour = new Date().getHours();
     return (
-      <div className="nuit nuit-grain min-h-screen flex flex-col items-center justify-center text-center p-6 space-y-6">
-        <div className="text-5xl">🕊️</div>
-        <h1 className="text-3xl font-serif text-amber-200">Ton temps à part est terminé</h1>
-        <p className="text-amber-50/70 max-w-md leading-relaxed">
-          {hour < 18
-            ? 'Va vivre ta journée avec cette Parole. Reviens ce soir pour faire le point.'
-            : 'Prends un moment pour faire le bilan de ta journée.'}
-        </p>
-        <div className="flex flex-col gap-3 w-full max-w-xs">
-          {hour >= 18 && (
+      <div className="table-travail min-h-screen text-encre-950 flex flex-col items-center justify-center p-4 sm:p-6 safe-area-inset">
+        <article className="feuille relative rounded-3xl p-8 sm:p-10 shadow-2xl border border-encre-900/10 text-center max-w-md w-full space-y-6">
+          <span className="ruban -top-3 left-1/2 -translate-x-1/2" aria-hidden="true" />
+          
+          <div className="text-4xl">🕊️</div>
+          
+          <div>
+            <span className="timbre inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-encre-800 bg-parchemin-100 mb-3">
+              Temps du jour accompli
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-encre-950">
+              Parole semée dans ton cœur
+            </h1>
+          </div>
+
+          <p className="text-sm text-encre-800 leading-relaxed font-serif italic">
+            {hour < 18
+              ? '« Va vivre ta journée avec cette Parole. Reviens ce soir pour faire le bilan avec le Père. »'
+              : '« La journée s\'achève. Prends un instant pour faire le point sur ce que tu as vécu. »'}
+          </p>
+
+          <div className="flex flex-col gap-3 pt-2">
+            {hour >= 18 && (
+              <button
+                onClick={() => setShowRetour(true)}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
+              >
+                Mon retour du soir
+              </button>
+            )}
             <button
-              onClick={() => setShowRetour(true)}
-              className="bg-amber-600 hover:bg-amber-500 text-white py-3 px-8 rounded-xl transition-colors font-medium shadow-lg"
+              onClick={() => setCompletedData(null)}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-encre-900/15 bg-white/60 px-5 text-xs font-bold text-encre-900 transition hover:bg-white"
             >
-              Mon retour du soir
+              Refaire ou réviser
             </button>
-          )}
-          <button
-            onClick={() => setCompletedData(null)}
-            className="bg-white/10 hover:bg-white/15 text-amber-200 py-3 px-8 rounded-xl transition-colors text-sm"
-          >
-            Refaire ou réviser
-          </button>
-          <a href="/dashboard" className="text-amber-400/60 hover:text-amber-400 underline text-xs mt-2">
-            Retour au tableau de bord
-          </a>
-        </div>
+            <a href="/dashboard" className="text-xs font-bold text-or-800 underline underline-offset-4 hover:text-or-950 mt-1">
+              Retour au tableau de bord
+            </a>
+          </div>
+        </article>
       </div>
     );
   }
