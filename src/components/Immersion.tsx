@@ -82,7 +82,79 @@ type Scene = { piste?: string } & (
   | { type: 'cloture' }
 );
 
-function construireScenario(fiche: FicheLivret): Scene[] {
+function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | null): Scene[] {
+  if (sectionCibleIndex !== undefined && sectionCibleIndex !== null && sectionCibleIndex >= 0) {
+    const section = fiche.sections[sectionCibleIndex];
+    if (!section) return [{ type: 'seuil', piste: pisteId.seuil(fiche.id) }, { type: 'cloture' }];
+
+    const scenes: Scene[] = [];
+    
+    // 1. Ouverture de la section
+    if (section.titre) {
+      scenes.push({
+        type: 'ouverture-section',
+        titre: section.titre,
+        rang: sectionCibleIndex + 1,
+        total: fiche.sections.length,
+        piste: pisteId.section(fiche.id, sectionCibleIndex),
+      });
+    }
+
+    // 2. Paragraphes de la section
+    let sousTitre: string | null = null;
+    section.blocs.forEach((bloc, indexBloc) => {
+      if (bloc.type === 'sous-titre') {
+        sousTitre = bloc.texte;
+        return;
+      }
+      scenes.push({
+        type: 'bloc',
+        bloc,
+        sousTitre,
+        section: section.titre,
+        piste: pisteId.bloc(fiche.id, sectionCibleIndex, indexBloc),
+      });
+      sousTitre = null;
+    });
+
+    // 3. Silence sacré
+    scenes.push({ type: 'silence' });
+
+    // 4. Résumé et Versets de cette section (si présents)
+    const resumeSec = fiche.resume[sectionCibleIndex];
+    if (resumeSec) {
+      scenes.push({
+        type: 'resume',
+        section: resumeSec,
+        piste: pisteId.resume(fiche.id, sectionCibleIndex),
+      });
+      resumeSec.versets.forEach((reference) => {
+        scenes.push({
+          type: 'verset',
+          reference,
+          texte: texteDuVerset(reference),
+          piste: pisteId.verset(reference),
+        });
+      });
+      resumeSec.lectures.forEach((texte) => scenes.push({ type: 'lecture', texte }));
+
+      // Questions de cette section
+      resumeSec.questions.forEach((texte, index) => {
+        scenes.push({
+          type: 'question',
+          id: `${fiche.id}_${sectionCibleIndex}_${index}`,
+          texte,
+          section: resumeSec.titre,
+          piste: pisteId.question(fiche.id, index),
+        });
+      });
+    }
+
+    // 5. Mon pas et clôture
+    scenes.push({ type: 'pas' }, { type: 'cloture' });
+    return scenes;
+  }
+
   const scenes: Scene[] = [{ type: 'seuil', piste: pisteId.seuil(fiche.id) }];
 
   const sectionsAvecTitre = fiche.sections.filter((s) => s.titre);
@@ -174,6 +246,7 @@ interface ImmersionProps {
   onQuitter: () => void;
   dejaPreparee?: boolean;
   indexInitial?: number;
+  sectionIndex?: number | null;
 }
 
 export default function Immersion({
@@ -184,8 +257,9 @@ export default function Immersion({
   onQuitter,
   dejaPreparee,
   indexInitial = 0,
+  sectionIndex = null,
 }: ImmersionProps) {
-  const scenario = useMemo(() => construireScenario(fiche), [fiche]);
+  const scenario = useMemo(() => construireScenario(fiche, sectionIndex), [fiche, sectionIndex]);
   const [index, setIndex] = useState(() =>
     Math.max(0, Math.min(scenario.length - 1, indexInitial))
   );

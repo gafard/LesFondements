@@ -3,19 +3,16 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import TempsApart from '@/components/TempsApart';
+import Immersion from '@/components/Immersion';
 import RetourSoir from '@/components/RetourSoir';
 import { useAuth } from '@/lib/AuthContext';
-import livret from '@/data/livret.json';
-import meditationData from '@/data/meditation-questions.json';
 import { 
   Loader2, Sunrise, BookOpen, Check, ArrowRight, Lock, 
-  ArrowLeft, CalendarDays, LockKeyhole 
+  ArrowLeft, LockKeyhole, Sparkles 
 } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
-import { getAnswers, getCachedAnswers } from '@/lib/firestore';
-
-type FicheMeditation = (typeof meditationData)[number];
+import { getAnswers, getCachedAnswers, saveAnswer, addJournalEntry } from '@/lib/firestore';
+import { chargerFiche, type FicheLivret } from '@/lib/livret';
 
 function AujourdhuiContent() {
   const { user } = useAuth();
@@ -24,7 +21,7 @@ function AujourdhuiContent() {
   
   const [loading, setLoading] = useState(true);
   const [showRetour, setShowRetour] = useState(false);
-  const [completedData, setCompletedData] = useState<any>(null);
+  const [fiche, setFiche] = useState<FicheLivret | null>(null);
   const [ficheId, setFicheId] = useState(1);
   const [sectionIndex, setSectionIndex] = useState<number | null>(null);
   const [reponsesFiche, setReponsesFiche] = useState<Record<string, string>>({});
@@ -37,6 +34,11 @@ function AujourdhuiContent() {
     const validFicheId = isNaN(fId) ? 1 : Math.max(1, Math.min(20, fId));
     setFicheId(validFicheId);
 
+    void chargerFiche(validFicheId).then((f) => {
+      setFiche(f);
+      setLoading(false);
+    });
+
     if (querySection !== null && querySection !== undefined) {
       const sId = parseInt(querySection, 10);
       setSectionIndex(isNaN(sId) ? null : sId);
@@ -44,61 +46,44 @@ function AujourdhuiContent() {
       setSectionIndex(null);
     }
 
-    // Charger les réponses et l'avancement depuis Firestore / cache local
     if (user) {
       const cached = getCachedAnswers(user.uid, validFicheId);
       setReponsesFiche(cached);
-      void getAnswers(user.uid, validFicheId).then(vals => {
+      void getAnswers(user.uid, validFicheId).then((vals) => {
         if (vals && typeof vals === 'object') setReponsesFiche(vals as Record<string, string>);
       });
     }
-
-    setLoading(false);
   }, [user, searchParams]);
 
-  const fiche = livret.fiches.find((f) => f.id === ficheId) || livret.fiches[0];
-  const totalSections = fiche?.sections?.length || 1;
+  const handleEnregistrerReponse = (cle: string, valeur: string) => {
+    setReponsesFiche((prev) => ({ ...prev, [cle]: valeur }));
+    if (user) {
+      void saveAnswer(user.uid, ficheId, cle, valeur);
+    }
+  };
 
-  // Données de la section si l'atelier est actif
-  const sectionActive = sectionIndex !== null ? fiche?.sections?.[sectionIndex] : null;
-  const meditationFiche = (meditationData as FicheMeditation[]).find((m) => m.ficheId === ficheId);
-  const meditationSection = sectionIndex !== null ? meditationFiche?.sections?.[sectionIndex] : null;
-
-  const questions = meditationSection?.questions || [
-    { id: 'q1', fonction: 'contempler', question: "Qu'est-ce que ce texte te révèle sur la grandeur de Dieu ?" },
-    { id: 'q2', fonction: 'recevoir', question: "Quelle vérité es-tu invité à garder dans ton cœur ?" },
-    { id: 'q3', fonction: 'vivre', question: "Si cela est vrai, comment vas-tu vivre avec Lui aujourd'hui ?" },
-  ];
-
-  const versets = meditationSection?.versets || [];
-
-  const handleCompleteSection = (data: any) => {
-    if (sectionIndex === null) return;
-    setCompletedData(data);
-    
-    // Mettre à jour l'état local
+  const handleTerminerImmersion = async () => {
+    if (sectionIndex === null || !fiche) return;
     const cleAvancement = `temps-apart:${sectionIndex}`;
-    setReponsesFiche(prev => ({ ...prev, [cleAvancement]: JSON.stringify(data) }));
-    
-    localStorage.setItem(`temps_apart_done_${user?.uid || 'guest'}`, new Date().toDateString());
-    localStorage.setItem(`temps_apart_latest_${user?.uid || 'guest'}`, JSON.stringify({
-      ...data,
-      ficheId,
-      sectionIndex,
-      sectionTitre: sectionActive?.titre,
-      versets,
-    }));
+    setReponsesFiche((prev) => ({ ...prev, [cleAvancement]: '1' }));
 
-    // Revenir au sommaire du chemin de la semaine
+    if (user) {
+      try {
+        await saveAnswer(user.uid, ficheId, cleAvancement, '1');
+        const sectionTitre = fiche.sections[sectionIndex]?.titre || `Étape ${sectionIndex + 1}`;
+        await addJournalEntry(
+          user.uid,
+          `📖 **Fiche ${fiche.id} : ${fiche.titre}** — Étape ${sectionIndex + 1} : ${sectionTitre}\n✨ Contemplation vécue dans le sanctuaire d'immersion.`
+        );
+      } catch (e) {
+        console.error("Erreur d'enregistrement", e);
+      }
+    }
+
     setSectionIndex(null);
   };
 
-  const handleRetourSave = () => {
-    setShowRetour(false);
-    setCompletedData(null);
-  };
-
-  if (loading) {
+  if (loading || !fiche) {
     return (
       <div className="table-travail min-h-screen flex items-center justify-center text-or-700">
         <Loader2 className="w-8 h-8 animate-spin" />
@@ -106,39 +91,28 @@ function AujourdhuiContent() {
     );
   }
 
-  // Écran du retour du soir
-  if (showRetour && completedData) {
-    const selectedTexts = completedData.selectedCards
-      ?.map((k: string) => completedData.answers?.[k])
-      .filter(Boolean)
-      .join(' · ') || '';
-
+  // ═══════════════════════════════════════════════════════════════
+  // MODE IMMERSION CONTEMPLATIVE SUR LA SECTION DU JOUR
+  // ═══════════════════════════════════════════════════════════════
+  if (sectionIndex !== null) {
     return (
-      <RetourSoir
-        verset={versets[0] || 'Psaume 46:11'}
-        confiance={selectedTexts || 'Ce que j\'ai médité aujourd\'hui'}
-        etapeChoisie={completedData.step6Answer || ''}
-        onSave={handleRetourSave}
-      />
-    );
-  }
-
-  // Si une section est sélectionnée : lancer l'Atelier Immersif
-  if (sectionIndex !== null && sectionActive) {
-    return (
-      <TempsApart
-        ficheId={ficheId}
+      <Immersion
+        fiche={fiche}
         sectionIndex={sectionIndex}
-        ficheData={fiche}
-        sectionBlocs={sectionActive.blocs || []}
-        meditationQuestions={questions}
-        versets={versets}
-        onComplete={handleCompleteSection}
+        reponses={reponsesFiche}
+        onEnregistrer={handleEnregistrerReponse}
+        onTerminer={handleTerminerImmersion}
+        onQuitter={() => setSectionIndex(null)}
+        dejaPreparee={Boolean(reponsesFiche[`temps-apart:${sectionIndex}`])}
       />
     );
   }
 
-  // VUE PAR DÉFAUT : La Table avec le Chemin de la semaine
+  // ═══════════════════════════════════════════════════════════════
+  // MODE TABLE DE TRAVAIL : Sommaire du chemin de la semaine
+  // ═══════════════════════════════════════════════════════════════
+  const sections = fiche.sections.filter((s) => s.titre) || [];
+
   return (
     <div className="table-travail min-h-screen text-encre-950 p-4 sm:p-6 md:p-8 pt-6 pb-24 safe-area-inset flex flex-col items-center">
       <div className="max-w-2xl mx-auto w-full space-y-6">
@@ -177,11 +151,11 @@ function AujourdhuiContent() {
         {/* Le Chemin de la semaine (Les étapes séquentielles) */}
         <div className="dossier relative rounded-2xl border border-or-800/15 bg-[#c9ae78] p-5 sm:p-7 shadow-lg space-y-4">
           <span className="absolute -top-4 left-6 rounded-t-xl border border-b-0 border-or-800/15 bg-[#c9ae78] px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-encre-900">
-            Chemin de préparation ({fiche.sections.length} étapes)
+            Chemin de contemplation ({sections.length} étapes)
           </span>
 
           <div className="space-y-3 pt-2">
-            {fiche.sections.map((sec, idx) => {
+            {sections.map((sec, idx) => {
               const cleAvancement = `temps-apart:${idx}`;
               const estVecu = Boolean(reponsesFiche[cleAvancement]);
               const clePrecedente = idx > 0 ? `temps-apart:${idx - 1}` : null;
@@ -229,7 +203,8 @@ function AujourdhuiContent() {
                             : 'bg-encre-950 text-parchemin-50 hover:bg-encre-800'
                         }`}
                       >
-                        {estVecu ? 'Refaire' : 'Entrer dans la contemplation'} <ArrowRight className="w-3.5 h-3.5" />
+                        <Sparkles className="w-3.5 h-3.5 text-or-400" />
+                        {estVecu ? "Revivre l'immersion" : "Entrer dans l'immersion"} <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 text-xs text-encre-600 font-medium px-4 py-2 bg-encre-900/5 rounded-full">
@@ -244,7 +219,7 @@ function AujourdhuiContent() {
 
           <p className="flex items-center gap-2 text-xs text-encre-800/80 pt-2">
             <LockKeyhole className="w-3.5 h-3.5 text-or-900" />
-            Chaque temps avec Dieu s'enregistre dans ton Carnet Spirituel personnel.
+            Chaque temps d'immersion s'enregistre dans ton Carnet Spirituel personnel.
           </p>
         </div>
 
