@@ -25,8 +25,8 @@ test('fiche 1 : une réponse est sauvegardée automatiquement', async ({ page })
     .toContain('dix minutes');
 });
 
-test('rituel : le texte du livret mène à un pas personnel privé', async ({ page }) => {
-  await page.goto('/rituel');
+test('temps à part : le texte du livret mène à un pas personnel privé', async ({ page }) => {
+  await page.goto('/aujourdhui');
   await expect(page.getByRole('heading', { name: 'Ma semaine sur la table' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Dieu règne' })).toBeVisible();
   await expect(page.getByText('Texte du livret', { exact: true })).toBeVisible();

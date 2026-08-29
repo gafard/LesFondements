@@ -197,7 +197,7 @@ function RituelContent() {
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-or-700">
-                <Sunrise className="h-4 w-4" /> Rituel du jour · 3 à 5 minutes
+                <Sunrise className="h-4 w-4" /> Un temps à part · 3 à 5 minutes
               </p>
               <h1 className="mt-3 font-serif text-4xl font-bold leading-none text-encre-950 sm:text-5xl">
                 Ma semaine sur la table
@@ -317,12 +317,12 @@ function RituelContent() {
           </Link>
           <div className="flex items-center gap-2">
             {fiche.id > 1 && (
-              <Link href={`/rituel?fiche=${fiche.id - 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-full border border-encre-900/15 bg-parchemin-50" aria-label="Fiche précédente">
+              <Link href={`/aujourdhui?fiche=${fiche.id - 1}`} className="grid min-h-11 min-w-11 place-items-center rounded-full border border-encre-900/15 bg-parchemin-50" aria-label="Fiche précédente">
                 <ArrowLeft className="h-4 w-4" />
               </Link>
             )}
             {fiche.id < maximum && (
-              <Link href={`/rituel?fiche=${fiche.id + 1}`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-encre-950 px-5 text-xs font-bold text-parchemin-50">
+              <Link href={`/aujourdhui?fiche=${fiche.id + 1}`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-encre-950 px-5 text-xs font-bold text-parchemin-50">
                 Préparer la fiche {fiche.id + 1} <ArrowRight className="h-4 w-4" />
               </Link>
             )}

@@ -40,7 +40,7 @@ export default function RituelDuJourCard({ userId, ficheId }: { userId: string; 
 
   return (
     <Link
-      href={`/rituel?fiche=${ficheId}`}
+      href={`/aujourdhui?fiche=${ficheId}`}
       className="group relative block overflow-visible rounded-3xl border border-encre-900/12 bg-[#263b31] px-5 py-6 text-parchemin-50 shadow-xl transition-transform hover:-translate-y-1 sm:px-7"
     >
       <span className="absolute -top-3 left-8 h-6 w-24 -rotate-2 bg-or-200/75 shadow-sm" aria-hidden="true" />
@@ -54,7 +54,7 @@ export default function RituelDuJourCard({ userId, ficheId }: { userId: string; 
           </span>
           <div className="min-w-0">
             <p className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-or-300">
-              Rituel du jour
+              Un temps à part
               <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-parchemin-100/80">
                 <Clock3 className="h-3 w-3" /> 3–5 min
               </span>

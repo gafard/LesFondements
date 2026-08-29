@@ -16,7 +16,7 @@ const BLOCS = [
   {
     icon: EyeOff,
     titre: 'Une mesure volontaire et minimale',
-    texte: 'La mesure produit est désactivée tant que vous ne l’acceptez pas. Elle ne contient ni nom, ni courriel, ni identifiant de groupe, ni texte saisi. Elle retient uniquement des jalons — installation, fiche 1, groupe, préparation, rituel, rencontre et rétention — sous un identifiant d’installation aléatoire.',
+    texte: 'La mesure produit est désactivée tant que vous ne l’acceptez pas. Elle ne contient ni nom, ni courriel, ni identifiant de groupe, ni texte saisi. Elle retient uniquement des jalons — installation, fiche 1, groupe, préparation, temps à part, rencontre et rétention — sous un identifiant d’installation aléatoire.',
   },
   {
     icon: Flag,

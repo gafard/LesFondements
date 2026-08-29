@@ -33,7 +33,7 @@ function goutteDeRosee(jour: string, ficheId?: number): PushPayload | null {
   return {
     title: 'Votre table du jour',
     body: `« ${texte} » — ${verset.reference}`,
-    url: ficheId ? `/rituel?fiche=${ficheId}` : '/rituel',
+    url: ficheId ? `/aujourdhui?fiche=${ficheId}` : '/aujourdhui',
     tag: `rosee-${jour}`,
   };
 }
@@ -136,7 +136,7 @@ export async function GET(requete: Request) {
           await envoyer([`rencontre:48h:${rencontreId}`], {
             title: `Préparer la fiche ${calendrier.currentStep}`,
             body: `${calendrier.groupName} se retrouve dans moins de 48 h. Votre feuille vous attend.`,
-            url: `/rituel?fiche=${calendrier.currentStep}`,
+            url: `/aujourdhui?fiche=${calendrier.currentStep}`,
             tag: `rencontre-48h-${rencontreId}`,
           });
         }

@@ -10,7 +10,7 @@ for (const route of ['/', '/login']) {
   });
 }
 
-for (const route of ['/dashboard', '/rituel', '/fiches/1', '/groupes', '/memorisation']) {
+for (const route of ['/dashboard', '/aujourdhui', '/fiches/1', '/groupes', '/memorisation']) {
   test(`accessibilité applicative : ${route}`, async ({ page }) => {
     await semerSession(page);
     await page.goto(route);

@@ -318,11 +318,11 @@ function FicheContent() {
 
               <div className="mt-7 flex flex-wrap gap-2.5">
                 <Link
-                  href={`/rituel?fiche=${fiche.id}`}
+                  href={`/aujourdhui?fiche=${fiche.id}`}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-or-300 px-5 py-3 text-xs font-bold text-encre-950 shadow-md transition hover:-translate-y-0.5 hover:bg-or-200"
                 >
                   <Sunrise className="h-4 w-4" strokeWidth={2} />
-                  Mon rituel du jour
+                  Prendre un temps à part
                 </Link>
 
                 <button
