@@ -1284,7 +1284,12 @@ function RenduScene({
     case 'silence':
       return <SceneSilence />;
 
-    case 'meditation':
+    case 'meditation': {
+      const papiers = [
+        'post-it-jaune pose-1',
+        'post-it-bleu pose-2',
+        'post-it-rose pose-3',
+      ];
       return (
         <div className="py-6 sm:py-9">
           <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
@@ -1298,52 +1303,67 @@ function RenduScene({
             trouver. Relis, attends, puis écris ce que tu vois.
           </p>
           <div className="mt-7 space-y-5">
-            {scene.questions.map((question, indexQuestion) => (
-              <div
-                key={question.id}
-                className="rounded-3xl border border-or-400/18 bg-encre-950/38 p-5 sm:p-6"
-              >
-                <span
-                  aria-hidden="true"
-                  className="font-serif text-xl italic text-or-300/45"
+            {scene.questions.map((question, indexQuestion) => {
+              const reponse = reponses[`q:${question.id}`] ?? '';
+              return (
+                <article
+                  key={question.id}
+                  className={`${papiers[indexQuestion % papiers.length]} relative rounded-[4px] p-5 text-encre-950 shadow-xl transition-transform sm:p-6`}
                 >
-                  {String(indexQuestion + 1).padStart(2, '0')}
-                </span>
-                {question.consigne && (
-                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-parchemin-100/68 sm:text-base">
-                    <TexteAvecReferences tone="nuit">{question.consigne}</TexteAvecReferences>
+                  <span
+                    className={`punaise -top-2.5 ${indexQuestion % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
+                    aria-hidden="true"
+                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <span aria-hidden="true" className="font-serif text-xl italic text-encre-700/55">
+                      {String(indexQuestion + 1).padStart(2, '0')}
+                    </span>
+                    {reponse.trim() && (
+                      <span className="inline-flex items-center gap-1 text-3xs font-black uppercase tracking-[0.12em] text-emerald-900/75">
+                        <Check className="h-3 w-3" /> Note déposée
+                      </span>
+                    )}
+                  </div>
+                  {question.consigne && (
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-encre-700 sm:text-base">
+                      <TexteAvecReferences>{question.consigne}</TexteAvecReferences>
+                    </p>
+                  )}
+                  <label
+                    htmlFor={`meditation-${question.id}`}
+                    className="mt-4 block font-serif text-lg font-bold leading-relaxed text-encre-950 sm:text-xl"
+                  >
+                    <TexteAvecReferences>{question.question}</TexteAvecReferences>
+                  </label>
+                  <textarea
+                    id={`meditation-${question.id}`}
+                    value={reponse}
+                    onChange={(event) => onEnregistrer(`q:${question.id}`, event.target.value)}
+                    rows={3}
+                    placeholder="Écris directement sur cette feuille…"
+                    className="manuscrit mt-4 w-full resize-y rounded-xl border border-encre-950/12 bg-white/55 p-4 text-lg leading-relaxed text-encre-950 outline-none transition-colors placeholder:font-sans placeholder:text-encre-600/55 focus:border-encre-700 focus:bg-white/75"
+                  />
+                  <p className="mt-2 inline-flex items-center gap-1 text-3xs font-bold text-emerald-900/75">
+                    <Check className="h-3 w-3" /> Sauvegarde automatique
                   </p>
-                )}
-                <label
-                  htmlFor={`meditation-${question.id}`}
-                  className="mt-4 block font-serif text-lg font-bold leading-relaxed text-parchemin-100 sm:text-xl"
-                >
-                  <TexteAvecReferences tone="nuit">{question.question}</TexteAvecReferences>
-                </label>
-                <textarea
-                  id={`meditation-${question.id}`}
-                  value={reponses[`q:${question.id}`] ?? ''}
-                  onChange={(event) => onEnregistrer(`q:${question.id}`, event.target.value)}
-                  rows={3}
-                  placeholder="Ce que je vois dans le texte…"
-                  className="mt-4 w-full resize-y rounded-2xl border border-or-400/22 bg-encre-950/60 p-4 text-base leading-relaxed text-parchemin-100 outline-none transition-colors placeholder:text-parchemin-100/30 focus:border-or-300"
-                />
-                <p className="mt-2 inline-flex items-center gap-1 text-3xs font-bold text-emerald-300/75">
-                  <Check className="h-3 w-3" /> Sauvegarde automatique
-                </p>
-              </div>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </div>
       );
+    }
 
     case 'priere': {
-      const reprises = scene.questions.flatMap((question) => {
+      const toutesLesReprises = scene.questions.flatMap((question) => {
         const reponse = reponses[`q:${question.id}`]?.trim();
-        return question.priereTitre && reponse
-          ? [{ id: question.id, titre: question.priereTitre, reponse }]
+        return reponse
+          ? [{ id: question.id, titre: question.priereTitre ?? question.question, reponse, prioritaire: !!question.priereTitre }]
           : [];
       });
+      const reprisesPrioritaires = toutesLesReprises.filter((reprise) => reprise.prioritaire);
+      const reprises = reprisesPrioritaires.length > 0 ? reprisesPrioritaires : toutesLesReprises;
+      const papiers = ['post-it-jaune pose-1', 'post-it-bleu pose-2', 'post-it-rose pose-3'];
       return (
         <div className="py-8 text-center sm:py-12">
           <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-or-300/30 bg-or-400/12 text-or-300 shadow-[0_0_28px_rgba(220,168,73,0.12)]">
@@ -1360,18 +1380,22 @@ function RenduScene({
             mots. Tu peux aussi rester un instant en silence.
           </p>
           {reprises.length > 0 && (
-            <div className="mx-auto mt-7 max-w-2xl rounded-3xl border border-or-400/18 bg-encre-950/35 p-5 text-left sm:p-6">
-              <p className="text-2xs font-black uppercase tracking-[0.18em] text-or-300/70">
-                Tes découvertes, devant Dieu
+            <div className="tableau-liege mx-auto mt-7 max-w-2xl rounded-3xl border border-[#d2a675]/55 p-5 text-left shadow-2xl sm:p-7">
+              <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/80">
+                Tes notes rassemblées devant Dieu
               </p>
-              <div className="mt-5 space-y-5">
-                {reprises.map((reprise) => (
-                  <div key={reprise.id} className="border-l border-or-400/35 pl-4">
-                    <p className="text-xs font-bold text-or-200/80">{reprise.titre}</p>
-                    <p className="mt-2 font-serif text-base italic leading-relaxed text-parchemin-100/85">
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {reprises.map((reprise, indexReprise) => (
+                  <article
+                    key={reprise.id}
+                    className={`${papiers[indexReprise % papiers.length]} relative rounded-[4px] p-4 text-encre-950 shadow-lg`}
+                  >
+                    <span className="punaise-bois absolute -top-2 left-1/2 -translate-x-1/2" aria-hidden="true" />
+                    <p className="line-clamp-2 text-xs font-bold leading-relaxed text-encre-700">{reprise.titre}</p>
+                    <p className="mt-3 font-serif text-base italic leading-relaxed text-encre-950">
                       « {reprise.reponse} »
                     </p>
-                  </div>
+                  </article>
                 ))}
               </div>
             </div>

@@ -99,6 +99,9 @@ test('fiche 1 · partie 3 : les textes conduisent à une prière issue des déco
   await expect(page.getByText('Lis lentement Marc 12:29', { exact: false })).toBeVisible();
   await expect(page.getByText('Lis Matthieu 28:19 puis 2 Corinthiens 13:13', { exact: false })).toBeVisible();
   await expect(page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?')).toBeVisible();
+  await expect(
+    page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?').locator('xpath=ancestor::article')
+  ).toHaveClass(/post-it-/);
 
   await page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?').fill(
     'Je découvre un Père qui m’accueille comme son enfant.'
@@ -114,7 +117,8 @@ test('fiche 1 · partie 3 : les textes conduisent à une prière issue des déco
   ).fill('Dieu est un et se fait connaître dans une communion vivante.');
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Tes découvertes, devant Dieu')).toBeVisible();
+  await expect(page.getByText('Tes notes rassemblées devant Dieu')).toBeVisible();
+  await expect(page.locator('.tableau-liege')).toBeVisible();
   await expect(page.getByText('Ce que j’ai découvert de Dieu comme Père')).toBeVisible();
   await expect(page.getByText('Je découvre un Père qui m’accueille comme son enfant.')).toBeVisible();
   await expect(page.getByText('Ce que l’ensemble m’a fait comprendre de Dieu')).toBeVisible();
