@@ -19,3 +19,13 @@ for (const route of ['/dashboard', '/aujourdhui', '/fiches/1', '/groupes', '/mem
     expect(resultat.violations).toEqual([]);
   });
 }
+
+test('accessibilité applicative : menu des outils mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await semerSession(page);
+  await page.goto('/dashboard');
+  await page.getByRole('button', { name: 'Plus' }).click();
+  await expect(page.getByRole('dialog', { name: 'Tous les outils' })).toBeVisible();
+  const resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
+  expect(resultat.violations).toEqual([]);
+});

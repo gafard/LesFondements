@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -10,6 +10,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   Award,
   Bell,
+  Bookmark,
   Smartphone,
   BookMarked,
   Brain,
@@ -17,13 +18,16 @@ import {
   Home,
   LogOut,
   MessageCircle,
+  MoreHorizontal,
   PenLine,
   Printer,
   Search,
+  Shield,
   ShieldCheck,
   Sunrise,
   TrendingUp,
   Users,
+  X,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -74,9 +78,14 @@ const SECONDAIRES: Destination[] = [
   { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
   { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
   { href: '/ressources', label: 'Bibliothèque & Contact', court: 'Ressources', icon: BookMarked },
+  { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Bookmark },
+  { href: '/guide-pastoral', label: 'Guide pastoral', court: 'Guide', icon: Shield },
   { href: '/certificat', label: 'Mon attestation', court: 'Attestation', icon: Award },
   { href: '/parametres/confidentialite', label: 'Confidentialité', court: 'Données', icon: ShieldCheck },
 ];
+
+const ONGLETS_MOBILES = PRINCIPALES.slice(0, 4);
+const MENU_MOBILE = [PRINCIPALES[4], ...SECONDAIRES];
 
 function estActive(pathname: string, href: string): boolean {
   return href === '/dashboard' ? pathname === href : pathname.startsWith(href);
@@ -119,7 +128,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      <BarreOnglets pathname={pathname} />
+      <BarreOnglets
+        key={pathname}
+        pathname={pathname}
+        onOuvrirNotifs={() => setNotifOuvert(true)}
+      />
 
       <NotificationCenter ouvert={notifOuvert} onFermer={() => setNotifOuvert(false)} />
     </div>
@@ -316,11 +329,176 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
   );
 }
 
-function BarreOnglets({ pathname }: { pathname: string }) {
+function BarreOnglets({
+  pathname,
+  onOuvrirNotifs,
+}: {
+  pathname: string;
+  onOuvrirNotifs: () => void;
+}) {
+  const [plusOuvert, setPlusOuvert] = useState(false);
+  const boutonPlus = useRef<HTMLButtonElement>(null);
+  const premierLien = useRef<HTMLAnchorElement>(null);
+  const panneauPlus = useRef<HTMLElement>(null);
+  const { miseAJourPrete } = useApplication();
+  const plusActif = plusOuvert || MENU_MOBILE.some((lien) => estActive(pathname, lien.href));
+
+  useEffect(() => {
+    if (!plusOuvert) return;
+    const debordement = document.body.style.overflow;
+    const fermerAvecClavier = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPlusOuvert(false);
+    };
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', fermerAvecClavier);
+    window.requestAnimationFrame(() => premierLien.current?.focus());
+    return () => {
+      document.body.style.overflow = debordement;
+      document.removeEventListener('keydown', fermerAvecClavier);
+    };
+  }, [plusOuvert]);
+
+  const fermer = () => {
+    setPlusOuvert(false);
+    window.requestAnimationFrame(() => boutonPlus.current?.focus());
+  };
+
+  const retenirLeFocus = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key !== 'Tab') return;
+    const elements = panneauPlus.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (!elements?.length) return;
+    const premier = elements[0];
+    const dernier = elements[elements.length - 1];
+    if (event.shiftKey && document.activeElement === premier) {
+      event.preventDefault();
+      dernier.focus();
+    } else if (!event.shiftKey && document.activeElement === dernier) {
+      event.preventDefault();
+      premier.focus();
+    }
+  };
+
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-parchemin-300 bg-parchemin-50/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
-      <ul className="flex">
-        {PRINCIPALES.map((lien) => {
+    <>
+      {plusOuvert && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            aria-label="Fermer le menu des outils"
+            onClick={fermer}
+            className="absolute inset-0 bg-encre-950/55 backdrop-blur-[2px]"
+          />
+          <section
+            ref={panneauPlus}
+            id="menu-outils-mobile"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titre-menu-outils"
+            onKeyDown={retenirLeFocus}
+            className="feuille absolute inset-x-2 bottom-[calc(5rem+env(safe-area-inset-bottom))] max-h-[min(72vh,42rem)] overflow-hidden rounded-[1.75rem] border border-parchemin-300 shadow-2xl"
+          >
+            <span className="ruban -top-2 left-8 -rotate-2 rounded-[2px]" />
+            <div className="flex items-start justify-between gap-4 border-b border-dashed border-encre-950/15 px-5 pb-4 pt-6">
+              <div>
+                <p className="text-3xs font-black uppercase tracking-[0.18em] text-or-700">
+                  La table de travail
+                </p>
+                <h2 id="titre-menu-outils" className="mt-1 font-serif text-2xl font-bold text-encre-950">
+                  Tous les outils
+                </h2>
+                <p className="mt-1 text-xs text-encre-600">
+                  Carnets, ressources et repères du parcours.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={fermer}
+                aria-label="Fermer"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-parchemin-200 text-encre-700 active:scale-95"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="max-h-[calc(min(72vh,42rem)-8rem)] overflow-y-auto px-4 pb-5 pt-4">
+              <Link
+                ref={premierLien}
+                href={PRINCIPALES[4].href}
+                onClick={() => setPlusOuvert(false)}
+                className="mb-4 flex min-h-14 items-center gap-3 rounded-2xl border border-or-300 bg-or-50 px-4 py-3 text-encre-950"
+              >
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-or-100 text-or-800">
+                  <Brain className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block font-serif text-base font-bold">Mémorisation</span>
+                  <span className="block text-2xs text-encre-600">Revoir et réciter les versets</span>
+                </span>
+              </Link>
+
+              <p className="mb-2 px-1 text-3xs font-black uppercase tracking-[0.16em] text-encre-500">
+                Aller plus loin
+              </p>
+              <div className="grid grid-cols-2 gap-2.5">
+                {SECONDAIRES.map((lien) => {
+                  const Icone = lien.icon;
+                  const actif = estActive(pathname, lien.href);
+                  return (
+                    <Link
+                      key={lien.href}
+                      href={lien.href}
+                      onClick={() => setPlusOuvert(false)}
+                      aria-current={actif ? 'page' : undefined}
+                      className={`flex min-h-16 items-center gap-2.5 rounded-2xl border px-3 py-3 text-xs font-bold transition-colors ${
+                        actif
+                          ? 'border-or-400 bg-or-100 text-or-950'
+                          : 'border-parchemin-300 bg-white/65 text-encre-800 active:bg-parchemin-100'
+                      }`}
+                    >
+                      <Icone className="h-4 w-4 shrink-0 text-or-700" strokeWidth={1.8} />
+                      <span className="leading-snug">{lien.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2.5 border-t border-dashed border-encre-950/15 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlusOuvert(false);
+                    onOuvrirNotifs();
+                  }}
+                  className="flex min-h-12 items-center gap-2 rounded-2xl bg-encre-950 px-3 py-3 text-left text-xs font-bold text-parchemin-100"
+                >
+                  <Bell className="h-4 w-4 text-or-300" />
+                  Mes rappels
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlusOuvert(false);
+                    ouvrirCentre();
+                  }}
+                  className="flex min-h-12 items-center gap-2 rounded-2xl border border-encre-950/12 bg-white/70 px-3 py-3 text-left text-xs font-bold text-encre-800"
+                >
+                  <Smartphone className="h-4 w-4 text-or-700" />
+                  L&apos;application
+                  {miseAJourPrete && (
+                    <span className="ml-auto h-2 w-2 rounded-full bg-or-500" aria-label="Mise à jour disponible" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-parchemin-300 bg-parchemin-50/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
+        <ul className="flex">
+        {ONGLETS_MOBILES.map((lien) => {
           const actif = estActive(pathname, lien.href);
           const Icone = lien.icon;
           return (
@@ -348,7 +526,29 @@ function BarreOnglets({ pathname }: { pathname: string }) {
             </li>
           );
         })}
-      </ul>
-    </nav>
+          <li className="flex-1">
+            <button
+              ref={boutonPlus}
+              type="button"
+              onClick={() => setPlusOuvert(true)}
+              aria-expanded={plusOuvert}
+              aria-controls="menu-outils-mobile"
+              className="flex w-full flex-col items-center gap-1 px-1 pb-2 pt-2.5"
+            >
+              <span
+                className={`grid h-8 w-14 place-items-center rounded-full transition-colors ${
+                  plusActif ? 'bg-or-100 text-or-700' : 'text-encre-400'
+                }`}
+              >
+                <MoreHorizontal className="h-[19px] w-[19px]" strokeWidth={plusActif ? 2.25 : 1.75} />
+              </span>
+              <span className={`text-[10px] font-bold leading-none ${plusActif ? 'text-or-700' : 'text-encre-400'}`}>
+                Plus
+              </span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </>
   );
 }

@@ -63,6 +63,25 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
     .toEqual({ termine: '1', pas: 'Commencer ma journée par reconnaître que Dieu règne.' });
 });
 
+test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/dashboard');
+
+  await expect(page.getByRole('heading', { name: 'Les instruments de ta table' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Mes écrits/ })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Plus' }).click();
+  const menu = page.getByRole('dialog', { name: 'Tous les outils' });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('link', { name: /Mémorisation/ })).toBeVisible();
+  await expect(menu.getByRole('link', { name: 'Journal' })).toBeVisible();
+  await expect(menu.getByRole('link', { name: 'Retrouver mes écrits' })).toBeVisible();
+  await expect(menu.getByRole('link', { name: 'Guide pastoral' })).toBeVisible();
+
+  await menu.getByRole('link', { name: 'Retrouver mes écrits' }).click();
+  await expect(page).toHaveURL(/\/recherche$/);
+});
+
 test('absence : le choix reste associé au membre', async ({ page }) => {
   await page.goto('/groupes');
   await page.getByRole('button', { name: /Je ne peux pas/i }).click();
