@@ -40,10 +40,17 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
   await page.getByPlaceholder('Ma prière aujourd’hui…').fill('Père, apprends-moi à te faire confiance.');
 
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('La Parole que je garde', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Choisir un verset' })).toBeDisabled();
+  await page.getByRole('button', { name: /^Ps 46:11/ }).click();
+  await expect(page.getByRole('button', { name: /^Ps 46:11/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByText('Mémoriser la Parole', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Vivre cette vérité', { exact: true }).first()).toBeVisible();
-  await page.getByPlaceholder('Aujourd’hui, je veux…').fill(
+  await expect(page.getByText('Vivre cette Parole', { exact: true }).first()).toBeVisible();
+  await page.getByPlaceholder('Je veux me souvenir de ce verset lorsque…').fill(
+    'Je commencerai à m’inquiéter avant ma réunion.'
+  );
+  await page.getByPlaceholder('Quand ce moment arrivera, je veux…').fill(
     'Commencer ma journée par reconnaître que Dieu règne.'
   );
   await page.getByRole('button', { name: 'Continuer' }).click();
@@ -56,11 +63,34 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
         const donnees = JSON.parse(localStorage.getItem(`lesfondements_prog_${uid}`) || '{}');
         return {
           termine: donnees['1']?.answers?.['temps-apart:0'],
+          verset: donnees['1']?.answers?.['verset-choisi:f1-s1'],
+          moment: donnees['1']?.answers?.['pas-moment:f1-s1'],
           pas: donnees['1']?.answers?.['pas:f1-s1'],
         };
       }, UTILISATEUR.uid)
     )
-    .toEqual({ termine: '1', pas: 'Commencer ma journée par reconnaître que Dieu règne.' });
+    .toEqual({
+      termine: '1',
+      verset: 'Ps 46:11',
+      moment: 'Je commencerai à m’inquiéter avant ma réunion.',
+      pas: 'Commencer ma journée par reconnaître que Dieu règne.',
+    });
+});
+
+test('fiche 1 · partie 2 : le verset choisi porte la mémorisation et la mise en pratique', async ({ page }) => {
+  await page.goto('/aujourdhui?fiche=1&section=1&scene=17');
+
+  await expect(page.getByRole('button', { name: /^1 Jn 4:16/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Ps 16:2/ })).toBeVisible();
+  await page.getByRole('button', { name: /^1 Jn 4:16/ }).click();
+
+  await expect(page.getByRole('button', { name: /^1 Jn 4:16/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('Mémoriser la Parole', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+
+  await expect(page.getByText('La Parole que tu gardes · 1 Jn 4:16')).toBeVisible();
+  await expect(page.getByPlaceholder('Je veux me souvenir de ce verset lorsque…')).toBeVisible();
+  await expect(page.getByPlaceholder('Quand ce moment arrivera, je veux…')).toBeVisible();
 });
 
 test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {

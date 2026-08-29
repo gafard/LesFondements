@@ -93,6 +93,11 @@ interface FicheMeditation {
   sections: SectionMeditation[];
 }
 
+interface PassageAncrage {
+  reference: string;
+  texte: string;
+}
+
 type Scene = { piste?: string } & (
   | { type: 'seuil' }
   | { type: 'ouverture-section'; titre: string; rang: number; total: number }
@@ -100,12 +105,12 @@ type Scene = { piste?: string } & (
   | { type: 'silence' }
   | { type: 'meditation'; sectionTitre: string; questions: QuestionMeditation[] }
   | { type: 'priere'; id: string; questions: QuestionMeditation[] }
-  | { type: 'ancrage-verset'; reference: string; texte: string }
+  | { type: 'ancrage-verset'; id: string; reference: string; texte: string; options: PassageAncrage[] }
   | { type: 'resume'; section: ResumeSection }
   | { type: 'verset'; reference: string; texte: string | null }
   | { type: 'lecture'; texte: string }
   | { type: 'question'; id: string; texte: string; section?: string }
-  | { type: 'pas'; id?: string; reference?: string }
+  | { type: 'pas'; id?: string; reference?: string; options?: PassageAncrage[] }
   | { type: 'cloture' }
 );
 
@@ -139,13 +144,21 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
             question: 'Quelle réponse simple et concrète peux-tu donner à Dieu ?',
           },
         ];
-    const reference = meditation?.versets[0]
-      ?? fiche.resume.find((resume) => resume.titre === section.titre)?.versets[0]
-      ?? fiche.resume.flatMap((resume) => resume.versets)[0]
-      ?? 'Ps 46:11';
-    const texte = VERSETS_CONNUS[normaliserReference(reference)]
-      ?? texteDuVerset(reference)
-      ?? 'Arrêtez, et sachez que je suis Dieu.';
+    const versetsDuResume = fiche.resume.find((resume) => resume.titre === section.titre)?.versets;
+    const referencesProposees = meditation?.versets.length
+      ? meditation.versets
+      : versetsDuResume?.length
+        ? versetsDuResume
+        : fiche.resume.flatMap((resume) => resume.versets).slice(0, 1);
+    const references = [...new Set(referencesProposees.length ? referencesProposees : ['Ps 46:11'])];
+    const options = references.map((reference) => ({
+      reference,
+      texte: VERSETS_CONNUS[normaliserReference(reference)]
+        ?? texteDuVerset(reference)
+        ?? 'Relis ce passage dans ta Bible pour le garder avec toi.',
+    }));
+    const reference = options[0].reference;
+    const texte = options[0].texte;
 
     const scenes: Scene[] = [
       { type: 'seuil', piste: pisteId.seuil(fiche.id) },
@@ -181,8 +194,8 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
       { type: 'silence' },
       { type: 'meditation', sectionTitre: section.titre || fiche.titre, questions },
       { type: 'priere', id: idSection, questions },
-      { type: 'ancrage-verset', reference, texte },
-      { type: 'pas', id: idSection, reference },
+      { type: 'ancrage-verset', id: idSection, reference, texte, options },
+      { type: 'pas', id: idSection, reference, options },
       { type: 'cloture' },
     );
     return scenes;
@@ -323,6 +336,16 @@ export default function Immersion({
 
   const scene = scenario[index];
   const progression = (index + 1) / scenario.length;
+  const sceneAncrage = scenario.find(
+    (candidate): candidate is Extract<Scene, { type: 'ancrage-verset' }> =>
+      candidate.type === 'ancrage-verset'
+  );
+  const choixVersetAncrage = sceneAncrage
+    ? reponses[`verset-choisi:${sceneAncrage.id}`]
+    : undefined;
+  const ancragePret = scene.type !== 'ancrage-verset'
+    || scene.options.length <= 1
+    || scene.options.some((option) => option.reference === choixVersetAncrage);
 
   const libelleScene = useMemo(() => {
     switch (scene.type) {
@@ -337,7 +360,7 @@ export default function Immersion({
       case 'verset': return scene.reference;
       case 'lecture': return 'Lecture dans votre Bible';
       case 'question': return 'Écriture personnelle';
-      case 'pas': return 'Vivre cette vérité';
+      case 'pas': return scene.id ? 'Vivre cette Parole' : 'Vivre cette vérité';
       case 'cloture': return 'Clôture de la fiche';
     }
   }, [scene]);
@@ -360,12 +383,17 @@ export default function Immersion({
           .join(' ');
       case 'priere':
         return 'Relis ce que tu viens d’écrire. Puis parle simplement à Dieu à partir de ce que tu as découvert. Tu peux aussi rester un instant en silence.';
-      case 'ancrage-verset':
-        return `${courante.reference}. ${courante.texte}`;
+      case 'ancrage-verset': {
+        if (courante.options.length > 1 && !choixVersetAncrage) return null;
+        const reference = choixVersetAncrage ?? courante.reference;
+        const passage = courante.options.find((option) => option.reference === reference)
+          ?? courante.options[0];
+        return `${passage.reference}. ${passage.texte}`;
+      }
       default:
         return null;
     }
-  }, []);
+  }, [choixVersetAncrage]);
 
   // ── Les moments ─────────────────────────────────────────────
   // « 17/55 · 38 min » dit la vérité et décourage. Le scénario se regroupe
@@ -406,12 +434,13 @@ export default function Immersion({
   // ── Navigation ──────────────────────────────────────────────
   const aller = useCallback(
     (delta: number) => {
+      if (delta > 0 && !ancragePret) return;
       // On change de scène : les commandes reviennent le temps de se repérer.
       setChrome(true);
       arreterLecture();
       setIndex((valeur) => Math.max(0, Math.min(scenario.length - 1, valeur + delta)));
     },
-    [scenario.length]
+    [ancragePret, scenario.length]
   );
 
   useEffect(() => {
@@ -466,17 +495,23 @@ export default function Immersion({
   }, [rangMoment]);
 
   useEffect(() => {
+    const referenceAncrage = scene.type === 'ancrage-verset'
+      ? choixVersetAncrage
+        ?? (scene.options.length === 1 ? scene.reference : null)
+      : null;
+    const estVerset = scene.type === 'verset'
+      || (scene.type === 'ancrage-verset' && referenceAncrage !== null);
     memoriserPassage({
       url: sectionIndex === null
         ? `/fiches/${fiche.id}?immersion=1&scene=${index}`
         : `/aujourdhui?fiche=${fiche.id}&section=${sectionIndex}&scene=${index}`,
       titre: scene.type === 'verset' || scene.type === 'ancrage-verset'
-        ? scene.reference
+        ? referenceAncrage ?? `Fiche ${fiche.id}`
         : `Fiche ${fiche.id}`,
       sousTitre: libelleScene,
-      type: scene.type === 'verset' || scene.type === 'ancrage-verset' ? 'verset' : 'immersion',
+      type: estVerset ? 'verset' : 'immersion',
     });
-  }, [fiche.id, index, libelleScene, scene, sectionIndex]);
+  }, [choixVersetAncrage, fiche.id, index, libelleScene, scene, sectionIndex]);
 
   useEffect(() => {
     const auClavier = (event: KeyboardEvent) => {
@@ -854,9 +889,10 @@ export default function Immersion({
             ) : (
               <button
                 onClick={() => aller(1)}
-                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
+                disabled={!ancragePret}
+                className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md disabled:cursor-not-allowed disabled:opacity-45"
               >
-                <span>Continuer</span>
+                <span>{ancragePret ? 'Continuer' : 'Choisir un verset'}</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </button>
             )}
@@ -1327,15 +1363,25 @@ function RenduScene({
         </div>
       );
 
-    case 'ancrage-verset':
+    case 'ancrage-verset': {
+      const cleChoix = `verset-choisi:${scene.id}`;
+      const selection = reponses[cleChoix]
+        ?? (scene.options.length === 1 ? scene.options[0].reference : '');
+      const passage = scene.options.find((option) => option.reference === selection)
+        ?? scene.options[0];
       return (
         <SceneAncrageVerset
-          reference={scene.reference}
-          texte={scene.texte}
-          valeur={reponses[`memo:${scene.reference}`] ?? ''}
-          onEnregistrer={(valeur) => onEnregistrer(`memo:${scene.reference}`, valeur)}
+          key={passage.reference}
+          options={scene.options}
+          selection={selection}
+          onChoisir={(reference) => onEnregistrer(cleChoix, reference)}
+          reference={passage.reference}
+          texte={passage.texte}
+          valeur={reponses[`memo:${passage.reference}`] ?? ''}
+          onEnregistrer={(valeur) => onEnregistrer(`memo:${passage.reference}`, valeur)}
         />
       );
+    }
 
     case 'resume':
       return (
@@ -1398,31 +1444,67 @@ function RenduScene({
 
     case 'pas': {
       const clePas = scene.id ? `pas:${scene.id}` : `pas:${fiche.id}`;
+      const cleMoment = scene.id ? `pas-moment:${scene.id}` : `pas-moment:${fiche.id}`;
+      const referenceChoisie = scene.id
+        ? reponses[`verset-choisi:${scene.id}`] ?? scene.reference
+        : scene.reference;
+      const passageChoisi = scene.options?.find((option) => option.reference === referenceChoisie)
+        ?? scene.options?.[0];
       return (
         <div className="py-8">
           <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-            Vivre cette vérité
+            {tempsDuJour ? 'Vivre cette Parole' : 'Vivre cette vérité'}
           </span>
           <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-            {tempsDuJour
-              ? 'Quelle vérité veux-tu garder présente aujourd’hui ?'
+            {tempsDuJour && passageChoisi
+              ? 'Relis une dernière fois le verset que tu as choisi.'
               : 'Quelle vérité veux-tu garder présente cette semaine ?'}
           </h2>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
-            Reviens une dernière fois à ce que tu as découvert de Dieu. Y a-t-il une situation
-            concrète dans laquelle tu veux choisir de vivre à partir de cette vérité ?
-          </p>
-          {tempsDuJour && scene.reference && (
-            <p className="mt-3 max-w-xl border-l border-or-400/35 pl-4 font-serif text-base italic leading-relaxed text-parchemin-100/78">
-              Dans quel moment de ta journée aimerais-tu te souvenir de {scene.reference} ?
-            </p>
+          {tempsDuJour && passageChoisi ? (
+            <>
+              <div className="mt-6 rounded-3xl border border-or-400/22 bg-or-400/8 px-5 py-5">
+                <p className="text-2xs font-black uppercase tracking-[0.16em] text-or-300">
+                  La Parole que tu gardes · {passageChoisi.reference}
+                </p>
+                <p className="mt-3 font-serif text-lg italic leading-relaxed text-parchemin-100 sm:text-xl">
+                  « {passageChoisi.texte} »
+                </p>
+              </div>
+              <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
+                Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?
+              </p>
+              <ChampEcriture
+                valeur={reponses[cleMoment] ?? ''}
+                onEnregistrer={(valeur) => onEnregistrer(cleMoment, valeur)}
+                placeholder="Je veux me souvenir de ce verset lorsque…"
+                ariaLabel="Le moment où je veux me souvenir de ce verset"
+                lignes={3}
+              />
+              <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
+                Et quand ce moment arrivera, qu’aimerais-tu faire à partir de cette Parole ?
+              </p>
+              <ChampEcriture
+                valeur={reponses[clePas] ?? ''}
+                onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
+                placeholder="Quand ce moment arrivera, je veux…"
+                ariaLabel="Comment je veux vivre cette Parole"
+                lignes={3}
+              />
+            </>
+          ) : (
+            <>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
+                Reviens une dernière fois à ce que tu as découvert de Dieu. Y a-t-il une situation
+                concrète dans laquelle tu veux choisir de vivre à partir de cette vérité ?
+              </p>
+              <ChampEcriture
+                valeur={reponses[clePas] ?? ''}
+                onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
+                placeholder="Cette semaine, je veux…"
+                lignes={4}
+              />
+            </>
           )}
-          <ChampEcriture
-            valeur={reponses[clePas] ?? ''}
-            onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
-            placeholder={tempsDuJour ? 'Aujourd’hui, je veux…' : 'Cette semaine, je veux…'}
-            lignes={4}
-          />
         </div>
       );
     }
@@ -1485,11 +1567,17 @@ function constructeurReconnaissance(): ConstructeurReconnaissance | null {
 }
 
 function SceneAncrageVerset({
+  options,
+  selection,
+  onChoisir,
   reference,
   texte,
   valeur,
   onEnregistrer,
 }: {
+  options: PassageAncrage[];
+  selection: string;
+  onChoisir: (reference: string) => void;
   reference: string;
   texte: string;
   valeur: string;
@@ -1499,6 +1587,8 @@ function SceneAncrageVerset({
   const [copiee, setCopiee] = useState(false);
   const [microActif, setMicroActif] = useState(false);
   const reconnaissance = useRef<ReconnaissanceVocale | null>(null);
+  const selectionValide = options.length === 1
+    || options.some((option) => option.reference === selection);
   const mots = useMemo(() => texte.trim().split(/\s+/), [texte]);
   const motsATrous = useMemo(
     () => mots.map((mot, indexMot) => ({ mot, masque: indexMot % 3 === 1 && mot.length > 2 })),
@@ -1594,22 +1684,74 @@ function SceneAncrageVerset({
 
   return (
     <div className="py-6 sm:py-9">
-      <div className="flex items-center justify-between gap-4 border-b border-or-400/18 pb-4">
-        <div>
-          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-            Mémoriser la Parole
-          </span>
-          <p className="mt-1 font-serif text-xl font-bold text-or-200">{reference}</p>
+      <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+        La Parole que je garde
+      </span>
+      <h2 className="mt-3 max-w-2xl font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
+        {options.length > 1
+          ? 'Lequel de ces versets veux-tu garder avec toi aujourd’hui ?'
+          : 'Garde cette Parole avec toi aujourd’hui.'}
+      </h2>
+
+      {options.length > 1 && (
+        <div className="mt-6 grid gap-3 sm:grid-cols-2" role="group" aria-label="Choisir le verset à mémoriser">
+          {options.map((option) => {
+            const choisi = option.reference === selection;
+            return (
+              <button
+                key={option.reference}
+                type="button"
+                onClick={() => onChoisir(option.reference)}
+                aria-pressed={choisi}
+                className={`min-h-28 rounded-3xl border p-4 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-300 ${
+                  choisi
+                    ? 'border-or-300 bg-or-400/16 shadow-[0_0_0_1px_rgba(216,170,85,0.2)]'
+                    : 'border-white/12 bg-white/5 hover:border-or-400/35 hover:bg-white/8'
+                }`}
+              >
+                <span className="flex items-center justify-between gap-3">
+                  <span className={`font-serif text-lg font-bold ${choisi ? 'text-or-200' : 'text-parchemin-100'}`}>
+                    {option.reference}
+                  </span>
+                  <span className={`grid h-7 w-7 place-items-center rounded-full border ${
+                    choisi
+                      ? 'border-or-300 bg-or-400 text-encre-950'
+                      : 'border-white/20 text-transparent'
+                  }`}>
+                    <Check className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                </span>
+                <span className="mt-3 block line-clamp-2 font-serif text-sm italic leading-relaxed text-parchemin-100/65">
+                  « {option.texte} »
+                </span>
+              </button>
+            );
+          })}
         </div>
-        <div className="flex items-center gap-1">
-          <button type="button" onClick={copierVerset} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Copier le verset">
-            {copiee ? <Check className="h-4 w-4 text-emerald-300" /> : <Copy className="h-4 w-4" />}
-          </button>
-          <button type="button" onClick={() => lireAVoixHaute(`${reference}. ${texte}`)} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Écouter le verset">
-            <Volume2 className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+      )}
+
+      {!selectionValide ? (
+        <p className="mt-7 rounded-2xl border border-dashed border-or-400/25 bg-or-400/6 px-4 py-4 text-sm text-parchemin-100/65">
+          Prends ton temps. La mémorisation commencera avec la Parole que tu auras choisie.
+        </p>
+      ) : (
+        <>
+          <div className="mt-8 flex items-center justify-between gap-4 border-b border-or-400/18 pb-4">
+            <div>
+              <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+                Mémoriser la Parole
+              </span>
+              <p className="mt-1 font-serif text-xl font-bold text-or-200">{reference}</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={copierVerset} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Copier le verset">
+                {copiee ? <Check className="h-4 w-4 text-emerald-300" /> : <Copy className="h-4 w-4" />}
+              </button>
+              <button type="button" onClick={() => lireAVoixHaute(`${reference}. ${texte}`)} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Écouter le verset">
+                <Volume2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
 
       <div className="mt-7 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {niveaux.map((element) => (
@@ -1666,9 +1808,11 @@ function SceneAncrageVerset({
         )}
       </div>
 
-      <button type="button" onClick={telechargerFond} className="mx-auto mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-or-400/22 bg-or-400/8 px-5 text-xs font-bold text-or-200 hover:bg-or-400/14">
-        <Download className="h-4 w-4" /> Garder ce verset en fond d&apos;écran
-      </button>
+          <button type="button" onClick={telechargerFond} className="mx-auto mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-or-400/22 bg-or-400/8 px-5 text-xs font-bold text-or-200 hover:bg-or-400/14">
+            <Download className="h-4 w-4" /> Garder ce verset en fond d&apos;écran
+          </button>
+        </>
+      )}
     </div>
   );
 }
@@ -1964,11 +2108,13 @@ function ChampEcriture({
   valeur,
   onEnregistrer,
   placeholder,
+  ariaLabel,
   lignes,
 }: {
   valeur: string;
   onEnregistrer: (valeur: string) => void;
   placeholder: string;
+  ariaLabel?: string;
   lignes: number;
 }) {
   const [sauvegarde, setSauvegarde] = useState(false);
@@ -1990,6 +2136,7 @@ function ChampEcriture({
         onChange={(event) => changer(event.target.value)}
         rows={lignes}
         placeholder={placeholder}
+        aria-label={ariaLabel}
         className="verre w-full resize-none rounded-3xl px-5 py-4 text-base leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
       />
       <div className="mt-2 flex items-center justify-between">
