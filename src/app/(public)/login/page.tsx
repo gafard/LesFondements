@@ -62,13 +62,40 @@ function LoginContent() {
 
   const handleGoogle = async () => {
     setLoading(true);
+    setError('');
     try {
       await signInWithGoogle();
-    } catch (err) {
-      console.error(err);
-      setError(
-        "La connexion Google a échoué. Vérifiez que le domaine est autorisé dans la console Firebase."
-      );
+    } catch (err: unknown) {
+      console.error('Erreur Google Sign-in:', err);
+      const code =
+        typeof err === 'object' && err !== null && 'code' in err
+          ? String((err as { code: unknown }).code)
+          : '';
+      const message =
+        typeof err === 'object' && err !== null && 'message' in err
+          ? String((err as { message: unknown }).message)
+          : '';
+
+      if (code === 'auth/popup-closed-by-user') {
+        // L'utilisateur a simplement fermé la fenêtre
+        return;
+      } else if (code === 'auth/operation-not-allowed') {
+        setError(
+          "Le fournisseur Google n'est pas activé. Activez-le dans l'onglet 'Méthode de connexion' de la console Firebase."
+        );
+      } else if (code === 'auth/unauthorized-domain') {
+        setError(
+          "Ce domaine n'est pas autorisé dans la console Firebase (Paramètres > Domaines autorisés)."
+        );
+      } else if (code === 'auth/network-request-failed') {
+        setError("Erreur réseau. Vérifiez votre connexion Internet.");
+      } else {
+        setError(
+          message || code
+            ? `Erreur Google (${code || 'info'}) : ${message || 'Échec de la connexion'}`
+            : 'La connexion Google a échoué. Veuillez réessayer.'
+        );
+      }
     } finally {
       setLoading(false);
     }

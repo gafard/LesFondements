@@ -65,9 +65,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (isFirebaseConfigured) {
       void Promise.all([import('./firebase'), import('firebase/auth')])
-        .then(([{ getFirebaseAuth }, { onAuthStateChanged }]) => {
+        .then(([{ getFirebaseAuth }, { onAuthStateChanged, getRedirectResult }]) => {
           return getFirebaseAuth().then((auth) => {
             if (!active) return;
+            getRedirectResult(auth).catch(() => {});
             unsubscribe = onAuthStateChanged(auth, (currentUser) => {
               if (currentUser) {
                 setUser({
@@ -110,22 +111,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     try {
-      const [{ getFirebaseAuth }, { GoogleAuthProvider, signInWithPopup }] = await Promise.all([
+      const [{ getFirebaseAuth }, { GoogleAuthProvider, signInWithPopup, signInWithRedirect }] = await Promise.all([
         import('./firebase'),
         import('firebase/auth'),
       ]);
       const auth = await getFirebaseAuth();
       const provider = new GoogleAuthProvider();
-      const res = await signInWithPopup(auth, provider);
-      setUser({
-        uid: res.user.uid,
-        email: res.user.email,
-        displayName: res.user.displayName,
-        photoURL: res.user.photoURL,
-      });
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      try {
+        const res = await signInWithPopup(auth, provider);
+        setUser({
+          uid: res.user.uid,
+          email: res.user.email,
+          displayName: res.user.displayName,
+          photoURL: res.user.photoURL,
+        });
+      } catch (popupErr: unknown) {
+        const code =
+          typeof popupErr === 'object' && popupErr !== null && 'code' in popupErr
+            ? String((popupErr as { code: unknown }).code)
+            : '';
+        if (code === 'auth/popup-blocked' || code === 'auth/cancelled-popup-request') {
+          console.warn('Popup bloquée par le navigateur, bascule en redirection...');
+          await signInWithRedirect(auth, provider);
+          return;
+        }
+        throw popupErr;
+      }
     } catch (err) {
-      // Firebase est branché : une erreur doit remonter, pas se transformer
-      // en session locale silencieuse qui ne rejoindra jamais de vrai groupe.
       console.error('Connexion Google refusée', err);
       throw err;
     }
