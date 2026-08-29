@@ -80,14 +80,18 @@ export default function Navbar() {
   // ── Mode filigrane : logo seul, fond transparent ─────────────
   if (estImmersive) {
     return (
-      <nav className="pointer-events-none fixed inset-x-0 top-0 z-50">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
+      <nav
+        className="pointer-events-none fixed inset-x-0 top-0 z-50"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-8">
           <Link href="/" className="pointer-events-auto flex items-center gap-2.5 group">
             <Image
               src="/logo-transparent.png"
               alt="Les Fondements Logo"
               width={32}
               height={32}
+              unoptimized
               className="h-8 w-8 object-contain transition-transform duration-300 group-hover:scale-105"
               priority
             />

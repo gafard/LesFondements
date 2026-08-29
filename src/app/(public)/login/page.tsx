@@ -76,7 +76,10 @@ function LoginContent() {
 
 
   return (
-    <div className="nuit nuit-grain relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-20 lg:py-28">
+    <div
+      className="nuit nuit-grain relative flex min-h-screen items-center justify-center overflow-hidden px-4 pb-12 lg:py-28"
+      style={{ paddingTop: 'calc(max(1.5rem, env(safe-area-inset-top, 0px)) + 4.5rem)' }}
+    >
       
       {/* Background Illustrated Community Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -163,7 +166,6 @@ function LoginContent() {
             </div>
 
             <div className="feuille relative rounded-3xl border border-parchemin-300 p-6 sm:p-8 shadow-2xl text-encre-950">
-              <span className="ruban -top-3 left-1/2 -translate-x-1/2 -rotate-1 rounded-[2px]" />
               
               <div className="hidden lg:block mb-6">
                 <h3 className="font-serif text-2xl font-bold text-encre-950">
