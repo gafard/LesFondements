@@ -26,14 +26,14 @@ function versetDuJour(jour: string): { reference: string; texte: string } | null
   return { reference, texte: VERSETS_CONNUS[reference] };
 }
 
-function goutteDeRosee(jour: string): PushPayload | null {
+function goutteDeRosee(jour: string, ficheId?: number): PushPayload | null {
   const verset = versetDuJour(jour);
   if (!verset) return null;
   const texte = verset.texte.length > 140 ? `${verset.texte.slice(0, 137)}…` : verset.texte;
   return {
-    title: 'Goutte de rosée',
+    title: 'Votre table du jour',
     body: `« ${texte} » — ${verset.reference}`,
-    url: '/memorisation',
+    url: ficheId ? `/rituel?fiche=${ficheId}` : '/rituel',
     tag: `rosee-${jour}`,
   };
 }
@@ -113,16 +113,16 @@ export async function GET(requete: Request) {
     const preferences = abonnement.preferences;
     const jour = jourLocal(maintenant, abonnement.timezone);
     const heure = heureLocale(maintenant, abonnement.timezone);
+    const calendrier = abonnement.calendrier;
 
     if (
       preferences?.goutteDeRosee &&
       estLHeure(preferences.heureMatin || '07:30', heure)
     ) {
-      const message = goutteDeRosee(jour);
+      const message = goutteDeRosee(jour, calendrier?.currentStep);
       if (message) await envoyer([`rosee:${jour}`], message);
     }
 
-    const calendrier = abonnement.calendrier;
     if (calendrier && !disparu) {
       const rencontre = prochaineRencontre(calendrier, maintenant);
       if (rencontre) {
@@ -136,7 +136,7 @@ export async function GET(requete: Request) {
           await envoyer([`rencontre:48h:${rencontreId}`], {
             title: `Préparer la fiche ${calendrier.currentStep}`,
             body: `${calendrier.groupName} se retrouve dans moins de 48 h. Votre feuille vous attend.`,
-            url: `/fiches/${calendrier.currentStep}`,
+            url: `/rituel?fiche=${calendrier.currentStep}`,
             tag: `rencontre-48h-${rencontreId}`,
           });
         }

@@ -16,7 +16,7 @@ const BLOCS = [
   {
     icon: EyeOff,
     titre: 'Une mesure volontaire et minimale',
-    texte: 'La mesure produit est désactivée tant que vous ne l’acceptez pas. Elle ne contient ni nom, ni courriel, ni identifiant de groupe, ni texte saisi. Elle retient uniquement des jalons — installation, fiche 1, groupe, préparation, rencontre et retour — sous un identifiant d’installation aléatoire.',
+    texte: 'La mesure produit est désactivée tant que vous ne l’acceptez pas. Elle ne contient ni nom, ni courriel, ni identifiant de groupe, ni texte saisi. Elle retient uniquement des jalons — installation, fiche 1, groupe, préparation, rituel, rencontre et rétention — sous un identifiant d’installation aléatoire.',
   },
   {
     icon: Flag,
@@ -39,7 +39,7 @@ export default function ConfidentialitePage() {
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-or-800">Confiance et protection</p>
           <h1 className="mt-3 font-serif text-3xl font-bold text-encre-950 sm:text-5xl">Vos écrits vous appartiennent.</h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-encre-700">
-            Cette politique décrit, en langage direct, ce que l’application conserve et ce qu’elle ne collecte pas. Dernière mise à jour : 27 août 2026.
+            Cette politique décrit, en langage direct, ce que l’application conserve et ce qu’elle ne collecte pas. Dernière mise à jour : 29 août 2026.
           </p>
         </header>
 

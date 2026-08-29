@@ -119,7 +119,12 @@ export default function YearHeatmap() {
       </div>
 
       {/* Month labels & Heatmap Grid */}
-      <div className="relative mb-2 overflow-x-auto pb-2">
+      <div
+        className="relative mb-2 overflow-x-auto pb-2"
+        role="region"
+        aria-label="Historique d’activité, défilement horizontal"
+        tabIndex={0}
+      >
         <div className="relative h-4 min-w-max mb-1" style={{ width: `${weeks.length * 13}px` }}>
           {monthOffsets.map(({ label, col }) => (
             <span

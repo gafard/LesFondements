@@ -162,7 +162,8 @@ function CelluleContent() {
               src="/warm-fellowship.jpg"
               alt="Communion fraternelle et partage dans un salon chaleureux"
               fill
-              sizes="100vw"
+              sizes="(min-width: 1024px) 1024px, calc(100vw - 2rem)"
+              priority
               className="object-cover object-[center_30%] opacity-45"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#07162b] via-[#07162b]/85 to-[#07162b]/65" />

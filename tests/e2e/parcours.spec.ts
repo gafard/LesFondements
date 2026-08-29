@@ -25,6 +25,31 @@ test('fiche 1 : une réponse est sauvegardée automatiquement', async ({ page })
     .toContain('dix minutes');
 });
 
+test('rituel : le texte du livret mène à un pas personnel privé', async ({ page }) => {
+  await page.goto('/rituel');
+  await expect(page.getByRole('heading', { name: 'Ma semaine sur la table' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dieu règne' })).toBeVisible();
+  await expect(page.getByText('Texte du livret', { exact: true })).toBeVisible();
+
+  await page.getByPlaceholder('Aujourd’hui, je choisis de…').fill(
+    'Commencer ma journée par reconnaître que Dieu règne.'
+  );
+  await page.getByRole('button', { name: 'Terminer ce moment' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Un amour relationnel et inconditionnel' })).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate((uid) => {
+        const donnees = JSON.parse(localStorage.getItem(`lesfondements_prog_${uid}`) || '{}');
+        const brut = donnees['1']?.answers?.['rituel:v1'];
+        if (!brut) return null;
+        const rituel = JSON.parse(brut);
+        return rituel.moments?.['resume-1']?.pas;
+      }, UTILISATEUR.uid)
+    )
+    .toContain('Dieu règne');
+});
+
 test('absence : le choix reste associé au membre', async ({ page }) => {
   await page.goto('/groupes');
   await page.getByRole('button', { name: /Je ne peux pas/i }).click();

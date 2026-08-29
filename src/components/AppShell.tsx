@@ -21,6 +21,7 @@ import {
   Printer,
   Search,
   ShieldCheck,
+  Sunrise,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -60,13 +61,14 @@ interface Destination {
 
 const PRINCIPALES: Destination[] = [
   { href: '/dashboard', label: 'Tableau de bord', court: 'Accueil', icon: Home },
+  { href: '/rituel', label: 'Rituel du jour', court: 'Aujourd’hui', icon: Sunrise },
   { href: '/fiches', label: 'Le parcours', court: 'Parcours', icon: Compass },
   { href: '/groupes', label: 'Ma cellule', court: 'Cellule', icon: Users },
   { href: '/memorisation', label: 'Mémorisation', court: 'Versets', icon: Brain },
-  { href: '/journal', label: 'Journal', court: 'Journal', icon: PenLine },
 ];
 
 const SECONDAIRES: Destination[] = [
+  { href: '/journal', label: 'Journal', court: 'Journal', icon: PenLine },
   { href: '/recherche', label: 'Retrouver mes écrits', court: 'Recherche', icon: Search },
   { href: '/transformation', label: 'Mon chemin parcouru', court: 'Chemin', icon: TrendingUp },
   { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
@@ -304,7 +306,7 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
             <LogOut className="h-4 w-4" />
           </button>
           {group && (
-            <span className="shrink-0 rounded-full bg-or-100 px-2.5 py-0.5 text-2xs font-bold text-or-700">
+            <span className="shrink-0 rounded-full bg-or-100 px-2.5 py-0.5 text-2xs font-bold text-encre-800">
               Fiche {group.currentStep}/20
             </span>
           )}

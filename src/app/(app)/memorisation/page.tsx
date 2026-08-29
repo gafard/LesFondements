@@ -157,7 +157,8 @@ function MemorisationContent() {
               src="/memorisation-hero.jpg"
               alt="Cartes de versets et méditation de la Parole"
               fill
-              sizes="100vw"
+              sizes="(min-width: 768px) 768px, calc(100vw - 2rem)"
+              priority
               className="object-cover object-center opacity-30"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#07162b]/95 via-[#07162b]/85 to-[#07162b]/95" />

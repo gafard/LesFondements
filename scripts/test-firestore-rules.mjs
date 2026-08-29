@@ -150,6 +150,9 @@ try {
     event: 'fiche_1', day: '2026-08-28', createdAt: 10, expiresAt: 1000, version: 'test',
   };
   await assertSucceeds(setDoc(doc(bob, 'usageEvents/installation-e2e:fiche_1'), usage));
+  await assertSucceeds(setDoc(doc(bob, 'usageEvents/installation-e2e:rituel'), {
+    ...usage, id: 'installation-e2e:rituel', event: 'rituel',
+  }));
   await assertFails(setDoc(doc(anonyme, 'usageEvents/anonymous'), { ...usage, id: 'anonymous' }));
   await assertFails(setDoc(doc(bob, 'usageEvents/extra'), { ...usage, id: 'extra', email: 'bob@example.test' }));
   await assertFails(getDoc(doc(bob, 'usageEvents/installation-e2e:fiche_1')));

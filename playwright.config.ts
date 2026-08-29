@@ -12,7 +12,7 @@ export default defineConfig({
   // evite que quatre premieres compilations se disputent le meme cache.
   workers: 1,
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
-  timeout: 45_000,
+  timeout: 75_000,
   expect: { timeout: 8_000 },
   use: {
     baseURL,

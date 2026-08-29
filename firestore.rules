@@ -390,7 +390,7 @@ service cloud.firestore {
         && request.resource.data.installationId.size() >= 20
         && request.resource.data.installationId.size() <= 80
         && request.resource.data.event in [
-          'installation', 'fiche_1', 'groupe', 'preparation', 'rencontre',
+          'installation', 'fiche_1', 'groupe', 'preparation', 'rituel', 'rencontre',
           'retention_j1', 'retention_j7', 'retention_j30'
         ]
         && request.resource.data.day is string

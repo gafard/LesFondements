@@ -17,7 +17,7 @@ export const MEETING_FLOW = [
   {
     key: 'retour',
     title: 'Retour sur la semaine',
-    hint: "Ce que chacun a vécu depuis la dernière fois : une joie, une difficulté, un pas franchi.",
+    hint: "Chacun peut partager, s’il le souhaite, une joie, une difficulté ou un pas vécu. Les notes privées ne sont jamais affichées au groupe.",
     minutes: 10,
   },
   {

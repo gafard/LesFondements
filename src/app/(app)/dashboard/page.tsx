@@ -34,6 +34,7 @@ import ModernIcon from '@/components/ModernIcon';
 import NotificationCenter from '@/components/NotificationCenter';
 import EdificeFondements from '@/components/EdificeFondements';
 import RecapManque from '@/components/RecapManque';
+import RituelDuJourCard from '@/components/RituelDuJourCard';
 import PauseSanctuaire from '@/components/PauseSanctuaire';
 import { ouvrirCentre } from '@/lib/centre';
 import { getCachedJournalEntries, getJournalEntries, timestampToDate } from '@/lib/firestore';
@@ -153,6 +154,8 @@ function DashboardContent() {
             />
           </div>
         </div>
+
+        <RituelDuJourCard userId={user.uid} ficheId={group.currentStep} />
 
         {/* ══ Rencontre en direct (si ouverte) ══ */}
         {enRencontre && (
