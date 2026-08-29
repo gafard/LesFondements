@@ -99,24 +99,25 @@ export default function CentreApplication({
     }
   };
 
+  // Un panneau ferme ne reste pas dans l'arbre d'accessibilite : masquer le
+  // conteneur avec aria-hidden laissait tous ses boutons atteignables au
+  // clavier et aux lecteurs d'ecran.
+  if (!ouvert) return null;
+
   return (
     <>
       <button
         type="button"
         aria-label="Fermer"
         onClick={onFermer}
-        className={`fixed inset-0 z-[90] cursor-default bg-encre-950/50 backdrop-blur-sm transition-opacity duration-300 ${
-          ouvert ? 'opacity-100' : 'pointer-events-none opacity-0'
-        }`}
+        className="fixed inset-0 z-[90] cursor-default bg-encre-950/50 backdrop-blur-sm"
       />
 
       <div
         role="dialog"
         aria-label="L’application"
-        aria-hidden={!ouvert}
-        className={`fixed inset-x-0 bottom-0 z-[91] mx-auto max-h-[86vh] max-w-lg overflow-y-auto rounded-t-4xl border-t border-white/12 bg-encre-950/95 px-5 pt-3 shadow-2xl backdrop-blur-2xl transition-transform duration-400 ${
-          ouvert ? 'translate-y-0' : 'pointer-events-none translate-y-full'
-        }`}
+        aria-modal="true"
+        className="fixed inset-x-0 bottom-0 z-[91] mx-auto max-h-[86vh] max-w-lg overflow-y-auto rounded-t-4xl border-t border-white/12 bg-encre-950/95 px-5 pt-3 shadow-2xl backdrop-blur-2xl"
         style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
       >
         <span className="mx-auto mb-5 block h-1 w-10 rounded-full bg-white/20" />

@@ -39,7 +39,6 @@ function LoginContent() {
     try {
       if (isLogin) await signInWithEmail(email, password);
       else await signUpWithEmail(email, password, name);
-      router.replace(suite);
     } catch (err: unknown) {
       console.error(err);
       const code =
@@ -65,7 +64,6 @@ function LoginContent() {
     setLoading(true);
     try {
       await signInWithGoogle();
-      router.replace(suite);
     } catch (err) {
       console.error(err);
       setError(
@@ -208,6 +206,7 @@ function LoginContent() {
                 <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-encre-400" />
                 <input
                   type="text"
+                  aria-label="Prénom"
                   required
                   value={name}
                   onChange={(event) => setName(event.target.value)}
@@ -221,6 +220,7 @@ function LoginContent() {
               <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-encre-400" />
               <input
                 type="email"
+                aria-label="Adresse e-mail"
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -234,6 +234,7 @@ function LoginContent() {
               <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-encre-400" />
               <input
                 type="password"
+                aria-label="Mot de passe"
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}

@@ -242,8 +242,7 @@ function MemorisationContent() {
         ) : (
           <>
             {/* ── Carte ── */}
-            <button
-              onClick={() => setRetournee((valeur) => !valeur)}
+            <div
               className="group relative block w-full text-left"
               style={{ perspective: '1600px' }}
             >
@@ -255,8 +254,11 @@ function MemorisationContent() {
                 }}
               >
                 {/* Recto : la référence */}
-                <div
-                  className="nuit nuit-grain absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-4xl p-8 text-center shadow-lg"
+                <button
+                  type="button"
+                  onClick={() => setRetournee(true)}
+                  aria-label={`Retourner la carte ${carte.reference}`}
+                  className="nuit nuit-grain absolute inset-0 flex w-full flex-col items-center justify-center overflow-hidden rounded-4xl p-8 text-center shadow-lg"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
                   <span className="ruban -top-3 left-1/2 -translate-x-1/2 -rotate-1 rounded-[2px]" />
@@ -270,7 +272,7 @@ function MemorisationContent() {
                   <span className="relative z-10 mt-8 inline-flex items-center gap-1.5 text-2xs text-parchemin-100/40">
                     <RotateCw className="h-3 w-3" /> Touchez pour retourner
                   </span>
-                </div>
+                </button>
 
                 {/* Verso : le texte */}
                 <div
@@ -278,6 +280,14 @@ function MemorisationContent() {
                   style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
                 >
                   <span className="ruban -top-3 left-1/2 -translate-x-1/2 -rotate-1 rounded-[2px]" />
+                  <button
+                    type="button"
+                    onClick={() => setRetournee(false)}
+                    className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/85 px-3 py-2 text-2xs font-bold text-encre-700 shadow-xs"
+                    aria-label="Retourner côté référence"
+                  >
+                    <RotateCw className="h-3.5 w-3.5" /> Référence
+                  </button>
                   <div>
                     <span className="manuscrit text-xl font-bold text-or-700">
                       {carte.reference}
@@ -391,7 +401,7 @@ function MemorisationContent() {
                   </div>
                 </div>
               </div>
-            </button>
+            </div>
 
             {mode === 'epreuve' && (carte.texte || carte.copie) && (
               <div className="mt-4">

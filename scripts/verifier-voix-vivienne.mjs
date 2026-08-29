@@ -9,6 +9,7 @@
  *   npm run voix:vivienne:verifier
  */
 import { access, readFile, stat, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -18,6 +19,7 @@ const livret = JSON.parse(await readFile(path.join(racine, 'src', 'data', 'livre
 const versets = JSON.parse(
   await readFile(path.join(racine, 'src', 'data', 'versetsLivret.json'), 'utf8')
 );
+const moteurDiction = await readFile(path.join(racine, 'src', 'lib', 'prononciation.mjs'), 'utf8');
 
 const estLisible = (texte) =>
   typeof texte === 'string' && texte.replace(/[^\p{L}\p{N}]/gu, '').length >= 2;
@@ -75,6 +77,7 @@ const manifeste = {
   complete: true,
   genereLe: new Date().toISOString(),
   voix: 'fr-FR-VivienneMultilingualNeural',
+  empreinteDiction: createHash('sha256').update(moteurDiction).digest('hex').slice(0, 16),
   pistes: [...attendues].sort(),
 };
 await writeFile(path.join(dossier, 'manifeste.json'), `${JSON.stringify(manifeste, null, 2)}\n`);

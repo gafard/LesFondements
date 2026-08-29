@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useSyncExternalStore } from 'react';
+import { firebaseConfigure } from './runtime';
 
 export interface AppUser {
   uid: string;
@@ -17,6 +18,7 @@ interface AuthContextType {
   signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   signInAsGuest: (displayName?: string) => Promise<void>;
   logout: () => Promise<void>;
+  supprimerCompte: () => Promise<void>;
   isFirebaseConfigured: boolean;
 }
 
@@ -44,10 +46,7 @@ function lireUtilisateurLocal(): AppUser | null {
  * en mode local — le bouton « Découvrir sans créer de compte » apparaissait
  * puis disparaissait à chaque chargement.
  */
-const FIREBASE_CONFIGURE = (() => {
-  const cle = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  return !!cle && cle !== 'your-api-key' && !cle.includes('your-');
-})();
+const FIREBASE_CONFIGURE = firebaseConfigure();
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Le serveur et le tout premier rendu navigateur voient tous les deux une
@@ -214,6 +213,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
+  const supprimerCompte = async () => {
+    if (!user) return;
+    const { effacerDonneesLocales, supprimerDonneesDistantes } = await import('./confidentialite');
+
+    if (isFirebaseConfigured) {
+      const [{ getFirebaseAuth }, { deleteUser }] = await Promise.all([
+        import('./firebase'),
+        import('firebase/auth'),
+      ]);
+      const auth = await getFirebaseAuth();
+      const current = auth.currentUser;
+      if (!current) throw new Error('AUTHENTIFICATION_REQUISE');
+      const jeton = await current.getIdTokenResult();
+      const authentifieLe = new Date(jeton.authTime).getTime();
+      if (Date.now() - authentifieLe > 5 * 60 * 1000) throw new Error('CONNEXION_RECENTE_REQUISE');
+      await supprimerDonneesDistantes(user.uid);
+      await deleteUser(current);
+    }
+
+    effacerDonneesLocales();
+    setUser(null);
+  };
+
   return (
     <AuthContext.Provider value={{
       user: hydrate ? user : null,
@@ -223,6 +245,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       signUpWithEmail,
       signInAsGuest,
       logout,
+      supprimerCompte,
       isFirebaseConfigured,
     }}>
       {children}

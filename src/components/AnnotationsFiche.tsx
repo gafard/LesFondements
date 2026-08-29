@@ -234,7 +234,7 @@ export default function AnnotationsFiche({ document, onChanger }: AnnotationsFic
         <div className="flex items-center gap-2 border-t border-[#755538]/20 bg-[#efe3d0] px-4 py-3 text-2xs text-encre-600">
           <Highlighter className="h-3.5 w-3.5 text-or-700" />
           <span>{document.surlignages.length} passage{document.surlignages.length > 1 ? 's' : ''} surligné{document.surlignages.length > 1 ? 's' : ''}</span>
-          <span className="ml-auto inline-flex items-center gap-1 font-bold text-emerald-700"><Check className="h-3 w-3" /> Sauvegarde auto</span>
+          <span className="ml-auto inline-flex items-center gap-1 font-bold text-emerald-900"><Check className="h-3 w-3" /> Sauvegarde auto</span>
         </div>
       </div>
     </aside>

@@ -28,6 +28,7 @@ import Illumination from '@/components/Illumination';
 import { Etincelle, MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import {
   AMBIANCES,
+  activerDuckingVoix,
   arreterAmbiance,
   arreterLecture,
   jouerAmbiance,
@@ -204,6 +205,8 @@ export default function Immersion({
   /** Confort de lecture, de 0,9 à 1,3. */
   const [taille, setTaille] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const sourceDuckingAudio = useRef(Symbol('immersion-piste-enregistree'));
+  const enchainerRef = useRef(enchainer);
   const zone = useRef<HTMLDivElement>(null);
   const depart = useRef<number | null>(null);
 
@@ -290,6 +293,32 @@ export default function Immersion({
   );
 
   useEffect(() => {
+    enchainerRef.current = enchainer;
+  }, [enchainer]);
+
+  const lireSceneAvecLeNavigateur = useCallback(
+    (courante: Scene) => {
+      const texte = texteDeLaScene(courante);
+      if (!texte) {
+        setAudioEnCours(false);
+        return false;
+      }
+      const demarree = lireAVoixHaute(texte, {
+        genre: genreVoixLocal,
+        onDebut: () => setAudioEnCours(true),
+        onFin: () => {
+          setAudioEnCours(false);
+          setAudioAvancement(1);
+          if (enchainerRef.current) aller(1);
+        },
+        onErreur: () => setAudioEnCours(false),
+      });
+      return demarree;
+    },
+    [aller, genreVoixLocal, texteDeLaScene]
+  );
+
+  useEffect(() => {
     zone.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [index]);
 
@@ -361,6 +390,7 @@ export default function Immersion({
 
   useEffect(
     () => () => {
+      activerDuckingVoix(false, sourceDuckingAudio.current);
       void arreterAmbiance();
       arreterLecture();
     },
@@ -401,9 +431,7 @@ export default function Immersion({
         const p = el.play();
         if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
       } else {
-        const texte = texteDeLaScene(scene);
-        if (texte) lireAVoixHaute(texte, { genre: genreVoixLocal });
-        setAudioEnCours(true);
+        lireSceneAvecLeNavigateur(scene);
       }
       return;
     }
@@ -417,22 +445,25 @@ export default function Immersion({
         const p = el.play();
         if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
       } else {
-        const texte = texteDeLaScene(scene);
-        if (texte) lireAVoixHaute(texte, { genre: genreVoixLocal });
-        setAudioEnCours(true);
+        lireSceneAvecLeNavigateur(scene);
       }
     }
-  }, [lecture, audioEnCours, pisteCourante, scene, texteDeLaScene, genreVoixLocal]);
+  }, [lecture, audioEnCours, pisteCourante, scene, lireSceneAvecLeNavigateur]);
 
   useEffect(() => {
     if (!lecture || pisteCourante) {
       arreterLecture();
       return;
     }
-    const texte = texteDeLaScene(scene);
-    if (texte) lireAVoixHaute(texte, { genre: genreVoixLocal });
-    return () => arreterLecture();
-  }, [lecture, scene, texteDeLaScene, pisteCourante, genreVoixLocal]);
+    // La synthèse appelle ses callbacks d'état dès le démarrage. La lancer
+    // après l'effet évite une cascade de rendu synchrone et laisse React
+    // stabiliser la scène courante avant que la voix prenne la main.
+    const minuteur = window.setTimeout(() => lireSceneAvecLeNavigateur(scene), 0);
+    return () => {
+      window.clearTimeout(minuteur);
+      arreterLecture();
+    };
+  }, [lecture, scene, pisteCourante, lireSceneAvecLeNavigateur]);
 
   // Lecture de la piste audio studio / ElevenLabs / Vivienne
   useEffect(() => {
@@ -748,16 +779,27 @@ export default function Immersion({
       <audio
         ref={audioRef}
         preload="auto"
-        onPlay={() => setAudioEnCours(true)}
-        onPause={() => setAudioEnCours(false)}
+        onPlay={() => {
+          activerDuckingVoix(true, sourceDuckingAudio.current);
+          setAudioEnCours(true);
+        }}
+        onPause={() => {
+          activerDuckingVoix(false, sourceDuckingAudio.current);
+          setAudioEnCours(false);
+        }}
         onTimeUpdate={(event) => {
           const el = event.currentTarget;
           if (el.duration) setAudioAvancement(el.currentTime / el.duration);
         }}
         onEnded={() => {
+          activerDuckingVoix(false, sourceDuckingAudio.current);
           setAudioEnCours(false);
           setAudioAvancement(1);
           if (enchainer) aller(1);
+        }}
+        onError={() => {
+          activerDuckingVoix(false, sourceDuckingAudio.current);
+          if (lecture) lireSceneAvecLeNavigateur(scene);
         }}
       />
     </div>
@@ -817,24 +859,22 @@ function FeuilleOptions({
     return () => window.removeEventListener('keydown', auClavier);
   }, [ouverte, onFermer]);
 
+  if (!ouverte) return null;
+
   return (
     <>
       <button
         type="button"
         aria-label="Fermer les réglages"
         onClick={onFermer}
-        className={`fixed inset-0 z-[70] cursor-default bg-encre-950/50 backdrop-blur-sm transition-opacity duration-300 ${
-          ouverte ? 'opacity-100' : 'pointer-events-none opacity-0'
-        }`}
+        className="fixed inset-0 z-[70] cursor-default bg-encre-950/50 backdrop-blur-sm"
       />
 
       <div
         role="dialog"
         aria-label="Réglages de l’immersion"
-        aria-hidden={!ouverte}
-        className={`fixed inset-x-0 bottom-0 z-[71] mx-auto max-h-[82vh] max-w-lg overflow-y-auto rounded-t-4xl border-t border-white/12 bg-encre-950/95 px-5 pt-3 shadow-2xl backdrop-blur-2xl transition-transform duration-400 ${
-          ouverte ? 'translate-y-0' : 'pointer-events-none translate-y-full'
-        }`}
+        aria-modal="true"
+        className="fixed inset-x-0 bottom-0 z-[71] mx-auto max-h-[82vh] max-w-lg overflow-y-auto rounded-t-4xl border-t border-white/12 bg-encre-950/95 px-5 pt-3 shadow-2xl backdrop-blur-2xl"
         style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
       >
         {/* La poignée : on doit voir que ça se tire. */}

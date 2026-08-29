@@ -1,25 +1,9 @@
 import type { Metadata, Viewport } from 'next';
-import { Caveat, Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/AuthContext';
 import { ParcoursProvider } from '@/lib/ParcoursContext';
-import Navbar from '@/components/Navbar';
-import AppShell from '@/components/AppShell';
 import ClientTools from '@/components/ClientTools';
-
-const inter = Inter({ subsets: ['latin'], variable: '--police-ui', display: 'swap' });
-
-/**
- * L'écriture à la main du parcours : les annotations, les post-it, les
- * versets recopiés. Caveat couvre les accents français, ce que la plupart
- * des fontes manuscrites ne font pas.
- */
-const caveat = Caveat({
-  subsets: ['latin', 'latin-ext'],
-  weight: ['400', '600', '700'],
-  variable: '--police-main',
-  display: 'swap',
-});
+import MesureProduit from '@/components/MesureProduit';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://parcours.lesfondements.workers.dev'),
@@ -98,12 +82,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${caveat.variable} ${inter.className}`}>
+      <body>
         <AuthProvider>
           <ParcoursProvider>
-            <Navbar />
-            <AppShell>{children}</AppShell>
+            {children}
             <ClientTools />
+            <MesureProduit />
           </ParcoursProvider>
         </AuthProvider>
       </body>

@@ -6,6 +6,11 @@
    ════════════════════════════════════════════════════════════ */
 
 @theme {
+  /* Piles locales : aucun appel a un fournisseur de polices ne peut bloquer
+     l'ouverture du carnet, en particulier hors-ligne ou sur un reseau lent. */
+  --police-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --police-main: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive;
+
   --color-encre-50: #f2f5fa;
   --color-encre-100: #e2e9f4;
   --color-encre-200: #c3d0e6;
@@ -35,10 +40,12 @@
   --color-or-600: #d18410;
   --color-or-700: #a75f0f;
 
-  --text-2xs: 0.6875rem;
+  /* Aucun texte fonctionnel sous 12 px. Les deux niveaux restent distincts
+     par la graisse, la casse et l'espacement plutôt que par l'illisibilité. */
+  --text-2xs: 0.75rem;
   --text-2xs--line-height: 1.15rem;
-  --text-3xs: 0.625rem;
-  --text-3xs--line-height: 0.9rem;
+  --text-3xs: 0.75rem;
+  --text-3xs--line-height: 1.05rem;
 
   --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
 
@@ -97,7 +104,7 @@
   }
 
   body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: var(--police-ui);
     background-color: #f8f3e9;
     color: #0b1d38;
     margin: 0;
@@ -108,6 +115,25 @@
     width: 100%;
     position: relative;
     touch-action: manipulation;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Cibles tactiles WCAG 2.2. Les liens intégrés aux paragraphes gardent
+     leur flux ; les contrôles et navigations prennent au moins 44 px. */
+  button,
+  [role="button"],
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  nav a,
+  a.bouton-or {
+    min-height: 44px;
+  }
+
+  button,
+  [role="button"] {
+    min-width: 44px;
   }
 
   /* Évite le zoom automatique agressif sur iPhone/Android qui fait déborder la page */
@@ -142,6 +168,32 @@
     }
   }
 }
+
+/* Quelques anciens détails utilisaient encore des valeurs arbitraires de
+   8–11 px. Cette garde garantit 12 px pendant leur remplacement progressif. */
+.text-\[8px\],
+.text-\[9px\],
+.text-\[10px\],
+.text-\[11px\] {
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
+/* Les opacités décoratives ne doivent pas rendre une information illisible
+   sur les surfaces nocturnes. */
+.nuit .text-parchemin-100\/25,
+.nuit .text-parchemin-100\/30,
+.nuit .text-parchemin-100\/35,
+.nuit .text-parchemin-100\/40,
+.nuit .text-parchemin-100\/45,
+.nuit .text-parchemin-100\/50,
+.nuit .text-parchemin-100\/55,
+.nuit .text-parchemin-100\/60 {
+  color: rgba(248, 243, 233, 0.78) !important;
+}
+
+.text-encre-300 { color: #2a4472 !important; }
+.text-encre-400 { color: #1c3159 !important; }
 
 /* ─── Barre de défilement ──────────────────────────────────── */
 ::-webkit-scrollbar { width: 8px; height: 8px; }

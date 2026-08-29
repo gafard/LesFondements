@@ -89,6 +89,20 @@ service cloud.firestore {
         && ajout[0].content.size() <= 200;
     }
 
+    function sessionPlanifieeValide(groupId, sessionId) {
+      return request.resource.data.keys().hasOnly([
+          'id', 'groupId', 'step', 'scheduledAt', 'status', 'liveStage', 'attendance'
+        ])
+        && request.resource.data.id == sessionId
+        && request.resource.data.groupId == groupId
+        && request.resource.data.step == get(/databases/$(database)/documents/groups/$(groupId)).data.currentStep
+        && request.resource.data.status == 'planifiee'
+        && request.resource.data.liveStage == 0
+        && request.resource.data.scheduledAt is int
+        && request.resource.data.attendance is map
+        && request.resource.data.attendance.size() == 0;
+    }
+
     match /profiles/{userId} {
       allow read, write: if connecte() && moi() == userId;
     }
@@ -169,7 +183,14 @@ service cloud.firestore {
           || (connecte()
             && moi() == memberId
             && request.resource.data.status == 'parti'
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']));
+            && (
+              request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+              || (request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['status', 'displayName', 'email', 'photoURL'])
+                && request.resource.data.displayName == 'Compte supprimé'
+                && request.resource.data.email == null
+                && request.resource.data.photoURL == null)
+            ));
         allow delete: if estAnimateur(groupId);
       }
 
@@ -190,21 +211,15 @@ service cloud.firestore {
 
       match /sessions/{sessionId} {
         allow read: if estMembre(groupId);
-        allow create: if estAnimateur(groupId)
-          || (estMembre(groupId)
-            && request.resource.data.id == sessionId
-            && request.resource.data.groupId == groupId
-            && request.resource.data.step == get(/databases/$(database)/documents/groups/$(groupId)).data.currentStep
-            && request.resource.data.status == 'planifiee'
-            && request.resource.data.liveStage == 0
-            && request.resource.data.attendance.size() == 0);
+        allow create: if estMembre(groupId) && sessionPlanifieeValide(groupId, sessionId);
         allow update: if (estAnimateur(groupId)
             && request.resource.data.id == resource.data.id
             && request.resource.data.groupId == resource.data.groupId
             && request.resource.data.step == resource.data.step)
           || (estMembre(groupId)
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendance'])
-            && request.resource.data.attendance.diff(resource.data.attendance).affectedKeys().hasOnly([moi()]));
+            && request.resource.data.attendance.diff(resource.data.attendance).affectedKeys().hasOnly([moi()])
+            && request.resource.data.attendance[moi()] in ['presentiel', 'ligne', 'absent']);
         allow delete: if estAnimateur(groupId);
       }
 
@@ -339,6 +354,53 @@ service cloud.firestore {
           || (!connecte() && request.resource.data.uid == null));
       // Les messages sont une boîte de dépôt, pas un annuaire lisible depuis
       // le navigateur. Leur consultation passera par un outil administrateur.
+      allow read, update, delete: if false;
+    }
+
+    // Boîte de signalement : le navigateur peut déposer, jamais consulter.
+    // Le traitement s'effectue avec un accès administrateur hors application.
+    match /moderationReports/{reportId} {
+      allow create: if connecte()
+        && request.resource.data.keys().hasOnly([
+          'id', 'reporterUid', 'targetType', 'targetId', 'reason',
+          'comment', 'status', 'createdAt'
+        ])
+        && request.resource.data.id == reportId
+        && request.resource.data.reporterUid == moi()
+        && request.resource.data.targetType in ['temoignage', 'message_groupe', 'reponse']
+        && request.resource.data.targetId is string
+        && request.resource.data.targetId.size() > 0
+        && request.resource.data.targetId.size() <= 180
+        && request.resource.data.reason in ['dangereux', 'haine', 'harcelement', 'spam', 'vie_privee', 'autre']
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() <= 500
+        && request.resource.data.status == 'en_attente'
+        && request.resource.data.createdAt is int;
+      allow read, update, delete: if false;
+    }
+
+    // Entonnoir minimal et consenti : aucun UID, groupe, écran ou texte libre.
+    match /usageEvents/{eventId} {
+      allow create: if connecte()
+        && request.resource.data.keys().hasOnly([
+          'id', 'installationId', 'event', 'day', 'createdAt', 'expiresAt', 'version'
+        ])
+        && request.resource.data.id == eventId
+        && request.resource.data.installationId is string
+        && request.resource.data.installationId.size() >= 20
+        && request.resource.data.installationId.size() <= 80
+        && request.resource.data.event in [
+          'installation', 'fiche_1', 'groupe', 'preparation', 'rencontre',
+          'retention_j1', 'retention_j7', 'retention_j30'
+        ]
+        && request.resource.data.day is string
+        && request.resource.data.day.size() == 10
+        && request.resource.data.createdAt is int
+        && request.resource.data.expiresAt is int
+        && request.resource.data.expiresAt > request.resource.data.createdAt
+        && request.resource.data.expiresAt <= request.resource.data.createdAt + 7862400000
+        && request.resource.data.version is string
+        && request.resource.data.version.size() <= 40;
       allow read, update, delete: if false;
     }
   }

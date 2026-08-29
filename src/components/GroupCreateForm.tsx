@@ -174,8 +174,9 @@ export default function GroupCreateForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-7">
       <div>
-        <label className={legendClass}>Nom du groupe</label>
+        <label htmlFor="nom-groupe" className={legendClass}>Nom du groupe</label>
         <input
+          id="nom-groupe"
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Cellule Emmaüs, Les Enracinés, Groupe du jeudi…"

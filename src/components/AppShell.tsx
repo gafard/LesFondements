@@ -20,6 +20,7 @@ import {
   PenLine,
   Printer,
   Search,
+  ShieldCheck,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -72,6 +73,7 @@ const SECONDAIRES: Destination[] = [
   { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
   { href: '/ressources', label: 'Bibliothèque & Contact', court: 'Ressources', icon: BookMarked },
   { href: '/certificat', label: 'Mon attestation', court: 'Attestation', icon: Award },
+  { href: '/parametres/confidentialite', label: 'Confidentialité', court: 'Données', icon: ShieldCheck },
 ];
 
 function estActive(pathname: string, href: string): boolean {

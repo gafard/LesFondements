@@ -1,7 +1,8 @@
 {
   "complete": true,
-  "genereLe": "2026-08-27T21:47:50.632Z",
+  "genereLe": "2026-08-27T23:24:18.788Z",
   "voix": "fr-FR-VivienneMultilingualNeural",
+  "empreinteDiction": "fba21de30354c1d2",
   "pistes": [
     "f1.q0",
     "f1.q1",

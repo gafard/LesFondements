@@ -32,6 +32,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { jetonFirebase } from '@/lib/firebase';
 import { FICHES_META } from '@/data/fichesMeta';
 import { lireAVoixHaute, lectureDisponible } from '@/lib/ambiance';
+import SignalerContenu from '@/components/SignalerContenu';
 
 /**
  * La reconnaissance vocale du navigateur n'est pas standardisée : elle vit
@@ -685,6 +686,9 @@ export default function TemoignagesPage() {
                   </h3>
                 </div>
                 <div className="flex items-center gap-2">
+                  {!estLeMien(temoignageActif) && (
+                    <SignalerContenu type="temoignage" cibleId={temoignageActif.id} discret />
+                  )}
                   {metaFiche && (
                     <span className="rounded-full bg-black/10 px-3 py-1 text-3xs font-bold uppercase tracking-wider text-encre-800">
                       Fiche {metaFiche.id}
@@ -762,6 +766,16 @@ export default function TemoignagesPage() {
                 <div
                   key={item.id}
                   onClick={() => setTemoignageActif(item)}
+                  onKeyDown={(evenement) => {
+                    if (evenement.key === 'Enter' || evenement.key === ' ') {
+                      evenement.preventDefault();
+                      setTemoignageActif(item);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={estSelectionne}
+                  aria-label={`Afficher le témoignage de ${item.auteur}`}
                   className={`group relative cursor-pointer rounded-2xl p-4 transition-all duration-200 hover:scale-105 hover:z-20 ${item.rotation || 'rotate-1'} ${obtenirClassesCouleur(
                     item.couleur
                   )} ${estSelectionne ? 'ring-3 ring-encre-950 scale-102 z-10' : ''}`}
@@ -874,4 +888,3 @@ export default function TemoignagesPage() {
     </div>
   );
 }
-

@@ -233,7 +233,19 @@ export default function LettreDuPere() {
       {/* ─── SCÈNE 1 : L'ENVELOPPE FERMÉE AVEC CACHET DE CIRE ─── */}
       {!ouverte && (
         <div className="flex flex-col items-center justify-center py-8 px-4">
-          <div className="relative group cursor-pointer w-full flex justify-center" onClick={ouvrirLettre}>
+          <div
+            className="relative group cursor-pointer w-full flex justify-center"
+            onClick={ouvrirLettre}
+            onKeyDown={(evenement) => {
+              if (evenement.key === 'Enter' || evenement.key === ' ') {
+                evenement.preventDefault();
+                ouvrirLettre();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Ouvrir la lettre du Père"
+          >
             {/* L'enveloppe 3D */}
             <div
               className={`relative w-full max-w-[340px] sm:max-w-[440px] h-[230px] sm:h-[260px] bg-[#e8dac1] rounded-3xl shadow-2xl border border-[#c9bda6] transition-transform duration-700 ease-out ${

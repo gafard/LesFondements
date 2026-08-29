@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const regles = await readFile(new URL('../firestore.rules', import.meta.url), 'utf8');
 const environnement = await initializeTestEnvironment({
@@ -50,6 +50,10 @@ try {
       id: 'p1', groupId: 'g1', authorId: 'alice', authorName: 'Alice', kind: 'priere',
       content: 'Priez pour moi', createdAt: 1, prayedBy: [], amenBy: [],
     });
+    await setDoc(doc(db, 'groups/g1/sessions/s1'), {
+      id: 's1', groupId: 'g1', step: 1, scheduledAt: 2, status: 'planifiee', liveStage: 0,
+      attendance: {},
+    });
     await setDoc(doc(db, 'temoignages/t1'), {
       id: 't1', auteur: 'Alice', auteurId: 'alice', ficheId: 1, texte: 'Une grâce reçue',
       audioUrl: null, amens: 1, amensVotants: ['alice'], date: 1,
@@ -78,6 +82,27 @@ try {
 
   await assertFails(updateDoc(doc(bob, 'groups/g1'), { membersCount: 1 }));
   await assertSucceeds(updateDoc(doc(bob, 'groups/g1'), { membersCount: 2 }));
+  await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { role: 'animateur' }));
+  await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { status: 'actif', role: 'co_animateur' }));
+  await assertFails(getDoc(doc(bob, 'profiles/alice')));
+  await assertFails(setDoc(doc(bob, 'users/alice/progress/1'), { completed: true, answers: {} }));
+  await assertFails(deleteDoc(doc(bob, 'profiles/alice')));
+
+  await assertFails(
+    setDoc(doc(bob, 'groups/g1/sessions/malveillante'), {
+      id: 'malveillante', groupId: 'g1', step: 1, scheduledAt: 2, status: 'planifiee',
+      liveStage: 0, attendance: {}, closedBy: 'bob', recap: { summary: 'Injecté' },
+    })
+  );
+  await assertSucceeds(
+    setDoc(doc(bob, 'groups/g1/sessions/s2'), {
+      id: 's2', groupId: 'g1', step: 1, scheduledAt: 2, status: 'planifiee',
+      liveStage: 0, attendance: {},
+    })
+  );
+  await assertFails(updateDoc(doc(bob, 'groups/g1/sessions/s1'), { attendance: { alice: 'absent' } }));
+  await assertFails(updateDoc(doc(bob, 'groups/g1/sessions/s1'), { attendance: { bob: 'administrateur' } }));
+  await assertSucceeds(updateDoc(doc(bob, 'groups/g1/sessions/s1'), { attendance: { bob: 'absent' } }));
 
   await assertSucceeds(updateDoc(doc(alice, 'groups/g1/posts/p1'), { prayedBy: ['alice'] }));
   await assertFails(updateDoc(doc(bob, 'groups/g1/posts/p1'), { prayedBy: ['alice', 'charlie'] }));
@@ -111,7 +136,31 @@ try {
   await assertFails(getDoc(doc(alice, 'retours/r1')));
   await assertFails(setDoc(doc(anonyme, 'retours/r2'), { ...retour, categorie: 'inconnue' }));
 
-  console.log('Règles Firestore vérifiées : annuaire, compteur, réactions, réponses, témoignages et retours.');
+  const signalement = {
+    id: 'report-1', reporterUid: 'bob', targetType: 'temoignage', targetId: 't1',
+    reason: 'vie_privee', comment: 'Une adresse est visible.', status: 'en_attente', createdAt: 3,
+  };
+  await assertSucceeds(setDoc(doc(bob, 'moderationReports/report-1'), signalement));
+  await assertFails(setDoc(doc(bob, 'moderationReports/report-2'), { ...signalement, id: 'report-2', reporterUid: 'alice' }));
+  await assertFails(setDoc(doc(anonyme, 'moderationReports/report-3'), { ...signalement, id: 'report-3' }));
+  await assertFails(getDoc(doc(bob, 'moderationReports/report-1')));
+
+  const usage = {
+    id: 'installation-e2e:fiche_1', installationId: 'installation-e2e-0000000001',
+    event: 'fiche_1', day: '2026-08-28', createdAt: 10, expiresAt: 1000, version: 'test',
+  };
+  await assertSucceeds(setDoc(doc(bob, 'usageEvents/installation-e2e:fiche_1'), usage));
+  await assertFails(setDoc(doc(anonyme, 'usageEvents/anonymous'), { ...usage, id: 'anonymous' }));
+  await assertFails(setDoc(doc(bob, 'usageEvents/extra'), { ...usage, id: 'extra', email: 'bob@example.test' }));
+  await assertFails(getDoc(doc(bob, 'usageEvents/installation-e2e:fiche_1')));
+
+  await assertSucceeds(
+    updateDoc(doc(bob, 'groups/g1/members/bob'), {
+      status: 'parti', displayName: 'Compte supprimé', email: null, photoURL: null,
+    })
+  );
+
+  console.log('Règles Firestore vérifiées : droits, rencontres, données privées, modération et mesure minimale.');
 } finally {
   await environnement.cleanup();
 }

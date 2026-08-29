@@ -184,6 +184,9 @@ function construirePluie(ctx: AudioContext, master: GainNode): Contexte {
 
 let volumeDefini = 0.5;
 let voixActive = false;
+const sourcesDucking = new Set<symbol>();
+const sourceDuckingManuel = Symbol('ducking-manuel');
+let animationVolumeMusique: number | null = null;
 
 function calculerVolumeMusique(): number {
   const facteurDucking = voixActive ? 0.22 : 1.0;
@@ -195,17 +198,66 @@ function calculerVolumeSynthese(): number {
   return Math.max(0, Math.min(1, volumeDefini * 0.25 * facteurDucking));
 }
 
-export function activerDuckingVoix(actif: boolean): void {
-  voixActive = actif;
+function animerVolumeMusique(dureeMs: number): void {
+  const audio = audioMusiqueActif;
+  if (!audio) return;
+  const cible = calculerVolumeMusique();
+
+  if (animationVolumeMusique !== null && typeof cancelAnimationFrame === 'function') {
+    cancelAnimationFrame(animationVolumeMusique);
+    animationVolumeMusique = null;
+  }
+  if (typeof requestAnimationFrame !== 'function' || dureeMs <= 0) {
+    audio.volume = cible;
+    return;
+  }
+
+  const depart = audio.volume;
+  const commence = performance.now();
+  const avancer = (maintenant: number) => {
+    if (audio !== audioMusiqueActif) return;
+    const progression = Math.min(1, (maintenant - commence) / dureeMs);
+    // Courbe douce : aucune marche audible au début ni à la fin du fondu.
+    const douceur = progression * progression * (3 - 2 * progression);
+    audio.volume = depart + (cible - depart) * douceur;
+    if (progression < 1) animationVolumeMusique = requestAnimationFrame(avancer);
+    else animationVolumeMusique = null;
+  };
+  animationVolumeMusique = requestAnimationFrame(avancer);
+}
+
+function tenirGainAuTempsCourant(ctx: AudioContext, gain: AudioParam): void {
+  if (typeof gain.cancelAndHoldAtTime === 'function') gain.cancelAndHoldAtTime(ctx.currentTime);
+  else {
+    gain.cancelScheduledValues(ctx.currentTime);
+    gain.setValueAtTime(gain.value, ctx.currentTime);
+  }
+}
+
+/**
+ * Atténue l'ambiance tant qu'au moins une source vocale est active. Chaque
+ * lecteur fournit son propre symbole : la fin d'une ancienne piste ne peut
+ * donc pas remonter la musique sous une nouvelle voix.
+ */
+export function activerDuckingVoix(
+  actif: boolean,
+  source: symbol = sourceDuckingManuel
+): void {
+  if (actif) sourcesDucking.add(source);
+  else sourcesDucking.delete(source);
+  voixActive = sourcesDucking.size > 0;
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.ducking = voixActive ? 'actif' : 'repos';
+  }
   if (audioMusiqueActif) {
-    audioMusiqueActif.volume = calculerVolumeMusique();
+    animerVolumeMusique(voixActive ? 300 : 1_200);
   }
   if (actifContextGlobal) {
     const { ctx, master } = actifContextGlobal;
-    master.gain.cancelScheduledValues(ctx.currentTime);
+    tenirGainAuTempsCourant(ctx, master.gain);
     master.gain.linearRampToValueAtTime(
       calculerVolumeSynthese(),
-      ctx.currentTime + (actif ? 0.3 : 1.2)
+      ctx.currentTime + (voixActive ? 0.3 : 1.2)
     );
   }
 }
@@ -262,11 +314,11 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
 export function reglerVolume(volume: number): void {
   volumeDefini = volume;
   if (audioMusiqueActif) {
-    audioMusiqueActif.volume = calculerVolumeMusique();
+    animerVolumeMusique(400);
   }
   if (!actif) return;
   const { ctx, master } = actif;
-  master.gain.cancelScheduledValues(ctx.currentTime);
+  tenirGainAuTempsCourant(ctx, master.gain);
   master.gain.linearRampToValueAtTime(
     calculerVolumeSynthese(),
     ctx.currentTime + 0.4
@@ -278,6 +330,10 @@ export async function arreterAmbiance(): Promise<void> {
   if (audioMusiqueActif) {
     const el = audioMusiqueActif;
     audioMusiqueActif = null;
+    if (animationVolumeMusique !== null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(animationVolumeMusique);
+      animationVolumeMusique = null;
+    }
     try {
       el.pause();
       el.currentTime = 0;
@@ -289,6 +345,7 @@ export async function arreterAmbiance(): Promise<void> {
   ambianceActuelle = 'silence';
   if (!courant) return;
   actif = null;
+  if (actifContextGlobal === courant) actifContextGlobal = null;
 
   const { ctx, master, sources } = courant;
   try {
@@ -364,6 +421,13 @@ export function lectureDisponible(): boolean {
 let lecteur: HTMLAudioElement | null = null;
 /** Périme les requêtes de studio parties avant un arrêt. */
 let jeton = 0;
+/** Source de ducking propre à la lecture générique en cours. */
+let sourceDuckingLecture: symbol | null = null;
+
+function relacherDuckingLecture(source: symbol): void {
+  activerDuckingVoix(false, source);
+  if (sourceDuckingLecture === source) sourceDuckingLecture = null;
+}
 
 /**
  * L'enregistrement déjà produit pour cette piste, s'il existe.
@@ -382,6 +446,7 @@ export function lireAVoixHaute(
   options: {
     vitesse?: number;
     genre?: GenreVoix;
+    onDebut?: () => void;
     onFin?: () => void;
     onErreur?: () => void;
     /** Piste prégénérée à préférer, ex. `pisteId.verset('Ps 37:4')`. */
@@ -393,18 +458,20 @@ export function lireAVoixHaute(
   arreterLecture();
 
   // Atténuation automatique de la musique pendant que la voix parle
-  activerDuckingVoix(true);
+  const sourceDucking = Symbol('lecture-vocale');
+  sourceDuckingLecture = sourceDucking;
+  activerDuckingVoix(true, sourceDucking);
 
   const onFinOriginal = options.onFin;
   const onErreurOriginal = options.onErreur;
 
   const onFinWrap = () => {
-    activerDuckingVoix(false);
+    relacherDuckingLecture(sourceDucking);
     onFinOriginal?.();
   };
 
   const onErreurWrap = () => {
-    activerDuckingVoix(false);
+    relacherDuckingLecture(sourceDucking);
     onErreurOriginal?.();
   };
 
@@ -431,6 +498,7 @@ export function lireAVoixHaute(
         const audio = new Audio(url);
         audio.playbackRate = options.vitesse ?? 1;
         audio.volume = 1.0; // Voix à 100% de clarté
+        audio.onplay = () => optionsEnveloppees.onDebut?.();
         audio.onended = () => optionsEnveloppees.onFin();
         audio.onerror = () => {
           if (mien === jeton) lireAvecLeNavigateur(dit, optionsEnveloppees);
@@ -452,7 +520,13 @@ export function lireAVoixHaute(
 /** La synthèse du navigateur : le repli, jamais le premier choix. */
 function lireAvecLeNavigateur(
   dit: string,
-  options: { vitesse?: number; genre?: GenreVoix; onFin?: () => void; onErreur?: () => void }
+  options: {
+    vitesse?: number;
+    genre?: GenreVoix;
+    onDebut?: () => void;
+    onFin?: () => void;
+    onErreur?: () => void;
+  }
 ): boolean {
   if (!lectureDisponible()) {
     options.onErreur?.();
@@ -480,6 +554,7 @@ function lireAvecLeNavigateur(
     enonce.volume = 1.0;
     const voix = choisirVoix(options.genre);
     if (voix) enonce.voice = voix;
+    if (index === 0 && options.onDebut) enonce.onstart = options.onDebut;
     if (index === morceaux.length - 1 && options.onFin) enonce.onend = options.onFin;
     if (options.onErreur) enonce.onerror = options.onErreur;
     window.speechSynthesis.speak(enonce);
@@ -492,7 +567,7 @@ export function arreterLecture(): void {
   // Un jeton qui s'incrémente : toute lecture de studio encore en vol se
   // verra périmée à son arrivée et ne démarrera pas.
   jeton += 1;
-  activerDuckingVoix(false);
+  if (sourceDuckingLecture) relacherDuckingLecture(sourceDuckingLecture);
   if (lecteur) {
     lecteur.pause();
     lecteur = null;

@@ -35,14 +35,25 @@ import {
 import { publierEvenementGroupe } from './notifications';
 import { distanceKm, nearestPlace } from './geo';
 import { marquerSynchronisation } from './syncState';
+import { firebaseConfigure } from './runtime';
+import { MEETING_FLOW_LENGTH, nextMeetingDate } from './parcoursDomain';
+export {
+  MEETING_FLOW,
+  MEETING_FLOW_LENGTH,
+  computeGate,
+  estEtapeLisible,
+  etapeDePreparation,
+  isStepUnlocked,
+  nextMeetingDate,
+  type ParcoursGate,
+} from './parcoursDomain';
 
 // ─────────────────────────────────────────────────────────────
 // Détection du backend
 // ─────────────────────────────────────────────────────────────
 
 export const hasRemoteBackend = (): boolean => {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  return !!apiKey && !apiKey.includes('your-') && apiKey !== 'your-api-key';
+  return firebaseConfigure();
 };
 
 /**
@@ -1062,48 +1073,6 @@ export async function findInvitationsFor(email: string | null): Promise<Parcours
 // Rencontres
 // ─────────────────────────────────────────────────────────────
 
-/** Déroulé d'une rencontre, calqué sur la partie « Résumé et Partage » du livret. */
-export const MEETING_FLOW = [
-  {
-    key: 'accueil',
-    title: 'Accueil et prière d’ouverture',
-    hint: "Quelques minutes pour se retrouver, prendre des nouvelles et confier la rencontre au Seigneur.",
-    minutes: 10,
-  },
-  {
-    key: 'retour',
-    title: 'Retour sur la semaine',
-    hint: "Ce que chacun a vécu depuis la dernière fois : une joie, une difficulté, un pas franchi.",
-    minutes: 10,
-  },
-  {
-    key: 'partage',
-    title: 'Tour de partage sur la fiche',
-    hint: "Chacun dit ce qui l’a marqué. Pas de cours magistral : chacun a déjà travaillé la fiche chez lui.",
-    minutes: 25,
-  },
-  {
-    key: 'questions',
-    title: 'Les questions de la fiche',
-    hint: "On reprend une à une les questions du « Résumé et Partage » et on laisse la parole circuler.",
-    minutes: 25,
-  },
-  {
-    key: 'application',
-    title: 'Un pas concret pour la semaine',
-    hint: "Chacun formule à voix haute une application précise, que le groupe portera dans la prière.",
-    minutes: 10,
-  },
-  {
-    key: 'priere',
-    title: 'Temps de prière',
-    hint: "Prière les uns pour les autres. Aux fiches 7, 8 et 10, prévoir un temps personnel plus long.",
-    minutes: 15,
-  },
-] as const;
-
-export const MEETING_FLOW_LENGTH = MEETING_FLOW.length;
-
 async function writeSession(session: GroupSession): Promise<void> {
   const client = await getClient();
   if (client) {
@@ -1262,33 +1231,6 @@ export async function getCurrentSession(groupId: string): Promise<GroupSession |
   };
   await writeSession(session);
   return session;
-}
-
-/** Prochaine occurrence du créneau hebdomadaire (ou bimensuel) du groupe. */
-export function nextMeetingDate(meeting: GroupMeetingPlan, from: number = Date.now()): Date {
-  const [hours, minutes] = (meeting.time || '20:00').split(':').map((n) => parseInt(n, 10));
-
-  // Si une date précise (prochaine rencontre ou 1ère rencontre) a été explicitement fixée
-  const dateFixee = meeting.nextMeetingDate || meeting.firstMeetingDate;
-  if (dateFixee) {
-    const parts = dateFixee.split('-');
-    if (parts.length === 3) {
-      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), hours || 20, minutes || 0, 0, 0);
-      // Si la date est aujourd'hui ou dans le futur, on la retourne directement
-      if (d.getTime() >= from - 3600000 * 2) {
-        return d;
-      }
-    }
-  }
-
-  const date = new Date(from);
-  date.setHours(hours || 20, minutes || 0, 0, 0);
-  const cadence = meeting.rhythm === 'bimensuel' ? 14 : 7;
-  let delta = (meeting.weekday - date.getDay() + 7) % 7;
-  if (delta === 0 && date.getTime() <= from) delta = cadence;
-  else if (delta === 0) delta = 0;
-  date.setDate(date.getDate() + delta);
-  return date;
 }
 
 export async function openMeeting(groupId: string, uid: string): Promise<GroupSession | null> {
@@ -1615,78 +1557,6 @@ export async function markPrayerAnswered(
     answered,
     answeredAt: answered ? Date.now() : undefined,
   });
-}
-
-// ─────────────────────────────────────────────────────────────
-// Règle d'accès au parcours
-// ─────────────────────────────────────────────────────────────
-
-export type ParcoursGate =
-  | { state: 'chargement' }
-  | { state: 'sans_groupe' }
-  | { state: 'en_attente'; group: ParcoursGroup }
-  | { state: 'refuse' }
-  | {
-      state: 'ouvert';
-      group: ParcoursGroup;
-      /** La fiche que le groupe vit en ce moment : celle qui se partage. */
-      unlockedStep: number;
-      /** La fiche qu'on peut déjà préparer seul, en avance. */
-      preparationStep: number;
-    }
-  | { state: 'termine'; group: ParcoursGroup };
-
-/**
- * Le parcours n'ouvre qu'une fois l'adhésion active. Deux rythmes ensuite,
- * délibérément distincts : la fiche du groupe, celle qui se partage, et la
- * suivante, qu'on peut déjà préparer seul.
- */
-export function computeGate(
-  profile: UserProfile | null,
-  group: ParcoursGroup | null,
-  membership: GroupMember | null
-): ParcoursGate {
-  if (!profile) return { state: 'chargement' };
-  if (!profile.groupId || !group) return { state: 'sans_groupe' };
-  if (membership?.status === 'refuse' || membership?.status === 'parti') return { state: 'refuse' };
-  if (!membership || membership.status !== 'actif') return { state: 'en_attente', group };
-  if (group.completedAt) return { state: 'termine', group };
-  return {
-    state: 'ouvert',
-    group,
-    unlockedStep: group.currentStep,
-    preparationStep: etapeDePreparation(group),
-  };
-}
-
-/**
- * La fiche du groupe : celle dont on partage les réponses à la rencontre.
- */
-export function isStepUnlocked(group: ParcoursGroup, step: number): boolean {
-  return step <= group.currentStep;
-}
-
-/**
- * Jusqu'où l'on peut lire seul, sans attendre personne.
- *
- * Le livret demande que chacun ait travaillé le cours chez lui avant la
- * rencontre. Si la fiche suivante n'ouvrait qu'à la seconde où l'animateur
- * clôture la précédente, la fenêtre de préparation serait écrasée — et
- * l'application empêcherait d'obéir au livret dont elle est tirée. On ouvre
- * donc la fiche suivante en lecture, une seule : de quoi toujours préparer
- * la prochaine rencontre, jamais de quoi dévorer les vingt d'un trait.
- *
- * Ce qui reste fermé jusqu'à la rencontre, c'est le partage — les réponses
- * déposées au groupe, les pépites, le mur. La fraîcheur du moment commun ne
- * se prépare pas, elle se vit ensemble.
- */
-export function etapeDePreparation(group: ParcoursGroup): number {
-  return Math.min(group.currentStep + 1, PARCOURS_TOTAL_STEPS);
-}
-
-/** Lisible seul : la fiche du groupe, ou celle qu'on prépare. */
-export function estEtapeLisible(group: ParcoursGroup, step: number): boolean {
-  return step <= etapeDePreparation(group);
 }
 
 // ─────────────────────────────────────────────────────────────

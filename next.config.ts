@@ -1,13 +1,15 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
+const autoriserEvaluationDev = process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'";
+
 const politiqueContenu = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${autoriserEvaluationDev}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   "img-src 'self' data: blob: https://*.googleusercontent.com",
