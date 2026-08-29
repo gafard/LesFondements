@@ -1,21 +1,22 @@
 'use client';
 
-import { Suspense, useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { 
   BookOpen, Brain, MousePointerClick, 
   Flame, BookA, Check, ArrowRight, ArrowLeft, Play, Pause, 
   Mic, MicOff, Download, Volume2, Copy,
-  LockKeyhole, Clock3, NotebookPen, Quote, CheckCircle2, Feather
+  LockKeyhole, Clock3, NotebookPen, Quote, CheckCircle2, Feather, Sparkles, VolumeX
 } from 'lucide-react';
 import { saveAnswer, addJournalEntry } from '@/lib/firestore';
 import { 
   jouerAmbiance, arreterAmbiance, lireAVoixHaute, arreterLecture,
-  getGenreVoix, setGenreVoix, type GenreVoix 
+  getGenreVoix, setGenreVoix, type GenreVoix, AMBIANCES 
 } from '@/lib/ambiance';
 import { VERSETS_CONNUS, normaliserReference } from '@/data/versets';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
 import { chargerManifesteVoix, type Manifeste } from '@/lib/voix';
+import { Pastille, Etincelle } from '@/components/decor';
 
 interface Props {
   ficheId: number;
@@ -31,16 +32,16 @@ interface Props {
   onComplete: (data: any) => void;
 }
 
-const FONCTION_BADGES: Record<string, { label: string; bg: string; text: string }> = {
-  'contempler': { label: '1. Contempler Dieu', bg: 'bg-or-100 border-or-300', text: 'text-or-950' },
-  'comprendre': { label: '2. Comprendre Sa Vérité', bg: 'bg-sky-100 border-sky-300', text: 'text-sky-950' },
-  'recevoir': { label: '3. Recevoir dans mon Cœur', bg: 'bg-emerald-100 border-emerald-300', text: 'text-emerald-950' },
-  'etre-transforme': { label: '4. Être Transformé', bg: 'bg-rose-100 border-rose-300', text: 'text-rose-950' },
-  'vivre': { label: '5. Vivre & Répondre', bg: 'bg-purple-100 border-purple-300', text: 'text-purple-950' },
-  'observer': { label: '1. Contempler Dieu', bg: 'bg-or-100 border-or-300', text: 'text-or-950' },
-  'decouvrir-dieu': { label: '2. Découvrir Sa Vérité', bg: 'bg-sky-100 border-sky-300', text: 'text-sky-950' },
-  'se-laisser-eclairer': { label: '3. Miroir de vérité', bg: 'bg-rose-100 border-rose-300', text: 'text-rose-950' },
-  'repondre': { label: '5. Vivre la Parole', bg: 'bg-purple-100 border-purple-300', text: 'text-purple-950' },
+const FONCTION_BADGES: Record<string, { label: string; border: string; bg: string; text: string }> = {
+  'contempler': { label: '1. Contempler Dieu', border: 'border-or-400/40', bg: 'bg-or-500/15', text: 'text-or-300' },
+  'comprendre': { label: '2. Comprendre Sa Vérité', border: 'border-sky-400/40', bg: 'bg-sky-500/15', text: 'text-sky-300' },
+  'recevoir': { label: '3. Recevoir dans mon Cœur', border: 'border-emerald-400/40', bg: 'bg-emerald-500/15', text: 'text-emerald-300' },
+  'etre-transforme': { label: '4. Être Transformé', border: 'border-rose-400/40', bg: 'bg-rose-500/15', text: 'text-rose-300' },
+  'vivre': { label: '5. Vivre la Parole', border: 'border-purple-400/40', bg: 'bg-purple-500/15', text: 'text-purple-300' },
+  'observer': { label: '1. Contempler Dieu', border: 'border-or-400/40', bg: 'bg-or-500/15', text: 'text-or-300' },
+  'decouvrir-dieu': { label: '2. Découvrir Sa Vérité', border: 'border-sky-400/40', bg: 'bg-sky-500/15', text: 'text-sky-300' },
+  'se-laisser-eclairer': { label: '3. Miroir de vérité', border: 'border-rose-400/40', bg: 'bg-rose-500/15', text: 'text-rose-300' },
+  'repondre': { label: '5. Vivre la Parole', border: 'border-purple-400/40', bg: 'bg-purple-500/15', text: 'text-purple-300' },
 };
 
 export default function TempsApart({ 
@@ -56,9 +57,14 @@ export default function TempsApart({
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [step6Answer, setStep6Answer] = useState('');
+  
+  // Audio & Voix
   const [isReadingAudio, setIsReadingAudio] = useState(false);
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
   const [genreVoix, setGenreVoixState] = useState<GenreVoix>('feminin');
+  const [musiqueActive, setMusiqueActive] = useState(true);
+
+  // Verset & Niveaux
   const [selectedVersetIndex, setSelectedVersetIndex] = useState(0);
   const [memoriseLevel, setMemoriseLevel] = useState<1 | 2 | 3 | 4>(1);
   const [timerSeconds, setTimerSeconds] = useState(90);
@@ -66,12 +72,16 @@ export default function TempsApart({
   const [isListeningMic, setIsListeningMic] = useState(false);
   const [transcriptMic, setTranscriptMic] = useState('');
   const [copiedVerset, setCopiedVerset] = useState(false);
-  const [manifeste, setManifeste] = useState<Manifeste | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
     setGenreVoixState(getGenreVoix());
-    void chargerManifesteVoix().then(setManifeste);
+    // Démarrer la nappe musicale contemplative dès l'entrée dans l'immersion
+    void jouerAmbiance('emotional-piano', 0.28);
+    return () => {
+      void arreterAmbiance();
+      arreterLecture();
+    };
   }, []);
 
   const currentVersetRef = versets[selectedVersetIndex] || versets[0] || 'Ps 46:11';
@@ -80,7 +90,7 @@ export default function TempsApart({
     return VERSETS_CONNUS[norm] || VERSETS_CONNUS[currentVersetRef] || "Arrêtez, et sachez que je suis Dieu : Je domine sur les nations, je domine sur la terre.";
   }, [currentVersetRef]);
 
-  // Playlist des blocs de cette section pour lecture continue
+  // Playlist continue de la section
   const playlistSection = useMemo(() => {
     const list: Array<{ id: string; texte: string }> = [];
     const secTitre = ficheData?.sections?.[sectionIndex]?.titre;
@@ -100,7 +110,7 @@ export default function TempsApart({
     return list;
   }, [ficheId, sectionIndex, ficheData, sectionBlocs]);
 
-  // Lecture continue bloc par bloc avec Vivienne / Studio
+  // Lecture continue bloc par bloc avec ducking automatique
   const jouerBlocIndex = (index: number) => {
     if (index >= playlistSection.length) {
       setIsReadingAudio(false);
@@ -131,6 +141,16 @@ export default function TempsApart({
     }
   };
 
+  const toggleMusique = () => {
+    if (musiqueActive) {
+      void arreterAmbiance();
+      setMusiqueActive(false);
+    } else {
+      void jouerAmbiance('emotional-piano', 0.28);
+      setMusiqueActive(true);
+    }
+  };
+
   const changerVoix = (nouveauGenre: GenreVoix) => {
     setGenreVoixState(nouveauGenre);
     setGenreVoix(nouveauGenre);
@@ -140,24 +160,12 @@ export default function TempsApart({
     }
   };
 
-  // Nappe musicale pendant la prière (Étape 4)
+  // Minuteur doux pour la prière
   useEffect(() => {
-    if (step === 4) {
-      void jouerAmbiance('emotional-piano', 0.35);
-      setTimerRunning(true);
-    } else {
-      void arreterAmbiance();
-      setTimerRunning(false);
-      arreterLecture();
-      setIsReadingAudio(false);
-    }
-    return () => {
-      void arreterAmbiance();
-      arreterLecture();
-    };
+    if (step === 4) setTimerRunning(true);
+    else setTimerRunning(false);
   }, [step]);
 
-  // Minuteur doux
   useEffect(() => {
     if (!timerRunning || timerSeconds <= 0) return;
     const interval = setInterval(() => {
@@ -220,7 +228,7 @@ export default function TempsApart({
     }
   };
 
-  // Fond d'écran
+  // Téléchargement Fond d'écran 1080x1920
   const genererFondEcran = () => {
     const canvas = document.createElement('canvas');
     canvas.width = 1080;
@@ -229,14 +237,14 @@ export default function TempsApart({
     if (!ctx) return;
 
     const grad = ctx.createLinearGradient(0, 0, 0, 1920);
-    grad.addColorStop(0, '#1a140c');
-    grad.addColorStop(0.5, '#261c10');
-    grad.addColorStop(1, '#0f0c07');
+    grad.addColorStop(0, '#0c0a08');
+    grad.addColorStop(0.5, '#1e160e');
+    grad.addColorStop(1, '#090806');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 1080, 1920);
 
     const radial = ctx.createRadialGradient(540, 960, 50, 540, 960, 650);
-    radial.addColorStop(0, 'rgba(217, 119, 6, 0.2)');
+    radial.addColorStop(0, 'rgba(217, 119, 6, 0.22)');
     radial.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = radial;
     ctx.fillRect(0, 0, 1080, 1920);
@@ -303,8 +311,8 @@ export default function TempsApart({
           .join('\n');
 
         const entreesJournal = [
-          `📖 **Fiche ${ficheId} : ${ficheData?.titre || ''}** — Étape ${sectionIndex + 1}`,
-          `✨ **Parole gardée :** « ${currentVersetTexte} » (${currentVersetRef})`,
+          `📖 **Fiche ${ficheId} : ${ficheData?.titre || ''}** — Étape ${sectionIndex + 1} : ${ficheData?.sections?.[sectionIndex]?.titre || ''}`,
+          `✨ **Parole contemplée & gardée :** « ${currentVersetTexte} » (${currentVersetRef})`,
           recapPriere ? `🕊️ **Ce que j'ai déposé devant Dieu :**\n${recapPriere}` : null,
           step6Answer.trim() ? `👣 **Ma réponse de foi & de vie :**\n${step6Answer.trim()}` : null,
         ].filter(Boolean).join('\n\n');
@@ -318,12 +326,13 @@ export default function TempsApart({
   };
 
   return (
-    <div className="table-travail min-h-screen text-encre-950 flex flex-col safe-area-inset overflow-x-hidden pb-16">
-      {/* En-tête / Navigation Table */}
-      <header className="p-4 flex items-center justify-between z-20 sticky top-0 bg-parchemin-50/85 backdrop-blur-md border-b border-encre-900/10 shadow-sm">
+    <div className="nuit nuit-grain min-h-screen text-parchemin-100 flex flex-col safe-area-inset overflow-x-hidden pb-16">
+      
+      {/* ══ Barre Supérieure Immersive ══ */}
+      <header className="p-4 flex items-center justify-between z-20 sticky top-0 bg-encre-950/80 backdrop-blur-md border-b border-or-500/15">
         <button 
           onClick={handlePrev} 
-          className={`p-2 rounded-full border border-encre-900/15 bg-parchemin-50 text-encre-700 hover:bg-parchemin-100 transition-opacity ${
+          className={`p-2 rounded-full border border-or-500/20 bg-encre-900/60 text-or-200 hover:bg-encre-800 transition-opacity ${
             step === 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
           aria-label="Étape précédente"
@@ -331,53 +340,67 @@ export default function TempsApart({
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        {/* Repères des 6 étapes */}
+        {/* 6 Repères Sacrés */}
         <div className="flex items-center gap-2 sm:gap-3">
           {[1, 2, 3, 4, 5, 6].map(i => (
             <div 
               key={i} 
-              className={`h-2.5 rounded-full transition-all duration-300 ${
+              className={`h-2 rounded-full transition-all duration-300 ${
                 i === step 
-                  ? 'w-7 bg-or-600 shadow-[0_0_8px_rgba(217,119,6,0.6)]' 
+                  ? 'w-7 bg-gradient-to-r from-or-400 to-or-500 shadow-[0_0_12px_rgba(245,158,11,0.8)]' 
                   : i < step 
-                    ? 'w-2.5 bg-encre-900/70' 
-                    : 'w-2.5 bg-encre-900/15'
+                    ? 'w-2 bg-or-500/70' 
+                    : 'w-2 bg-white/15'
               }`} 
             />
           ))}
         </div>
 
-        <span className="timbre inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-encre-800 bg-parchemin-100">
-          Étape {step} / 6
-        </span>
+        {/* Contrôles Ambiance / Son */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleMusique}
+            className={`p-2 rounded-full border text-xs font-bold transition ${
+              musiqueActive 
+                ? 'bg-or-500/15 border-or-400/40 text-or-300' 
+                : 'bg-white/5 border-white/10 text-white/40'
+            }`}
+            title={musiqueActive ? "Couper la musique" : "Activer la musique"}
+          >
+            {musiqueActive ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+
+          <span className="px-3 py-1 text-2xs font-bold tracking-wider uppercase rounded-full bg-or-500/15 border border-or-400/30 text-or-300">
+            {step} / 6
+          </span>
+        </div>
       </header>
 
-      {/* Plan de travail principal */}
+      {/* ══ Conteneur Central du Sanctuaire ══ */}
       <main className="flex-1 p-4 sm:p-6 md:p-8 flex flex-col max-w-2xl mx-auto w-full transition-all duration-500 relative">
         
-        {/* ÉTAPE 1 : LIRE & ÉCOUTER (Feuille avec trombone, versets cliquables et voix continue) */}
+        {/* ── ÉTAPE 1 : CONTEMPLER & ÉCOUTER (Immersion Textuelle & Vocale) ── */}
         {step === 1 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
-            <article className="feuille relative rounded-3xl p-6 sm:p-9 shadow-xl border border-encre-900/10">
-              <span className="trombone absolute -top-3 left-9" aria-hidden="true" />
+            <article className="relative rounded-3xl p-6 sm:p-9 shadow-2xl border border-or-500/25 bg-encre-900/60 backdrop-blur-xl">
               
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-encre-900/15 pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-or-500/20 pb-4">
                 <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] bg-or-100 text-or-900 border border-or-300">
-                    <BookOpen className="w-3.5 h-3.5" /> Fiche {ficheId} • Étape {sectionIndex + 1}
+                  <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] bg-or-500/15 text-or-300 border border-or-400/30">
+                    <Sparkles className="w-3.5 h-3.5" /> Fiche {ficheId} • Étape {sectionIndex + 1}
                   </span>
-                  <h2 className="mt-2.5 font-serif text-2xl sm:text-3xl font-bold text-encre-950">
-                    {ficheData?.sections?.[sectionIndex]?.titre || "1. Lire & Écouter attentivement"}
+                  <h2 className="mt-2.5 font-serif text-2xl sm:text-3xl font-bold titre-or">
+                    {ficheData?.sections?.[sectionIndex]?.titre || "1. Contempler la Parole"}
                   </h2>
                 </div>
                 
                 {/* Sélecteur de voix & Lecture continue */}
                 <div className="flex items-center gap-2">
-                  <div className="inline-flex rounded-full border border-encre-900/15 bg-white/70 p-0.5 text-2xs font-bold">
+                  <div className="inline-flex rounded-full border border-or-500/30 bg-encre-950/70 p-0.5 text-2xs font-bold">
                     <button
                       onClick={() => changerVoix('feminin')}
                       className={`px-2.5 py-1 rounded-full transition ${
-                        genreVoix === 'feminin' ? 'bg-encre-950 text-white shadow-xs' : 'text-encre-600 hover:text-encre-900'
+                        genreVoix === 'feminin' ? 'bg-or-400 text-encre-950 font-bold shadow-xs' : 'text-or-200/70 hover:text-or-200'
                       }`}
                     >
                       Vivienne
@@ -385,7 +408,7 @@ export default function TempsApart({
                     <button
                       onClick={() => changerVoix('masculin')}
                       className={`px-2.5 py-1 rounded-full transition ${
-                        genreVoix === 'masculin' ? 'bg-encre-950 text-white shadow-xs' : 'text-encre-600 hover:text-encre-900'
+                        genreVoix === 'masculin' ? 'bg-or-400 text-encre-950 font-bold shadow-xs' : 'text-or-200/70 hover:text-or-200'
                       }`}
                     >
                       Studio
@@ -394,50 +417,50 @@ export default function TempsApart({
 
                   <button 
                     onClick={toggleAudioLecture}
-                    className="inline-flex items-center gap-2 bg-encre-950 hover:bg-encre-800 text-parchemin-50 px-4 py-2 rounded-full text-xs font-bold transition shadow-sm"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-or-400 to-or-500 hover:brightness-110 text-encre-950 px-4 py-2 rounded-full text-xs font-bold transition shadow-md"
                   >
-                    {isReadingAudio ? <Pause className="w-3.5 h-3.5 text-or-400 animate-pulse"/> : <Play className="w-3.5 h-3.5 text-or-400" />}
+                    {isReadingAudio ? <Pause className="w-3.5 h-3.5 animate-pulse"/> : <Play className="w-3.5 h-3.5 fill-current" />}
                     {isReadingAudio ? 'Pause' : 'Écouter'}
                   </button>
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-or-50/60 rounded-xl border border-or-200/80 text-xs text-or-950 font-medium flex items-start gap-2.5">
-                <Feather className="w-4 h-4 text-or-700 shrink-0 mt-0.5" />
+              <div className="mt-4 p-3 bg-or-500/10 rounded-xl border border-or-400/20 text-xs text-or-200 font-medium flex items-start gap-2.5">
+                <Feather className="w-4 h-4 text-or-400 shrink-0 mt-0.5" />
                 <span>
-                  Lis ce texte lentement. Clique sur les versets pour lire le passage biblique.
+                  Écoute paisiblement. Clique sur les versets dorés pour ouvrir le passage biblique.
                 </span>
               </div>
 
-              {/* Rendu des blocs avec versets cliquables */}
-              <div className="mt-6 space-y-4 font-serif leading-[1.8] text-lg text-encre-900">
+              {/* Paragraphes illuminés avec versets cliquables */}
+              <div className="mt-6 space-y-4 font-serif leading-[1.9] text-lg text-parchemin-100/90">
                 {sectionBlocs.map((b, idx) => {
                   if (!b.texte) return null;
                   if (b.type === 'citation') {
                     return (
-                      <blockquote key={idx} className="relative rounded-2xl border border-or-300 bg-parchemin-100 p-4 pl-5 my-4 italic text-base">
-                        <Quote className="absolute right-3 top-3 h-5 w-5 text-or-400/40" />
-                        <TexteAvecReferences>{b.texte}</TexteAvecReferences>
+                      <blockquote key={idx} className="relative rounded-2xl border border-or-500/30 bg-or-500/10 p-5 pl-6 my-5 italic text-base text-or-100 shadow-inner">
+                        <Quote className="absolute right-3 top-3 h-5 w-5 text-or-400/30" />
+                        <TexteAvecReferences tone="nuit">{b.texte}</TexteAvecReferences>
                       </blockquote>
                     );
                   }
                   if (b.type === 'encadre') {
                     return (
-                      <div key={idx} className="rounded-2xl border-l-4 border-or-600 bg-or-50/70 p-4 text-base font-medium my-4">
-                        <TexteAvecReferences>{b.texte}</TexteAvecReferences>
+                      <div key={idx} className="rounded-2xl border-l-4 border-or-400 bg-or-500/15 p-4 text-base font-medium my-4 text-or-200">
+                        <TexteAvecReferences tone="nuit">{b.texte}</TexteAvecReferences>
                       </div>
                     );
                   }
                   if (b.type === 'sous-titre') {
                     return (
-                      <h3 key={idx} className="font-bold text-xl text-encre-950 pt-2">
+                      <h3 key={idx} className="font-bold text-xl text-or-300 pt-3">
                         {b.texte}
                       </h3>
                     );
                   }
                   return (
                     <p key={idx}>
-                      <TexteAvecReferences>{b.texte}</TexteAvecReferences>
+                      <TexteAvecReferences tone="nuit">{b.texte}</TexteAvecReferences>
                     </p>
                   );
                 })}
@@ -446,52 +469,48 @@ export default function TempsApart({
             
             <button 
               onClick={handleNext} 
-              className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
+              className="w-full inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-or-400 via-or-500 to-or-400 px-6 text-sm font-bold text-encre-950 shadow-xl transition hover:brightness-110 hover:-translate-y-0.5"
             >
-              Passer à la contemplation <ArrowRight className="w-4 h-4" />
+              Entrer dans la méditation <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 2 : CONTEMPLER & MÉDITER */}
+        {/* ── ÉTAPE 2 : MÉDITER & CONTEMPLER (Questions Théocentriques) ── */}
         {step === 2 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
-            <div className="flex items-center justify-between border-b border-encre-900/15 pb-3">
+            <div className="flex items-center justify-between border-b border-or-500/20 pb-3">
               <div>
-                <h2 className="font-serif text-2xl font-bold text-encre-950 flex items-center gap-2">
-                  <Brain className="w-6 h-6 text-or-700" /> 2. Méditer & Contempler
+                <h2 className="font-serif text-2xl font-bold titre-or flex items-center gap-2">
+                  <Brain className="w-6 h-6 text-or-400" /> 2. Méditer & Regarder à Dieu
                 </h2>
-                <p className="text-xs text-encre-700 mt-0.5">
-                  Regarde à Dieu et Sa vérité avant tout.
+                <p className="text-xs text-parchemin-200/70 mt-0.5">
+                  Prends le temps d'accueillir Sa vérité dans ton cœur.
                 </p>
               </div>
-              <span className="timbre px-2.5 py-1 text-xs font-bold text-encre-800">
+              <span className="px-3 py-1 rounded-full bg-or-500/15 border border-or-400/30 text-xs font-bold text-or-300">
                 {meditationQuestions.length} questions
               </span>
             </div>
             
             <div className="space-y-5">
               {meditationQuestions.map((q, idx) => {
-                const badge = FONCTION_BADGES[q.fonction || ''] || { label: `Question ${idx + 1}`, bg: 'bg-parchemin-100 border-encre-900/20', text: 'text-encre-800' };
+                const badge = FONCTION_BADGES[q.fonction || ''] || { label: `Question ${idx + 1}`, border: 'border-or-400/30', bg: 'bg-or-500/15', text: 'text-or-300' };
                 return (
-                  <article key={q.id || idx} className="feuille relative rounded-2xl p-5 shadow-md border border-encre-900/10">
-                    <span className="punaise -top-2 left-6" />
-                    
-                    <div className="flex items-center justify-between mb-2.5">
-                      <span className={`text-[10px] font-bold uppercase tracking-[0.14em] px-2.5 py-1 rounded-md border ${badge.bg} ${badge.text}`}>
-                        {badge.label}
-                      </span>
-                    </div>
+                  <article key={q.id || idx} className="relative rounded-2xl p-5 shadow-lg border border-or-500/20 bg-encre-900/60 backdrop-blur-md space-y-3">
+                    <span className={`text-[10px] font-bold uppercase tracking-[0.14em] px-2.5 py-1 rounded-md border ${badge.bg} ${badge.border} ${badge.text} inline-block`}>
+                      {badge.label}
+                    </span>
 
-                    <label className="block font-serif text-base font-bold text-encre-950 mb-3 leading-snug">
-                      <TexteAvecReferences>{q.question}</TexteAvecReferences>
+                    <label className="block font-serif text-base font-bold text-parchemin-100 leading-snug">
+                      <TexteAvecReferences tone="nuit">{q.question}</TexteAvecReferences>
                     </label>
 
                     <textarea 
                       value={answers[q.id] || ''}
                       onChange={(e) => setAnswers(prev => ({...prev, [q.id]: e.target.value}))}
-                      className="w-full h-24 rounded-xl border border-encre-900/15 bg-white/60 p-3.5 text-encre-900 text-sm leading-relaxed outline-none transition focus:border-or-700 focus:ring-2 focus:ring-or-400/20 placeholder:text-encre-900/30"
-                      placeholder="Ta pensée ou prière..."
+                      className="w-full h-24 rounded-xl border border-or-500/25 bg-encre-950/80 p-3.5 text-parchemin-100 text-sm leading-relaxed outline-none transition focus:border-or-400 focus:ring-2 focus:ring-or-400/20 placeholder:text-parchemin-100/30"
+                      placeholder="Ce qui monte dans ton cœur..."
                     />
                   </article>
                 );
@@ -500,22 +519,22 @@ export default function TempsApart({
 
             <button 
               onClick={handleNext} 
-              className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
+              className="w-full inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-or-400 to-or-500 px-6 text-sm font-bold text-encre-950 shadow-xl transition hover:brightness-110 hover:-translate-y-0.5"
             >
               Choisir ce que j'apporte dans la prière <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 3 : CHOISIR CE QUE JE PORTE */}
+        {/* ── ÉTAPE 3 : CHOISIR CE QUE JE DÉPOSE ── */}
         {step === 3 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
-            <div className="border-b border-encre-900/15 pb-3">
-              <h2 className="font-serif text-2xl font-bold text-encre-950 flex items-center gap-2">
-                <MousePointerClick className="w-6 h-6 text-or-700" /> 3. Choisir ce que je porte
+            <div className="border-b border-or-500/20 pb-3">
+              <h2 className="font-serif text-2xl font-bold titre-or flex items-center gap-2">
+                <MousePointerClick className="w-6 h-6 text-or-400" /> 3. Choisir ce que je porte
               </h2>
-              <p className="text-xs text-encre-700 mt-1">
-                Parmi ce que tu viens de contempler, que veux-tu déposer maintenant devant Dieu ?
+              <p className="text-xs text-parchemin-200/70 mt-1">
+                Quelles découvertes ou convictions veux-tu déposer maintenant devant Dieu ?
               </p>
             </div>
             
@@ -524,7 +543,7 @@ export default function TempsApart({
                 const val = answers[q.id]?.trim();
                 if (!val) return null;
                 const isSelected = selectedCards.includes(q.id);
-                const badge = FONCTION_BADGES[q.fonction || ''] || { label: 'Révélation', bg: 'bg-parchemin-100 border-encre-900/20', text: 'text-encre-800' };
+                const badge = FONCTION_BADGES[q.fonction || ''] || { label: 'Révélation', border: 'border-or-400/30', bg: 'bg-or-500/15', text: 'text-or-300' };
 
                 return (
                   <div 
@@ -534,72 +553,71 @@ export default function TempsApart({
                     }}
                     className={`relative rounded-2xl p-5 transition-all cursor-pointer border ${
                       isSelected 
-                        ? 'bg-parchemin-100 border-or-600 shadow-md scale-[1.01]' 
-                        : 'bg-white/60 border-encre-900/15 hover:border-or-500 shadow-sm'
+                        ? 'bg-or-500/20 border-or-400 shadow-[0_0_15px_rgba(245,158,11,0.25)] scale-[1.01]' 
+                        : 'bg-encre-900/60 border-or-500/20 hover:border-or-400/50'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className={`text-[10px] font-bold uppercase tracking-[0.14em] px-2.5 py-0.5 rounded border ${badge.bg} ${badge.text}`}>
+                      <span className={`text-[10px] font-bold uppercase tracking-[0.14em] px-2.5 py-0.5 rounded border ${badge.bg} ${badge.border} ${badge.text}`}>
                         {badge.label}
                       </span>
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-colors ${
-                        isSelected ? 'bg-or-600 border-or-600 text-white' : 'border-encre-900/30 bg-white'
+                        isSelected ? 'bg-or-400 border-or-400 text-encre-950' : 'border-white/30 bg-encre-950'
                       }`}>
                         {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                       </div>
                     </div>
-                    <p className="font-serif italic text-base text-encre-900 pr-2">"{val}"</p>
+                    <p className="font-serif italic text-base text-parchemin-100 pr-2">"{val}"</p>
                   </div>
                 );
               })}
 
               {Object.values(answers).every(v => !v.trim()) && (
-                <div className="text-center p-8 bg-white/40 rounded-2xl border border-dashed border-encre-900/20 text-encre-700 text-sm">
-                  Tu n'as pas renseigné de notes. Tu peux tout de même entrer librement dans la prière.
+                <div className="text-center p-8 bg-encre-900/40 rounded-2xl border border-dashed border-or-500/20 text-parchemin-200/60 text-sm">
+                  Tu peux entrer directement dans la prière avec ce que tu as sur le cœur.
                 </div>
               )}
             </div>
 
             <button 
               onClick={handleNext}
-              className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
+              className="w-full inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-or-400 to-or-500 px-6 text-sm font-bold text-encre-950 shadow-xl transition hover:brightness-110 hover:-translate-y-0.5"
             >
-              🕊️ Je veux parler à Dieu de ceci <ArrowRight className="w-4 h-4" />
+              🕊️ Entrer dans le Sanctuaire de prière <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 4 : PRIER LIBREMENT */}
+        {/* ── ÉTAPE 4 : LE SANCTUAIRE DE PRIÈRE ── */}
         {step === 4 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
-            <div className="feuille relative rounded-3xl p-6 sm:p-9 shadow-xl border border-encre-900/10 text-center">
-              <span className="ruban -top-3 left-1/2 -translate-x-1/2" />
+            <div className="relative rounded-3xl p-6 sm:p-9 shadow-2xl border border-or-500/30 bg-encre-900/70 backdrop-blur-xl text-center space-y-4">
               
-              <div className="inline-flex p-3.5 rounded-full bg-or-100 border border-or-300 text-or-800 mb-3 shadow-inner">
-                <Flame className="w-7 h-7 animate-pulse" />
+              <div className="inline-flex p-3.5 rounded-full bg-or-500/20 border border-or-400/40 text-or-300 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                <Flame className="w-8 h-8 animate-pulse text-or-400" />
               </div>
               
-              <h2 className="font-serif text-3xl font-bold text-encre-950">
-                4. Ton temps de prière
+              <h2 className="font-serif text-3xl font-bold titre-or">
+                4. Ton Sanctuaire de Prière
               </h2>
-              <p className="text-xs text-encre-700 max-w-md mx-auto mt-1 leading-relaxed">
-                Dépose ce que tu as découvert devant Lui. Parle-lui simplement, comme un enfant à son Père.
+              <p className="text-xs text-parchemin-200/75 max-w-md mx-auto leading-relaxed">
+                Parle simplement à ton Père céleste. Dépose devant Lui ce que tu as contemplé.
               </p>
 
-              {/* Miroir des cartes choisies */}
+              {/* Miroir sacré des cartes choisies */}
               <div className="mt-6 space-y-3.5 text-left">
                 {selectedCards.map(key => {
                   const q = meditationQuestions.find(mq => mq.id === key);
                   const badge = FONCTION_BADGES[q?.fonction || ''];
                   return (
-                    <blockquote key={key} className="relative rounded-2xl border border-or-300 bg-parchemin-100 p-4 shadow-sm">
-                      <Quote className="absolute right-3 top-3 h-5 w-5 text-or-400/40" />
+                    <blockquote key={key} className="relative rounded-2xl border border-or-400/30 bg-or-500/10 p-4 shadow-sm">
+                      <Quote className="absolute right-3 top-3 h-5 w-5 text-or-400/20" />
                       {badge && (
-                        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-or-800 block mb-1">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-or-300 block mb-1">
                           {badge.label}
                         </span>
                       )}
-                      <p className="font-serif italic text-base text-encre-950">
+                      <p className="font-serif italic text-base text-parchemin-100">
                         « {answers[key]} »
                       </p>
                     </blockquote>
@@ -607,42 +625,42 @@ export default function TempsApart({
                 })}
               </div>
 
-              {/* Verbes d'action */}
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {/* Verbes d'adoration & de prière */}
+              <div className="mt-6 flex flex-wrap justify-center gap-2 pt-2">
                 {['Adorer', 'Remercier', 'Confesser', 'Demander', 'Écouter', 'Remettre'].map(verb => (
-                  <span key={verb} className="px-3 py-1 rounded-full border border-encre-900/15 text-encre-800 text-xs font-bold uppercase tracking-wider bg-white/70 shadow-sm">
+                  <span key={verb} className="px-3 py-1 rounded-full border border-or-500/30 text-or-200 text-xs font-bold uppercase tracking-wider bg-encre-950/70 shadow-xs">
                     {verb}
                   </span>
                 ))}
               </div>
 
-              {/* Minuteur */}
-              <div className="mt-6 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-encre-950 text-parchemin-50 text-xs font-bold">
-                <Clock3 className="w-3.5 h-3.5 text-or-400" />
+              {/* Minuteur paisible */}
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-encre-950 border border-or-400/30 text-or-300 text-xs font-bold">
+                <Clock3 className="w-4 h-4 text-or-400" />
                 <span>
                   {Math.floor(timerSeconds / 60)}:{(timerSeconds % 60).toString().padStart(2, '0')}
                 </span>
-                <span className="text-or-300/70">• Musique contemplative</span>
+                <span className="text-or-400/60">• Présence de Dieu</span>
               </div>
             </div>
 
             <button 
               onClick={handleNext} 
-              className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
+              className="w-full inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-or-400 to-or-500 px-6 text-sm font-bold text-encre-950 shadow-xl transition hover:brightness-110 hover:-translate-y-0.5"
             >
-              Ancrer la Parole <ArrowRight className="w-4 h-4" />
+              Ancrer la Parole vivante <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 5 : ANCRER LE VERSET */}
+        {/* ── ÉTAPE 5 : ANCRER LE VERSET ── */}
         {step === 5 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
-            <div className="border-b border-encre-900/15 pb-3">
-              <h2 className="font-serif text-2xl font-bold text-encre-950 flex items-center gap-2">
-                <BookA className="w-6 h-6 text-or-700" /> 5. Ancrer le Verset
+            <div className="border-b border-or-500/20 pb-3">
+              <h2 className="font-serif text-2xl font-bold titre-or flex items-center gap-2">
+                <BookA className="w-6 h-6 text-or-400" /> 5. Ancrer le Verset
               </h2>
-              <p className="text-xs text-encre-700 mt-1">
+              <p className="text-xs text-parchemin-200/70 mt-1">
                 Grave cette parole vivante dans ta mémoire pour qu'elle t'accompagne toute la journée.
               </p>
             </div>
@@ -659,8 +677,8 @@ export default function TempsApart({
                     }}
                     className={`px-4 py-2 rounded-full text-xs font-bold transition border ${
                       selectedVersetIndex === idx
-                        ? 'bg-encre-950 text-parchemin-50 border-encre-950 shadow-md'
-                        : 'bg-parchemin-50 text-encre-800 border-encre-900/15 hover:bg-parchemin-100'
+                        ? 'bg-or-400 text-encre-950 border-or-400 shadow-md font-bold'
+                        : 'bg-encre-900/60 text-or-200 border-or-500/20 hover:border-or-400/50'
                     }`}
                   >
                     {vRef}
@@ -669,11 +687,10 @@ export default function TempsApart({
               </div>
             )}
 
-            {/* Carte Verset */}
-            <article className="feuille relative rounded-3xl p-6 sm:p-8 shadow-xl border border-encre-900/10 text-center">
-              <span className="trombone absolute -top-3 right-8" />
+            {/* Carte Verset Immersive */}
+            <article className="relative rounded-3xl p-6 sm:p-8 shadow-2xl border border-or-500/30 bg-encre-900/60 backdrop-blur-xl text-center">
               
-              <div className="flex items-center justify-between text-xs text-or-800 uppercase tracking-widest font-bold border-b border-encre-900/10 pb-3">
+              <div className="flex items-center justify-between text-xs text-or-300 uppercase tracking-widest font-bold border-b border-or-500/20 pb-3">
                 <span>{currentVersetRef}</span>
                 <div className="flex items-center gap-2">
                   <button 
@@ -682,35 +699,35 @@ export default function TempsApart({
                       setCopiedVerset(true);
                       setTimeout(() => setCopiedVerset(false), 2000);
                     }}
-                    className="p-1 text-encre-600 hover:text-encre-950 transition"
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-or-200 transition"
                     title="Copier le verset"
                   >
-                    {copiedVerset ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                    {copiedVerset ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
                   <button 
                     onClick={() => lireAVoixHaute(currentVersetTexte)}
-                    className="p-1 text-encre-600 hover:text-encre-950 transition"
-                    title="Écouter"
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-or-200 transition"
+                    title="Écouter le verset"
                   >
                     <Volume2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Niveaux */}
-              <div className="py-6">
+              {/* Rendu Dynamique des 4 Niveaux */}
+              <div className="py-6 min-h-[140px] flex items-center justify-center">
                 {memoriseLevel === 1 && (
-                  <p className="font-serif text-xl sm:text-2xl text-encre-950 leading-relaxed italic">
+                  <p className="font-serif text-xl sm:text-2xl text-parchemin-100 leading-relaxed italic">
                     « {currentVersetTexte} »
                   </p>
                 )}
 
                 {memoriseLevel === 2 && (
-                  <p className="font-serif text-lg sm:text-xl text-encre-950 leading-loose">
+                  <p className="font-serif text-lg sm:text-xl text-parchemin-100 leading-loose">
                     {wordsWithGaps.map((item, idx) => (
                       <span key={idx} className="inline-block mx-1">
                         {item.isGap ? (
-                          <span className="bg-or-200 text-or-950 border-b-2 border-or-600 px-2 py-0.5 rounded font-bold">
+                          <span className="bg-or-500/25 text-or-300 border-b-2 border-or-400 px-2 py-0.5 rounded font-bold">
                             [ ... ]
                           </span>
                         ) : (
@@ -722,28 +739,28 @@ export default function TempsApart({
                 )}
 
                 {memoriseLevel === 3 && (
-                  <p className="font-serif text-lg sm:text-xl text-or-950 leading-loose tracking-wide font-medium">
+                  <p className="font-serif text-lg sm:text-xl text-or-300 leading-loose tracking-wider font-medium">
                     {firstLettersText}
                   </p>
                 )}
 
                 {memoriseLevel === 4 && (
-                  <div className="space-y-4">
-                    <p className="text-xs text-encre-700 font-medium">
+                  <div className="space-y-4 w-full">
+                    <p className="text-xs text-or-200/80 font-medium">
                       Appuie sur le micro et récite le verset de mémoire :
                     </p>
                     <button
                       onClick={toggleMicRecitation}
                       className={`p-5 rounded-full mx-auto flex items-center justify-center transition-all ${
                         isListeningMic 
-                          ? 'bg-rose-600 text-white animate-pulse shadow-lg' 
-                          : 'bg-encre-950 text-parchemin-50 hover:bg-encre-800 shadow-md'
+                          ? 'bg-rose-600 text-white animate-pulse shadow-[0_0_25px_rgba(225,29,72,0.6)]' 
+                          : 'bg-gradient-to-r from-or-400 to-or-500 text-encre-950 shadow-lg hover:brightness-110'
                       }`}
                     >
-                      {isListeningMic ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6 text-or-400" />}
+                      {isListeningMic ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
                     </button>
                     {transcriptMic && (
-                      <div className="bg-white/70 p-4 rounded-xl border border-encre-900/10 text-sm text-encre-900 italic">
+                      <div className="bg-encre-950/80 p-4 rounded-xl border border-or-400/20 text-sm text-or-100 italic">
                         « {transcriptMic} »
                       </div>
                     )}
@@ -751,8 +768,8 @@ export default function TempsApart({
                 )}
               </div>
 
-              {/* Grille des niveaux */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-encre-900/10">
+              {/* Grille des 4 niveaux */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-or-500/20">
                 {[
                   { lvl: 1, title: 'Niveau 1', sub: 'Lecture' },
                   { lvl: 2, title: 'Niveau 2', sub: 'Mots à trous' },
@@ -764,11 +781,11 @@ export default function TempsApart({
                     onClick={() => setMemoriseLevel(item.lvl as any)}
                     className={`p-2.5 rounded-xl border text-center transition ${
                       memoriseLevel === item.lvl
-                        ? 'bg-or-100 border-or-600 text-or-950 shadow-sm'
-                        : 'bg-parchemin-50 border-encre-900/15 text-encre-700 hover:bg-parchemin-100'
+                        ? 'bg-or-500/25 border-or-400 text-or-300 shadow-sm font-bold'
+                        : 'bg-encre-950/50 border-or-500/15 text-parchemin-200/60 hover:text-parchemin-100 hover:border-or-500/30'
                     }`}
                   >
-                    <p className="font-bold text-xs">{item.title}</p>
+                    <p className="text-xs font-bold">{item.title}</p>
                     <p className="text-[10px] opacity-75">{item.sub}</p>
                   </button>
                 ))}
@@ -777,24 +794,23 @@ export default function TempsApart({
 
             <button 
               onClick={handleNext} 
-              className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
+              className="w-full inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-or-400 to-or-500 px-6 text-sm font-bold text-encre-950 shadow-xl transition hover:brightness-110 hover:-translate-y-0.5"
             >
               Passer à ma réponse de vie <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 6 : VIVRE LA PAROLE */}
+        {/* ── ÉTAPE 6 : VIVRE & RÉPONDRE (Le Pas de Foi & Fond d'écran) ── */}
         {step === 6 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
-            <div className="postit postit-jaune relative mx-auto w-full rotate-[-0.5deg] rounded-sm p-6 sm:p-8 shadow-xl border border-encre-900/15">
-              <span className="ruban -top-3 left-1/2 -translate-x-1/2" />
+            <div className="relative rounded-3xl p-6 sm:p-8 shadow-2xl border border-or-500/30 bg-encre-900/70 backdrop-blur-xl space-y-4">
               
-              <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-encre-700 mb-2">
+              <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-or-400">
                 <NotebookPen className="w-4 h-4" /> 6. Vivre & Répondre à cette révélation
               </p>
               
-              <label className="block font-serif text-xl sm:text-2xl font-bold text-encre-950 mb-3 leading-snug">
+              <label className="block font-serif text-xl sm:text-2xl font-bold titre-or leading-snug">
                 Si cette vérité sur Dieu est réelle, comment vas-tu vivre avec Lui aujourd'hui ?
               </label>
               
@@ -802,36 +818,36 @@ export default function TempsApart({
                 value={step6Answer}
                 onChange={(e) => setStep6Answer(e.target.value)}
                 rows={4}
-                className="w-full rounded-xl border border-encre-900/20 bg-white/60 p-4 text-encre-950 text-base leading-relaxed outline-none transition focus:border-or-700 focus:ring-2 focus:ring-or-400/20 placeholder:text-encre-900/35"
-                placeholder="Ex : M'approcher de Lui avec confiance, déposer cette inquiétude, Lui obéir dans telle situation..."
+                className="w-full rounded-xl border border-or-500/30 bg-encre-950/80 p-4 text-parchemin-100 text-base leading-relaxed outline-none transition focus:border-or-400 focus:ring-2 focus:ring-or-400/20 placeholder:text-parchemin-100/30"
+                placeholder="Ex : M'approcher de Lui avec confiance, déposer telle inquiétude, Lui obéir dans cette décision..."
               />
 
-              <p className="flex items-center gap-2 text-xs text-encre-700 mt-3">
-                <LockKeyhole className="w-3.5 h-3.5 text-or-800" />
-                Ton engagement s'enregistre dans ton Carnet Spirituel.
+              <p className="flex items-center gap-2 text-xs text-parchemin-200/70">
+                <LockKeyhole className="w-3.5 h-3.5 text-or-400" />
+                Ton pas s'enregistre dans ton Carnet Spirituel personnel.
               </p>
             </div>
 
-            {/* Fond d'écran 1 clic */}
-            <div className="rounded-2xl border border-encre-900/15 bg-parchemin-50/80 p-4 flex items-center justify-between shadow-sm">
+            {/* Téléchargement du fond d'écran */}
+            <div className="rounded-2xl border border-or-500/20 bg-encre-900/50 p-4 flex items-center justify-between shadow-md">
               <div>
-                <h4 className="font-bold text-sm text-encre-950">Garder le verset avec soi</h4>
-                <p className="text-xs text-encre-700">Fond d'écran verrouillé pour smartphone</p>
+                <h4 className="font-bold text-sm text-parchemin-100">Garder le verset avec soi</h4>
+                <p className="text-xs text-parchemin-200/60">Fond d'écran verrouillé pour smartphone</p>
               </div>
               <button 
                 onClick={genererFondEcran}
-                className="inline-flex items-center gap-2 bg-encre-950 hover:bg-encre-800 text-parchemin-50 text-xs font-bold px-4 py-2.5 rounded-full transition shadow-sm"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-or-400 to-or-500 hover:brightness-110 text-encre-950 text-xs font-bold px-4 py-2.5 rounded-full transition shadow-md"
               >
-                <Download className="w-3.5 h-3.5 text-or-400" /> Télécharger
+                <Download className="w-3.5 h-3.5" /> Télécharger
               </button>
             </div>
 
             <button 
               onClick={handleFinish} 
               disabled={!step6Answer.trim()}
-              className="w-full inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-encre-950 px-8 text-base font-bold text-parchemin-50 shadow-lg transition hover:-translate-y-0.5 hover:bg-encre-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="w-full inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-or-400 via-or-500 to-or-400 px-8 text-base font-bold text-encre-950 shadow-2xl transition hover:brightness-110 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
-              <CheckCircle2 className="w-5 h-5 text-or-400" /> Valider mon temps à part
+              <CheckCircle2 className="w-5 h-5" /> Valider mon temps avec Dieu
             </button>
           </div>
         )}
