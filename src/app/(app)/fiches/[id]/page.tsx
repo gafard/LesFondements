@@ -319,34 +319,18 @@ function FicheContent() {
               <div className="mt-7 flex flex-wrap gap-2.5">
                 <Link
                   href={`/aujourdhui?fiche=${fiche.id}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-or-300 px-5 py-3 text-xs font-bold text-encre-950 shadow-md transition hover:-translate-y-0.5 hover:bg-or-200"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-or-300 px-6 py-3.5 text-xs font-bold text-encre-950 shadow-md transition hover:-translate-y-0.5 hover:bg-or-200"
                 >
                   <Sunrise className="h-4 w-4" strokeWidth={2} />
-                  Prendre un temps à part
+                  Vivre mon temps du jour
                 </Link>
 
                 <button
-                  onClick={() => setImmersion(true)}
-                  className="bouton-or inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-xs font-bold shadow-md"
-                >
-                  <Headphones className="h-4 w-4" strokeWidth={2} />
-                  Immersion guidée
-                </button>
-
-                <button
                   onClick={() => setEcouteContinueOuverte(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-3 text-xs font-bold text-parchemin-100 backdrop-blur-sm transition-colors hover:bg-white/20"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-5 py-3.5 text-xs font-bold text-parchemin-100 backdrop-blur-sm transition-colors hover:bg-white/20"
                 >
                   <Headphones className="h-4 w-4 text-or-300" strokeWidth={2} />
                   Écoute continue (Mains-libres)
-                </button>
-
-                <button
-                  onClick={() => setPauseSanctuaireOuverte(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-3 text-xs font-bold text-parchemin-100 backdrop-blur-sm transition-colors hover:bg-white/20"
-                >
-                  <Hourglass className="h-4 w-4 text-or-300" strokeWidth={2} />
-                  Pause Sanctuaire
                 </button>
               </div>
             </div>
@@ -363,6 +347,86 @@ function FicheContent() {
 
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_330px]">
           <main className="min-w-0">
+
+        {/* ══ Cahier d'étude de la semaine (Découpage séquentiel) ══ */}
+        <div className="feuille relative rounded-3xl p-6 sm:p-8 shadow-xl border border-encre-900/10 mb-8">
+          <span className="trombone absolute -top-3 left-9" aria-hidden="true" />
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-encre-900/15 pb-4 mb-6">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] bg-or-100 text-or-900 border border-or-300">
+                <Sunrise className="w-3.5 h-3.5" /> Cahier d'étude de la semaine
+              </span>
+              <h2 className="mt-2 font-serif text-2xl sm:text-3xl font-bold text-encre-950">
+                Le chemin pas à pas
+              </h2>
+            </div>
+            <span className="timbre px-3 py-1 text-xs font-bold text-encre-800">
+              {fiche.sections.length} étapes
+            </span>
+          </div>
+
+          <div className="space-y-3.5">
+            {fiche.sections.map((sec, idx) => {
+              const cleAvancement = `temps-apart:${idx}`;
+              const estVecu = Boolean(reponses[cleAvancement]);
+              const clePrecedente = idx > 0 ? `temps-apart:${idx - 1}` : null;
+              const estDeverouille = idx === 0 || Boolean(clePrecedente && reponses[clePrecedente]);
+
+              return (
+                <div 
+                  key={idx}
+                  className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                    estVecu 
+                      ? 'bg-emerald-50/70 border-emerald-300/80 shadow-sm'
+                      : estDeverouille 
+                        ? 'bg-white/90 border-or-400 shadow-md scale-[1.01]' 
+                        : 'bg-encre-900/5 border-encre-900/10 opacity-60'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs ${
+                      estVecu ? 'bg-emerald-600 text-white' : estDeverouille ? 'bg-or-600 text-white' : 'bg-encre-900/20 text-encre-700'
+                    }`}>
+                      {estVecu ? <Check className="w-4 h-4 stroke-[3]" /> : idx + 1}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-encre-600">Étape {idx + 1}</span>
+                        {estVecu && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-200/60 text-emerald-900">
+                            Vécu
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-serif text-lg font-bold text-encre-950 mt-0.5">
+                        {sec.titre || `Section ${idx + 1}`}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div>
+                    {estDeverouille ? (
+                      <Link
+                        href={`/aujourdhui?fiche=${fiche.id}&section=${idx}`}
+                        className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition shadow-sm ${
+                          estVecu 
+                            ? 'bg-emerald-900 text-white hover:bg-emerald-800'
+                            : 'bg-encre-950 text-parchemin-50 hover:bg-encre-800'
+                        }`}
+                      >
+                        {estVecu ? 'Refaire' : 'Commencer'} <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-xs text-encre-600 font-medium px-4 py-2 bg-encre-900/5 rounded-full">
+                        <Lock className="w-3.5 h-3.5" /> Terminer l'étape {idx} d'abord
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
         {/* ══ Onglets ══ */}
         <div className="flex gap-1.5 overflow-x-auto border-b border-parchemin-300 pb-px">
           {(

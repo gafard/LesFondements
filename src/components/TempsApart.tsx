@@ -6,10 +6,13 @@ import {
   BookOpen, Brain, MousePointerClick, 
   Flame, BookA, Check, ArrowRight, ArrowLeft, Play, Pause, 
   Mic, MicOff, Download, Sparkles, Volume2, Copy,
-  LockKeyhole, Clock3, NotebookPen, Quote, CheckCircle2, Feather
+  LockKeyhole, Clock3, NotebookPen, Quote, CheckCircle2, Feather, UserCheck
 } from 'lucide-react';
-import { saveAnswer } from '@/lib/firestore';
-import { jouerAmbiance, arreterAmbiance, lireAVoixHaute, arreterLecture } from '@/lib/ambiance';
+import { saveAnswer, addJournalEntry } from '@/lib/firestore';
+import { 
+  jouerAmbiance, arreterAmbiance, lireAVoixHaute, arreterLecture,
+  getGenreVoix, setGenreVoix, type GenreVoix 
+} from '@/lib/ambiance';
 import { VERSETS_CONNUS, normaliserReference } from '@/data/versets';
 
 interface Props {
@@ -27,13 +30,16 @@ interface Props {
 }
 
 const FONCTION_BADGES: Record<string, { label: string; bg: string; text: string }> = {
-  'observer': { label: 'Observation attentive', bg: 'bg-sky-100 border-sky-300', text: 'text-sky-900' },
-  'decouvrir-dieu': { label: 'Révélation sur Dieu', bg: 'bg-or-100 border-or-300', text: 'text-or-950' },
-  'se-laisser-eclairer': { label: 'Miroir du cœur', bg: 'bg-rose-100 border-rose-300', text: 'text-rose-950' },
-  'recevoir': { label: 'Ce que je reçois', bg: 'bg-emerald-100 border-emerald-300', text: 'text-emerald-950' },
-  'repondre': { label: 'Mon action', bg: 'bg-purple-100 border-purple-300', text: 'text-purple-950' },
-  'observer+decouvrir-dieu': { label: 'Observer & Découvrir Dieu', bg: 'bg-or-100 border-or-300', text: 'text-or-950' },
-  'recevoir+repondre': { label: 'Recevoir & Répondre', bg: 'bg-emerald-100 border-emerald-300', text: 'text-emerald-950' },
+  'contempler': { label: '1. Contempler Dieu', bg: 'bg-or-100 border-or-300', text: 'text-or-950' },
+  'comprendre': { label: '2. Comprendre Sa Vérité', bg: 'bg-sky-100 border-sky-300', text: 'text-sky-950' },
+  'recevoir': { label: '3. Recevoir dans mon Cœur', bg: 'bg-emerald-100 border-emerald-300', text: 'text-emerald-950' },
+  'etre-transforme': { label: '4. Être Transformé', bg: 'bg-rose-100 border-rose-300', text: 'text-rose-950' },
+  'vivre': { label: '5. Vivre & Répondre', bg: 'bg-purple-100 border-purple-300', text: 'text-purple-950' },
+  // Backward compatibility
+  'observer': { label: '1. Contempler', bg: 'bg-or-100 border-or-300', text: 'text-or-950' },
+  'decouvrir-dieu': { label: '2. Découvrir Dieu', bg: 'bg-sky-100 border-sky-300', text: 'text-sky-950' },
+  'se-laisser-eclairer': { label: '3. Miroir de vérité', bg: 'bg-rose-100 border-rose-300', text: 'text-rose-950' },
+  'repondre': { label: '5. Vivre la Parole', bg: 'bg-purple-100 border-purple-300', text: 'text-purple-950' },
 };
 
 export default function TempsApart({ 
@@ -50,6 +56,7 @@ export default function TempsApart({
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [step6Answer, setStep6Answer] = useState('');
   const [isReadingAudio, setIsReadingAudio] = useState(false);
+  const [genreVoix, setGenreVoixState] = useState<GenreVoix>('feminin');
   const [selectedVersetIndex, setSelectedVersetIndex] = useState(0);
   const [memoriseLevel, setMemoriseLevel] = useState<1 | 2 | 3 | 4>(1);
   const [timerSeconds, setTimerSeconds] = useState(90);
@@ -58,6 +65,10 @@ export default function TempsApart({
   const [transcriptMic, setTranscriptMic] = useState('');
   const [copiedVerset, setCopiedVerset] = useState(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    setGenreVoixState(getGenreVoix());
+  }, []);
 
   const currentVersetRef = versets[selectedVersetIndex] || versets[0] || 'Ps 46:11';
   const currentVersetTexte = useMemo(() => {
@@ -103,9 +114,20 @@ export default function TempsApart({
       setIsReadingAudio(true);
       const textOnly = sectionText.replace(/<[^>]*>/g, ' ');
       lireAVoixHaute(textOnly, {
+        piste: `f${ficheId}.s${sectionIndex}`,
+        genre: genreVoix,
         onFin: () => setIsReadingAudio(false),
         onErreur: () => setIsReadingAudio(false),
       });
+    }
+  };
+
+  const changerVoix = (nouveauGenre: GenreVoix) => {
+    setGenreVoixState(nouveauGenre);
+    setGenreVoix(nouveauGenre);
+    if (isReadingAudio) {
+      arreterLecture();
+      setIsReadingAudio(false);
     }
   };
 
@@ -245,6 +267,22 @@ export default function TempsApart({
     if (user) {
       try {
         await saveAnswer(user.uid, ficheId, `temps-apart:${sectionIndex}`, JSON.stringify(finalData));
+
+        // Enregistrer automatiquement dans le Journal Spirituel
+        const recapPriere = selectedCards
+          .map(k => answers[k]?.trim())
+          .filter(Boolean)
+          .map(t => `• ${t}`)
+          .join('\n');
+
+        const entreesJournal = [
+          `📖 **Fiche ${ficheId} : ${ficheData?.titre || ''}** — Étape ${sectionIndex + 1}`,
+          `✨ **Parole gardée :** « ${currentVersetTexte} » (${currentVersetRef})`,
+          recapPriere ? `🕊️ **Ce que j'ai déposé devant Dieu :**\n${recapPriere}` : null,
+          step6Answer.trim() ? `👣 **Ma réponse de foi & de vie :**\n${step6Answer.trim()}` : null,
+        ].filter(Boolean).join('\n\n');
+
+        await addJournalEntry(user.uid, entreesJournal);
       } catch (e) {
         console.error("Erreur de sauvegarde", e);
       }
@@ -290,7 +328,7 @@ export default function TempsApart({
       {/* Main Table Work Area */}
       <main className="flex-1 p-4 sm:p-6 md:p-8 flex flex-col max-w-2xl mx-auto w-full transition-all duration-500 relative">
         
-        {/* ÉTAPE 1 : LIRE & ÉCOUTER (Feuille de travail avec trombone) */}
+        {/* ÉTAPE 1 : LIRE & ÉCOUTER (Feuille de travail avec trombone & sélecteur de voix) */}
         {step === 1 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
             <article className="feuille relative rounded-3xl p-6 sm:p-9 shadow-xl border border-encre-900/10">
@@ -299,26 +337,48 @@ export default function TempsApart({
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-encre-900/15 pb-4">
                 <div>
                   <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] bg-or-100 text-or-900 border border-or-300">
-                    <BookOpen className="w-3.5 h-3.5" /> Fiche {ficheId} • Section {sectionIndex + 1}
+                    <BookOpen className="w-3.5 h-3.5" /> Fiche {ficheId} • Étape {sectionIndex + 1}
                   </span>
                   <h2 className="mt-2.5 font-serif text-2xl sm:text-3xl font-bold text-encre-950">
                     1. Lire & Écouter attentivement
                   </h2>
                 </div>
                 
-                <button 
-                  onClick={toggleAudioLecture}
-                  className="inline-flex items-center gap-2 bg-encre-950 hover:bg-encre-800 text-parchemin-50 px-4 py-2 rounded-full text-xs font-bold transition shadow-sm"
-                >
-                  {isReadingAudio ? <Pause className="w-3.5 h-3.5 text-or-400 animate-pulse"/> : <Play className="w-3.5 h-3.5 text-or-400" />}
-                  {isReadingAudio ? 'Pause' : 'Écouter la voix'}
-                </button>
+                {/* Voice & Audio Controls */}
+                <div className="flex items-center gap-2">
+                  <div className="inline-flex rounded-full border border-encre-900/15 bg-white/70 p-0.5 text-2xs font-bold">
+                    <button
+                      onClick={() => changerVoix('feminin')}
+                      className={`px-2.5 py-1 rounded-full transition ${
+                        genreVoix === 'feminin' ? 'bg-encre-950 text-white shadow-xs' : 'text-encre-600 hover:text-encre-900'
+                      }`}
+                    >
+                      Vivienne
+                    </button>
+                    <button
+                      onClick={() => changerVoix('masculin')}
+                      className={`px-2.5 py-1 rounded-full transition ${
+                        genreVoix === 'masculin' ? 'bg-encre-950 text-white shadow-xs' : 'text-encre-600 hover:text-encre-900'
+                      }`}
+                    >
+                      Studio
+                    </button>
+                  </div>
+
+                  <button 
+                    onClick={toggleAudioLecture}
+                    className="inline-flex items-center gap-2 bg-encre-950 hover:bg-encre-800 text-parchemin-50 px-4 py-2 rounded-full text-xs font-bold transition shadow-sm"
+                  >
+                    {isReadingAudio ? <Pause className="w-3.5 h-3.5 text-or-400 animate-pulse"/> : <Play className="w-3.5 h-3.5 text-or-400" />}
+                    {isReadingAudio ? 'Pause' : 'Écouter'}
+                  </button>
+                </div>
               </div>
 
               <div className="mt-4 p-3 bg-or-50/60 rounded-xl border border-or-200/80 text-xs text-or-950 font-medium flex items-start gap-2.5">
                 <Feather className="w-4 h-4 text-or-700 shrink-0 mt-0.5" />
                 <span>
-                  Lis ce texte lentement. Prête attention aux mots répétés, aux contrastes et aux verbes d'action.
+                  Lis ce texte lentement. Prête attention à ce qu'il révèle sur Dieu et Son cœur.
                 </span>
               </div>
 
@@ -332,21 +392,21 @@ export default function TempsApart({
               onClick={handleNext} 
               className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
             >
-              Passer à la méditation <ArrowRight className="w-4 h-4" />
+              Passer à la contemplation <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 2 : MÉDITER (Fiches bristol avec étiquettes) */}
+        {/* ÉTAPE 2 : CONTEMPLER & MÉDITER (Fiches bristol théocentriques) */}
         {step === 2 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
             <div className="flex items-center justify-between border-b border-encre-900/15 pb-3">
               <div>
                 <h2 className="font-serif text-2xl font-bold text-encre-950 flex items-center gap-2">
-                  <Brain className="w-6 h-6 text-or-700" /> 2. Méditer
+                  <Brain className="w-6 h-6 text-or-700" /> 2. Méditer & Contempler
                 </h2>
                 <p className="text-xs text-encre-700 mt-0.5">
-                  Laisse le texte sonder ton âme. Réponds simplement et avec vérité.
+                  Regarde à Dieu et Sa vérité avant tout.
                 </p>
               </div>
               <span className="timbre px-2.5 py-1 text-xs font-bold text-encre-800">
@@ -375,7 +435,7 @@ export default function TempsApart({
                       value={answers[q.id] || ''}
                       onChange={(e) => setAnswers(prev => ({...prev, [q.id]: e.target.value}))}
                       className="w-full h-24 rounded-xl border border-encre-900/15 bg-white/60 p-3.5 text-encre-900 text-sm leading-relaxed outline-none transition focus:border-or-700 focus:ring-2 focus:ring-or-400/20 placeholder:text-encre-900/30"
-                      placeholder="Ta réflexion personnelle..."
+                      placeholder="Ta pensée ou prière..."
                     />
                   </article>
                 );
@@ -391,7 +451,7 @@ export default function TempsApart({
           </div>
         )}
 
-        {/* ÉTAPE 3 : CHOISIR (Cartes posées sur la table à cocher) */}
+        {/* ÉTAPE 3 : CHOISIR CE QUE JE PORTE */}
         {step === 3 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
             <div className="border-b border-encre-900/15 pb-3">
@@ -399,7 +459,7 @@ export default function TempsApart({
                 <MousePointerClick className="w-6 h-6 text-or-700" /> 3. Choisir ce que je porte
               </h2>
               <p className="text-xs text-encre-700 mt-1">
-                Parmi ce que tu viens de découvrir, que veux-tu apporter maintenant à Dieu ?
+                Parmi ce que tu viens de contempler, que veux-tu déposer maintenant devant Dieu ?
               </p>
             </div>
             
@@ -408,7 +468,7 @@ export default function TempsApart({
                 const val = answers[q.id]?.trim();
                 if (!val) return null;
                 const isSelected = selectedCards.includes(q.id);
-                const badge = FONCTION_BADGES[q.fonction || ''] || { label: 'Découverte', bg: 'bg-parchemin-100 border-encre-900/20', text: 'text-encre-800' };
+                const badge = FONCTION_BADGES[q.fonction || ''] || { label: 'Révélation', bg: 'bg-parchemin-100 border-encre-900/20', text: 'text-encre-800' };
 
                 return (
                   <div 
@@ -439,7 +499,7 @@ export default function TempsApart({
 
               {Object.values(answers).every(v => !v.trim()) && (
                 <div className="text-center p-8 bg-white/40 rounded-2xl border border-dashed border-encre-900/20 text-encre-700 text-sm">
-                  Tu n'as pas renseigné de notes à l'étape précédente. Tu peux tout de même entrer dans la prière.
+                  Tu n'as pas renseigné de notes. Tu peux tout de même entrer librement dans la prière.
                 </div>
               )}
             </div>
@@ -453,7 +513,7 @@ export default function TempsApart({
           </div>
         )}
 
-        {/* ÉTAPE 4 : PRIER LIBREMENT (Le Sanctuaire avec nappes musicales) */}
+        {/* ÉTAPE 4 : PRIER LIBREMENT (Sanctuaire avec nappe musicale) */}
         {step === 4 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
             <div className="feuille relative rounded-3xl p-6 sm:p-9 shadow-xl border border-encre-900/10 text-center">
@@ -467,7 +527,7 @@ export default function TempsApart({
                 4. Ton temps de prière
               </h2>
               <p className="text-xs text-encre-700 max-w-md mx-auto mt-1 leading-relaxed">
-                Dépose ce que tu viens de découvrir devant Lui. Parle-lui simplement, comme un enfant à son Père.
+                Dépose ce que tu as découvert devant Lui. Parle-lui simplement, comme un enfant à son Père.
               </p>
 
               {/* Selected Cards Mirror */}
@@ -493,7 +553,7 @@ export default function TempsApart({
 
               {/* Action Verbs */}
               <div className="mt-6 flex flex-wrap justify-center gap-2">
-                {['Remercier', 'Confesser', 'Demander', 'Écouter', 'Remettre'].map(verb => (
+                {['Adorer', 'Remercier', 'Confesser', 'Demander', 'Écouter', 'Remettre'].map(verb => (
                   <span key={verb} className="px-3 py-1 rounded-full border border-encre-900/15 text-encre-800 text-xs font-bold uppercase tracking-wider bg-white/70 shadow-sm">
                     {verb}
                   </span>
@@ -519,7 +579,7 @@ export default function TempsApart({
           </div>
         )}
 
-        {/* ÉTAPE 5 : ANCRER LE VERSET (Carte Verset & Niveaux) */}
+        {/* ÉTAPE 5 : ANCRER LE VERSET */}
         {step === 5 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
             <div className="border-b border-encre-900/15 pb-3">
@@ -663,23 +723,23 @@ export default function TempsApart({
               onClick={handleNext} 
               className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-sm font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
             >
-              Passer à l'action concrète <ArrowRight className="w-4 h-4" />
+              Passer à ma réponse de vie <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 6 : POSER MON PAS (Le Post-it Jaune avec ruban) */}
+        {/* ÉTAPE 6 : VIVRE LA PAROLE (Le Post-it Jaune avec ruban) */}
         {step === 6 && (
           <div className="animate-in fade-in slide-in-from-bottom-3 space-y-6">
             <div className="postit postit-jaune relative mx-auto w-full rotate-[-0.5deg] rounded-sm p-6 sm:p-8 shadow-xl border border-encre-900/15">
               <span className="ruban -top-3 left-1/2 -translate-x-1/2" />
               
               <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-encre-700 mb-2">
-                <NotebookPen className="w-4 h-4" /> 6. Mon pas concret d'obéissance
+                <NotebookPen className="w-4 h-4" /> 6. Vivre & Répondre à cette révélation
               </p>
               
               <label className="block font-serif text-xl sm:text-2xl font-bold text-encre-950 mb-3 leading-snug">
-                À quoi cela ressemblera concrètement aujourd'hui ?
+                Si cette vérité sur Dieu est réelle, comment vas-tu vivre avec Lui aujourd'hui ?
               </label>
               
               <textarea 
@@ -687,12 +747,12 @@ export default function TempsApart({
                 onChange={(e) => setStep6Answer(e.target.value)}
                 rows={4}
                 className="w-full rounded-xl border border-encre-900/20 bg-white/60 p-4 text-encre-950 text-base leading-relaxed outline-none transition focus:border-or-700 focus:ring-2 focus:ring-or-400/20 placeholder:text-encre-900/35"
-                placeholder="Ex : Avant 18h, appeler X pour lui demander pardon..."
+                placeholder="Ex : Lui faire confiance dans telle décision, m'approcher de Lui comme un Père, déposer telle inquiétude, ou poser un geste d'obéissance..."
               />
 
               <p className="flex items-center gap-2 text-xs text-encre-700 mt-3">
                 <LockKeyhole className="w-3.5 h-3.5 text-or-800" />
-                Ton engagement reste privé.
+                Ton engagement s'enregistre dans ton Carnet Spirituel.
               </p>
             </div>
 
