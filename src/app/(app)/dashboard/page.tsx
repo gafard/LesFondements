@@ -15,6 +15,7 @@ import {
   Search,
   Shield,
   ShieldCheck,
+  RotateCcw,
   Sunrise,
   TrendingUp,
 } from 'lucide-react';
@@ -247,18 +248,16 @@ function DashboardContent() {
               {sections.map((sec, idx) => {
                 const estFait = Boolean(reponsesFiche[`temps-apart:${idx}`]);
                 const estCourante = idx === premierIndexNonFait;
-
-                return (
-                  <li
-                    key={idx}
-                    className={`flex items-center gap-3 rounded-xl border p-3.5 ${
-                      estFait
-                        ? 'border-emerald-300 bg-parchemin-50 text-emerald-950'
-                        : estCourante
-                          ? 'border-or-400 bg-white/90 text-encre-950 shadow-xs'
-                          : 'border-transparent bg-encre-900/5 text-encre-500'
-                    }`}
-                  >
+                const accessible = estFait || estCourante;
+                const classeEtape = `flex min-h-20 items-center gap-3 rounded-xl border p-3.5 transition ${
+                  estFait
+                    ? 'border-emerald-300 bg-parchemin-50 text-emerald-950'
+                    : estCourante
+                      ? 'border-or-400 bg-white/90 text-encre-950 shadow-xs'
+                      : 'border-transparent bg-encre-900/5 text-encre-500'
+                }`;
+                const contenuEtape = (
+                  <>
                     <div className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold ${
                       estFait
                         ? 'bg-emerald-600 text-white'
@@ -268,14 +267,43 @@ function DashboardContent() {
                     }`}>
                       {estFait ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : idx + 1}
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="truncate font-serif text-sm font-bold">
                         {sec.titre || `Étape ${idx + 1}`}
                       </p>
-                      <p className="mt-0.5 text-3xs font-bold uppercase tracking-[0.12em] opacity-65">
-                        {estFait ? 'Vécu' : estCourante ? 'Prochaine étape' : 'À venir'}
+                      <p className="mt-0.5 text-2xs font-bold uppercase tracking-[0.12em] opacity-65">
+                        {estFait ? 'Vécu · revoir' : estCourante ? 'Prochaine étape' : 'À venir'}
                       </p>
                     </div>
+                    {accessible && (
+                      <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
+                        estFait ? 'bg-emerald-100 text-emerald-800' : 'bg-or-100 text-or-800'
+                      }`}>
+                        {estFait ? (
+                          <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          <Sunrise className="h-4 w-4" aria-hidden="true" />
+                        )}
+                      </span>
+                    )}
+                  </>
+                );
+
+                return (
+                  <li key={idx}>
+                    {accessible ? (
+                      <Link
+                        href={`/aujourdhui?fiche=${ficheCouranteId}&section=${idx}`}
+                        aria-label={`${estFait ? 'Revoir' : 'Ouvrir'} l’étape ${idx + 1} : ${sec.titre || `Étape ${idx + 1}`}`}
+                        className={`${classeEtape} group hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-600`}
+                      >
+                        {contenuEtape}
+                      </Link>
+                    ) : (
+                      <div className={classeEtape} aria-label={`Étape ${idx + 1} à venir`}>
+                        {contenuEtape}
+                      </div>
+                    )}
                   </li>
                 );
               })}

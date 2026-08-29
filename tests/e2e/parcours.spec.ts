@@ -82,6 +82,38 @@ test('mobile : le menu Plus et la table donnent accès à tous les outils', asyn
   await expect(page).toHaveURL(/\/recherche$/);
 });
 
+test('tableau de bord : une étape vécue peut être revue sans perdre ses réponses', async ({ page }) => {
+  await page.addInitScript((uid) => {
+    localStorage.setItem(
+      `lesfondements_prog_${uid}`,
+      JSON.stringify({
+        1: {
+          completed: false,
+          answers: {
+            'temps-apart:0': '1',
+            'q:f1-s1-q1': 'Une découverte déjà écrite.',
+          },
+          lastUpdated: Date.now(),
+        },
+      })
+    );
+  }, UTILISATEUR.uid);
+  await page.goto('/dashboard');
+
+  const revoir = page.getByRole('link', { name: 'Revoir l’étape 1 : Dieu règne' });
+  await expect(revoir).toBeVisible();
+  await revoir.click();
+  await expect(page).toHaveURL(/\/aujourdhui\?fiche=1&section=0$/);
+  await expect(page.getByRole('heading', { name: 'Connaître Dieu' })).toBeVisible();
+
+  await expect(
+    page.evaluate((uid) => {
+      const donnees = JSON.parse(localStorage.getItem(`lesfondements_prog_${uid}`) || '{}');
+      return donnees['1']?.answers?.['q:f1-s1-q1'];
+    }, UTILISATEUR.uid)
+  ).resolves.toBe('Une découverte déjà écrite.');
+});
+
 test('absence : le choix reste associé au membre', async ({ page }) => {
   await page.goto('/groupes');
   await page.getByRole('button', { name: /Je ne peux pas/i }).click();
