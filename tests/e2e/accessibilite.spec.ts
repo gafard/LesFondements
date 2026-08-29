@@ -29,3 +29,23 @@ test('accessibilité applicative : menu des outils mobile', async ({ page }) => 
   const resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
   expect(resultat.violations).toEqual([]);
 });
+
+test('accessibilité applicative : méditation, prière et mémorisation de Dieu est un', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await semerSession(page);
+  await page.goto('/aujourdhui?fiche=1&section=2&scene=17');
+  await expect(page.getByText('Lis lentement Marc 12:29', { exact: false })).toBeVisible();
+
+  let resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
+  expect(resultat.violations).toEqual([]);
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de ce que tu as découvert' })).toBeVisible();
+  resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
+  expect(resultat.violations).toEqual([]);
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Mémorisation progressive')).toBeVisible();
+  resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
+  expect(resultat.violations).toEqual([]);
+});

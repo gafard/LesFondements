@@ -80,6 +80,7 @@ interface QuestionMeditation {
   fonction?: string;
   consigne?: string;
   question: string;
+  priereTitre?: string;
 }
 
 interface SectionMeditation {
@@ -1336,7 +1337,13 @@ function RenduScene({
         </div>
       );
 
-    case 'priere':
+    case 'priere': {
+      const reprises = scene.questions.flatMap((question) => {
+        const reponse = reponses[`q:${question.id}`]?.trim();
+        return question.priereTitre && reponse
+          ? [{ id: question.id, titre: question.priereTitre, reponse }]
+          : [];
+      });
       return (
         <div className="py-8 text-center sm:py-12">
           <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-or-300/30 bg-or-400/12 text-or-300 shadow-[0_0_28px_rgba(220,168,73,0.12)]">
@@ -1352,6 +1359,23 @@ function RenduScene({
             Relis ce que tu viens d&apos;écrire. Puis prends le temps de lui répondre avec tes propres
             mots. Tu peux aussi rester un instant en silence.
           </p>
+          {reprises.length > 0 && (
+            <div className="mx-auto mt-7 max-w-2xl rounded-3xl border border-or-400/18 bg-encre-950/35 p-5 text-left sm:p-6">
+              <p className="text-2xs font-black uppercase tracking-[0.18em] text-or-300/70">
+                Tes découvertes, devant Dieu
+              </p>
+              <div className="mt-5 space-y-5">
+                {reprises.map((reprise) => (
+                  <div key={reprise.id} className="border-l border-or-400/35 pl-4">
+                    <p className="text-xs font-bold text-or-200/80">{reprise.titre}</p>
+                    <p className="mt-2 font-serif text-base italic leading-relaxed text-parchemin-100/85">
+                      « {reprise.reponse} »
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="mx-auto mt-7 max-w-xl text-left">
             <ChampEcriture
               valeur={reponses[`priere:${scene.id}`] ?? ''}
@@ -1362,6 +1386,7 @@ function RenduScene({
           </div>
         </div>
       );
+    }
 
     case 'ancrage-verset': {
       const cleChoix = `verset-choisi:${scene.id}`;
@@ -1566,6 +1591,41 @@ function constructeurReconnaissance(): ConstructeurReconnaissance | null {
   return navigateur.SpeechRecognition ?? navigateur.webkitSpeechRecognition ?? null;
 }
 
+interface EtapeMemoire {
+  reference: string;
+  texte: string;
+  libelle: string;
+}
+
+function decouperPassagePourMemoire(reference: string, texte: string): EtapeMemoire[] {
+  const plage = reference.match(/^(.+?)\s+(\d+):(\d+)-(\d+)$/);
+  if (!plage) return [{ reference, texte, libelle: 'Passage entier' }];
+
+  const [, livre, chapitre, debutBrut, finBrut] = plage;
+  const debut = Number(debutBrut);
+  const fin = Number(finBrut);
+  const phrases = texte.match(/[^.!?]+[.!?]+[»”]?/g)?.map((phrase) => phrase.trim()) ?? [];
+  if (fin < debut || phrases.length !== fin - debut + 1) {
+    return [{ reference, texte, libelle: 'Passage entier' }];
+  }
+
+  return phrases.map((_, index) => {
+    const dernierVerset = debut + index;
+    const referenceEtape = index === 0
+      ? `${livre} ${chapitre}:${debut}`
+      : `${livre} ${chapitre}:${debut}-${dernierVerset}`;
+    return {
+      reference: referenceEtape,
+      texte: phrases.slice(0, index + 1).join(' '),
+      libelle: index === phrases.length - 1
+        ? 'Passage entier'
+        : index === 0
+          ? `Verset ${debut}`
+          : `Versets ${debut}–${dernierVerset}`,
+    };
+  });
+}
+
 function SceneAncrageVerset({
   options,
   selection,
@@ -1584,12 +1644,18 @@ function SceneAncrageVerset({
   onEnregistrer: (valeur: string) => void;
 }) {
   const [niveau, setNiveau] = useState<NiveauMemoire>(1);
+  const [etapePassage, setEtapePassage] = useState(0);
   const [copiee, setCopiee] = useState(false);
   const [microActif, setMicroActif] = useState(false);
   const reconnaissance = useRef<ReconnaissanceVocale | null>(null);
   const selectionValide = options.length === 1
     || options.some((option) => option.reference === selection);
-  const mots = useMemo(() => texte.trim().split(/\s+/), [texte]);
+  const etapesMemoire = useMemo(
+    () => decouperPassagePourMemoire(reference, texte),
+    [reference, texte]
+  );
+  const passageMemoire = etapesMemoire[Math.min(etapePassage, etapesMemoire.length - 1)];
+  const mots = useMemo(() => passageMemoire.texte.trim().split(/\s+/), [passageMemoire.texte]);
   const motsATrous = useMemo(
     () => mots.map((mot, indexMot) => ({ mot, masque: indexMot % 3 === 1 && mot.length > 2 })),
     [mots]
@@ -1625,7 +1691,7 @@ function SceneAncrageVerset({
   };
 
   const copierVerset = () => {
-    void navigator.clipboard?.writeText(`« ${texte} » — ${reference}`);
+    void navigator.clipboard?.writeText(`« ${passageMemoire.texte} » — ${passageMemoire.reference}`);
     setCopiee(true);
     window.setTimeout(() => setCopiee(false), 1800);
   };
@@ -1651,7 +1717,7 @@ function SceneAncrageVerset({
     contexte.fillStyle = '#f7f0df';
     contexte.font = 'italic 50px Georgia, serif';
 
-    const fragments = `« ${texte} »`.split(' ');
+    const fragments = `« ${passageMemoire.texte} »`.split(' ');
     let ligne = '';
     let hauteur = 700;
     fragments.forEach((fragment) => {
@@ -1667,10 +1733,10 @@ function SceneAncrageVerset({
     contexte.fillText(ligne.trim(), 540, hauteur);
     contexte.fillStyle = '#d8aa55';
     contexte.font = '700 36px sans-serif';
-    contexte.fillText(reference, 540, hauteur + 120);
+    contexte.fillText(passageMemoire.reference, 540, hauteur + 120);
 
     const lien = document.createElement('a');
-    lien.download = `verset-${reference.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
+    lien.download = `verset-${passageMemoire.reference.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
     lien.href = toile.toDataURL('image/png');
     lien.click();
   };
@@ -1741,72 +1807,100 @@ function SceneAncrageVerset({
               <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
                 Mémoriser la Parole
               </span>
-              <p className="mt-1 font-serif text-xl font-bold text-or-200">{reference}</p>
+              <p className="mt-1 font-serif text-xl font-bold text-or-200">{passageMemoire.reference}</p>
             </div>
             <div className="flex items-center gap-1">
               <button type="button" onClick={copierVerset} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Copier le verset">
                 {copiee ? <Check className="h-4 w-4 text-emerald-300" /> : <Copy className="h-4 w-4" />}
               </button>
-              <button type="button" onClick={() => lireAVoixHaute(`${reference}. ${texte}`)} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Écouter le verset">
+              <button type="button" onClick={() => lireAVoixHaute(`${passageMemoire.reference}. ${passageMemoire.texte}`)} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Écouter le verset">
                 <Volume2 className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-      <div className="mt-7 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {niveaux.map((element) => (
-          <button
-            key={element.niveau}
-            type="button"
-            onClick={() => setNiveau(element.niveau)}
-            className={`min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors ${
-              niveau === element.niveau
-                ? 'border-or-300 bg-or-400 text-encre-950'
-                : 'border-white/10 bg-white/5 text-parchemin-100/65 hover:bg-white/10'
-            }`}
-          >
-            {element.niveau} · {element.titre}
-          </button>
-        ))}
-      </div>
+          {etapesMemoire.length > 1 && (
+            <div className="mt-6">
+              <p className="text-2xs font-bold uppercase tracking-[0.18em] text-parchemin-100/55">
+                Mémorisation progressive
+              </p>
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {etapesMemoire.map((etape, indexEtape) => (
+                  <button
+                    key={etape.reference}
+                    type="button"
+                    onClick={() => {
+                      setEtapePassage(indexEtape);
+                      setNiveau(1);
+                    }}
+                    aria-pressed={etapePassage === indexEtape}
+                    className={`min-h-11 rounded-2xl border px-2 py-2 text-2xs font-bold transition-colors ${
+                      etapePassage === indexEtape
+                        ? 'border-or-300 bg-or-400/16 text-or-200'
+                        : 'border-white/10 bg-white/5 text-parchemin-100/60 hover:bg-white/10'
+                    }`}
+                  >
+                    {etape.libelle}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-      <div className="mt-7 flex min-h-52 items-center justify-center rounded-3xl border border-or-400/16 bg-encre-950/35 p-6 text-center sm:p-8">
-        {niveau === 1 && (
-          <p className="font-serif text-xl italic leading-relaxed text-parchemin-100 sm:text-2xl">« {texte} »</p>
-        )}
-        {niveau === 2 && (
-          <p className="font-serif text-lg leading-loose text-parchemin-100 sm:text-xl">
-            {motsATrous.map((element, indexMot) => (
-              <span key={`${element.mot}-${indexMot}`} className="mx-1">
-                {element.masque ? (
-                  <span className="rounded border-b border-or-300 bg-or-400/12 px-2 py-0.5 text-or-200">…</span>
-                ) : element.mot}
-              </span>
+          <div className="mt-7 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {niveaux.map((element) => (
+              <button
+                key={element.niveau}
+                type="button"
+                onClick={() => setNiveau(element.niveau)}
+                className={`min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors ${
+                  niveau === element.niveau
+                    ? 'border-or-300 bg-or-400 text-encre-950'
+                    : 'border-white/10 bg-white/5 text-parchemin-100/65 hover:bg-white/10'
+                }`}
+              >
+                {element.niveau} · {element.titre}
+              </button>
             ))}
-          </p>
-        )}
-        {niveau === 3 && (
-          <p className="font-serif text-lg leading-loose tracking-wider text-or-200 sm:text-xl">{initiales}</p>
-        )}
-        {niveau === 4 && (
-          <div className="w-full max-w-xl">
-            <p className="text-sm leading-relaxed text-parchemin-100/60">
-              Le texte disparaît. Récite-le sans prompteur, puis écoute ce que tu as réellement retenu.
-            </p>
-            <button
-              type="button"
-              onClick={basculerMicro}
-              className={`mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full transition-colors ${
-                microActif ? 'animate-pulse bg-rose-600 text-white' : 'bg-or-400 text-encre-950'
-              }`}
-              aria-label={microActif ? 'Arrêter la récitation' : 'Commencer la récitation'}
-            >
-              {microActif ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-            </button>
-            {valeur && <p className="mt-5 rounded-2xl bg-white/6 p-4 font-serif italic text-parchemin-100/75">« {valeur} »</p>}
           </div>
-        )}
-      </div>
+
+          <div className="mt-7 flex min-h-52 items-center justify-center rounded-3xl border border-or-400/16 bg-encre-950/35 p-6 text-center sm:p-8">
+            {niveau === 1 && (
+              <p className="font-serif text-xl italic leading-relaxed text-parchemin-100 sm:text-2xl">« {passageMemoire.texte} »</p>
+            )}
+            {niveau === 2 && (
+              <p className="font-serif text-lg leading-loose text-parchemin-100 sm:text-xl">
+                {motsATrous.map((element, indexMot) => (
+                  <span key={`${element.mot}-${indexMot}`} className="mx-1">
+                    {element.masque ? (
+                      <span className="rounded border-b border-or-300 bg-or-400/12 px-2 py-0.5 text-or-200">…</span>
+                    ) : element.mot}
+                  </span>
+                ))}
+              </p>
+            )}
+            {niveau === 3 && (
+              <p className="font-serif text-lg leading-loose tracking-wider text-or-200 sm:text-xl">{initiales}</p>
+            )}
+            {niveau === 4 && (
+              <div className="w-full max-w-xl">
+                <p className="text-sm leading-relaxed text-parchemin-100/60">
+                  Le texte disparaît. Récite-le sans prompteur, puis écoute ce que tu as réellement retenu.
+                </p>
+                <button
+                  type="button"
+                  onClick={basculerMicro}
+                  className={`mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full transition-colors ${
+                    microActif ? 'animate-pulse bg-rose-600 text-white' : 'bg-or-400 text-encre-950'
+                  }`}
+                  aria-label={microActif ? 'Arrêter la récitation' : 'Commencer la récitation'}
+                >
+                  {microActif ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+                </button>
+                {valeur && <p className="mt-5 rounded-2xl bg-white/6 p-4 font-serif italic text-parchemin-100/75">« {valeur} »</p>}
+              </div>
+            )}
+          </div>
 
           <button type="button" onClick={telechargerFond} className="mx-auto mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-or-400/22 bg-or-400/8 px-5 text-xs font-bold text-or-200 hover:bg-or-400/14">
             <Download className="h-4 w-4" /> Garder ce verset en fond d&apos;écran

@@ -93,6 +93,42 @@ test('fiche 1 · partie 2 : le verset choisi porte la mémorisation et la mise e
   await expect(page.getByPlaceholder('Quand ce moment arrivera, je veux…')).toBeVisible();
 });
 
+test('fiche 1 · partie 3 : les textes conduisent à une prière issue des découvertes', async ({ page }) => {
+  await page.goto('/aujourdhui?fiche=1&section=2&scene=17');
+
+  await expect(page.getByText('Lis lentement Marc 12:29', { exact: false })).toBeVisible();
+  await expect(page.getByText('Lis Matthieu 28:19 puis 2 Corinthiens 13:13', { exact: false })).toBeVisible();
+  await expect(page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?')).toBeVisible();
+
+  await page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?').fill(
+    'Je découvre un Père qui m’accueille comme son enfant.'
+  );
+  await page.getByLabel('Qu’est-ce que cela te fait découvrir de Dieu en regardant Jésus ?').fill(
+    'Dieu s’approche de notre faiblesse.'
+  );
+  await page.getByLabel('À la lumière de ces textes, qu’est-ce que tu comprends de cette affirmation ?').fill(
+    'Le Saint-Esprit agit et demeure avec nous.'
+  );
+  await page.getByLabel(
+    'Lorsque tu mets ensemble ce que tu viens de découvrir, qu’est-ce que tu comprends maintenant de Dieu ?'
+  ).fill('Dieu est un et se fait connaître dans une communion vivante.');
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Tes découvertes, devant Dieu')).toBeVisible();
+  await expect(page.getByText('Ce que j’ai découvert de Dieu comme Père')).toBeVisible();
+  await expect(page.getByText('Je découvre un Père qui m’accueille comme son enfant.')).toBeVisible();
+  await expect(page.getByText('Ce que l’ensemble m’a fait comprendre de Dieu')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Mémoriser la Parole', { exact: true })).toBeVisible();
+  await expect(page.getByText('Mémorisation progressive')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Verset 1' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Passage entier' }).click();
+  await expect(page.getByText('Jn 1:1-3', { exact: true }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('La Parole que tu gardes · Jn 1:1-3')).toBeVisible();
+});
+
 test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/dashboard');
