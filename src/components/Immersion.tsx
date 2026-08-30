@@ -1432,17 +1432,19 @@ function RenduScene({
     }
 
     case 'priere': {
-      const toutesLesReprises = scene.questions.flatMap((question) => {
+      const reprises = scene.questions.map((question) => {
         const reponse = reponses[`q:${question.id}`]?.trim();
-        return reponse
-          ? [{ id: question.id, titre: question.priereTitre ?? question.question, reponse, prioritaire: !!question.priereTitre }]
-          : [];
+        return {
+          id: question.id,
+          titre: question.question,
+          consigne: question.consigne,
+          reponse: reponse || '',
+        };
       });
-      const reprisesPrioritaires = toutesLesReprises.filter((reprise) => reprise.prioritaire);
-      const reprises = reprisesPrioritaires.length > 0 ? reprisesPrioritaires : toutesLesReprises;
       return (
         <ScenePriereImmersive
           reprises={reprises}
+          questions={scene.questions}
           onAvancer={onAvancer}
         />
       );
@@ -1765,62 +1767,27 @@ function distanceCirculaire(index: number, actif: number, total: number): number
   return distance;
 }
 
-const ORIENTATIONS_PRIERE = [
-  {
-    cle: 'adorer',
-    verbe: 'Adorer',
-    icone: '✨',
-    guidance: 'Contemple la grandeur, la majesté et la fidélité de Dieu au-dessus de toute chose.',
-    amorce: '« Seigneur Dieu, je reconnais que Tu règnes avec sainteté, sagesse et amour… »',
-  },
-  {
-    cle: 'remercier',
-    verbe: 'Remercier',
-    icone: '🙏',
-    guidance: 'Exprime ta gratitude pour Sa présence fidèle, Sa grâce et Ses bontés envers toi.',
-    amorce: '« Père céleste, merci parce que Tu es mon refuge, mon appui et… »',
-  },
-  {
-    cle: 'confesser',
-    verbe: 'Confesser',
-    icone: '🕊️',
-    guidance: 'Dépose avec humilité tes doutes, tes peurs ou tes manquements. Il t’accueille avec miséricorde.',
-    amorce: '« Seigneur, je viens devant Toi en vérité, pardonne mes hésitations et mes craintes… »',
-  },
-  {
-    cle: 'remettre',
-    verbe: 'Remettre',
-    icone: '🤲',
-    guidance: 'Remets entre Ses mains souveraines tes fardeaux, tes décisions et tes proches.',
-    amorce: '« Père, je lâche prise et je Te confie totalement cette situation… »',
-  },
-  {
-    cle: 'ecouter',
-    verbe: 'Écouter',
-    icone: '👂',
-    guidance: 'Fais silence. Laisse Sa paix remplir tes pensées et laisse le Saint-Esprit te parler.',
-    amorce: '« Parle, Seigneur, Ton serviteur écoute dans le secret de Ta présence… »',
-  },
-];
-
 function ScenePriereImmersive({
   reprises,
+  questions,
   onAvancer,
 }: {
   reprises: ReprisePriere[];
+  questions: QuestionMeditation[];
   onAvancer?: () => void;
 }) {
-  const [verbeActif, setVerbeActif] = useState<string>('adorer');
-  const [minuteurActif, setMinuteurActif] = useState(false);
-  const [secondes, setSecondes] = useState(60);
+  const notesRemplies = reprises.filter((r) => r.reponse && r.reponse.trim().length > 0);
+  const elements = notesRemplies.length > 0
+    ? notesRemplies
+    : questions.map((q) => ({
+        id: q.id,
+        titre: q.question,
+        consigne: q.consigne,
+        reponse: '',
+      }));
 
-  useEffect(() => {
-    if (!minuteurActif || secondes <= 0) return;
-    const timer = window.setTimeout(() => setSecondes((s) => s - 1), 1000);
-    return () => window.clearTimeout(timer);
-  }, [minuteurActif, secondes]);
-
-  const orientation = ORIENTATIONS_PRIERE.find((o) => o.cle === verbeActif) || ORIENTATIONS_PRIERE[0];
+  const [indexActif, setIndexActif] = useState(0);
+  const elementActif = elements[indexActif] || elements[0];
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 py-6 text-center animate-fade-in sm:py-10">
@@ -1830,110 +1797,79 @@ function ScenePriereImmersive({
           <Flame className="h-8 w-8 animate-pulse text-or-400" />
         </span>
         <span className="block text-2xs font-bold uppercase tracking-[0.28em] text-or-300/80">
-          Sanctuaire de Prière
+          Prier la Parole
         </span>
         <h2 className="font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-          Parle à Dieu en toute intimité
+          Parle à Dieu à partir de tes découvertes
         </h2>
         <p className="mx-auto max-w-xl text-sm leading-relaxed text-parchemin-100/70">
-          Ce moment est le tien, entre Dieu et toi. Aucun enregistrement, aucune transcription : ouvre simplement ton cœur à ton Père.
+          Prends ce que tu as découvert et écrit lors de ta méditation. Adresse-toi directement à ton Père céleste avec tes propres mots.
         </p>
       </div>
 
-      {/* ── Miroir des Découvertes Déposées ── */}
-      {reprises.length > 0 && (
-        <div className="space-y-3 text-left">
-          <div className="flex items-center gap-2 px-1 text-2xs font-black uppercase tracking-[0.16em] text-or-300/80">
-            <Sparkles className="h-3.5 w-3.5" /> Ce que tu as découvert aujourd&apos;hui
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            {reprises.map((reprise) => (
-              <div
-                key={reprise.id}
-                className="rounded-2xl border border-or-400/25 bg-encre-950/70 p-4 shadow-lg backdrop-blur-md transition-all hover:border-or-400/50 sm:p-5"
+      {/* ── Sélecteur d'onglets si plusieurs découvertes ── */}
+      {elements.length > 1 && (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {elements.map((el, idx) => {
+            const actif = idx === indexActif;
+            return (
+              <button
+                key={el.id}
+                type="button"
+                onClick={() => setIndexActif(idx)}
+                className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-bold transition-all ${
+                  actif
+                    ? 'scale-105 bg-or-400 text-encre-950 shadow-md shadow-or-400/20'
+                    : 'border border-white/10 bg-white/5 text-parchemin-100/65 hover:bg-white/10 hover:text-parchemin-100'
+                }`}
               >
-                <p className="text-3xs font-black uppercase tracking-[0.12em] text-or-400/80">
-                  {reprise.titre}
-                </p>
-                <p className="mt-2.5 font-serif text-base italic leading-relaxed text-parchemin-100 sm:text-lg">
-                  « {reprise.reponse} »
-                </p>
-              </div>
-            ))}
-          </div>
+                <span>Découverte {idx + 1}</span>
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* ── Piliers de Communion ── */}
-      <div className="space-y-6 rounded-3xl border border-white/12 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl sm:p-7">
+      {/* ── La Feuille Sacrée de Méditation ── */}
+      <div className="space-y-6 rounded-3xl border border-or-400/30 bg-encre-950/80 p-6 text-left shadow-2xl backdrop-blur-xl sm:p-8">
         <div>
-          <p className="mb-3 text-2xs font-black uppercase tracking-[0.2em] text-or-300/90">
-            Piliers de recueillement
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {ORIENTATIONS_PRIERE.map((o) => {
-              const actif = verbeActif === o.cle;
-              return (
-                <button
-                  key={o.cle}
-                  type="button"
-                  onClick={() => setVerbeActif(o.cle)}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-sm transition-all ${
-                    actif
-                      ? 'scale-105 bg-or-400 text-encre-950 shadow-or-400/30'
-                      : 'border border-white/10 bg-encre-950/60 text-parchemin-100/75 hover:bg-white/10 hover:text-parchemin-100'
-                  }`}
-                >
-                  <span>{o.icone}</span>
-                  <span>{o.verbe}</span>
-                </button>
-              );
-            })}
+          <span className="mb-2 block text-3xs font-black uppercase tracking-[0.18em] text-or-300/80">
+            La vérité que tu as contemplée
+          </span>
+          <h3 className="font-serif text-lg font-bold leading-relaxed text-parchemin-100 sm:text-xl">
+            {elementActif.titre}
+          </h3>
+        </div>
+
+        {elementActif.reponse ? (
+          <div className="space-y-2 rounded-2xl border border-or-400/25 bg-or-400/10 p-5 sm:p-6">
+            <span className="block text-3xs font-black uppercase tracking-[0.14em] text-or-300/90">
+              Ce que l&apos;Esprit a déposé dans ton cœur :
+            </span>
+            <p className="font-serif text-lg italic leading-relaxed text-parchemin-100 sm:text-xl">
+              « {elementActif.reponse} »
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm italic text-parchemin-100/60">
+            Médite sur cette vérité et parle à Dieu dans le secret de ton cœur.
+          </div>
+        )}
 
-        {/* Orientation inspirante */}
-        <div className="space-y-2 rounded-2xl border border-or-400/20 bg-or-500/10 p-5 text-center animate-fade-in">
-          <p className="text-sm font-medium leading-relaxed text-parchemin-100/90">
-            {orientation.guidance}
+        <div className="space-y-2 border-t border-white/10 pt-5 text-center sm:text-left">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-or-300">
+            🕊️ Parle à Dieu maintenant :
           </p>
-          <p className="font-serif text-base italic text-or-200 sm:text-lg">
-            {orientation.amorce}
+          <p className="font-serif text-base italic leading-relaxed text-parchemin-100 sm:text-lg">
+            « Seigneur, à partir de cette vérité que Tu m&apos;as montrée, je Te prie et je Te dis… »
           </p>
-        </div>
-
-        {/* ── Minuteur Sacré & Respiration ── */}
-        <div className="flex flex-col items-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={() => setMinuteurActif(!minuteurActif)}
-            className="group relative flex items-center justify-center p-6"
-            aria-label={minuteurActif ? 'Suspendre le recueillement' : 'Prendre 1 minute de silence'}
-          >
-            <span
-              className={`absolute inset-0 rounded-full border-2 border-or-400/40 ${
-                minuteurActif ? 'animate-souffle border-or-400 shadow-[0_0_30px_rgba(245,158,11,0.3)]' : ''
-              }`}
-            />
-            <div className="z-10 flex flex-col items-center gap-1">
-              <Clock3 className="h-5 w-5 text-or-300" />
-              <span className="font-mono text-2xl font-bold text-or-200">
-                {secondes > 0 ? `0:${secondes.toString().padStart(2, '0')}` : '✓'}
-              </span>
-              <span className="text-3xs font-bold uppercase tracking-wider text-parchemin-100/60">
-                {minuteurActif ? 'Recueillement en cours…' : 'Prendre 1 min de silence'}
-              </span>
-            </div>
-          </button>
-
-          <p className="max-w-sm text-xs italic text-parchemin-100/50">
-            Ferme les yeux, respire calmement et parle à ton Père.
+          <p className="pt-1 text-xs text-parchemin-100/50">
+            Prends le temps de Lui parler librement à voix haute ou dans ton cœur.
           </p>
         </div>
       </div>
 
-      {/* ── Sortie vers la Parole ── */}
+      {/* ── Sortie vers la suite ── */}
       <div className="pt-2">
         <button
           type="button"

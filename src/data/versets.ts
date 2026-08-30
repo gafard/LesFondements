@@ -9,6 +9,14 @@ import versetsLivret from './versetsLivret.json';
 // `src/lib/bibleVersions.ts` s'y réfère pour ne pas dupliquer le texte.
 
 const VERSETS_SELECTIONNES: Record<string, string> = {
+  "2 Co 10:4-5": "Car les armes avec lesquelles nous combattons ne sont pas charnelles; mais elles sont puissantes, par la vertu de Dieu, pour renverser des forteresses. Nous renversons les raisonnements et toute hauteur qui s’élève contre la connaissance de Dieu, et nous amenons toute pensée captive à l’obéissance de Christ.",
+  "Ep 4:32": "Soyez bons les uns envers les autres, compatissants, vous pardonnant réciproquement, comme Dieu vous a pardonné en Christ.",
+  "Es 61:1-3": "L’esprit du Seigneur, l’Éternel, est sur moi, Car l’Éternel m’a oint pour porter de bonnes nouvelles aux malheureux; Il m’a envoyé pour guérir ceux qui ont le cœur brisé, Pour proclamer aux captifs la liberté, Et aux prisonniers la délivrance; Pour publier une année de grâce de l’Éternel, Et un jour de vengeance de notre Dieu; Pour consoler tous les affligés; Pour accorder aux affligés de Sion, Pour leur donner un diadème au lieu de la cendre, Une huile de joie au lieu du deuil, Un vêtement de louange au lieu d’un esprit abattu, Afin qu’on les appelle des térébinthes de la justice, Une plantation de l’Éternel, pour servir à sa gloire.",
+  "He 4:15": "Car nous n’avons pas un souverain sacrificateur qui ne puisse compatir à nos faiblesses; au contraire, il a été tenté comme nous en toutes choses, sans commettre de péché.",
+  "Jn 8:32": "vous connaîtrez la vérité, et la vérité vous affranchira.",
+  "Lc 4:18-19": "L’Esprit du Seigneur est sur moi, Parce qu’il m’a oint pour annoncer une bonne nouvelle aux pauvres; Il m’a envoyé pour guérir ceux qui ont le cœur brisé, (. ) Pour proclamer aux captifs la délivrance, Et aux aveugles le recouvrement de la vue, Pour renvoyer libres les opprimés, Pour publier une année de grâce du Seigneur.",
+  "Ps 139:23": "Sonde-moi, ô Dieu, et connais mon cœur! Eprouve-moi, et connais mes pensées!",
+  "Rm 12:19": "Ne vous vengez point vous-mêmes, bien-aimés, mais laissez agir la colère; car il est écrit: À moi la vengeance, à moi la rétribution, dit le Seigneur.",
   "1 Ch 4:10": "Jaebets invoqua le Dieu d'Israël, en disant : Si tu me bénis et que tu étendes mes limites, si ta main est avec moi, et si tu me préserves du malheur, en sorte que je ne sois pas dans la souffrance !... Et Dieu accorda ce qu'il avait demandé.",
   "1 Co 1:18": "Car la prédication de la croix est une folie pour ceux qui périssent; mais pour nous qui sommes sauvés, elle est une puissance de Dieu.",
   "1 Co 1:2": "À l'Église de Dieu qui est à Corinthe, à ceux qui ont été sanctifiés en Jésus-Christ, appelés à être saints, et à tous ceux qui invoquent en quelque lieu que ce soit le nom de notre Seigneur Jésus-Christ, leur Seigneur et le nôtre.",

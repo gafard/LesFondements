@@ -2026,137 +2026,339 @@
   {
     "ficheId": 7,
     "ficheTitre": "Vivre libre — première partie",
+    "parcoursGuide": true,
     "sections": [
       {
-        "sectionTitre": "Introduction",
-        "versets": [],
+        "sectionTitre": "Où est-ce que je cherche à être comblé ?",
+        "versets": [
+          "Lc 4:18-19"
+        ],
         "questions": [
           {
             "id": "f7-s1-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Jésus énumère sa mission : libérer les captifs, guérir les aveugles, délivrer les opprimés. Relis ces trois mots (captif, aveugle, opprimé). Dans quel domaine de ta vie te sens-tu le plus visé par l'un de ces mots aujourd'hui ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Luc 4:18-19. Ce sont les paroles par lesquelles Jésus ouvre son ministère.",
+            "question": "Qu’est-ce qui retient ton attention dans ce qu’il dit être venu accomplir ?"
           },
           {
             "id": "f7-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Que te révèle cette proclamation sur le cœur de Jésus ? Il n'est pas venu pour juger tes chaînes, mais pour les briser et proclamer \"une année de grâce\"."
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Après tout ce que tu as parcouru depuis la première fiche, reste un instant sur ce mot.",
+            "question": "Qu’est-ce que le mot « liberté » évoque maintenant pour toi ?"
           },
           {
             "id": "f7-s1-q3",
-            "fonction": "recevoir+repondre",
-            "question": "Si Jésus t'annonce cette grâce aujourd'hui, es-tu prêt à admettre tes oppressions devant lui au lieu de les cacher ? Que vas-tu lui remettre concrètement dans la prière aujourd'hui ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret part de trois besoins : la sécurité, l’identité, la raison d’être. Il explique qu’une chose bonne peut prendre une place qui n’est pas la sienne quand on en dépend pour se sentir en sécurité ou pour avoir de la valeur.",
+            "question": "Que comprends-tu de cette distinction entre une chose bonne et la place qu’on lui donne ?"
+          },
+          {
+            "id": "f7-s1-q4",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Cela peut être une personne, une relation, l’argent, le travail, la réussite, l’apparence, le regard des autres, une activité — ou tout autre chose. Ne cherche pas plusieurs réponses.",
+            "question": "Y a-t-il quelque chose dont tu as particulièrement besoin pour te sentir en sécurité, reconnu, important, ou simplement « bien » ?"
+          },
+          {
+            "id": "f7-s1-q5",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Cette question va plus loin que « est-ce une idole ? ». Prends le temps.",
+            "question": "Qu’est-ce que tu attends réellement de cette chose ou de cette personne ?"
+          },
+          {
+            "id": "f7-s1-q6",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Reste avec ce que tu viens de nommer, sans le juger.",
+            "question": "Qu’est-ce que cette prise de conscience vient éclairer dans ta relation avec Dieu ?"
+          },
+          {
+            "id": "f7-s1-q7",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Tu n’as pas besoin de nier ton besoin ni ton désir, ni de renoncer à quoi que ce soit maintenant. Apporte-le simplement devant Dieu.",
+            "question": "Parle à Dieu de ce que tu viens de découvrir."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment concret risques-tu de chercher à nouveau dans cette chose ce que tu viens de comprendre ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, quel pas voudrais-tu poser à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Comment satisfaire nos besoins de base ?",
-        "versets": [],
+        "sectionTitre": "Comprendre ce que mes émotions signalent",
+        "versets": [
+          "Rm 12:2"
+        ],
         "questions": [
           {
             "id": "f7-s2-q1",
-            "fonction": "observer",
-            "question": "Le texte mentionne trois besoins fondamentaux : sécurité, identité, raison d'être. Lequel de ces trois besoins est le plus criant pour toi en ce moment ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret montre que les émotions aident à discerner ce qui se passe en nous. Une émotion peut être déclenchée par ce qui nous arrive, et elle peut aussi révéler la manière dont nous vivons et interprétons la situation.",
+            "question": "Que comprends-tu de ce que tes émotions peuvent t’apprendre — sans être ni des ennemies, ni des juges ?"
           },
           {
             "id": "f7-s2-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "L'idolâtrie est définie comme le fait de chercher la satisfaction de ses besoins ailleurs qu'en Dieu (personnes, travail, passions). Si tu regardes à ton agenda ou à tes préoccupations, quelle est ton idole secrète ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Pense à une émotion qui revient régulièrement ces derniers temps. Pas forcément la plus forte de ta vie : peur, colère, frustration, tristesse, jalousie, anxiété, honte, joie, soulagement…",
+            "question": "Laquelle reconnais-tu ?"
           },
           {
             "id": "f7-s2-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte affirme que ces besoins fondamentaux doivent être comblés « par Dieu ou ce que Dieu choisit de m'accorder ». Qu'est-ce que cela te dit sur le Dieu qui a créé tes besoins et qui désire les combler lui-même ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Observe, sans te juger.",
+            "question": "Dans quelle situation apparaît-elle généralement ?"
           },
           {
             "id": "f7-s2-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Comment peux-tu, aujourd'hui même, renoncer consciemment à chercher ton identité ou ta sécurité dans cette idole, et choisir de dépendre uniquement de l'amour de ton Père céleste ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Ce que l’on se dit intérieurement passe souvent inaperçu.",
+            "question": "Qu’est-ce que tu te dis intérieurement à ce moment-là ?"
+          },
+          {
+            "id": "f7-s2-q5",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Derrière une émotion, il y a souvent une attente.",
+            "question": "Qu’est-ce que tu voudrais, ou aurais besoin, qu’il se passe ?"
+          },
+          {
+            "id": "f7-s2-q6",
+            "fonction": "examiner",
+            "source": "parole",
+            "consigne": "Relis maintenant Romains 12:2, en gardant cette situation devant toi.",
+            "question": "À la lumière de ce verset, y a-t-il quelque chose dans ta manière de regarder cette situation qui mérite d’être examiné ?"
+          },
+          {
+            "id": "f7-s2-q7",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Tu peux dire à Dieu exactement ce que tu ressens, sans l’embellir et sans chercher tout de suite à le corriger.",
+            "question": "Apporte-lui la situation, l’émotion et la pensée que tu viens d’identifier."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "La prochaine fois que cette émotion apparaîtra…",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Quel réflexe veux-tu apprendre à avoir avant de réagir comme d’habitude ? Comment ta Parole peut-elle t’y aider ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Gérer nos émotions",
-        "versets": [],
+        "sectionTitre": "Gagner la bataille dans mes pensées",
+        "versets": [
+          "2 Co 10:4-5",
+          "Jn 8:32"
+        ],
         "questions": [
           {
             "id": "f7-s3-q1",
             "fonction": "observer",
-            "question": "Le texte insiste : « Ce que nous ressentons n'est jamais la faute des autres. Ils peuvent déclencher nos sentiments mais n'en seront jamais la cause. » Quelle émotion négative as-tu récemment mise sur le dos de quelqu'un d'autre ?"
+            "source": "parole",
+            "consigne": "Lis lentement 2 Corinthiens 10:4-5.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul parle des raisonnements et des pensées ?"
           },
           {
             "id": "f7-s3-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "Si l'autre n'est que le déclencheur, quelle \"fausse croyance\" ou quel besoin non satisfait (peur du rejet, besoin de contrôle) se cache réellement derrière ta réaction émotionnelle disproportionnée ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Jean 8:32, cette parole de Jésus.",
+            "question": "Qu’est-ce qu’elle ajoute à ce que tu viens de lire ?"
           },
           {
             "id": "f7-s3-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "En affirmant que ton besoin ultime est ton \"besoin de Dieu\", que découvres-tu sur sa jalousie bienveillante ? Dieu ne veut pas que tu dépendes émotionnellement des circonstances ou des hommes, mais de Lui seul."
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Ne cherche pas à qualifier cette pensée pour l’instant.",
+            "question": "Y a-t-il une pensée, ou une manière de raisonner, qui revient si souvent qu’elle finit par influencer tes décisions ou ton comportement ?"
           },
           {
             "id": "f7-s3-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Accepte aujourd'hui d'arrêter de blâmer les autres pour tes émotions. Comment vas-tu réagir face à la prochaine contrariété, sachant que tu as \"tout pleinement en Lui\" ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Écris-la telle qu’elle t’apparaît, avec tes mots. Non pas « manque de confiance », mais par exemple : « si j’échoue, les autres verront que je ne vaux rien ».",
+            "question": "Formule-la exactement comme elle se présente dans ton esprit."
+          },
+          {
+            "id": "f7-s3-q5",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Sépare ce qui est établi de ce qui est déduit.",
+            "question": "Est-elle entièrement vraie ? Qu’est-ce qui est factuel, et qu’est-ce qui est une conclusion, une crainte ou une interprétation ?"
+          },
+          {
+            "id": "f7-s3-q6",
+            "fonction": "chercher-dans-la-parole",
+            "source": "parole",
+            "consigne": "Tu peux chercher parmi les versets déjà rencontrés depuis la première fiche.",
+            "question": "Que dit la Parole qui puisse éclairer cette pensée ?"
+          },
+          {
+            "id": "f7-s3-q7",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Reste devant la Parole que tu viens de choisir.",
+            "question": "Parle à Dieu de cette manière de penser, et demande-lui de continuer à t’éclairer."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "La prochaine fois que cette pensée apparaîtra…",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Que veux-tu faire avant de la laisser déterminer ta réaction ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Gagner la bataille dans nos pensées",
+        "sectionTitre": "Blessures et guérison intérieure",
         "versets": [
-          "Mt 5:29"
+          "Ps 147:3",
+          "He 4:15",
+          "Es 61:1-3"
         ],
         "questions": [
           {
             "id": "f7-s4-q1",
             "fonction": "observer",
-            "question": "Le texte indique que l'ennemi introduit ses mensonges pour nous faire croire « que ce sont les nôtres ». Y a-t-il une pensée d'autodépréciation, de doute ou de peur que tu rumines souvent, en pensant que c'est juste \"ta personnalité\" ?"
+            "source": "parole",
+            "consigne": "Lis lentement le Psaume 147:3.",
+            "question": "Qu’est-ce que ce verset te révèle de Dieu face à ceux qui ont le cœur blessé ?"
           },
           {
             "id": "f7-s4-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "À la racine de toute tentation, il y a « l'invitation à vivre indépendamment de Dieu ». Comment cette recherche d'indépendance se manifeste-t-elle concrètement dans ta plus grande lutte actuelle ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Hébreux 4:15.",
+            "question": "Qu’est-ce qu’il ajoute à ce que tu viens de découvrir ?"
           },
           {
             "id": "f7-s4-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Jésus a dit : « Vous connaîtrez la vérité et la vérité vous rendra libres. » Que t'enseigne cette promesse sur le pouvoir de la Parole de Dieu face à la ruse de l'ennemi ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Ne fouille pas ton passé pour y trouver quelque chose. Le livret lui-même déconseille l’introspection forcée.",
+            "question": "Est-ce qu’une blessure, une situation ou une relation que tu connais déjà te vient naturellement à l’esprit ?"
           },
           {
             "id": "f7-s4-q4",
-            "fonction": "recevoir+repondre",
-            "question": "La solution donnée est d'« échanger nos fausses croyances contre de nouvelles convictions ». Prends le mensonge identifié à la question 1 : quelle vérité biblique vas-tu lui opposer, et comment vas-tu t'y attacher aujourd'hui ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret le dit : ta douleur est réelle et mérite d’être reconnue.",
+            "question": "Qu’est-ce qui reste douloureux aujourd’hui dans cette situation ?"
+          },
+          {
+            "id": "f7-s4-q5",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "On apprend souvent à se protéger après une blessure. Ce n’est pas un tort.",
+            "question": "Y a-t-il une manière dont tu t’es protégé depuis cette expérience ?"
+          },
+          {
+            "id": "f7-s4-q6",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Sans conclure trop vite dans un sens ou dans l’autre.",
+            "question": "Cette protection t’aide-t-elle encore aujourd’hui, ou t’empêche-t-elle parfois aussi de vivre librement ?"
+          },
+          {
+            "id": "f7-s4-q7",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Reste avec Dieu dans cette situation. Rien ne doit être réglé aujourd’hui. Tu peux prendre tout le temps qu’il te faut.",
+            "question": "Dis-lui simplement ce qui s’est passé, ce que cela t’a fait, et ce qui reste difficile aujourd’hui."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Il n’y a pas de geste à poser immédiatement.",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À partir de la Parole que tu as choisie, quelle étape saine veux-tu poser pour ne plus simplement enfouir cette blessure ? Cela peut être en parler, prier, demander de l’aide, poser une limite.",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "La guérison intérieure",
+        "sectionTitre": "Le pardon",
         "versets": [
-          "Ps 147:3"
+          "Ep 4:32",
+          "Rm 12:19"
         ],
         "questions": [
           {
             "id": "f7-s5-q1",
             "fonction": "observer",
-            "question": "Le texte donne une définition forte : pardonner ce n'est pas oublier, ni minimiser l'offense. C'est « reconnaître que ce qu'a fait l'autre est mal » sans le juger. Cette définition te semble-t-elle plus difficile ou plus libératrice que celle que tu avais du pardon ?"
+            "source": "parole",
+            "consigne": "Lis lentement Éphésiens 4:32.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul relie le pardon reçu et le pardon donné ?"
           },
           {
             "id": "f7-s5-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "As-tu choisi de « bâtir des murs » pour te protéger, parce que tu refuses de faire face à la souffrance d'une ancienne blessure ? Comment ce mur bloque-t-il tes relations aujourd'hui ?"
+            "fonction": "observer",
+            "source": "livret",
+            "consigne": "Lis la parabole de Matthieu 18:21-35, que le livret propose en lecture. Prends ton temps.",
+            "question": "Qu’est-ce qui te frappe dans cette histoire ?"
           },
           {
             "id": "f7-s5-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte rappelle que ton pardon est minime par rapport à celui de Dieu pour toi (parabole des 100 pièces contre 60 millions). Que découvres-tu sur la grâce vertigineuse que Dieu t'a accordée et qui doit déborder sur les autres ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret pose deux questions : y a-t-il quelqu’un à qui je n’ai pas pardonné ? Y a-t-il quelqu’un à qui je dois demander pardon ?",
+            "question": "Pendant ta lecture, une personne ou une situation t’est-elle revenue à l’esprit ?"
           },
           {
             "id": "f7-s5-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Le pardon est « une décision », un choix de libérer l'autre. Qui dois-tu libérer aujourd'hui de son offense, même si tes émotions ne suivent pas encore, simplement en obéissant et en donnant cette douleur à Jésus ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "On reconnaît l’offense avant de parler de pardon. Le livret est clair : pardonner n’est ni oublier, ni nier, ni dire que ce qui a été fait était acceptable.",
+            "question": "Qu’est-ce qui s’est réellement passé, et qu’est-ce qui a été blessant ou injuste ?"
+          },
+          {
+            "id": "f7-s5-q5",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Une offense laisse souvent quelque chose derrière elle.",
+            "question": "Qu’est-ce que tu portes encore aujourd’hui à cause de cette situation ?"
+          },
+          {
+            "id": "f7-s5-q6",
+            "fonction": "examiner",
+            "source": "parole",
+            "consigne": "Lis maintenant Romains 12:19.",
+            "question": "Qu’est-ce que ce passage te montre sur ce qui t’appartient, et sur ce que tu peux laisser entre les mains de Dieu ?"
+          },
+          {
+            "id": "f7-s5-q7",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Ne minimise pas ce qui s’est passé. Pour certaines blessures, le pardon est un chemin — et une décision de ne pas nourrir la vengeance peut commencer aujourd’hui. Pardonner ne signifie pas rétablir une relation dangereuse, ni renoncer à des limites nécessaires.",
+            "question": "Parle honnêtement à Dieu de l’offense, de ta douleur, et de ce que sa Parole met devant toi. Que veux-tu désormais laisser entre ses mains ?"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Reviens à la situation que tu as identifiée.",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À partir de cette Parole, quel pas concret peux-tu poser ? Une décision intérieure, une conversation, demander pardon pour ta part, abandonner une revanche, demander de l’aide, poser une limite.",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Tu n’as pas besoin de tout régler aujourd’hui. Parmi tout ce qui a été mis en lumière dans cette fiche, quel domaine crois-tu important de continuer à travailler avec Dieu maintenant ?",
+      "questionVerset": "Parmi les Paroles que tu as gardées dans cette fiche, laquelle accompagnera particulièrement ce chemin ?",
+      "etapes": [
+        "Ce dans quoi je cherche parfois à être comblé",
+        "Une émotion que je veux mieux comprendre",
+        "Une pensée qui a besoin d’être renouvelée",
+        "Une blessure qui demande encore de la lumière",
+        "Une offense concernant laquelle je veux avancer"
+      ]
+    }
   },
   {
     "ficheId": 8,
