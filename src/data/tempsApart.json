@@ -76,5 +76,12 @@
     { "section": 3, "titre": "Gagner la bataille dans mes pensées" },
     { "section": 4, "titre": "Blessures et guérison intérieure", "jusqua": "Le pardon" },
     { "section": 4, "titre": "Le pardon", "depuis": "Le pardon" }
+  ],
+
+  "8": [
+    { "section": 1, "titre": "Jésus est vainqueur", "jusqua": "La délivrance des démons" },
+    { "section": 1, "titre": "Ai-je besoin de délivrance ?", "depuis": "La délivrance des démons", "jusqua": "La libération des liens de l’âme" },
+    { "section": 1, "titre": "Les liens de l’âme et les liens héréditaires", "depuis": "La libération des liens de l’âme" },
+    { "section": 2, "titre": "Les conditions pour être libéré" }
   ]
 }

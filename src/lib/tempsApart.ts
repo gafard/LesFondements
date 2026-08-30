@@ -40,11 +40,17 @@ interface EtapeDeclaree {
 
 const TABLE = decoupages as unknown as Record<string, EtapeDeclaree[]>;
 
-/** Comparaison indifférente aux accents et à la casse. */
+/**
+ * Comparaison indifférente aux accents, à la casse et à la forme de
+ * l'apostrophe. Le livret écrit « l'âme » avec une apostrophe droite, les
+ * découpages « l’âme » avec une typographique : sans cette normalisation,
+ * deux textes identiques à l'œil ne se reconnaissent pas.
+ */
 function depouiller(texte: string): string {
   return texte
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
+    .replace(/[’‘ʼ`]/g, "'")
     .toLowerCase();
 }
 

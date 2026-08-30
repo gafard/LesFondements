@@ -2363,86 +2363,306 @@
   {
     "ficheId": 8,
     "ficheTitre": "Vivre libre — deuxième partie",
+    "parcoursGuide": true,
     "sections": [
       {
-        "sectionTitre": "Introduction",
-        "versets": [],
+        "sectionTitre": "Jésus est vainqueur",
+        "versets": [
+          "Col 2:15",
+          "He 2:14-15",
+          "Jc 4:7"
+        ],
         "questions": [
           {
             "id": "f8-s1-q1",
             "fonction": "observer",
-            "question": "Le texte liste des signes d'oppression : péché récurrent, crainte, angoisse, rejet, honte, culpabilité... et ajoute : « on est poussé à faire ou à subir quelque chose qu'on ne veut pas ». Te reconnais-tu dans cette description de soumission involontaire et répétée dans un domaine de ta vie ?"
+            "source": "parole",
+            "consigne": "Lis lentement Colossiens 2:15. Puis relis-le une seconde fois.",
+            "question": "Qu’est-ce qui retient ton attention dans ce que ce passage affirme de Jésus et des puissances ?"
           },
           {
             "id": "f8-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte proclame que « Jésus a vaincu le diable et détruit ses œuvres ». Que t'enseigne cette affirmation catégorique sur la souveraineté absolue de Dieu et de Christ sur les puissances des ténèbres ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Hébreux 2:14-15.",
+            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de découvrir ?"
           },
           {
             "id": "f8-s1-q3",
-            "fonction": "se-laisser-eclairer",
-            "question": "« Souvent, on attribue au démon nos mauvais penchants... alors que la solution est simplement d'avoir une discipline spirituelle ». Comment discerner, dans tes propres luttes, ce qui relève de la paresse spirituelle et ce qui relève d'une véritable oppression nécessitant délivrance ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Jacques 4:7. Ce verset comporte deux mouvements, et l’ordre compte.",
+            "question": "Qu’est-ce qui te frappe dans l’enchaînement de ces deux mouvements ?"
           },
           {
             "id": "f8-s1-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Si la victoire est acquise, tu n'as plus à subir. Quelle parole d'autorité dois-tu prononcer aujourd'hui au nom de Jésus pour rejeter l'oppression (honte, peur, péché) et t'approprier cette liberté ?"
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Reviens aux trois passages ensemble.",
+            "question": "Que te font-ils comprendre de la place de Jésus, de ta relation avec Dieu, et de ton attitude face au mal ?"
+          },
+          {
+            "id": "f8-s1-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret pose la base : « Jésus a vaincu le diable et détruit ses œuvres. C’est sur cette base que nous pouvons expérimenter la libération personnelle. » Il précise aussitôt qu’un chrétien ne peut pas être possédé : Satan ne peut pas toucher l’esprit régénéré.",
+            "question": "Que comprends-tu de cette base, avant tout examen de ta propre vie ?"
+          },
+          {
+            "id": "f8-s1-q6",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Avant de regarder quoi que ce soit de ta vie, reste devant cette victoire.",
+            "question": "Parle à Jésus de ce que tu viens de lire sur ce qu’il a accompli."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment as-tu besoin de te rappeler cette victoire ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Que voudrais-tu affirmer à ce moment-là, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "La libération de l'oppression spirituelle",
-        "versets": [],
+        "sectionTitre": "Ai-je besoin de délivrance ? Le discernement du livret",
+        "versets": [
+          "Rm 6:12-14",
+          "1 Co 10:13",
+          "Jc 4:7"
+        ],
         "questions": [
           {
             "id": "f8-s2-q1",
             "fonction": "observer",
-            "question": "Le texte affirme que l'immoralité mentale est aussi destructrice que l'acte physique. Es-tu prêt à admettre que ce que tu tolères dans tes pensées ou ton imagination crée de réels liens spirituels ?"
+            "source": "parole",
+            "consigne": "Lis lentement Romains 6:12-14.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul parle du péché et de son pouvoir ?"
           },
           {
             "id": "f8-s2-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "Concernant les liens héréditaires ou d'anciennes relations, le texte souligne : « Pourquoi suis-je lié ou attiré par ça ? » Quelle est la racine émotionnelle (besoin d'affection, de contrôle, peur de manquer) qui t'a poussé vers une dépendance dont tu as du mal à te libérer ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant 1 Corinthiens 10:13.",
+            "question": "Qu’est-ce que ce passage ajoute à ta compréhension du combat contre la tentation ?"
           },
           {
             "id": "f8-s2-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Christ a été fait malédiction pour nous (Ga 3:13). Qu'est-ce que ce sacrifice révèle de l'amour d'un Dieu prêt à absorber la malédiction que tes péchés ou tes pères avaient méritée ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret met en garde des deux côtés. D’abord : « Être attaqué ne veut pas dire automatiquement qu’on a un démon en nous. Nous devons avant tout résister et combattre. » Puis : « Souvent, on attribue au démon nos mauvais penchants ou nos réactions, alors que la solution est simplement d’avoir une discipline spirituelle. »",
+            "question": "Que comprends-tu de cette première mise en garde ?"
           },
           {
             "id": "f8-s2-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Le texte précise qu'il faut « s'approprier ce qui a déjà été accompli ». Quel lien (âme, hérédité, dépendance) dois-tu briser aujourd'hui en proclamant consciemment la promesse de Dieu sur ta vie ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Décris simplement ce qui se passe, sans chercher encore à l’expliquer.",
+            "question": "Y a-t-il un domaine dans lequel tu te sens régulièrement dominé, poussé à faire ou à subir quelque chose que tu ne veux pas ?"
+          },
+          {
+            "id": "f8-s2-q5",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "C’est la question que le livret pose avant toute autre.",
+            "question": "As-tu déjà cherché à résister, à renouveler tes pensées, à marcher par l’Esprit et à exercer la maîtrise de soi dans ce domaine ? Qu’est-ce qui s’est passé ?"
+          },
+          {
+            "id": "f8-s2-q6",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret distingue précisément ces deux cas, et c’est sur cette distinction que repose la suite.",
+            "question": "Lorsque cela arrive, as-tu le sentiment de pouvoir choisir autrement — même difficilement — ou d’être irrésistiblement dominé ?"
+          },
+          {
+            "id": "f8-s2-q7",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret écrit : « Il peut arriver que malgré cette discipline et notre bonne volonté de marcher par l’Esprit et ne pas laisser la chair dominer, on soit toujours irrésistiblement dominé, et ce, de manière régulière. On est poussé à faire ou à subir quelque chose qu’on ne veut pas : péché particulier, crainte, angoisse, rejet, honte, culpabilité, violence, colère, pitié de soi, envie de mort. Il est alors fort possible que l’on soit sous l’influence d’un démon. »",
+            "question": "À la lumière de ce que tu viens de décrire, est-ce que cette situation te semble correspondre à ce que le livret décrit ici ?"
+          },
+          {
+            "id": "f8-s2-q8",
+            "fonction": "identifier",
+            "source": "livret",
+            "consigne": "Le livret nomme les entrées possibles : péchés héréditaires, occultisme, un péché habituel dont on ne se repent pas, l’idolâtrie, les fausses religions ou croyances, les malédictions, l’affliction mentale, le non-pardon, mais aussi un choc émotif ou un abus subi.",
+            "question": "Y a-t-il quelque chose que tu identifies comme ayant pu ouvrir cette porte ou créer ce lien ?"
+          },
+          {
+            "id": "f8-s2-q9",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Apporte à Jésus ce que tu viens de décrire, y compris ce que tu ne comprends pas encore.",
+            "question": "Demande-lui de t’éclairer sur ce qui est vrai, et sur le chemin de liberté à emprunter."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Lorsque cette situation se présentera de nouveau…",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Quelle première réponse veux-tu apprendre à avoir, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Conclusion : les conditions pour être libéré2",
-        "versets": [],
+        "sectionTitre": "Les liens de l’âme et les liens héréditaires",
+        "versets": [
+          "1 Co 6:15-20",
+          "1 P 1:18-19",
+          "Ga 3:13-14"
+        ],
         "questions": [
           {
             "id": "f8-s3-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "La question est directe : « Est-ce que je veux vraiment être débarrassé de ce problème ou est-ce que je me suis trop attaché à ce vieil ami ? » Quel est ce péché ou cette attitude (la plainte, une habitude secrète) que tu dénonces en surface, mais que tu chéris secrètement ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis attentivement 1 Corinthiens 6:15-20.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul parle du corps, de l’union et de l’appartenance à Dieu ?"
           },
           {
             "id": "f8-s3-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "L'emprise perd de sa force lorsque nous exposons le problème à la lumière. Que découvres-tu sur le caractère de Dieu qui t'invite à la lumière non pas pour te condamner, mais pour t'ôter tes chaînes ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret appelle « liens de l’âme » les liens psychologiques et émotionnels rattachés à une personne, un péché sexuel, une situation ou un lieu — un ancien partenaire, quelqu’un qui a eu une ascendance sur moi.",
+            "question": "Que comprends-tu de ce que le livret décrit ici ?"
           },
           {
             "id": "f8-s3-q3",
-            "fonction": "recevoir",
-            "question": "« Je refuse la victimisation ». Es-tu prêt à recevoir la pleine responsabilité de ta marche spirituelle et à cesser d'accuser ton passé, ton éducation ou les démons pour justifier ton inaction ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Prends le temps. Ne cherche pas à qualifier.",
+            "question": "Y a-t-il une relation, passée ou actuelle, qui continue d’exercer sur toi une influence que tu ne souhaites plus ?"
           },
           {
             "id": "f8-s3-q4",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Cela peut être la présence de la personne, des contacts, des souvenirs, une attente, une peur, une culpabilité, une habitude, un objet.",
+            "question": "Qu’est-ce qui maintient aujourd’hui cette influence ?"
+          },
+          {
+            "id": "f8-s3-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret indique le chemin : « Confesser le contact avec le péché, renoncer à ce contact, pardonner, rompre tout contact avec la personne et les objets qui nous relient à elle, briser tout lien en proclamant que Jésus est Seigneur sur mon esprit, mon âme et mon corps. Demander l’accompagnement de personnes matures. »",
+            "question": "Parmi ces étapes, laquelle te semble être la première à poser dans ta situation ?"
+          },
+          {
+            "id": "f8-s3-q6",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement 1 Pierre 1:18-19, puis Galates 3:13-14.",
+            "question": "Qu’est-ce que ces passages affirment de ce dont nous avons été rachetés ?"
+          },
+          {
+            "id": "f8-s3-q7",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret applique ces passages à ce qui est transmis par les générations passées : traditions, péchés, maladies, tempéraments, peurs. Il ajoute que la malédiction de la Loi a été effacée pour ceux qui croient, mais que — comme pour le salut — nous devons nous approprier ce qui a déjà été accompli à la croix.",
+            "question": "Que comprends-tu de cet ordre : ce qui est déjà acquis, et ce qui reste à s’approprier ?"
+          },
+          {
+            "id": "f8-s3-q8",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Regarde ton histoire familiale sans la juger.",
+            "question": "Y a-t-il des manières de vivre, des peurs, des croyances ou des comportements qui s’y répètent, et dont tu ne veux pas reproduire le modèle ?"
+          },
+          {
+            "id": "f8-s3-q9",
             "fonction": "repondre",
-            "question": "Le texte conseille de se confier à des frères et sœurs matures. Vas-tu décider aujourd'hui de faire le pas difficile d'en parler à quelqu'un de confiance pour vivre enfin dans la lumière ?"
+            "source": "vie",
+            "consigne": "Reviens à ce que tu as identifié — la relation, l’héritage, ou les deux.",
+            "question": "Apporte-le à Dieu : dis-lui ce qui te lie encore, ce que tu désires quitter, et ce que tu veux lui confier."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Reviens à ce que tu as identifié.",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Quelle démarche ou quelle limite concrète veux-tu poser, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Les conditions pour être libéré",
+        "versets": [
+          "1 Jn 1:5-9",
+          "Jc 5:16"
+        ],
+        "questions": [
+          {
+            "id": "f8-s4-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement 1 Jean 1:5-9.",
+            "question": "Qu’est-ce qui retient ton attention dans l’opposition entre la lumière et les ténèbres ?"
+          },
+          {
+            "id": "f8-s4-q2",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Jacques 5:16.",
+            "question": "Qu’est-ce que ce passage ajoute sur le fait de ne pas rester seul ?"
+          },
+          {
+            "id": "f8-s4-q3",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret pose ses conditions, et commence par l’équilibre : « Si les démons peuvent nous affecter, ils ne sont pas responsables de tout ! Nous devons aussi nous remettre en cause personnellement pour marcher comme Dieu le veut. »",
+            "question": "Que comprends-tu de cet équilibre, après tout ce que tu viens de parcourir ?"
+          },
+          {
+            "id": "f8-s4-q4",
+            "fonction": "examiner",
+            "source": "livret",
+            "consigne": "Le livret pose une question directe : « Est-ce que je veux vraiment être débarrassé de ce problème, ou est-ce que je me suis trop attaché à ce vieil ami, qui me veut du mal ? »",
+            "question": "Réponds-y honnêtement. C’est le livret qui la pose, et il la dit décisive."
+          },
+          {
+            "id": "f8-s4-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret écrit : « Quand j’expose un problème à la lumière, l’emprise perd de sa force et je peux entrer dans le processus de libération-restauration. »",
+            "question": "Dans le domaine que tu as travaillé, y a-t-il quelque chose que tu gardes actuellement seul ou caché ?"
+          },
+          {
+            "id": "f8-s4-q6",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Honte, peur du jugement, orgueil, habitude — il n’y a pas de mauvaise réponse.",
+            "question": "Qu’est-ce qui rend difficile le fait d’en parler ?"
+          },
+          {
+            "id": "f8-s4-q7",
+            "fonction": "identifier",
+            "source": "livret",
+            "consigne": "Le livret est net : « Je m’entoure de frères et sœurs matures, en qui j’ai confiance, qui ne me jugeront pas et qui m’aideront dans ce processus. » Il rappelle aussi de refuser la victimisation et de tout mettre en œuvre pour s’en sortir.",
+            "question": "Qui, autour de toi, correspond à cette description ?"
+          },
+          {
+            "id": "f8-s4-q8",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Le livret conclut par l’action de grâce : remercier Dieu pour son œuvre de libération, pratiquer la louange, vivre l’unité et la communion fraternelle.",
+            "question": "Parle maintenant à Dieu de ta décision de marcher dans la lumière, et remercie-le pour ce qu’il a déjà accompli à la croix."
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand veux-tu faire cette démarche ? Donne-toi une date.",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À qui vas-tu en parler, et qu’attends-tu de cette personne — écoute, prière, redevabilité, accompagnement ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Tu n’as pas besoin d’avoir aujourd’hui une explication à tout. Parmi ce que cette fiche a mis en lumière, où veux-tu davantage de liberté, et qu’as-tu compris de la manière dont cela fonctionne ?",
+      "questionVerset": "Parmi les Paroles que tu as gardées dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "La victoire de Jésus",
+        "Le domaine où je me sens dominé",
+        "Ce qui a pu ouvrir cette porte",
+        "La démarche de lumière que je veux poser"
+      ]
+    }
   },
   {
     "ficheId": 9,
