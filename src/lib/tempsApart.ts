@@ -147,6 +147,58 @@ export function etapesTempsApart(fiche: FicheLivret): EtapeTempsApart[] {
     ];
   }
 
+  if (fiche.id === 6) {
+    const depouiller = fiche.sections[1];
+    const devenirSpirituel = fiche.sections[2];
+    const chairOuEsprit = fiche.sections[3];
+    const agir = fiche.sections[4];
+    if (!depouiller || !devenirSpirituel || !chairOuEsprit || !agir) return ordinaires;
+
+    const debutRenouvellement = agir.blocs.findIndex(
+      (bloc) => /renouvelant notre manière de pensée/i.test(bloc.texte)
+    );
+    const debutMarcheEsprit = agir.blocs.findIndex(
+      (bloc) => /apprenant à marcher par l'esprit/i.test(bloc.texte)
+    );
+    if (debutRenouvellement < 0 || debutMarcheEsprit <= debutRenouvellement) return ordinaires;
+
+    return [
+      {
+        section: { ...depouiller, titre: 'Se dépouiller et se revêtir' },
+        sourceSectionIndex: 1,
+        sourceBlocOffset: 0,
+        ouverturePreenregistree: true,
+      },
+      {
+        section: {
+          titre: 'Marcher par la chair ou par l’Esprit ?',
+          blocs: [...devenirSpirituel.blocs, ...chairOuEsprit.blocs],
+        },
+        sourceSectionIndex: 3,
+        sourceBlocOffset: 0,
+        ouverturePreenregistree: true,
+      },
+      {
+        section: {
+          titre: 'Renouveler ma manière de penser',
+          blocs: agir.blocs.slice(debutRenouvellement, debutMarcheEsprit),
+        },
+        sourceSectionIndex: 4,
+        sourceBlocOffset: debutRenouvellement,
+        ouverturePreenregistree: false,
+      },
+      {
+        section: {
+          titre: 'Apprendre à marcher par l’Esprit',
+          blocs: agir.blocs.slice(debutMarcheEsprit),
+        },
+        sourceSectionIndex: 4,
+        sourceBlocOffset: debutMarcheEsprit,
+        ouverturePreenregistree: false,
+      },
+    ];
+  }
+
   if (fiche.id !== 2) return ordinaires;
 
   const peche = fiche.sections[0];

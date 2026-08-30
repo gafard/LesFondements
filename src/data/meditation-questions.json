@@ -1713,138 +1713,315 @@
   {
     "ficheId": 6,
     "ficheTitre": "Un comportement nouveau",
+    "parcoursGuide": true,
     "sections": [
       {
-        "sectionTitre": "Introduction",
-        "versets": [],
-        "questions": [
-          {
-            "id": "f6-s1-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte affirme : « Dieu a changé notre nature, cependant nous sommes chargés de changer notre comportement. » En lisant cela, dans quel domaine de ta vie as-tu l'impression d'attendre que Dieu fasse le travail à ta place, alors qu'il te demande d'agir ?"
-          },
-          {
-            "id": "f6-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le fait que Dieu te rende responsable de ton comportement (et ne te télécommande pas) montre qu'il te considère comme un partenaire libre et mature. Qu'est-ce que cela te révèle sur la confiance que ton Père céleste place en toi ?"
-          },
-          {
-            "id": "f6-s1-q3",
-            "fonction": "recevoir+repondre",
-            "question": "Si c'est à toi de changer ton comportement, accepte aujourd'hui cette responsabilité. Quelle habitude précise dois-tu décider de modifier dès aujourd'hui, non par tes propres forces, mais parce que tu as reçu cette nouvelle nature ?"
-          }
-        ]
-      },
-      {
-        "sectionTitre": "Se dépouiller et revêtir",
+        "sectionTitre": "Se dépouiller et se revêtir",
         "versets": [
+          "Ep 4:20-24",
+          "Col 3:3-5",
           "Ga 5:24",
           "Rm 6:11"
         ],
         "questions": [
           {
+            "id": "f6-s1-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Éphésiens 4:20-24. Puis relis-le encore une fois.",
+            "question": "Qu’est-ce qui retient ton attention dans les images et les mouvements utilisés par Paul ?"
+          },
+          {
+            "id": "f6-s1-q2",
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Relis le passage en t’arrêtant sur les expressions qui t’ont particulièrement marqué.",
+            "question": "Qu’est-ce que tu comprends de la transformation dont Paul parle ?",
+            "priereTitre": "Ce que j’ai compris du passage"
+          },
+          {
+            "id": "f6-s1-q3",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret explique que le croyant est déjà un homme nouveau, mais qu’il peut encore porter dans sa vie nouvelle des habitudes acquises auparavant, « tel un vêtement » dont il doit se dépouiller. Il place aussi le renouvellement de la pensée au cœur de cette transformation.",
+            "question": "Après Éphésiens 4:20-24, qu’est-ce que cette explication t’aide à mieux comprendre ?"
+          },
+          {
+            "id": "f6-s1-q4",
+            "fonction": "se-laisser-eclairer",
+            "source": "vie",
+            "consigne": "Pense à ta vie telle qu’elle est réellement aujourd’hui. Ne cherche pas à dresser une liste de tout ce qui devrait changer.",
+            "question": "Y a-t-il une manière de penser, de réagir ou d’agir que tu reconnais comme appartenant encore à ton ancienne manière de vivre ?"
+          },
+          {
+            "id": "f6-s1-q5",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Ne choisis qu’une seule chose. Sors du général et pense à un moment réel.",
+            "question": "Dans quelle situation concrète cela apparaît-il généralement ?",
+            "priereTitre": "La situation que j’ai identifiée"
+          },
+          {
+            "id": "f6-s1-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Regarde honnêtement cette situation, sans te condamner et sans chercher encore la solution.",
+            "question": "Que fais-tu, ou que se passe-t-il habituellement en toi dans cette situation ?",
+            "priereTitre": "Ce que je reconnais dans ma manière actuelle de réagir"
+          },
+          {
+            "id": "f6-s1-q7",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Colossiens 3:3-5.",
+            "question": "Qu’est-ce qui te frappe lorsque Paul place ensemble ce qui est déjà vrai du croyant et ce qu’il lui demande ensuite de faire ?"
+          },
+          {
+            "id": "f6-s1-q8",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Reviens à la situation que tu viens d’identifier et garde Colossiens 3:3-5 ouvert devant toi.",
+            "question": "À la lumière du texte, qu’est-ce qui aurait besoin d’être laissé derrière ?"
+          }
+        ],
+        "pratique": {
+          "mode": "transformation",
+          "rappelQuestionId": "f6-s1-q5",
+          "rappelTitre": "La situation que tu as identifiée",
+          "questionAction": "Lorsque cette situation se présentera à nouveau, quel pas concret voudrais-tu poser à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Marcher par la chair ou par l’Esprit ?",
+        "versets": [
+          "Ga 5:16-25",
+          "Jn 15:5"
+        ],
+        "questions": [
+          {
             "id": "f6-s2-q1",
             "fonction": "observer",
-            "question": "L'auteur compare nos anciennes habitudes à un vieux « vêtement dont on se dépouille ». Si tu examines ta vie actuelle, quel est ce vêtement usé (une vieille habitude, un trait de caractère) que tu portes encore par-dessus ta nouvelle nature ?"
+            "source": "parole",
+            "consigne": "Lis lentement Galates 5:16-25. Ne cherche pas immédiatement à te classer quelque part.",
+            "question": "Qu’est-ce qui retient ton attention dans le contraste présenté par Paul ?"
           },
           {
             "id": "f6-s2-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte souligne que « le pouvoir du péché n'a pas été aboli, mais son pouvoir de nous dominer a été brisé » par l'œuvre de Christ. Que découvres-tu sur la grandeur du salut offert par Dieu, qui ne t'enlève pas du monde mais te rend vainqueur à l'intérieur de celui-ci ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Relis particulièrement Galates 5:22-25, sans résumer trop vite la liste.",
+            "question": "Qu’est-ce qui te frappe ?"
           },
           {
             "id": "f6-s2-q3",
-            "fonction": "se-laisser-eclairer",
-            "question": "« La pensée est présentée comme l'élément stratégique du renouvellement du comportement. » Quelles sont les pensées récurrentes chez toi (inquiétude, jugement, impureté) qui t'empêchent de te revêtir de cet homme nouveau ?"
+            "fonction": "comparer",
+            "source": "parole",
+            "consigne": "Lis maintenant Jean 15:5 et garde-le à côté de Galates 5.",
+            "question": "Qu’est-ce que cette parole de Jésus ajoute à ce que tu viens de lire ?"
           },
           {
             "id": "f6-s2-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Dieu t'appelle à vivre « selon les normes du ciel et non plus selon les pratiques... de la terre ». Décide aujourd'hui de remplacer une pensée charnelle par une vérité biblique. Quelle vérité choisis-tu de méditer pour renouveler ton intelligence aujourd'hui ?"
+            "fonction": "se-laisser-eclairer",
+            "source": "vie",
+            "consigne": "Regarde ta vie à partir de Galates 5, et non l’inverse.",
+            "question": "Y a-t-il un domaine dans lequel tu reconnais un décalage entre ce que tu désires vivre et ta manière habituelle de réagir ?"
+          },
+          {
+            "id": "f6-s2-q5",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Pense à un exemple récent, pas à une idée générale.",
+            "question": "Qu’est-il arrivé ?",
+            "priereTitre": "La situation que j’ai identifiée"
+          },
+          {
+            "id": "f6-s2-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Reste sur les faits et sur ce qui s’est réellement passé en toi.",
+            "question": "Comment as-tu réagi ?",
+            "priereTitre": "Ma manière habituelle de réagir"
+          },
+          {
+            "id": "f6-s2-q7",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Relis Galates 5:22-25 et laisse le texte éclairer cette situation précise.",
+            "question": "Qu’est-ce qui aurait pu être différent ?",
+            "priereTitre": "Ce que la Parole m’a montré"
           }
-        ]
+        ],
+        "pratique": {
+          "mode": "transformation",
+          "rappelQuestionId": "f6-s2-q5",
+          "rappelTitre": "La situation que tu as identifiée",
+          "questionAction": "Imagine que cette situation se reproduise. Qu’aimerais-tu faire différemment cette fois-ci en t’appuyant sur cette Parole ?",
+          "placeholderAction": "Cette fois-ci, à partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Devenir l'homme spirituel que nous voulons être",
-        "versets": [],
+        "sectionTitre": "Renouveler ma manière de penser",
+        "versets": [
+          "Rm 12:2"
+        ],
         "questions": [
           {
             "id": "f6-s3-q1",
             "fonction": "observer",
-            "question": "Le texte affirme que l'homme charnel agit « indépendamment de Dieu ». Relis cette expression. Y a-t-il un domaine de ta vie (finances, couple, loisirs) où tu prends tes décisions seul, sans consulter Dieu ?"
+            "source": "parole",
+            "consigne": "Lis lentement Romains 12:2. Puis relis-le une deuxième fois.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul parle de transformation ?"
           },
           {
             "id": "f6-s3-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "Il est écrit que céder à la chair produit « des sentiments d'infériorité, d'insécurité, d'incapacité, de culpabilité, d'inquiétude et de doute ». Lequel de ces sentiments t'étouffe le plus en ce moment, et en quoi est-ce lié à une habitude charnelle plutôt qu'à Dieu ?"
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Reste encore un instant avec les mots du verset.",
+            "question": "Qu’est-ce que tu comprends du rôle de la pensée dans ce passage ?"
           },
           {
             "id": "f6-s3-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "L'Esprit produit un fruit d'amour, de paix, de patience. Que t'apprend ce contraste entre la lourdeur de la chair et la douceur du fruit de l'Esprit sur la nature même de Dieu et ce qu'Il désire pour toi ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Reviens à une situation précise dans laquelle tu réagis souvent de la même manière.",
+            "question": "Quelle est cette situation ?"
           },
           {
             "id": "f6-s3-q4",
-            "fonction": "recevoir+repondre",
-            "question": "L'homme spirituel est « libre de choisir de ne pas marcher selon la chair ». Accueille cette liberté : tu n'es pas obligé de céder. Face à ta prochaine tentation d'inquiétude ou de culpabilité, quel choix concret vas-tu poser pour marcher selon l'Esprit ?"
-          }
-        ]
-      },
-      {
-        "sectionTitre": "Marcher par la chair ou par l'Esprit ?",
-        "versets": [],
-        "questions": [
-          {
-            "id": "f6-s4-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte dit : « je me sens mal à l'aise parce que mon comportement ne correspond pas à qui je suis réellement. » Te souviens-tu d'une fois récente où tu as ressenti ce malaise intérieur profond après avoir agi ou parlé selon la chair ?"
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Écoute ce qui se dit intérieurement en toi lorsque cette situation arrive.",
+            "question": "Dans ce moment, qu’est-ce que tu te dis souvent ?",
+            "priereTitre": "La pensée que j’ai identifiée"
           },
           {
-            "id": "f6-s4-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le fait que ta nouvelle nature proteste quand tu pèches (cette fameuse \"perte de paix intérieure\") montre que Dieu a réellement fait de toi une créature nouvelle. Comment cela te rassure-t-il sur l'authenticité de l'œuvre de Dieu en toi ?"
+            "id": "f6-s3-q5",
+            "fonction": "comprendre",
+            "source": "vie",
+            "consigne": "Ne juge pas encore cette pensée. Cherche d’abord à comprendre sa logique.",
+            "question": "Pourquoi cette pensée te paraît-elle vraie ?"
           },
           {
-            "id": "f6-s4-q3",
-            "fonction": "recevoir",
-            "question": "Le texte affirme que la sanctification est un changement « progressif » et que tu agis « en fonction de notre nouvelle identité ». Arrives-tu à recevoir cette patience de Dieu envers toi, ou es-tu sans cesse en train de te condamner de ne pas être encore parfait ?"
+            "id": "f6-s3-q6",
+            "fonction": "examiner",
+            "source": "parole",
+            "consigne": "Regarde maintenant cette pensée à la lumière de Romains 12:2 et des Paroles déjà rencontrées dans le parcours.",
+            "question": "Est-elle entièrement vraie, partiellement vraie, ou y a-t-il quelque chose qui a besoin d’être renouvelé ?"
           },
           {
-            "id": "f6-s4-q4",
+            "id": "f6-s3-q7",
+            "fonction": "chercher-dans-la-parole",
+            "source": "parole",
+            "consigne": "Tu peux revenir à un verset déjà étudié. L’application ne choisira pas la réponse à ta place.",
+            "question": "Quelle Parole biblique éclaire, corrige, complète ou remet en perspective cette manière de penser ?",
+            "priereTitre": "Ce que la Parole vient éclairer"
+          },
+          {
+            "id": "f6-s3-q8",
             "fonction": "repondre",
-            "question": "Puisque tes expériences passées ont « programmé ton cerveau », de quelle nouvelle habitude (lecture de la Parole, silence, louange) as-tu besoin dès aujourd'hui pour laisser l'Esprit reprogrammer ta manière de réagir ?"
+            "source": "vie",
+            "consigne": "Reformule maintenant cette situation à la lumière de la Parole, sans nier ce qui est réellement difficile.",
+            "question": "Qu’est-ce que tu comprends autrement aujourd’hui ?",
+            "priereTitre": "Ce que je comprends autrement maintenant"
           }
-        ]
+        ],
+        "pratique": {
+          "mode": "transformation",
+          "rappelQuestionId": "f6-s3-q4",
+          "rappelTitre": "La pensée que tu as identifiée",
+          "questionAction": "La prochaine fois que cette pensée reviendra, que veux-tu faire à partir de la Parole que tu viens de choisir ?",
+          "placeholderAction": "Quand cette pensée reviendra, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Comment agir en fonction de notre nouvelle identité ?",
+        "sectionTitre": "Apprendre à marcher par l’Esprit",
         "versets": [
-          "Ga 2:20"
+          "Ga 2:20",
+          "Ph 2:13",
+          "Col 1:29",
+          "Ga 5:16"
         ],
         "questions": [
           {
-            "id": "f6-s5-q1",
+            "id": "f6-s4-q1",
             "fonction": "observer",
-            "question": "Relis attentivement cette phrase : « Le secret de la délivrance... ne consiste pas à faire quelque chose, mais à s'appuyer sur ce que Dieu a accompli. » Qu'est-ce qui est le plus difficile pour toi : essayer de bien faire par tes propres forces, ou t'arrêter pour t'appuyer sur Dieu ?"
+            "source": "parole",
+            "consigne": "Lis lentement Galates 2:20. Ne cherche pas à le réciter trop vite parce que tu le connais peut-être déjà.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul décrit sa vie ?"
           },
           {
-            "id": "f6-s5-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "Le texte dit : « Si je veux faire par moi-même c'est impossible... ce sera au prix de luttes et de frustrations énormes. » Dans quel domaine de ta vie ressens-tu cette lutte et cette frustration énorme en ce moment parce que tu essaies d'être saint par toi-même ?"
+            "id": "f6-s4-q2",
+            "fonction": "comparer",
+            "source": "parole",
+            "consigne": "Lis maintenant Philippiens 2:13 et garde-le à côté de Galates 2:20.",
+            "question": "Qu’est-ce que ce texte ajoute ?"
           },
           {
-            "id": "f6-s5-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Jésus-Christ t'est donné « pour être formé en toi dans sa plénitude », ce n'est donc pas Dieu qui te demande des efforts inatteignables. Que découvres-tu sur la générosité et l'amour d'un Dieu qui fait lui-même le travail en toi ?"
+            "id": "f6-s4-q3",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Colossiens 1:29.",
+            "question": "Qu’est-ce qui te frappe dans la manière dont Paul parle à la fois de son effort et de la puissance qui agit en lui ?"
           },
           {
-            "id": "f6-s5-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Le texte t'invite à déclarer : \"Seigneur, je ne peux pas pardonner/aimer/être patient, et je n'essaierai pas de le faire, mais je me confie en toi...\" Fais cette prière sincèrement maintenant pour un défi de ta vie. Comment vas-tu vivre ce « repos actif » aujourd'hui ?"
+            "id": "f6-s4-q4",
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Mets maintenant Galates 2:20, Philippiens 2:13 et Colossiens 1:29 ensemble.",
+            "question": "Qu’est-ce que ces passages te font comprendre de ta part et de l’action de Dieu dans la transformation ?"
+          },
+          {
+            "id": "f6-s4-q5",
+            "fonction": "rester-ouvert",
+            "source": "livret",
+            "consigne": "Le livret emploie des formulations comme « Dieu attend que nous cessions de faire » ou « rejeter toute intervention de notre volonté ». Ce sont ses formulations interprétatives. Les passages que tu viens de lire montrent ensemble l’action de Dieu et une réponse humaine réelle ; le livret parle lui-même ensuite de « collaboration avec le Saint-Esprit ».",
+            "question": "Après avoir lu les textes, qu’est-ce que tu retiens, qu’est-ce que tu nuances ou qu’est-ce qui reste ouvert pour toi ?"
+          },
+          {
+            "id": "f6-s4-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Pense à ta vie actuelle, sans chercher un exemple spectaculaire.",
+            "question": "Y a-t-il quelque chose que tu sais juste, mais que tu as beaucoup de mal à vivre par tes propres forces ?",
+            "priereTitre": "La difficulté que j’ai identifiée"
+          },
+          {
+            "id": "f6-s4-q7",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Reste sur ce que tu expérimentes réellement lorsque tu essaies.",
+            "question": "Qu’est-ce qui se passe généralement ?",
+            "priereTitre": "Ce que je fais ou vis habituellement"
+          },
+          {
+            "id": "f6-s4-q8",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Reviens aux trois passages et garde ensemble ta responsabilité et l’action de Dieu en toi.",
+            "question": "Qu’est-ce qu’ils changent dans ta manière d’aborder cette difficulté ?",
+            "priereTitre": "Ce que les textes viennent changer dans ma compréhension"
           }
-        ]
+        ],
+        "pratique": {
+          "mode": "transformation",
+          "rappelQuestionId": "f6-s4-q6",
+          "rappelTitre": "La difficulté que tu as identifiée",
+          "questionAction": "La prochaine fois que tu te retrouveras face à cette difficulté, comment voudrais-tu agir en tenant compte à la fois de ta responsabilité et de l’action de Dieu en toi ?",
+          "placeholderAction": "La prochaine fois, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Parmi ces quatre domaines, lequel te semble aujourd’hui le plus important à continuer de travailler avec Dieu ?",
+      "questionVerset": "Quelle Parole choisie dans cette fiche veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "Une ancienne manière de vivre",
+        "Chair et Esprit",
+        "Une pensée à renouveler",
+        "Dépendre de l’action de Dieu"
+      ]
+    }
   },
   {
     "ficheId": 7,

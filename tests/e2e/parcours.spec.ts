@@ -471,6 +471,91 @@ test('fiche 5 : quatre traversées bibliques conduisent à une identité reçue 
   await expect(page.getByRole('button', { name: 'Jn 1:12' })).toBeVisible();
 });
 
+test('fiche 6 : la Parole éclaire une situation réelle puis conduit à un pas de transformation', async ({ page }) => {
+  await page.addInitScript(
+    ({ uid, groupeId }) => {
+      const groupes = JSON.parse(localStorage.getItem('lf.groups') || '[]');
+      localStorage.setItem(
+        'lf.groups',
+        JSON.stringify(groupes.map((groupe: { id: string }) =>
+          groupe.id === groupeId ? { ...groupe, currentStep: 6 } : groupe
+        ))
+      );
+      localStorage.setItem(
+        `lesfondements_prog_${uid}`,
+        JSON.stringify({
+          6: {
+            completed: false,
+            answers: {
+              'verset-choisi:f6-s1': 'Ga 5:24',
+              'verset-choisi:f6-s2': 'Jn 15:5',
+              'verset-choisi:f6-s3': 'Rm 12:2',
+            },
+            lastUpdated: Date.now(),
+          },
+        })
+      );
+    },
+    { uid: UTILISATEUR.uid, groupeId: GROUPE.id }
+  );
+
+  await page.goto('/dashboard');
+  await expect(page.getByText('0 / 4 étapes')).toBeVisible();
+  await expect(page.getByText('Se dépouiller et se revêtir', { exact: true })).toBeVisible();
+  await expect(page.getByText('Marcher par la chair ou par l’Esprit ?', { exact: true })).toBeVisible();
+  await expect(page.getByText('Renouveler ma manière de penser', { exact: true })).toBeVisible();
+  await expect(page.getByText('Apprendre à marcher par l’Esprit', { exact: true })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=6&section=0&scene=3');
+  await expect(page.getByText('Lis lentement Éphésiens 4:20-24', { exact: false })).toBeVisible();
+  await expect(page.getByText('🪞 Ma vie aujourd’hui', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Ne choisis qu’une seule chose', { exact: false })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=6&section=3&scene=3');
+  await expect(page.getByText('Lis lentement Galates 2:20', { exact: false })).toBeVisible();
+  await expect(page.getByText('à la fois de son effort et de la puissance', { exact: false })).toBeVisible();
+  await expect(page.getByText('📘 Le livret · interprétation proposée', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Ce sont ses formulations interprétatives', { exact: false })).toBeVisible();
+
+  await page.getByLabel(
+    'Y a-t-il quelque chose que tu sais juste, mais que tu as beaucoup de mal à vivre par tes propres forces ?'
+  ).fill('Rester disponible et doux lorsque je reçois une critique inattendue.');
+  await page.getByLabel('Qu’est-ce qui se passe généralement ?').fill(
+    'Je me défends immédiatement et je n’écoute plus vraiment.'
+  );
+  await page.getByLabel('Qu’est-ce qu’ils changent dans ta manière d’aborder cette difficulté ?').fill(
+    'Je peux répondre réellement tout en comptant sur la force que Dieu produit en moi.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('La difficulté que j’ai identifiée')).toBeVisible();
+  await expect(page.getByText('Ce que je fais ou vis habituellement')).toBeVisible();
+  await expect(page.getByText('Ce que les textes viennent changer dans ma compréhension')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: 'Parole précédente' }).click();
+  await page.getByRole('button', { name: /^Ga 5:16/ }).click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+
+  await expect(page.getByText('La difficulté que tu as identifiée')).toBeVisible();
+  await expect(page.getByText('Rester disponible et doux lorsque je reçois une critique inattendue.')).toBeVisible();
+  await expect(
+    page.getByText('Rester disponible et doux lorsque je reçois une critique inattendue.').locator('xpath=ancestor::aside')
+  ).toHaveClass(/post-it-jaune/);
+  await page.getByPlaceholder('La prochaine fois, je voudrais…').fill(
+    'M’arrêter avant de répondre et demander à Dieu de m’aider à écouter.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Regarde le chemin parcouru.' })).toBeVisible();
+  await expect(page.getByText('Une ancienne manière de vivre', { exact: true })).toBeVisible();
+  await expect(page.getByText('Chair et Esprit', { exact: true })).toBeVisible();
+  await expect(page.getByText('Une pensée à renouveler', { exact: true })).toBeVisible();
+  await expect(page.getByText('Dépendre de l’action de Dieu', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ga 5:24' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ga 5:16' })).toBeVisible();
+});
+
 test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/dashboard');

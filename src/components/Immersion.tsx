@@ -80,7 +80,7 @@ import meditationData from '@/data/meditation-questions.json';
 interface QuestionMeditation {
   id: string;
   fonction?: string;
-  source?: 'parole' | 'livret' | 'contemplation';
+  source?: 'parole' | 'livret' | 'contemplation' | 'vie';
   consigne?: string;
   question: string;
   priereTitre?: string;
@@ -91,7 +91,10 @@ interface SectionMeditation {
   versets: string[];
   questions: QuestionMeditation[];
   pratique?: {
-    questionMoment: string;
+    mode?: 'transformation';
+    rappelQuestionId?: string;
+    rappelTitre?: string;
+    questionMoment?: string;
     placeholderMoment?: string;
     questionAction: string;
     placeholderAction?: string;
@@ -1355,6 +1358,8 @@ function RenduScene({
                 ? '📖 La Parole'
                 : question.source === 'livret'
                   ? '📘 Le livret · interprétation proposée'
+                  : question.source === 'vie'
+                    ? '🪞 Ma vie aujourd’hui'
                   : question.source === 'contemplation'
                     ? '🌿 Prends le temps'
                     : null;
@@ -1519,6 +1524,10 @@ function RenduScene({
         : scene.reference;
       const passageChoisi = scene.options?.find((option) => option.reference === referenceChoisie)
         ?? scene.options?.[0];
+      const rappelTransformation = scene.pratique?.rappelQuestionId
+        ? reponses[`q:${scene.pratique.rappelQuestionId}`]?.trim()
+        : '';
+      const modeTransformation = scene.pratique?.mode === 'transformation';
       return (
         <div className="py-8">
           <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
@@ -1539,17 +1548,32 @@ function RenduScene({
                   « {passageChoisi.texte} »
                 </p>
               </div>
-              <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
-                {scene.pratique?.questionMoment
-                  ?? 'Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?'}
-              </p>
-              <ChampEcriture
-                valeur={reponses[cleMoment] ?? ''}
-                onEnregistrer={(valeur) => onEnregistrer(cleMoment, valeur)}
-                placeholder={scene.pratique?.placeholderMoment ?? 'Je veux me souvenir de ce verset lorsque…'}
-                ariaLabel="Le moment où je veux me souvenir de ce verset"
-                lignes={3}
-              />
+              {rappelTransformation && (
+                <aside className="post-it-jaune pose-1 relative mt-7 max-w-xl rounded-[4px] p-5 text-encre-950 shadow-xl sm:p-6">
+                  <span className="punaise punaise-bleue -top-2.5 left-8" aria-hidden="true" />
+                  <p className="text-xs font-black uppercase tracking-[0.12em] text-encre-700/65">
+                    {scene.pratique?.rappelTitre ?? 'La situation que tu as identifiée'}
+                  </p>
+                  <p className="mt-3 font-serif text-lg font-bold leading-relaxed sm:text-xl">
+                    {rappelTransformation}
+                  </p>
+                </aside>
+              )}
+              {!modeTransformation && (
+                <>
+                  <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
+                    {scene.pratique?.questionMoment
+                      ?? 'Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?'}
+                  </p>
+                  <ChampEcriture
+                    valeur={reponses[cleMoment] ?? ''}
+                    onEnregistrer={(valeur) => onEnregistrer(cleMoment, valeur)}
+                    placeholder={scene.pratique?.placeholderMoment ?? 'Je veux me souvenir de ce verset lorsque…'}
+                    ariaLabel="Le moment où je veux me souvenir de ce verset"
+                    lignes={3}
+                  />
+                </>
+              )}
               <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
                 {scene.pratique?.questionAction
                   ?? 'Et quand ce moment arrivera, qu’aimerais-tu faire à partir de cette Parole ?'}
