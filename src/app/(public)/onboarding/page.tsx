@@ -72,7 +72,18 @@ export default function OnboardingPage() {
   // Synchronisation des états locaux sur les données chargées, pendant le
   // rendu : un re-rendu immédiat plutôt qu'un aller-retour d'effet.
   if (profile?.place && !place) setPlace(profile.place);
-  if (!loading && gate.state === 'en_attente' && etape !== 'inviter' && etape !== 'attente') {
+  // Le prologue est une étape qu'on choisit d'ouvrir : il compte parmi celles
+  // que cette remise à jour ne doit pas défaire. Sans lui dans la liste, la
+  // vidéo était remontée à l'écran puis aussitôt remplacée — depuis la salle
+  // d'attente, où l'on est justement « en_attente », elle ne s'atteignait
+  // même pas.
+  if (
+    !loading &&
+    gate.state === 'en_attente' &&
+    etape !== 'inviter' &&
+    etape !== 'attente' &&
+    etape !== 'prologue'
+  ) {
     setEtape('attente');
   }
 
@@ -121,8 +132,8 @@ export default function OnboardingPage() {
         place,
         attendance,
       });
-      await refresh();
       setEtape('attente');
+      await refresh();
     } catch (error) {
       setErreur(error instanceof Error ? error.message : 'La demande a échoué.');
     } finally {
@@ -133,8 +144,14 @@ export default function OnboardingPage() {
   const creerLeGroupe = async (input: CreateGroupInput) => {
     const created = await createGroup(input);
     setNouveauGroupe(created);
-    await refresh();
+    // L'étape avant le rafraîchissement, et non après : `refresh()` fait
+    // passer le parcours à « ouvert », et le temps d'un rendu l'étape valait
+    // encore « creer » — que la redirection ne protège pas. Le tableau de
+    // bord était donc demandé pendant que l'écran d'invitation s'affichait,
+    // et la navigation tombait quelques centaines de millisecondes plus tard,
+    // en plein prologue.
     setEtape('inviter');
+    await refresh();
   };
 
   const rejoindreParCode = async () => {
@@ -159,8 +176,8 @@ export default function OnboardingPage() {
         place,
         attendance,
       });
-      await refresh();
       setEtape('attente');
+      await refresh();
     } catch (error) {
       setCodeError(error instanceof Error ? error.message : 'Impossible de rejoindre ce groupe.');
     } finally {
