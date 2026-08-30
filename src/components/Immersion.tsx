@@ -80,6 +80,7 @@ import meditationData from '@/data/meditation-questions.json';
 interface QuestionMeditation {
   id: string;
   fonction?: string;
+  source?: 'parole' | 'livret' | 'contemplation';
   consigne?: string;
   question: string;
   priereTitre?: string;
@@ -1350,6 +1351,13 @@ function RenduScene({
           <div className="mt-7 space-y-5">
             {scene.questions.map((question, indexQuestion) => {
               const reponse = reponses[`q:${question.id}`] ?? '';
+              const etiquetteSource = question.source === 'parole'
+                ? '📖 La Parole'
+                : question.source === 'livret'
+                  ? '📘 Le livret · interprétation proposée'
+                  : question.source === 'contemplation'
+                    ? '🌿 Prends le temps'
+                    : null;
               return (
                 <article
                   key={question.id}
@@ -1360,8 +1368,15 @@ function RenduScene({
                     aria-hidden="true"
                   />
                   <div className="flex items-center justify-between gap-3">
-                    <span aria-hidden="true" className="font-serif text-xl italic text-encre-700/55">
-                      {String(indexQuestion + 1).padStart(2, '0')}
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span aria-hidden="true" className="font-serif text-xl italic text-encre-700/55">
+                        {String(indexQuestion + 1).padStart(2, '0')}
+                      </span>
+                      {etiquetteSource && (
+                        <span className="truncate rounded-full border border-encre-700/12 bg-white/35 px-2.5 py-1 text-xs font-black uppercase tracking-[0.06em] text-encre-800/70">
+                          {etiquetteSource}
+                        </span>
+                      )}
                     </span>
                     {reponse.trim() && (
                       <span className="inline-flex items-center gap-1 text-3xs font-black uppercase tracking-[0.12em] text-emerald-900/75">

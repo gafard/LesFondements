@@ -86,6 +86,67 @@ export function etapesTempsApart(fiche: FicheLivret): EtapeTempsApart[] {
     ];
   }
 
+  if (fiche.id === 4) {
+    const definition = fiche.sections[0];
+    const obstacles = fiche.sections[1];
+    const croissance = fiche.sections[2];
+    const obeissanceEtEpreuve = fiche.sections[3];
+    const repos = fiche.sections[4];
+    if (!definition || !obstacles || !croissance || !obeissanceEtEpreuve || !repos) {
+      return ordinaires;
+    }
+
+    const debutEpreuve = obeissanceEtEpreuve.blocs.findIndex(
+      (bloc) => bloc.type === 'sous-titre' && /école de la souffrance/i.test(bloc.texte)
+    );
+    if (debutEpreuve < 0) return ordinaires;
+
+    return [
+      {
+        section: { ...definition, titre: 'Qu’est-ce que la grâce ?' },
+        sourceSectionIndex: 0,
+        sourceBlocOffset: 0,
+        ouverturePreenregistree: true,
+      },
+      {
+        section: { ...obstacles, titre: 'Pourquoi est-il difficile de vivre dans la grâce ?' },
+        sourceSectionIndex: 1,
+        sourceBlocOffset: 0,
+        ouverturePreenregistree: true,
+      },
+      {
+        section: { ...croissance, titre: 'Comment Dieu me fait-il croître dans la grâce ?' },
+        sourceSectionIndex: 2,
+        sourceBlocOffset: 0,
+        ouverturePreenregistree: true,
+      },
+      {
+        section: {
+          titre: 'Ma part : l’obéissance',
+          blocs: obeissanceEtEpreuve.blocs.slice(0, debutEpreuve),
+        },
+        sourceSectionIndex: 3,
+        sourceBlocOffset: 0,
+        ouverturePreenregistree: true,
+      },
+      {
+        section: {
+          titre: 'Dans la faiblesse et l’épreuve',
+          blocs: obeissanceEtEpreuve.blocs.slice(debutEpreuve),
+        },
+        sourceSectionIndex: 3,
+        sourceBlocOffset: debutEpreuve,
+        ouverturePreenregistree: false,
+      },
+      {
+        section: { ...repos, titre: 'Le repos' },
+        sourceSectionIndex: 4,
+        sourceBlocOffset: 0,
+        ouverturePreenregistree: true,
+      },
+    ];
+  }
+
   if (fiche.id !== 2) return ordinaires;
 
   const peche = fiche.sections[0];

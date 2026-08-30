@@ -9,9 +9,12 @@ import versetsLivret from './versetsLivret.json';
 // `src/lib/bibleVersions.ts` s'y réfère pour ne pas dupliquer le texte.
 
 const VERSETS_SELECTIONNES: Record<string, string> = {
+  "1 Ch 4:10": "Jaebets invoqua le Dieu d'Israël, en disant : Si tu me bénis et que tu étendes mes limites, si ta main est avec moi, et si tu me préserves du malheur, en sorte que je ne sois pas dans la souffrance !... Et Dieu accorda ce qu'il avait demandé.",
   "1 Co 1:18": "Car la prédication de la croix est une folie pour ceux qui périssent; mais pour nous qui sommes sauvés, elle est une puissance de Dieu.",
   "1 Jn 3:1a": "Voyez quel amour le Père nous a témoigné, pour que nous soyons appelés enfants de Dieu !",
+  "1 Jn 4:19": "Pour nous, nous l'aimons, parce qu'il nous a aimés le premier.",
   "1 Jn 4:16": "Et nous, nous avons connu l'amour que Dieu a pour nous, et nous y avons cru. Dieu est amour; et celui qui demeure dans l'amour demeure en Dieu, et Dieu demeure en lui.",
+  "2 Co 3:5": "Ce n'est pas à dire que nous soyons par nous-mêmes capables de concevoir quelque chose comme venant de nous-mêmes. Notre capacité, au contraire, vient de Dieu.",
   "2 Co 5:17": "Si quelqu'un est en Christ, il est une nouvelle créature. Les choses anciennes sont passées; voici, toutes choses sont devenues nouvelles.",
   "2 Co 5:21": "Celui qui n'a point connu le péché, il l'a fait devenir péché pour nous, afin que nous devenions en lui justice de Dieu.",
   "2 Co 5:7": "Car nous marchons par la foi et non par la vue.",
@@ -26,6 +29,8 @@ const VERSETS_SELECTIONNES: Record<string, string> = {
   "Ga 4:5-7": "Afin qu'il rachetât ceux qui étaient sous la loi, afin que nous reçussions l'adoption. Et parce que vous êtes fils, Dieu a envoyé dans nos cœurs l'Esprit de son Fils, lequel crie : Abba ! Père ! Ainsi tu n'es plus esclave, mais fils ; et si tu es fils, tu es aussi héritier par la grâce de Dieu.",
   "He 11:1": "Or la foi est une ferme assurance des choses qu'on espère, une démonstration de celles qu'on ne voit pas.",
   "He 11:6": "Or sans la foi il est impossible de lui être agréable ; car il faut que celui qui s'approche de Dieu croie que Dieu existe, et qu'il est le rémunérateur de ceux qui le cherchent.",
+  "He 13:21": "Qu'il vous rende capables de toute bonne œuvre pour l'accomplissement de sa volonté, et fasse en vous ce qui lui est agréable, par Jésus-Christ, auquel soit la gloire aux siècles des siècles ! Amen !",
+  "He 4:10-11": "Car celui qui entre dans le repos de Dieu se repose de ses œuvres, comme Dieu s'est reposé des siennes. Efforçons-nous donc d'entrer dans ce repos, afin que personne ne tombe en donnant le même exemple de désobéissance.",
   "Jn 10:10": "Le voleur ne vient que pour dérober, égorger et détruire; moi, je suis venu afin que les brebis aient la vie, et qu'elles soient dans l'abondance.",
   "Jn 14:6": "Jésus lui dit : Je suis le chemin, la vérité, et la vie. Nul ne vient au Père que par moi.",
   "Jn 15:10": "Si vous gardez mes commandements, vous demeurerez dans mon amour, de même que j'ai gardé les commandements de mon Père, et que je demeure dans son amour.",
@@ -44,6 +49,7 @@ const VERSETS_SELECTIONNES: Record<string, string> = {
   "Rm 5:12": "C'est pourquoi, comme par un seul homme le péché est entré dans le monde, et par le péché la mort, et qu'ainsi la mort s'est étendue sur tous les hommes, parce que tous ont péché...",
   "Rm 5:8": "Mais Dieu prouve son amour envers nous, en ce que, lorsque nous étions encore des pécheurs, Christ est mort pour nous.",
   "Rm 6:23": "Car le salaire du péché, c'est la mort; mais le don gratuit de Dieu, c'est la vie éternelle en Jésus-Christ notre Seigneur.",
+  "Rm 6:15-18": "Quoi donc ! Pécherions-nous, parce que nous sommes, non sous la loi, mais sous la grâce ? Loin de là ! Ne savez-vous pas qu'en vous livrant à quelqu'un comme esclaves pour lui obéir, vous êtes esclaves de celui à qui vous obéissez, soit du péché qui conduit à la mort, soit de l'obéissance qui conduit à la justice ? Mais grâces soient rendues à Dieu de ce que, après avoir été esclaves du péché, vous avez obéi de cœur à la règle de doctrine dans laquelle vous avez été instruits. Ayant été affranchis du péché, vous êtes devenus esclaves de la justice.",
   "Rm 6:3-4": "Ignorez-vous que nous tous qui avons été baptisés en Jésus-Christ, c'est en sa mort que nous avons été baptisés ? Nous avons donc été ensevelis avec lui par le baptême en sa mort, afin que, comme Christ est ressuscité des morts par la gloire du Père, de même nous aussi nous marchions en nouveauté de vie.",
   "Rm 8:14-16": "Car tous ceux qui sont conduits par l'Esprit de Dieu sont fils de Dieu. Et vous n'avez point reçu un esprit de servitude, pour être encore dans la crainte ; mais vous avez reçu un Esprit d'adoption, par lequel nous crions : Abba ! Père ! L'Esprit lui-même rend témoignage à notre esprit que nous sommes enfants de Dieu.",
   "Rm 8:1": "Il n'y a donc maintenant aucune condamnation pour ceux qui sont en Jésus-Christ.",

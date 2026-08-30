@@ -293,6 +293,93 @@ test('fiche 3 : six découvertes distinctes conduisent à une Parole principale'
   await expect(page.getByRole('button', { name: 'Rm 6:3-4' })).toBeVisible();
 });
 
+test('fiche 4 : la Parole et l’interprétation du livret restent distinctes dans six traversées', async ({ page }) => {
+  await page.addInitScript(
+    ({ uid, groupeId }) => {
+      const groupes = JSON.parse(localStorage.getItem('lf.groups') || '[]');
+      localStorage.setItem(
+        'lf.groups',
+        JSON.stringify(groupes.map((groupe: { id: string }) =>
+          groupe.id === groupeId ? { ...groupe, currentStep: 4 } : groupe
+        ))
+      );
+      localStorage.setItem(
+        `lesfondements_prog_${uid}`,
+        JSON.stringify({
+          4: {
+            completed: false,
+            answers: {
+              'verset-choisi:f4-s1': 'Ep 2:8',
+              'verset-choisi:f4-s2': 'Rm 8:1',
+              'verset-choisi:f4-s3': 'Jn 15:7',
+              'verset-choisi:f4-s4': 'He 13:21',
+              'verset-choisi:f4-s5': '2 Co 12:9',
+            },
+            lastUpdated: Date.now(),
+          },
+        })
+      );
+    },
+    { uid: UTILISATEUR.uid, groupeId: GROUPE.id }
+  );
+
+  await page.goto('/dashboard');
+  await expect(page.getByText('0 / 6 étapes')).toBeVisible();
+  await expect(page.getByText('Qu’est-ce que la grâce ?', { exact: true })).toBeVisible();
+  await expect(page.getByText('Pourquoi est-il difficile de vivre dans la grâce ?', { exact: true })).toBeVisible();
+  await expect(page.getByText('Comment Dieu me fait-il croître dans la grâce ?', { exact: true })).toBeVisible();
+  await expect(page.getByText('Ma part : l’obéissance', { exact: true })).toBeVisible();
+  await expect(page.getByText('Dans la faiblesse et l’épreuve', { exact: true })).toBeVisible();
+  await expect(page.getByText('Le repos', { exact: true })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=4&section=3&scene=3');
+  await expect(page.getByText('📖 La Parole', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('📘 Le livret · interprétation proposée', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Il s’agit ici d’une interprétation proposée par le livret', { exact: false })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=4&section=4&scene=3');
+  await expect(page.getByText('Lis lentement 2 Corinthiens 12:9', { exact: false })).toBeVisible();
+  await expect(page.getByLabel('Qu’est-ce que tu ne comprends pas encore ?')).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=4&section=5&scene=3');
+  await expect(page.getByText('Lis lentement Hébreux 4:10-11', { exact: false })).toBeVisible();
+  await expect(page.getByText('sans la transformer en promesse générale', { exact: false })).toBeVisible();
+  await page.getByLabel('Comment comprends-tu maintenant le repos dans la grâce ?').fill(
+    'Le repos me semble être une confiance qui demeure active.'
+  );
+  await page.getByLabel('Qu’est-ce que cela t’a fait découvrir de Dieu ?').fill(
+    'Dieu précède et prépare ce qu’il donne à vivre.'
+  );
+  await page.getByLabel('Quelle Parole veux-tu garder devant toi ?').fill(
+    'Éphésiens 2:10 reste devant moi.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Ce que j’ai compris du repos')).toBeVisible();
+  await expect(page.getByText('La Parole que je veux garder devant moi')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: /^Ep 2:10/ }).click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByPlaceholder('Je veux revenir à cette Parole lorsque…').fill(
+    'Je recommence à vouloir tout produire seul.'
+  );
+  await page.getByPlaceholder('À partir de cette Parole, je voudrais…').fill(
+    'Revenir à ce que Dieu a déjà préparé.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Regarde le chemin parcouru.' })).toBeVisible();
+  await expect(page.getByText('La grâce comme don', { exact: true })).toBeVisible();
+  await expect(page.getByText('Approbation et performance', { exact: true })).toBeVisible();
+  await expect(page.getByText('Croître dans la grâce', { exact: true })).toBeVisible();
+  await expect(page.getByText('Obéissance', { exact: true })).toBeVisible();
+  await expect(page.getByText('Faiblesse', { exact: true })).toBeVisible();
+  await expect(page.getByText('Repos', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ep 2:8' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ep 2:10' })).toBeVisible();
+});
+
 test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/dashboard');

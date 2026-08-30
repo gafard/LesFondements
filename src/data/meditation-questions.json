@@ -794,149 +794,513 @@
   {
     "ficheId": 4,
     "ficheTitre": "La Grâce",
+    "parcoursGuide": true,
     "sections": [
       {
-        "sectionTitre": "Qu'est-ce que la Grâce ?",
+        "sectionTitre": "Qu’est-ce que la grâce ?",
         "versets": [
+          "Ep 2:8",
+          "Jn 10:10",
+          "2 Co 3:5",
           "Sophonie 3:17"
         ],
         "questions": [
           {
             "id": "f4-s1-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte distingue deux choses : Dieu m'épargne ce que je mérite (le châtiment) et m'offre en plus ce que je ne mérite pas (la vie abondante). Dans ta vie quotidienne, as-tu tendance à vivre comme un \"gracié\" (qui a échappé de justesse à la prison) ou comme un \"comblé\" qui profite de l'abondance de Dieu ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Éphésiens 2:8. Puis relis-le encore une fois.",
+            "question": "Qu’est-ce qui retient ton attention dans ce verset ?"
           },
           {
             "id": "f4-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "« La grâce ne dépend pas de ce que je suis mais de qui est Dieu. » Qu'est-ce que cela t'apprend sur l'immutabilité et la fidélité de Dieu, comparées à l'instabilité de tes propres humeurs et de tes \"performances\" spirituelles ?"
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Reste encore un instant dans Éphésiens 2:8, sans ajouter d’autre explication.",
+            "question": "Qu’est-ce que ce passage te fait comprendre de la grâce ?"
           },
           {
             "id": "f4-s1-q3",
-            "fonction": "recevoir",
-            "question": "Dieu te donne l'abondance « parce qu'il est Dieu et qu'il prend plaisir à te bénir. » Es-tu capable de recevoir simplement le fait que Dieu \"prend plaisir\" à te faire du bien, sans chercher immédiatement la contrepartie ?"
+            "fonction": "comparer",
+            "source": "parole",
+            "consigne": "Lis maintenant Jean 10:10. Prends quelques instants, puis garde ce passage à côté d’Éphésiens 2:8.",
+            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de méditer ?"
           },
           {
             "id": "f4-s1-q4",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret propose ces deux formulations : « La grâce est un don immérité de Dieu » et « La grâce ne dépend pas de ce que je suis mais de qui est Dieu. » Relis-les lentement, puis reviens aux passages bibliques.",
+            "question": "Qu’est-ce que tu comprends maintenant de ces affirmations ?"
+          },
+          {
+            "id": "f4-s1-q5",
+            "fonction": "observer+decouvrir-dieu",
+            "source": "parole",
+            "consigne": "Lis 2 Corinthiens 3:5 lentement.",
+            "question": "Qu’est-ce qui te frappe dans ce que Paul dit ici de lui-même et de Dieu ?"
+          },
+          {
+            "id": "f4-s1-q6",
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Garde 2 Corinthiens 3:5 à côté des passages déjà parcourus.",
+            "question": "Qu’est-ce que ce passage ajoute à ta compréhension de la grâce ?"
+          },
+          {
+            "id": "f4-s1-q7",
             "fonction": "repondre",
-            "question": "« Vivre dans la grâce... c'est laisser l'Esprit de Dieu s'exprimer à travers moi. » Aujourd'hui, face à une tâche difficile ou une relation tendue, comment vas-tu arrêter de forcer par tes propres moyens pour laisser l'Esprit agir à ta place ?"
+            "source": "contemplation",
+            "consigne": "Appuie-toi seulement sur le chemin que tu viens de parcourir.",
+            "question": "Si tu devais maintenant expliquer la grâce avec tes propres mots, que dirais-tu ?",
+            "priereTitre": "Ce que j’ai compris de la grâce"
+          },
+          {
+            "id": "f4-s1-q8",
+            "fonction": "decouvrir-dieu",
+            "source": "contemplation",
+            "consigne": "Reviens aux mots qui ont particulièrement retenu ton attention.",
+            "question": "Qu’est-ce que cette partie t’a fait découvrir de Dieu ?",
+            "priereTitre": "Ce que j’ai découvert de Dieu"
+          },
+          {
+            "id": "f4-s1-q9",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Tu n’as pas besoin de tout retenir.",
+            "question": "Qu’est-ce qui t’a particulièrement marqué ?",
+            "priereTitre": "Ce qui m’a particulièrement marqué"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?",
+          "placeholderMoment": "Je veux revenir à cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir de ce qu’elle t’a fait découvrir ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Pourquoi est-ce difficile de vivre pleinement la Grâce ?",
+        "sectionTitre": "Pourquoi est-il difficile de vivre dans la grâce ?",
         "versets": [
+          "Rm 8:1",
           "Ga 1:10"
         ],
         "questions": [
           {
             "id": "f4-s2-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte démasque le légalisme : c'est quand « notre regard n'est plus centré sur lui mais sur nous. » Dans tes moments de prière ou de service, à quel point es-tu obsédé par *ta* performance plutôt que captivé par la beauté de Dieu ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Jean 6:28-29. Relis particulièrement la réponse de Jésus.",
+            "question": "Qu’est-ce qui retient ton attention ?"
           },
           {
             "id": "f4-s2-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Au lieu de donner une liste de tâches, Jésus répond : « Que tu reçoives mon amour et y prennes plaisir. » Qu'est-ce que cela change de réaliser que le premier \"travail\" que Dieu exige de toi, c'est que tu profites de son amour ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Romains 8:1. Relis-le encore une fois, lentement.",
+            "question": "Qu’est-ce qui te frappe dans cette affirmation ?"
           },
           {
             "id": "f4-s2-q3",
-            "fonction": "recevoir",
-            "question": "« En Christ, je n’ai rien à prouver car je suis approuvé de Dieu. » Quel fardeau de comparaison, d'image à préserver ou de pression religieuse peux-tu déposer définitivement à la lecture de cette phrase ?"
+            "fonction": "comparer",
+            "source": "parole",
+            "consigne": "Lis Galates 1:10, puis garde-le avec les passages précédents.",
+            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de méditer ?"
           },
           {
             "id": "f4-s2-q4",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret explique qu’une personne qui fonde sa valeur sur ses performances et cherche continuellement à être « acceptable » peut entretenir une image d’elle-même et vivre dans l’échec ou la culpabilité. Il oppose cela à l’identité reçue en Christ.",
+            "question": "Qu’est-ce que cette interprétation vient éclairer ou questionner pour toi ?"
+          },
+          {
+            "id": "f4-s2-q5",
+            "fonction": "se-laisser-eclairer",
+            "source": "parole",
+            "consigne": "Relis maintenant 2 Corinthiens 5:17. Tu as déjà rencontré ce texte dans la fiche précédente.",
+            "question": "Quel sens prend-il ici, après les passages que tu viens de méditer ?"
+          },
+          {
+            "id": "f4-s2-q6",
             "fonction": "repondre",
-            "question": "Si la force motrice de ta vie n'est plus \"le devoir mais le vouloir\", quel est le prochain acte de service ou de dévotion que tu dois peut-être suspendre aujourd'hui, le temps de retrouver l'amour et l'envie véritable de le faire ?"
+            "source": "contemplation",
+            "consigne": "Regarde l’ensemble du chemin parcouru dans cette partie.",
+            "question": "Qu’est-ce que cette partie t’a fait comprendre de la grâce et de la manière dont tu te regardes devant Dieu ?",
+            "priereTitre": "Ce que j’ai découvert"
+          },
+          {
+            "id": "f4-s2-q7",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Reviens aux textes, sans chercher une réponse exemplaire.",
+            "question": "Y a-t-il une Parole que tu voudrais garder particulièrement ?",
+            "priereTitre": "La Parole qui m’a particulièrement arrêté"
+          },
+          {
+            "id": "f4-s2-q8",
+            "fonction": "rester-ouvert",
+            "source": "contemplation",
+            "consigne": "Tu peux aussi constater que rien de précis ne s’impose encore.",
+            "question": "Qu’est-ce que tout cela vient éclairer pour toi ?",
+            "priereTitre": "Ce que cela vient éclairer pour moi"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment aujourd’hui aimerais-tu particulièrement te souvenir de cette Parole ?",
+          "placeholderMoment": "Je veux m’en souvenir lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu y répondre ?",
+          "placeholderAction": "Je voudrais y répondre en…"
+        }
       },
       {
-        "sectionTitre": "Comment Dieu me fait-il croître dans la Grâce ?",
+        "sectionTitre": "Comment Dieu me fait-il croître dans la grâce ?",
         "versets": [
           "Mt 7:7",
           "Ps 37:4",
-          "1 Sm 15:23",
-          "2 Co 12:9"
+          "Jn 15:7",
+          "1 Jn 4:19"
         ],
         "questions": [
           {
             "id": "f4-s3-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte surprend en disant que « servir Dieu ne consiste pas à réduire ses propres désirs à un strict minimum », mais que « Jésus ramenait les gens... à la recherche de leurs désirs enfouis ». As-tu éteint ta soif de vie sous un vernis religieux ennuyeux, pensant que c'était cela être un \"bon chrétien\" ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Jean 7:37-38. Puis relis les paroles de Jésus une deuxième fois.",
+            "question": "Qu’est-ce qui retient ton attention ?"
           },
           {
             "id": "f4-s3-q2",
             "fonction": "decouvrir-dieu",
-            "question": "Le texte affirme que Dieu n'est pas inerte mais passionné, et qu'il veut être Celui qui te comble pour que tu n'aies plus besoin d'aller chercher ta satisfaction dans le péché. Quelle image de Dieu cela dessine-t-il pour toi ?"
+            "source": "contemplation",
+            "consigne": "Reste encore un instant avec Jean 7:37-38.",
+            "question": "Qu’est-ce que ce passage te fait découvrir de Jésus et de ce qu’il propose à celui qui a soif ?"
           },
           {
             "id": "f4-s3-q3",
-            "fonction": "recevoir",
-            "question": "« Sous la Grâce, c'est Jésus qui occupe tout son esprit. » Es-tu prêt à recevoir la grâce de lâcher l'obsession de ton propre comportement et de tes échecs pour te laisser fasciner par Jésus ?"
+            "fonction": "comparer",
+            "source": "parole",
+            "consigne": "Lis maintenant Matthieu 7:7 et rapproche-le de Jean 7:37-38.",
+            "question": "Qu’est-ce que ce texte ajoute à ce que tu viens de méditer ?"
           },
           {
             "id": "f4-s3-q4",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Matthieu 4:4.",
+            "question": "Qu’est-ce qui te frappe dans la comparaison faite par Jésus ?"
+          },
+          {
+            "id": "f4-s3-q5",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret explique que la Parole révèle Dieu, son amour, notre identité et ses promesses. Il utilise l’image d’une graine qui grandit en nous.",
+            "question": "Qu’est-ce que cette interprétation ajoute à ce que tu viens de lire dans Matthieu 4:4 ?"
+          },
+          {
+            "id": "f4-s3-q6",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Jean 15:7, puis relis-le lentement.",
+            "question": "Qu’est-ce qui retient ton attention dans les paroles de Jésus ?"
+          },
+          {
+            "id": "f4-s3-q7",
+            "fonction": "comparer",
+            "source": "parole",
+            "consigne": "Lis maintenant 1 Jean 4:19 et garde-le à côté de Jean 15:7.",
+            "question": "Qu’est-ce que ce verset ajoute à ce que tu viens de contempler ?"
+          },
+          {
+            "id": "f4-s3-q8",
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Tu viens de rencontrer trois images : avoir soif, être nourri, demeurer. Prends un instant avant de répondre.",
+            "question": "Qu’est-ce que tout cela te fait comprendre de la manière dont une relation avec Dieu grandit ?",
+            "priereTitre": "Ce que ces textes m’ont fait découvrir"
+          },
+          {
+            "id": "f4-s3-q9",
             "fonction": "repondre",
-            "question": "Pour croître, le texte propose de se nourrir de la Parole. Quelle vérité sur « l'héritage, l'adoption, ta véritable identité » vas-tu choisir de méditer spécifiquement cette semaine pour raviver ton intimité avec Dieu ?"
+            "source": "contemplation",
+            "consigne": "Reviens au passage qui est resté avec toi.",
+            "question": "Quelle Parole t’a particulièrement nourri ?",
+            "priereTitre": "La Parole qui m’a particulièrement nourri"
+          },
+          {
+            "id": "f4-s3-q10",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Tu peux nommer une découverte, un désir, une question ou quelque chose d’encore indistinct.",
+            "question": "Qu’est-ce qui s’est éveillé ou précisé en toi ?",
+            "priereTitre": "Ce qui s’est éveillé ou précisé en moi"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "À quel moment aujourd’hui voudrais-tu revenir à cette Parole ?",
+          "placeholderMoment": "Je veux revenir à cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu la laisser prendre place dans ce que tu vis ?",
+          "placeholderAction": "Je voudrais lui laisser une place en…"
+        }
       },
       {
-        "sectionTitre": "Ma part : l'obéissance",
-        "versets": [],
+        "sectionTitre": "Ma part : l’obéissance",
+        "versets": [
+          "Jn 15:10",
+          "Rm 6:15-18",
+          "He 13:21",
+          "1 Sm 15:23"
+        ],
         "questions": [
           {
             "id": "f4-s4-q1",
             "fonction": "observer",
-            "question": "Relis : « Cette obéissance est motivée par l'amour, non par le devoir. » Quand tu fais le bilan des choses que tu fais \"pour Dieu\" actuellement, quel pourcentage est motivé par la peur ou le devoir, et quel pourcentage est porté par l'amour ?"
+            "source": "parole",
+            "consigne": "Lis lentement Jean 15:10. Relis encore une fois les paroles de Jésus.",
+            "question": "Qu’est-ce qui retient ton attention dans ce qu’il dit de l’obéissance et de l’amour ?"
           },
           {
             "id": "f4-s4-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "L'obéissance, c'est « dire non aux mensonges de l'ennemi... et dire oui à ses promesses ». Quel est le mensonge le plus toxique que l'ennemi te murmure régulièrement et auquel tu \"obéis\" en le croyant ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Romains 6:15-18. Prends ton temps.",
+            "question": "Qu’est-ce qui te frappe dans ce passage ?"
           },
           {
             "id": "f4-s4-q3",
-            "fonction": "decouvrir-dieu+recevoir",
-            "question": "Le texte choque notre logique humaine : « Pour que Dieu puisse nous utiliser, il faut non pas que nous soyons assez forts, mais plutôt assez faibles. » Es-tu prêt à accepter l'amour d'un Dieu qui ne réclame pas tes compétences, mais qui chérit ta vulnérabilité ?"
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Garde Romains 6:15-18 à côté de Jean 15:10.",
+            "question": "Qu’est-ce que ce passage ajoute à ce que Jésus vient de dire ?"
           },
           {
             "id": "f4-s4-q4",
+            "fonction": "observer+decouvrir-dieu",
+            "source": "parole",
+            "consigne": "Lis Hébreux 13:21 lentement.",
+            "question": "Qu’est-ce qui retient ton attention dans ce passage ?"
+          },
+          {
+            "id": "f4-s4-q5",
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Reviens maintenant à l’ensemble des textes que tu viens de lire.",
+            "question": "Qu’est-ce que tu comprends de l’obéissance dans une vie de grâce ?"
+          },
+          {
+            "id": "f4-s4-q6",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret propose que l’obéissance est motivée par l’amour et la confiance, et qu’elle devient la conséquence de la relation avec Dieu.",
+            "question": "Qu’est-ce que cette interprétation vient préciser dans ce que tu avais observé ?"
+          },
+          {
+            "id": "f4-s4-q7",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant 1 Samuel 15:23 dans son contexte. Reste d’abord avec les mots du passage.",
+            "question": "Qu’est-ce que tu observes dans le texte lui-même ?"
+          },
+          {
+            "id": "f4-s4-q8",
+            "fonction": "rester-ouvert",
+            "source": "livret",
+            "consigne": "Le livret rapproche ensuite la désobéissance de la sorcellerie, du contrôle et de « droits » donnés à l’ennemi. Il s’agit ici d’une interprétation proposée par le livret, et non d’une formulation directe du texte biblique.",
+            "question": "Après avoir lu 1 Samuel 15:23, qu’est-ce que tu retiens, qu’est-ce que tu questionnes ou qu’est-ce qui reste ouvert pour toi ?"
+          },
+          {
+            "id": "f4-s4-q9",
             "fonction": "repondre",
-            "question": "Si la désobéissance obstinée mène inévitablement « vers le désastre » en te coupant de la grâce, dans quel petit détail de ta vie refuses-tu encore de laisser Dieu être Dieu, et comment vas-tu capituler aujourd'hui ?"
+            "source": "contemplation",
+            "consigne": "Appuie-toi sur les passages parcourus, sans chercher une formule parfaite.",
+            "question": "Comment comprends-tu maintenant l’obéissance ?",
+            "priereTitre": "Ce que j’ai compris de l’obéissance"
+          },
+          {
+            "id": "f4-s4-q10",
+            "fonction": "decouvrir-dieu",
+            "source": "contemplation",
+            "consigne": "Reviens à ce qui t’a frappé dans les textes.",
+            "question": "Qu’est-ce que tu as découvert de Dieu ?",
+            "priereTitre": "Ce que j’ai découvert de Dieu"
+          },
+          {
+            "id": "f4-s4-q11",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Tu peux nommer une invitation, une résistance ou une question.",
+            "question": "Qu’est-ce qui t’interpelle ?",
+            "priereTitre": "Ce qui m’interpelle"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Y a-t-il une situation aujourd’hui dans laquelle cette Parole pourrait éclairer une décision ou une manière d’agir ?",
+          "placeholderMoment": "Cette Parole pourrait m’éclairer lorsque…",
+          "questionAction": "Lorsque cette situation arrivera, comment voudrais-tu y répondre ?",
+          "placeholderAction": "Je voudrais y répondre en…"
+        }
       },
       {
-        "sectionTitre": "La conséquence de la Grâce dans ma vie : le repos et la bénédiction",
+        "sectionTitre": "Dans la faiblesse et l’épreuve",
         "versets": [
-          "Ep 2:10"
+          "2 Co 12:9"
         ],
         "questions": [
           {
             "id": "f4-s5-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte avertit très clairement : « Dieu ne m'obligera jamais à lâcher ce à quoi je tiens fermement, même si ce que je chéris me détruit. » À quoi t'accroches-tu fermement en ce moment (une relation, un confort, une habitude) que Dieu te laisse garder, bien que cela te détruise à petit feu ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement 2 Corinthiens 12:9. Puis relis-le encore une fois.",
+            "question": "Qu’est-ce qui retient ton attention ?"
           },
           {
             "id": "f4-s5-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le passage sur Jaebets révèle un Dieu qui attend que nous lui demandions « d'étendre nos limites » et de « vivre grand pour lui ». Quelle vision nouvelle as-tu de ce Dieu qui veut déborder les petits cadres dans lesquels nous l'enfermons ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Hébreux 5:8.",
+            "question": "Qu’est-ce qui t’interpelle dans ce qui est dit de Jésus ?"
           },
           {
             "id": "f4-s5-q3",
-            "fonction": "recevoir",
-            "question": "« Notre Dieu œuvre au travers de gens ordinaires qui croient en un Dieu extraordinaire. » Es-tu prêt à recevoir la pleine valeur de ton identité, non pas basée sur tes \"capacités\" ou ton \"apparence\", mais sur la puissance de Dieu en toi ?"
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Garde les deux textes ensemble, sans chercher une conclusion rapide.",
+            "question": "Qu’est-ce qu’ils te font comprendre ?"
           },
           {
             "id": "f4-s5-q4",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret voit dans les épreuves un lieu où l’être humain peut apprendre à moins dépendre de ses propres capacités et à davantage s’appuyer sur Dieu. C’est l’interprétation proposée par le livret, pas une citation biblique directe.",
+            "question": "Après les textes que tu viens de lire, qu’est-ce que tu retiens de cette affirmation ?"
+          },
+          {
+            "id": "f4-s5-q5",
             "fonction": "repondre",
-            "question": "Regarde tes circonstances actuelles et déclare avec le texte : « Je dois être né pour plus que cela ! » Quelle prière audacieuse vas-tu oser formuler aujourd'hui pour cesser de limiter Dieu dans ta vie et celle de tes proches ?"
+            "source": "contemplation",
+            "consigne": "Tu peux répondre que quelque chose a changé, s’est précisé ou demeure entièrement ouvert.",
+            "question": "Qu’est-ce que ces passages changent, précisent ou laissent encore ouvert dans ta compréhension de la faiblesse et de l’épreuve ?",
+            "priereTitre": "Ce que ces textes m’ont fait comprendre"
+          },
+          {
+            "id": "f4-s5-q6",
+            "fonction": "rester-ouvert",
+            "source": "contemplation",
+            "consigne": "Il n’est pas nécessaire de résoudre maintenant ce qui reste douloureux ou mystérieux.",
+            "question": "Qu’est-ce que tu ne comprends pas encore ?",
+            "priereTitre": "Ce que je ne comprends pas encore"
+          },
+          {
+            "id": "f4-s5-q7",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Reviens à la Parole que tu souhaites simplement garder devant Dieu.",
+            "question": "Quelle Parole veux-tu apporter avec toi dans la prière ?",
+            "priereTitre": "La Parole que je veux apporter devant Dieu"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment où tu te sens limité, faible ou dépassé voudrais-tu revenir à cette Parole ?",
+          "placeholderMoment": "Je veux revenir à cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir d’elle ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Le repos",
+        "versets": [
+          "He 4:10-11",
+          "Ep 2:10",
+          "1 Ch 4:10"
+        ],
+        "questions": [
+          {
+            "id": "f4-s6-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Hébreux 4:10-11.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont ce passage parle du repos ?"
+          },
+          {
+            "id": "f4-s6-q2",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Éphésiens 2:10. Tu as rencontré la grâce quelques versets plus tôt, dans Éphésiens 2:8-9.",
+            "question": "Qu’est-ce que ce verset ajoute ?"
+          },
+          {
+            "id": "f4-s6-q3",
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Garde maintenant Éphésiens 2:8-10 ensemble, sans qu’on t’en fournisse le lien.",
+            "question": "Qu’est-ce que tu comprends lorsque tu relis l’ensemble ?"
+          },
+          {
+            "id": "f4-s6-q4",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret propose : « Se reposer, ce n’est pas être passif, c’est s’en remettre totalement à Jésus afin qu’il anime notre vie. » Relis cette phrase, puis reviens à Hébreux 4 et Éphésiens 2.",
+            "question": "Quelle différence comprends-tu maintenant entre le repos et la passivité ?"
+          },
+          {
+            "id": "f4-s6-q5",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis simplement la prière de Jaebets dans 1 Chroniques 4:10, sans la transformer en promesse générale.",
+            "question": "Qu’est-ce qui retient ton attention dans ce qu’il demande à Dieu ?"
+          },
+          {
+            "id": "f4-s6-q6",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Reste avec le texte tel qu’il est écrit.",
+            "question": "Y a-t-il quelque chose dans cette prière qui nourrit ta propre relation avec Dieu ?"
+          },
+          {
+            "id": "f4-s6-q7",
+            "fonction": "repondre",
+            "source": "contemplation",
+            "consigne": "Regarde l’ensemble des passages de cette dernière traversée.",
+            "question": "Comment comprends-tu maintenant le repos dans la grâce ?",
+            "priereTitre": "Ce que j’ai compris du repos"
+          },
+          {
+            "id": "f4-s6-q8",
+            "fonction": "decouvrir-dieu",
+            "source": "contemplation",
+            "consigne": "Reviens aux mots qui ont retenu ton attention.",
+            "question": "Qu’est-ce que cela t’a fait découvrir de Dieu ?",
+            "priereTitre": "Ce que j’ai découvert de Dieu"
+          },
+          {
+            "id": "f4-s6-q9",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Tu n’as pas besoin de produire davantage. Choisis simplement ce que tu veux garder devant toi.",
+            "question": "Quelle Parole veux-tu garder devant toi ?",
+            "priereTitre": "La Parole que je veux garder devant moi"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment de ta journée voudrais-tu revenir à cette Parole ?",
+          "placeholderMoment": "Je veux revenir à cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir de ce qu’elle t’a fait comprendre ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "En regardant les six traversées que tu viens de vivre, qu’est-ce qui est devenu le plus clair pour toi sur la grâce ?",
+      "questionVerset": "Parmi toutes les Paroles que tu as choisies dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "La grâce comme don",
+        "Approbation et performance",
+        "Croître dans la grâce",
+        "Obéissance",
+        "Faiblesse",
+        "Repos"
+      ]
+    }
   },
   {
     "ficheId": 5,
