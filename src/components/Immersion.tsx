@@ -720,7 +720,12 @@ export default function Immersion({
   // ── Repères du sommaire ─────────────────────────────────────
 
   return (
-    <div className="immersion-bureau fixed inset-0 z-[60] overflow-hidden">
+    <div
+      className="immersion-bureau fixed inset-0 z-[60] overflow-hidden"
+      // En capture, et sans rien empêcher : le toucher rappelle les
+      // commandes et poursuit sa route vers le champ ou le bouton visé.
+      onPointerDownCapture={() => setChrome(true)}
+    >
       <div className="immersion-sous-main absolute inset-3 sm:inset-6" />
       <span className="immersion-ruban absolute left-5 top-0 z-20 hidden h-24 w-10 items-end justify-center pb-4 text-or-200 sm:flex">
         <Bookmark className="h-4 w-4 fill-current" />
@@ -958,17 +963,6 @@ export default function Immersion({
             )}
           </div>
         </footer>
-      )}
-
-      {/* Un toucher sur le fond rappelle les commandes effacées. Placé
-          derrière le contenu pour ne jamais voler un clic à un champ. */}
-      {!chrome && (
-        <button
-          type="button"
-          aria-label="Afficher les commandes"
-          onClick={() => setChrome(true)}
-          className="absolute inset-0 z-0 cursor-default"
-        />
       )}
 
       <FeuilleOptions

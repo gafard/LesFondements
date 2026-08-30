@@ -40,6 +40,7 @@ import {
   type FicheLivret,
 } from '@/lib/livret';
 import { texteDuVerset } from '@/data/versets';
+import { enregistrerRevision, qualiteDepuisScore } from '@/lib/memorisation';
 import { FICHES_META } from '@/data/fichesMeta';
 import { useDeclarerFondSombre } from '@/lib/fondSombre';
 import Illumination from '@/components/Illumination';
@@ -938,6 +939,18 @@ function CarteVerset({
 }) {
   const texte = texteDuVerset(reference);
   const [epreuve, setEpreuve] = useState(false);
+  const [garde, setGarde] = useState<number | null>(null);
+  const { user } = useAuth();
+
+  // L'épreuve rendait son verdict et l'oubliait. Le score ne rejoignait ni
+  // le compte des versets acquis, ni le calendrier des révisions : réciter
+  // depuis sa fiche ne comptait pour rien. Il compte maintenant, et la
+  // prochaine échéance s'ajuste comme depuis la page de mémorisation.
+  const retenirScore = async (score: number) => {
+    setGarde(score);
+    if (!user) return;
+    await enregistrerRevision(user.uid, reference, qualiteDepuisScore(score), score);
+  };
   const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
   const pose = poses[index % poses.length];
   const postitColors = ['postit', 'postit-bleu', 'postit-rose', 'postit-vert'];
@@ -983,7 +996,14 @@ function CarteVerset({
       {texte && (
         <div className="mt-3">
           {epreuve ? (
-            <EpreuveMemoire reference={reference} texte={texte} />
+            <>
+              <EpreuveMemoire reference={reference} texte={texte} onScore={retenirScore} />
+              {garde !== null && (
+                <p className="mt-2 text-2xs font-bold text-encre-600">
+                  Gardé dans vos révisions · {garde}%
+                </p>
+              )}
+            </>
           ) : (
             <button
               onClick={() => setEpreuve(true)}

@@ -100,6 +100,23 @@ function prochainInterval(record: MemoireVerset, quality: QualiteRappel): number
   return PROGRESSION[Math.min(record.streak, PROGRESSION.length - 1)] ?? 120;
 }
 
+/**
+ * La qualité déduite d'un score, quand personne ne l'a donnée.
+ *
+ * Sur la page de mémorisation, on se note soi-même après coup : « oublié,
+ * difficile, bien, évident ». L'épreuve proposée dans une fiche n'a pas
+ * cette étape — elle arrive au moment où l'on vient de recopier le verset,
+ * et l'interrompre pour un formulaire casserait ce moment. Son verdict est
+ * chiffré : on le traduit, avec les mêmes seuils que ceux qu'un lecteur
+ * emploierait en se jugeant.
+ */
+export function qualiteDepuisScore(score: number): QualiteRappel {
+  if (score >= 92) return 3;
+  if (score >= 75) return 2;
+  if (score >= 50) return 1;
+  return 0;
+}
+
 export async function enregistrerRevision(
   uid: string,
   reference: string,
