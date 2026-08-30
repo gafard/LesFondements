@@ -8,6 +8,7 @@ import type { JournalEntry } from '@/lib/firestore';
 import Image from 'next/image';
 import { PenLine, Plus, Trash2, Calendar } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
+import ChampDictée from '@/components/ChampDictée';
 
 function Journal() {
   const { user, loading } = useAuth();
@@ -100,13 +101,16 @@ function Journal() {
         {isFormOpen && (
           <div className="feuille feuille-dechiree p-6 sm:p-8 rounded-3xl shadow-lg border border-parchemin-300 mb-8 animate-fade-in relative">
             <span className="ruban -top-3 left-8 -rotate-2 rounded-[2px]" />
-            <h3 className="manuscrit font-bold text-2xl text-encre-950 mb-2">Nouvelle réflexion manuscrite</h3>
-            <textarea
-              className="manuscrit w-full p-4 border border-parchemin-300 rounded-2xl focus:ring-1 focus:ring-or-400 focus:outline-none min-h-[160px] mb-4 bg-parchemin-50/60 text-encre-950 text-base leading-relaxed placeholder:font-sans placeholder:text-xs placeholder:text-encre-300"
-              placeholder="Que souhaitez-vous confier au Seigneur aujourd'hui ?"
-              value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-            />
+            <h3 className="manuscrit font-bold text-2xl text-encre-950 mb-2">Nouvelle réflexion manuscrite ou dictée</h3>
+            <div className="mb-4">
+              <ChampDictée
+                valeur={newContent}
+                onEnregistrer={setNewContent}
+                placeholder="Que souhaitez-vous confier au Seigneur aujourd'hui ? Écrivez ou dictez à la voix…"
+                theme="clair"
+                lignes={5}
+              />
+            </div>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsFormOpen(false)}

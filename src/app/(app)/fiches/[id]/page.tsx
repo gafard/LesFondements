@@ -31,6 +31,7 @@ import AnnotationsFiche from '@/components/AnnotationsFiche';
 import TexteSurlignable, { type SelectionTexte } from '@/components/TexteSurlignable';
 import EcouteContinueFiche from '@/components/EcouteContinueFiche';
 import GuidePastoralCellule from '@/components/GuidePastoralCellule';
+import ChampDictée from '@/components/ChampDictée';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
 import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswers } from '@/lib/firestore';
 import {
@@ -625,13 +626,16 @@ function FicheContent() {
                 </span>
               </div>
 
-              <textarea
-                value={reponses[`pas:${fiche.id}`] ?? ''}
-                onChange={(event) => enregistrer(`pas:${fiche.id}`, event.target.value)}
-                rows={3}
-                placeholder="Cette semaine, je m'engage à…"
-                className="manuscrit mt-4 w-full rounded-2xl border border-encre-950/10 bg-white/80 px-4 py-3 text-base text-encre-950 outline-none placeholder:font-sans placeholder:text-xs placeholder:text-encre-400 focus:bg-white focus:ring-1 focus:ring-emerald-500"
-              />
+              <div className="mt-4">
+                <ChampDictée
+                  valeur={reponses[`pas:${fiche.id}`] ?? ''}
+                  onEnregistrer={(valeur) => enregistrer(`pas:${fiche.id}`, valeur)}
+                  placeholder="Cette semaine, je m'engage à… (vous pouvez dicter à la voix)"
+                  questionPourAudio="Mon pas concret de la semaine : une seule action précise, que vous partagerez en vérité à votre groupe."
+                  theme="clair"
+                  lignes={3}
+                />
+              </div>
             </section>
           </div>
         )}
@@ -1023,13 +1027,16 @@ function BlocQuestion({
         <p className="font-serif text-base font-bold leading-snug text-encre-950">{question}</p>
       </div>
 
-      <textarea
-        value={valeur}
-        onChange={(event) => onEnregistrer(event.target.value)}
-        rows={4}
-        placeholder="Votre réponse personnelle (confidentielle)…"
-        className="manuscrit mt-3 w-full resize-none rounded-2xl border border-parchemin-300 bg-white px-4 py-3 text-base leading-relaxed text-encre-900 outline-none placeholder:font-sans placeholder:text-xs placeholder:text-encre-300 focus:border-or-400 focus:ring-1 focus:ring-or-400"
-      />
+      <div className="mt-3">
+        <ChampDictée
+          valeur={valeur}
+          onEnregistrer={onEnregistrer}
+          placeholder="Votre réponse personnelle (écrivez ou dictez à la voix)…"
+          questionPourAudio={question}
+          theme="clair"
+          lignes={4}
+        />
+      </div>
 
       {onPartager && valeur.trim().length > 20 && (
         <button

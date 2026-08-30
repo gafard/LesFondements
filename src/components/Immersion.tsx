@@ -30,6 +30,7 @@ import {
 import ShareableVerseCard from '@/components/ShareableVerseCard';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
 import Illumination from '@/components/Illumination';
+import ChampDictée from '@/components/ChampDictée';
 import { Etincelle, MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import {
   AMBIANCES,
@@ -1345,17 +1346,16 @@ function RenduScene({
                   >
                     <TexteAvecReferences>{question.question}</TexteAvecReferences>
                   </label>
-                  <textarea
-                    id={`meditation-${question.id}`}
-                    value={reponse}
-                    onChange={(event) => onEnregistrer(`q:${question.id}`, event.target.value)}
-                    rows={3}
-                    placeholder="Écris directement sur cette feuille…"
-                    className="manuscrit mt-4 w-full resize-y rounded-xl border border-encre-950/12 bg-white/55 p-4 text-lg leading-relaxed text-encre-950 outline-none transition-colors placeholder:font-sans placeholder:text-encre-600/55 focus:border-encre-700 focus:bg-white/75"
-                  />
-                  <p className="mt-2 inline-flex items-center gap-1 text-3xs font-bold text-emerald-900/75">
-                    <Check className="h-3 w-3" /> Sauvegarde automatique
-                  </p>
+                  <div className="mt-4">
+                    <ChampDictée
+                      valeur={reponse}
+                      onEnregistrer={(valeur) => onEnregistrer(`q:${question.id}`, valeur)}
+                      placeholder="Écris ou dicte à la voix ce qui vient dans ton cœur…"
+                      questionPourAudio={`${question.consigne ? `${question.consigne}. ` : ''}${question.question}`}
+                      theme="clair"
+                      lignes={3}
+                    />
+                  </div>
                 </article>
               );
             })}
@@ -2225,7 +2225,8 @@ function SceneQuestion({
       <ChampEcriture
         valeur={valeur}
         onEnregistrer={onEnregistrer}
-        placeholder="Écrivez ce qui vient, même si c’est incomplet. Personne d’autre ne le lira."
+        placeholder="Écrivez ou dictez ce qui vient, même si c’est incomplet. Personne d’autre ne le lira."
+        questionPourAudio={scene.texte}
         lignes={6}
       />
     </div>
@@ -2238,45 +2239,25 @@ function ChampEcriture({
   placeholder,
   ariaLabel,
   lignes,
+  questionPourAudio,
 }: {
   valeur: string;
   onEnregistrer: (valeur: string) => void;
   placeholder: string;
   ariaLabel?: string;
   lignes: number;
+  questionPourAudio?: string;
 }) {
-  const [sauvegarde, setSauvegarde] = useState(false);
-  const minuteur = useRef<number | null>(null);
-
-  const changer = (nouvelle: string) => {
-    onEnregistrer(nouvelle);
-    if (minuteur.current) window.clearTimeout(minuteur.current);
-    minuteur.current = window.setTimeout(() => {
-      setSauvegarde(true);
-      window.setTimeout(() => setSauvegarde(false), 1600);
-    }, 700);
-  };
-
   return (
-    <div className="mt-6">
-      <textarea
-        value={valeur}
-        onChange={(event) => changer(event.target.value)}
-        rows={lignes}
+    <div className="mt-4">
+      <ChampDictée
+        valeur={valeur}
+        onEnregistrer={onEnregistrer}
         placeholder={placeholder}
-        aria-label={ariaLabel}
-        className="verre w-full resize-none rounded-3xl px-5 py-4 text-base leading-relaxed text-parchemin-100 outline-none placeholder:text-parchemin-100/50 focus:border-or-400/50"
+        lignes={lignes}
+        questionPourAudio={questionPourAudio}
+        theme="sombre"
       />
-      <div className="mt-2 flex items-center justify-between">
-        <span className="text-2xs text-parchemin-100/55">
-          {valeur.trim() ? `${valeur.trim().split(/\s+/).length} mots` : ''}
-        </span>
-        {sauvegarde && (
-          <span className="inline-flex items-center gap-1 text-2xs font-bold text-emerald-300/80">
-            <Check className="h-3 w-3" /> Enregistré
-          </span>
-        )}
-      </div>
     </div>
   );
 }
