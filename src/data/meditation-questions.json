@@ -146,6 +146,7 @@
   {
     "ficheId": 2,
     "ficheTitre": "Le péché, le salut",
+    "parcoursGuide": true,
     "sections": [
       {
         "sectionTitre": "Le péché",
@@ -156,51 +157,110 @@
         "questions": [
           {
             "id": "f2-s1-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte affirme que la rupture avec Dieu s'est produite quand l'humain a exprimé « sa volonté d'autonomie... le désir de décider soi-même de ce qui est bien et mal ». Dans quel domaine précis de ta vie refuses-tu encore de dépendre de Dieu et préfères-tu décider par toi-même de ce qui est bon pour toi ?"
+            "fonction": "observer",
+            "consigne": "Lis lentement Genèse 2:8-9. Puis relis le passage une seconde fois, sans chercher immédiatement une explication.",
+            "question": "Qu’est-ce qui retient ton attention dans la relation entre Dieu, l’être humain et ce que Dieu met à sa disposition ?",
+            "priereTitre": "Ce que j’ai compris du projet initial de Dieu"
           },
           {
             "id": "f2-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte précise que le but de notre création était « d'avoir cette relation intime avec le Créateur en dépendant entièrement et uniquement de Lui ». Qu'est-ce que cela révèle du cœur de Dieu pour toi : un maître cherchant des esclaves dociles, ou un Créateur désirant une intimité profonde ?"
+            "fonction": "observer+comparer",
+            "consigne": "Lis maintenant Genèse 3. Prends ton temps, puis garde ce récit à côté de ce que tu viens de lire en Genèse 2.",
+            "question": "Qu’est-ce qui te frappe lorsque tu compares les deux passages ?"
           },
           {
             "id": "f2-s1-q3",
-            "fonction": "recevoir",
-            "question": "« Nous tous, personnellement, avons péché et avons été coupés de la présence glorieuse de Dieu. » Es-tu prêt à cesser de minimiser tes fautes, à arrêter de te comparer aux autres, et à recevoir cette dure réalité te concernant personnellement ?"
+            "fonction": "se-laisser-eclairer",
+            "consigne": "Reste encore un instant dans le récit, sans passer trop vite à une définition du péché.",
+            "question": "Qu’est-ce qui semble avoir changé dans la relation entre l’être humain et Dieu ?",
+            "priereTitre": "Ce que j’ai compris de la rupture"
           },
           {
             "id": "f2-s1-q4",
+            "fonction": "relire-le-livret",
+            "consigne": "Reviens à cette explication du livret : la communion cesse lorsque l’être humain cherche l’autonomie vis-à-vis du Créateur et veut décider lui-même du bien et du mal. Le livret décrit le péché comme « manquer le but, quitter le droit chemin ».",
+            "question": "Après Genèse 2 et 3, qu’est-ce que cette explication t’aide à mieux comprendre ?"
+          },
+          {
+            "id": "f2-s1-q5",
+            "fonction": "comprendre",
+            "consigne": "Garde simplement devant toi l’expression « manquer le but » et reviens au chemin parcouru depuis Genèse 2.",
+            "question": "À la lumière de ce que tu viens de lire, quel était ce « but » ?"
+          },
+          {
+            "id": "f2-s1-q6",
+            "fonction": "observer+comparer",
+            "consigne": "Lis Romains 5:12 puis Romains 3:23 lentement. Mets les deux passages ensemble, puis reviens un instant à Genèse 2 et 3.",
+            "question": "Qu’est-ce que ces passages ajoutent à ce que tu avais compris de la rupture ?"
+          },
+          {
+            "id": "f2-s1-q7",
             "fonction": "repondre",
-            "question": "Le texte conclut que « Le péché a entraîné la mort spirituelle ». Concrètement aujourd'hui, quelle habitude, pensée ou relation dois-tu fuir parce que tu réalises qu'elle est en train de te couper spirituellement de Dieu ?"
+            "consigne": "Ne cherche pas une formule parfaite. Appuie-toi seulement sur les passages que tu viens de parcourir.",
+            "question": "Comment expliquerais-tu maintenant, avec tes propres mots, ce qu’est le péché et ce qu’il a produit dans la relation entre Dieu et l’être humain ?",
+            "priereTitre": "Ce que j’ai compris du péché et de ce qu’il a produit"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quelle situation de ta journée cette vérité pourrait-elle avoir quelque chose à te dire ?",
+          "placeholderMoment": "Cette Parole pourra me rejoindre lorsque…",
+          "questionAction": "Quand ce moment arrivera, comment voudrais-tu vivre à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "La Loi 1",
-        "versets": [],
+        "sectionTitre": "La Loi",
+        "versets": [
+          "Rm 3:20",
+          "Ga 3:19-22"
+        ],
         "questions": [
           {
             "id": "f2-s2-q1",
             "fonction": "observer",
-            "question": "Relis bien cette phrase : « Le rôle de la Loi a été de révéler le péché des hommes... et de prouver la culpabilité de tous. » Avais-tu compris jusqu'ici que les commandements de Dieu n'étaient pas une échelle pour atteindre le ciel, mais un miroir pour te prouver que tu es coupable ?"
+            "consigne": "Lis Deutéronome 5:6-21 lentement. Avant de te concentrer sur les commandements eux-mêmes, reste avec les premières paroles prononcées par Dieu.",
+            "question": "Qu’est-ce qui retient ton attention dans ces premières paroles ?",
+            "priereTitre": "Ce que les textes m’ont fait découvrir de Dieu"
           },
           {
             "id": "f2-s2-q2",
-            "fonction": "decouvrir-dieu+se-laisser-eclairer",
-            "question": "La Loi révèle ta condition « face à la sainteté et à la justice de Dieu ». Face à cette sainteté parfaite de Dieu, que reste-t-il de tes petites \"bonnes actions\" dont tu tires parfois de l'orgueil ?"
+            "fonction": "decouvrir-dieu",
+            "consigne": "Continue maintenant la lecture de Deutéronome 5:6-21 et regarde l’ensemble du passage.",
+            "question": "Qu’est-ce que ce passage te fait découvrir de Dieu et de la manière dont il appelle son peuple à vivre ?"
           },
           {
             "id": "f2-s2-q3",
-            "fonction": "recevoir",
-            "question": "Le texte est catégorique : « Personne ne peut accomplir parfaitement ce que demande la Loi. » Vas-tu enfin accepter d'abandonner tes efforts épuisants pour essayer d'être \"assez bien\" par toi-même devant Dieu ?"
+            "fonction": "observer",
+            "consigne": "Lis lentement Romains 3:20. Ne cherche pas encore à faire la synthèse de la section.",
+            "question": "Qu’est-ce qui t’arrête particulièrement dans ce que ce verset dit de la Loi ?"
           },
           {
             "id": "f2-s2-q4",
+            "fonction": "comparer+se-laisser-eclairer",
+            "consigne": "Lis maintenant Galates 3:19-22, puis reviens à Romains 3:20.",
+            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de comprendre ?"
+          },
+          {
+            "id": "f2-s2-q5",
             "fonction": "repondre",
-            "question": "Si la Loi ne peut te rendre juste, mais seulement te montrer ton péché, comment vas-tu réagir aujourd'hui face à ta propre culpabilité : vas-tu encore essayer de la réparer par tes propres moyens, ou vas-tu capituler et la remettre à Dieu ?"
+            "consigne": "Relis cette phrase du livret après Romains 3 et Galates 3 : « Personne ne peut accomplir parfaitement ce que demande la Loi. Personne donc ne peut être justifié par la Loi, celle-ci donnant seulement la connaissance du péché. »",
+            "question": "Si tu devais maintenant expliquer le rôle de la Loi à partir de ces passages, que dirais-tu ?",
+            "priereTitre": "Ce que j’ai compris du rôle de la Loi"
+          },
+          {
+            "id": "f2-s2-q6",
+            "fonction": "rester-ouvert",
+            "consigne": "Tu n’as pas besoin de résoudre immédiatement tout ce que ces textes soulèvent.",
+            "question": "Qu’est-ce qui t’interpelle encore ?",
+            "priereTitre": "Ce qui m’interpelle encore"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quelle situation aujourd’hui cette Parole pourrait-elle éclairer ta manière de penser, de décider ou d’agir ?",
+          "placeholderMoment": "Cette Parole pourrait m’éclairer lorsque…",
+          "questionAction": "Quand cette situation arrivera, comment voudrais-tu répondre à ce que tu viens de comprendre ?",
+          "placeholderAction": "Je voudrais répondre en…"
+        }
       },
       {
         "sectionTitre": "Le Salut",
@@ -211,27 +271,128 @@
         "questions": [
           {
             "id": "f2-s3-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte utilise une image forte : « La moindre trace de poussière en lui l'éloigne du Dieu saint... » Quelle petite \"poussière\" (un péché que tu juges inoffensif ou acceptable) tolères-tu dans ta vie, oubliant qu'elle suffit à dresser un mur entre toi et Dieu ?"
+            "fonction": "observer",
+            "consigne": "Lis Jean 3:16 puis Romains 5:6-8 lentement. Relis-les une deuxième fois et observe particulièrement les verbes.",
+            "question": "Qu’est-ce que ces deux passages te révèlent sur le cœur de Dieu face à l’être humain qui a péché contre lui ?",
+            "priereTitre": "Ce que j’ai découvert du cœur de Dieu"
           },
           {
             "id": "f2-s3-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte déclare que « c'est Dieu qui vient me sauver. Il prend l'initiative et donne ce qu'il a de plus cher : son Fils. » Qu'est-ce que cela te révèle sur la valeur immense que tu as aux yeux de ce Dieu d'Amour ?"
+            "fonction": "aller-plus-loin",
+            "consigne": "Attends encore un moment. Relis très attentivement Romains 5:6-8.",
+            "question": "À quel moment Christ meurt-il pour nous, selon le passage ? Qu’est-ce que cela ajoute à ce que tu avais découvert de l’amour de Dieu dans la fiche précédente ?"
           },
           {
             "id": "f2-s3-q3",
-            "fonction": "recevoir",
-            "question": "Il est écrit : « Nous ne pouvons rien donner à Dieu (pour gagner son approbation), nous ne pouvons que recevoir de lui. » Qu'est-ce qui est le plus difficile pour toi à recevoir : le fait que tu ne mérites rien, ou le fait que Dieu t'offre tout gratuitement ?"
+            "fonction": "contempler",
+            "consigne": "Lis Ésaïe 53:4-12 lentement. Le passage est dense : ne cherche pas à tout comprendre immédiatement.",
+            "question": "Qu’est-ce qui te frappe particulièrement dans ce qui arrive au serviteur et dans ce qui concerne les autres ?"
           },
           {
             "id": "f2-s3-q4",
+            "fonction": "comprendre",
+            "consigne": "Relis uniquement les phrases d’Ésaïe 53 qui t’ont arrêté.",
+            "question": "Qu’est-ce qu’elles t’aident à comprendre de ce qui se passe à la croix ?"
+          },
+          {
+            "id": "f2-s3-q5",
+            "fonction": "observer+comparer",
+            "consigne": "Lis maintenant Philippiens 2:6-11. Puis garde ce passage à côté d’Ésaïe 53.",
+            "question": "Qu’est-ce qui retient ton attention dans le chemin parcouru par Jésus, et qu’est-ce que ce passage ajoute à ce que tu viens de contempler ?",
+            "priereTitre": "Ce qui m’a marqué en regardant Jésus"
+          },
+          {
+            "id": "f2-s3-q6",
+            "fonction": "relier",
+            "consigne": "Lis Romains 5:10. Arrête-toi sur le mot « réconciliés », puis reviens mentalement à Genèse 2 et Genèse 3.",
+            "question": "Qu’est-ce que ce mot prend comme sens après tout ce que tu viens de parcourir ?",
+            "priereTitre": "Ce que le mot « réconciliation » signifie maintenant pour moi"
+          },
+          {
+            "id": "f2-s3-q7",
+            "fonction": "comprendre",
+            "consigne": "Lis Romains 4:25 puis 1 Corinthiens 15:17.",
+            "question": "Qu’est-ce que ces passages ajoutent à ta compréhension du salut après tout ce que tu viens de lire sur la croix ?"
+          },
+          {
+            "id": "f2-s3-q8",
             "fonction": "repondre",
-            "question": "Le texte dénonce l'idée ancrée en nous que « dans ce que nous faisons de bien, nous pouvons gagner l'approbation de Dieu. » Comment vas-tu, concrètement aujourd'hui, arrêter d'essayer de \"payer\" Dieu par tes œuvres, pour simplement le remercier de ce que Jésus a déjà payé à la croix ?"
+            "consigne": "Reviens brièvement au chemin entier, puis garde devant toi la formulation du livret : Dieu vient sauver, il donne son Fils, Jésus s’offre, la réconciliation devient possible et Jésus ressuscite.",
+            "question": "Qu’est-ce que cette partie entière t’a fait découvrir de Dieu dans le salut ?"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Qu’est-ce que cette Parole pourrait changer aujourd’hui dans ta manière de regarder Dieu, toi-même ou quelqu’un d’autre ?",
+          "placeholderMoment": "Cette Parole pourrait changer mon regard sur…",
+          "questionAction": "Dans quel moment concret veux-tu revenir à cette vérité ?",
+          "placeholderAction": "Je veux revenir à cette vérité lorsque…"
+        }
+      },
+      {
+        "sectionTitre": "La Grâce",
+        "versets": [
+          "Ep 2:4-5",
+          "Ep 2:8-9"
+        ],
+        "questions": [
+          {
+            "id": "f2-s4-q1",
+            "fonction": "observer",
+            "consigne": "Lis Éphésiens 2:4-9 lentement. Puis relis-le une deuxième fois, sans chercher d’abord une conclusion.",
+            "question": "Qu’est-ce qui retient ton attention dans ce passage ?"
+          },
+          {
+            "id": "f2-s4-q2",
+            "fonction": "decouvrir-dieu",
+            "consigne": "Reste avec les mots et les phrases qui t’ont arrêté dans Éphésiens 2:4-9.",
+            "question": "Qu’est-ce que tu y découvres de Dieu ?",
+            "priereTitre": "Ce que j’ai découvert de Dieu dans Éphésiens 2"
+          },
+          {
+            "id": "f2-s4-q3",
+            "fonction": "comprendre",
+            "consigne": "Reviens maintenant aux mots ou aux phrases qui ont particulièrement retenu ton attention.",
+            "question": "Qu’est-ce qu’ils te font comprendre de la grâce ?",
+            "priereTitre": "Ce que j’ai compris de la grâce"
+          },
+          {
+            "id": "f2-s4-q4",
+            "fonction": "relire-le-livret",
+            "consigne": "Relis très lentement cette phrase du livret : « Dieu ne nous a pas aimés parce que nous étions aimables. Il ne nous a pas non plus changés au préalable afin de pouvoir enfin nous aimer : il nous a aimés malgré ce que nous étions, car il est amour. » Puis reviens à Romains 5:6-8 et Éphésiens 2:4-5.",
+            "question": "Qu’est-ce que ces passages t’aident à comprendre de cette affirmation ?"
+          },
+          {
+            "id": "f2-s4-q5",
+            "fonction": "observer",
+            "consigne": "Relis seulement Éphésiens 2:8-9, sans ajouter d’autres explications.",
+            "question": "Qu’est-ce qui te frappe dans les mots employés ?"
+          },
+          {
+            "id": "f2-s4-q6",
+            "fonction": "comprendre",
+            "consigne": "Garde Éphésiens 2:8-9 à côté de cette phrase du livret : « Nous ne pouvons rien donner à Dieu pour gagner son approbation, nous ne pouvons que recevoir de lui. »",
+            "question": "Qu’est-ce que tu comprends maintenant de la différence entre recevoir et essayer de mériter ?"
+          },
+          {
+            "id": "f2-s4-q7",
+            "fonction": "repondre",
+            "consigne": "Reprends seulement la phrase ou le verset qui est resté avec toi.",
+            "question": "Quelle phrase ou quel verset t’a le plus arrêté, et pourquoi ?",
+            "priereTitre": "La phrase ou la Parole qui m’a le plus arrêté"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Dans quelle situation aujourd’hui serais-tu tenté de vivre comme si tu devais mériter ce que Dieu donne ?",
+          "placeholderMoment": "Je pourrais chercher à mériter lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "En regardant les quatre étapes que tu viens de traverser — péché, Loi, salut et grâce — quelle vérité sur Dieu veux-tu emporter de cette fiche ?",
+      "questionVerset": "Parmi les quatre Paroles que tu as choisies, laquelle veux-tu faire devenir ton verset principal de la semaine ?"
+    }
   },
   {
     "ficheId": 3,

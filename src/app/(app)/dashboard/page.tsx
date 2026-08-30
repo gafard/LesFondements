@@ -28,6 +28,7 @@ import { chargerFiche, type FicheLivret } from '@/lib/livret';
 import NotificationCenter from '@/components/NotificationCenter';
 import Illumination from '@/components/Illumination';
 import { VERSETS_CONNUS, normaliserReference } from '@/data/versets';
+import { etapesTempsApart } from '@/lib/tempsApart';
 
 interface OutilTable {
   href: string;
@@ -180,7 +181,7 @@ function DashboardContent() {
     };
   }, [ficheCouranteId, user]);
 
-  const sections = fiche?.sections || [];
+  const sections = fiche ? etapesTempsApart(fiche) : [];
   const etapesTerminees = sections.filter((_, idx) => Boolean(reponsesFiche[`temps-apart:${idx}`])).length;
 
   let premierIndexNonFait = sections.findIndex((_, idx) => !reponsesFiche[`temps-apart:${idx}`]);
@@ -269,7 +270,7 @@ function DashboardContent() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-serif text-sm font-bold">
-                        {sec.titre || `Étape ${idx + 1}`}
+                        {sec.section.titre || `Étape ${idx + 1}`}
                       </p>
                       <p className="mt-0.5 text-2xs font-bold uppercase tracking-[0.12em] opacity-65">
                         {estFait ? 'Vécu · revoir' : estCourante ? 'Prochaine étape' : 'À venir'}
@@ -294,7 +295,7 @@ function DashboardContent() {
                     {accessible ? (
                       <Link
                         href={`/aujourdhui?fiche=${ficheCouranteId}&section=${idx}`}
-                        aria-label={`${estFait ? 'Revoir' : 'Ouvrir'} l’étape ${idx + 1} : ${sec.titre || `Étape ${idx + 1}`}`}
+                        aria-label={`${estFait ? 'Revoir' : 'Ouvrir'} l’étape ${idx + 1} : ${sec.section.titre || `Étape ${idx + 1}`}`}
                         className={`${classeEtape} group hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-600`}
                       >
                         {contenuEtape}

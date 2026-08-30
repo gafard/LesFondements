@@ -133,6 +133,79 @@ test('fiche 1 · partie 3 : les textes conduisent à une prière issue des déco
   await expect(page.getByText('La Parole que tu gardes · Jn 1:1-3')).toBeVisible();
 });
 
+test('fiche 2 : péché, Loi, salut et grâce forment quatre traversées complètes', async ({ page }) => {
+  await page.addInitScript(
+    ({ uid, groupeId }) => {
+      const groupes = JSON.parse(localStorage.getItem('lf.groups') || '[]');
+      localStorage.setItem(
+        'lf.groups',
+        JSON.stringify(groupes.map((groupe: { id: string }) =>
+          groupe.id === groupeId ? { ...groupe, currentStep: 2 } : groupe
+        ))
+      );
+      localStorage.setItem(
+        `lesfondements_prog_${uid}`,
+        JSON.stringify({
+          2: {
+            completed: false,
+            answers: {
+              'verset-choisi:f2-s1': 'Rm 5:12',
+              'verset-choisi:f2-s2': 'Rm 3:20',
+              'verset-choisi:f2-s3': 'Rm 6:23',
+            },
+            lastUpdated: Date.now(),
+          },
+        })
+      );
+    },
+    { uid: UTILISATEUR.uid, groupeId: GROUPE.id }
+  );
+
+  await page.goto('/dashboard');
+  await expect(page.getByText('0 / 4 étapes')).toBeVisible();
+  await expect(page.getByText('Le péché', { exact: true })).toBeVisible();
+  await expect(page.getByText('La Loi', { exact: true })).toBeVisible();
+  await expect(page.getByText('Le Salut', { exact: true })).toBeVisible();
+  await expect(page.getByText('La Grâce', { exact: true })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=2&section=3&scene=3');
+  await expect(page.getByText('Lis Éphésiens 2:4-9 lentement.', { exact: false })).toBeVisible();
+  await expect(page.getByLabel('Qu’est-ce que tu y découvres de Dieu ?')).toBeVisible();
+  await page.getByLabel('Qu’est-ce que tu y découvres de Dieu ?').fill(
+    'Je découvre un Dieu riche en bonté qui donne la vie.'
+  );
+  await page.getByLabel('Qu’est-ce qu’ils te font comprendre de la grâce ?').fill(
+    'La grâce vient de Dieu et ne se gagne pas.'
+  );
+  await page.getByLabel('Quelle phrase ou quel verset t’a le plus arrêté, et pourquoi ?').fill(
+    'C’est par grâce que vous êtes sauvés.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Tes notes rassemblées devant Dieu')).toBeVisible();
+  await expect(page.getByText('Ce que j’ai découvert de Dieu dans Éphésiens 2')).toBeVisible();
+  await expect(page.getByText('Ce que j’ai compris de la grâce')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: /^Ep 2:8-9/ }).click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Dans quelle situation aujourd’hui serais-tu tenté de vivre comme si tu devais mériter ce que Dieu donne ?')).toBeVisible();
+  await page.getByPlaceholder('Je pourrais chercher à mériter lorsque…').fill(
+    'Je pense devoir prouver ma valeur à Dieu.'
+  );
+  await page.getByPlaceholder('À partir de cette Parole, je voudrais…').fill(
+    'Recevoir sa grâce avec reconnaissance.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Regarde le chemin parcouru.' })).toBeVisible();
+  await expect(page.getByText('Péché', { exact: true })).toBeVisible();
+  await expect(page.getByText('Loi', { exact: true })).toBeVisible();
+  await expect(page.getByText('Salut', { exact: true })).toBeVisible();
+  await expect(page.getByText('Grâce', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ep 2:8-9' })).toBeVisible();
+});
+
 test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/dashboard');

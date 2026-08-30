@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Rapports générés par Playwright (ils embarquent du JavaScript tiers) :
+    "playwright-report/**",
+    "test-results/**",
     // État local de wrangler (déploiements temporaires) :
     ".wrangler/**",
   ]),

@@ -8,6 +8,7 @@ import ParcoursGate from '@/components/ParcoursGate';
 import { useAuth } from '@/lib/AuthContext';
 import { addJournalEntry, getAnswers, saveAnswer } from '@/lib/firestore';
 import { chargerFiche, type FicheLivret } from '@/lib/livret';
+import { etapesTempsApart } from '@/lib/tempsApart';
 
 function entierBorne(valeur: string | null, minimum: number, maximum: number, repli: number): number {
   const nombre = valeur === null ? Number.NaN : Number.parseInt(valeur, 10);
@@ -25,6 +26,7 @@ function AujourdhuiContent() {
 
   const [fiche, setFiche] = useState<FicheLivret | null | undefined>(undefined);
   const [reponses, setReponses] = useState<Record<string, string> | null>(null);
+  const etapes = useMemo(() => (fiche ? etapesTempsApart(fiche) : []), [fiche]);
 
   useEffect(() => {
     let actif = true;
@@ -42,13 +44,13 @@ function AujourdhuiContent() {
   const sectionIndex = useMemo(() => {
     if (!fiche || !reponses) return 0;
     if (sectionDemandee !== null) {
-      return entierBorne(sectionDemandee, 0, Math.max(0, fiche.sections.length - 1), 0);
+      return entierBorne(sectionDemandee, 0, Math.max(0, etapes.length - 1), 0);
     }
-    const prochaine = fiche.sections.findIndex(
+    const prochaine = etapes.findIndex(
       (_section, index) => !reponses[`temps-apart:${index}`]
     );
     return prochaine >= 0 ? prochaine : 0;
-  }, [fiche, reponses, sectionDemandee]);
+  }, [etapes, fiche, reponses, sectionDemandee]);
 
   const enregistrer = (cle: string, valeur: string) => {
     setReponses((actuelles) => ({ ...(actuelles ?? {}), [cle]: valeur }));
@@ -64,7 +66,7 @@ function AujourdhuiContent() {
 
     await saveAnswer(user.uid, ficheId, cle, '1');
     if (!dejaTerminee) {
-      const sectionTitre = fiche.sections[sectionIndex]?.titre || `Étape ${sectionIndex + 1}`;
+      const sectionTitre = etapes[sectionIndex]?.section.titre || `Étape ${sectionIndex + 1}`;
       await addJournalEntry(
         user.uid,
         `📖 **Fiche ${fiche.id} : ${fiche.titre}** — ${sectionTitre}\n✨ Lecture, méditation, prière et mémorisation vécues aujourd’hui.`

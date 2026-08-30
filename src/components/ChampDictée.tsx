@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Volume2, Square, Loader2, Check, X, Sparkles } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Mic, Volume2, Loader2, Check, X, Sparkles } from 'lucide-react';
 import { useEnregistreurVocal } from '@/lib/transcription';
 import { lireAVoixHaute, arreterLecture } from '@/lib/ambiance';
 
@@ -13,6 +13,7 @@ interface ChampDictéeProps {
   questionPourAudio?: string;
   theme?: 'sombre' | 'clair';
   label?: string;
+  ariaLabel?: string;
 }
 
 export default function ChampDictée({
@@ -23,10 +24,20 @@ export default function ChampDictée({
   questionPourAudio,
   theme = 'sombre',
   label,
+  ariaLabel,
 }: ChampDictéeProps) {
   const [sauvegarde, setSauvegarde] = useState(false);
   const [lectureQuestion, setLectureQuestion] = useState(false);
   const minuteurSauvegarde = useRef<number | null>(null);
+
+  const changerValeur = (nouvelle: string) => {
+    onEnregistrer(nouvelle);
+    if (minuteurSauvegarde.current) window.clearTimeout(minuteurSauvegarde.current);
+    minuteurSauvegarde.current = window.setTimeout(() => {
+      setSauvegarde(true);
+      window.setTimeout(() => setSauvegarde(false), 1600);
+    }, 600);
+  };
 
   const {
     estEnregistrement,
@@ -43,15 +54,6 @@ export default function ChampDictée({
       : texteTranscrit;
     changerValeur(nouvelleValeur);
   });
-
-  const changerValeur = (nouvelle: string) => {
-    onEnregistrer(nouvelle);
-    if (minuteurSauvegarde.current) window.clearTimeout(minuteurSauvegarde.current);
-    minuteurSauvegarde.current = window.setTimeout(() => {
-      setSauvegarde(true);
-      window.setTimeout(() => setSauvegarde(false), 1600);
-    }, 600);
-  };
 
   const gererLectureAudio = () => {
     if (!questionPourAudio) return;
@@ -195,6 +197,7 @@ export default function ChampDictée({
           onChange={(event) => changerValeur(event.target.value)}
           rows={lignes}
           placeholder={placeholder}
+          aria-label={ariaLabel}
           className={`w-full rounded-2xl p-4 text-sm leading-relaxed outline-none transition ${
             estSombre
               ? 'border border-or-500/30 bg-encre-950/80 text-parchemin-100 placeholder:text-parchemin-100/30 focus:border-or-400'

@@ -133,11 +133,6 @@ export async function lirePassage(reference: ReferenceBiblique): Promise<Passage
   const tous = livre.chapitres[String(numeroChapitre)];
   if (!tous) return null;
 
-  const debut = reference.versetDebut;
-  const fin = reference.versetFin ?? debut;
-  const versets =
-    debut === undefined ? tous : tous.filter((verset) => verset.v >= debut && verset.v <= fin!);
-
   return {
     reference: { ...reference, chapitre: numeroChapitre },
     titre: `${livre.nom} ${numeroChapitre}`,

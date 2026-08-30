@@ -42,7 +42,7 @@ const TEMPS: { cle: string; titre: string; types: string[] }[] = [
   { cle: 'prier', titre: 'Prier', types: ['priere'] },
   { cle: 'memoriser', titre: 'Mémoriser', types: ['ancrage-verset', 'resume', 'verset', 'lecture'] },
   { cle: 'ecrire', titre: 'Écrire', types: ['question'] },
-  { cle: 'vivre', titre: 'Vivre', types: ['pas'] },
+  { cle: 'vivre', titre: 'Vivre', types: ['pas', 'synthese-fiche'] },
   { cle: 'conclure', titre: 'Conclure', types: ['cloture'] },
 ];
 
@@ -64,6 +64,7 @@ const MINUTES_FIXES: Record<string, number> = {
   lecture: 3,
   question: 2,
   pas: 3,
+  'synthese-fiche': 4,
   cloture: 2,
 };
 

@@ -59,6 +59,7 @@ import {
   type ManifesteVivienne,
 } from '@/lib/voixVivienne';
 import type { Bloc, FicheLivret, ResumeSection } from '@/lib/livret';
+import { etapesTempsApart } from '@/lib/tempsApart';
 import { memoriserPassage } from '@/lib/marquePage';
 import { decouperEnMoments, momentDe, type Moment } from '@/lib/moments';
 import {
@@ -88,11 +89,23 @@ interface SectionMeditation {
   sectionTitre: string;
   versets: string[];
   questions: QuestionMeditation[];
+  pratique?: {
+    questionMoment: string;
+    placeholderMoment?: string;
+    questionAction: string;
+    placeholderAction?: string;
+  };
 }
 
 interface FicheMeditation {
   ficheId: number;
   sections: SectionMeditation[];
+  /** La Parole et les questions précèdent les formulations du livret. */
+  parcoursGuide?: boolean;
+  synthese?: {
+    question: string;
+    questionVerset: string;
+  };
 }
 
 interface PassageAncrage {
@@ -112,7 +125,8 @@ type Scene = { piste?: string } & (
   | { type: 'verset'; reference: string; texte: string | null }
   | { type: 'lecture'; texte: string }
   | { type: 'question'; id: string; texte: string; section?: string }
-  | { type: 'pas'; id?: string; reference?: string; options?: PassageAncrage[] }
+  | { type: 'pas'; id?: string; reference?: string; options?: PassageAncrage[]; pratique?: SectionMeditation['pratique'] }
+  | { type: 'synthese-fiche'; id: string; question: string; questionVerset: string }
   | { type: 'cloture' }
 );
 
@@ -120,12 +134,13 @@ const MEDITATIONS = meditationData as FicheMeditation[];
 
 function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | null): Scene[] {
   if (sectionCibleIndex !== undefined && sectionCibleIndex !== null && sectionCibleIndex >= 0) {
-    const section = fiche.sections[sectionCibleIndex];
+    const etapes = etapesTempsApart(fiche);
+    const etape = etapes[sectionCibleIndex];
+    const section = etape?.section;
     if (!section) return [{ type: 'seuil', piste: pisteId.seuil(fiche.id) }, { type: 'cloture' }];
 
-    const meditation = MEDITATIONS
-      .find((element) => element.ficheId === fiche.id)
-      ?.sections[sectionCibleIndex];
+    const parcoursMeditation = MEDITATIONS.find((element) => element.ficheId === fiche.id);
+    const meditation = parcoursMeditation?.sections[sectionCibleIndex];
     const idSection = `f${fiche.id}-s${sectionCibleIndex + 1}`;
     const questions = meditation?.questions.length
       ? meditation.questions
@@ -171,35 +186,50 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
         type: 'ouverture-section',
         titre: section.titre,
         rang: sectionCibleIndex + 1,
-        total: fiche.sections.filter((element) => element.titre).length,
-        piste: pisteId.section(fiche.id, sectionCibleIndex),
+        total: etapes.filter((element) => element.section.titre).length,
+        piste: etape.ouverturePreenregistree
+          ? pisteId.section(fiche.id, etape.sourceSectionIndex)
+          : undefined,
       });
     }
 
-    let sousTitre: string | null = null;
-    section.blocs.forEach((bloc, indexBloc) => {
-      if (bloc.type === 'sous-titre') {
-        sousTitre = bloc.texte;
-        return;
-      }
-      scenes.push({
-        type: 'bloc',
-        bloc,
-        sousTitre,
-        section: section.titre,
-        piste: pisteId.bloc(fiche.id, sectionCibleIndex, indexBloc),
+    if (!parcoursMeditation?.parcoursGuide) {
+      let sousTitre: string | null = null;
+      section.blocs.forEach((bloc, indexBloc) => {
+        if (bloc.type === 'sous-titre') {
+          sousTitre = bloc.texte;
+          return;
+        }
+        scenes.push({
+          type: 'bloc',
+          bloc,
+          sousTitre,
+          section: section.titre,
+          piste: pisteId.bloc(
+            fiche.id,
+            etape.sourceSectionIndex,
+            etape.sourceBlocOffset + indexBloc
+          ),
+        });
+        sousTitre = null;
       });
-      sousTitre = null;
-    });
+    }
 
     scenes.push(
       { type: 'silence' },
       { type: 'meditation', sectionTitre: section.titre || fiche.titre, questions },
       { type: 'priere', id: idSection, questions },
       { type: 'ancrage-verset', id: idSection, reference, texte, options },
-      { type: 'pas', id: idSection, reference, options },
-      { type: 'cloture' },
+      { type: 'pas', id: idSection, reference, options, pratique: meditation?.pratique },
     );
+    if (sectionCibleIndex === etapes.length - 1 && parcoursMeditation?.synthese) {
+      scenes.push({
+        type: 'synthese-fiche',
+        id: `f${fiche.id}`,
+        ...parcoursMeditation.synthese,
+      });
+    }
+    scenes.push({ type: 'cloture' });
     return scenes;
   }
 
@@ -364,6 +394,7 @@ export default function Immersion({
       case 'lecture': return 'Lecture dans votre Bible';
       case 'question': return 'Écriture personnelle';
       case 'pas': return scene.id ? 'Vivre cette Parole' : 'Vivre cette vérité';
+      case 'synthese-fiche': return 'Relire le chemin parcouru';
       case 'cloture': return 'Clôture de la fiche';
     }
   }, [scene]);
@@ -393,6 +424,8 @@ export default function Immersion({
           ?? courante.options[0];
         return `${passage.reference}. ${passage.texte}`;
       }
+      case 'synthese-fiche':
+        return `${courante.question} ${courante.questionVerset}`;
       default:
         return null;
     }
@@ -1351,6 +1384,7 @@ function RenduScene({
                       valeur={reponse}
                       onEnregistrer={(valeur) => onEnregistrer(`q:${question.id}`, valeur)}
                       placeholder="Écris ou dicte à la voix ce qui vient dans ton cœur…"
+                      ariaLabel={question.question}
                       questionPourAudio={`${question.consigne ? `${question.consigne}. ` : ''}${question.question}`}
                       theme="clair"
                       lignes={3}
@@ -1530,22 +1564,24 @@ function RenduScene({
                 </p>
               </div>
               <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
-                Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?
+                {scene.pratique?.questionMoment
+                  ?? 'Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?'}
               </p>
               <ChampEcriture
                 valeur={reponses[cleMoment] ?? ''}
                 onEnregistrer={(valeur) => onEnregistrer(cleMoment, valeur)}
-                placeholder="Je veux me souvenir de ce verset lorsque…"
+                placeholder={scene.pratique?.placeholderMoment ?? 'Je veux me souvenir de ce verset lorsque…'}
                 ariaLabel="Le moment où je veux me souvenir de ce verset"
                 lignes={3}
               />
               <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
-                Et quand ce moment arrivera, qu’aimerais-tu faire à partir de cette Parole ?
+                {scene.pratique?.questionAction
+                  ?? 'Et quand ce moment arrivera, qu’aimerais-tu faire à partir de cette Parole ?'}
               </p>
               <ChampEcriture
                 valeur={reponses[clePas] ?? ''}
                 onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
-                placeholder="Quand ce moment arrivera, je veux…"
+                placeholder={scene.pratique?.placeholderAction ?? 'Quand ce moment arrivera, je veux…'}
                 ariaLabel="Comment je veux vivre cette Parole"
                 lignes={3}
               />
@@ -1563,6 +1599,73 @@ function RenduScene({
                 lignes={4}
               />
             </>
+          )}
+        </div>
+      );
+    }
+
+    case 'synthese-fiche': {
+      const versetsChoisis = Array.from({ length: 4 }, (_, indexSection) =>
+        reponses[`verset-choisi:f${fiche.id}-s${indexSection + 1}`]
+      ).filter((reference): reference is string => Boolean(reference));
+      const versetPrincipal = reponses[`verset-principal:${scene.id}`] ?? '';
+      return (
+        <div className="py-8 sm:py-12">
+          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+            Synthèse de la fiche
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
+            Regarde le chemin parcouru.
+          </h2>
+          <div className="mt-6 grid grid-cols-4 gap-2" aria-label="Les quatre mouvements de la fiche">
+            {['Péché', 'Loi', 'Salut', 'Grâce'].map((titre, indexTitre) => (
+              <span
+                key={titre}
+                className={`rounded-xl border px-2 py-3 text-center text-2xs font-black uppercase tracking-[0.1em] ${
+                  indexTitre % 2 === 0
+                    ? 'border-or-400/20 bg-or-400/8 text-or-200'
+                    : 'border-white/10 bg-white/5 text-parchemin-100/65'
+                }`}
+              >
+                {titre}
+              </span>
+            ))}
+          </div>
+          <p className="mt-8 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
+            {scene.question}
+          </p>
+          <ChampEcriture
+            valeur={reponses[`synthese:${scene.id}`] ?? ''}
+            onEnregistrer={(valeur) => onEnregistrer(`synthese:${scene.id}`, valeur)}
+            placeholder="La vérité sur Dieu que je veux emporter…"
+            lignes={4}
+          />
+          {versetsChoisis.length > 0 && (
+            <div className="mt-9">
+              <p className="max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
+                {scene.questionVerset}
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {versetsChoisis.map((reference) => {
+                  const choisi = reference === versetPrincipal;
+                  return (
+                    <button
+                      key={reference}
+                      type="button"
+                      aria-pressed={choisi}
+                      onClick={() => onEnregistrer(`verset-principal:${scene.id}`, reference)}
+                      className={`min-h-12 rounded-2xl border px-4 py-3 text-left font-serif text-base font-bold transition-colors ${
+                        choisi
+                          ? 'border-or-300 bg-or-400/16 text-or-100'
+                          : 'border-white/12 bg-white/5 text-parchemin-100/75 hover:bg-white/10'
+                      }`}
+                    >
+                      {reference}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
       );
@@ -2254,6 +2357,7 @@ function ChampEcriture({
         valeur={valeur}
         onEnregistrer={onEnregistrer}
         placeholder={placeholder}
+        ariaLabel={ariaLabel}
         lignes={lignes}
         questionPourAudio={questionPourAudio}
         theme="sombre"

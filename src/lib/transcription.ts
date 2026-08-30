@@ -103,10 +103,11 @@ export function useEnregistreurVocal(onTranscriptionReussie?: (texte: string) =>
       timerRef.current = window.setInterval(() => {
         setSecondes((prev) => prev + 1);
       }, 1000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erreur accès microphone:', err);
+      const nom = err instanceof Error ? err.name : '';
       setErreur(
-        err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
+        nom === 'NotAllowedError' || nom === 'PermissionDeniedError'
           ? 'Microphone non autorisé. Merci de donner l’accès au micro dans votre navigateur.'
           : 'Impossible d’accéder au microphone.'
       );
@@ -149,7 +150,7 @@ export function useEnregistreurVocal(onTranscriptionReussie?: (texte: string) =>
           }
           setEstEnTranscription(false);
           resolve(texte);
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.warn('Échec transcription Whisper, tentative repli WebSpeech...', err);
           setErreur('Transcription non disponible, veuillez saisir votre réponse au clavier.');
           setEstEnTranscription(false);
