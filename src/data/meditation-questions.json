@@ -2754,7 +2754,7 @@
           {
             "id": "f13-s1-q5",
             "fonction": "se-rendre-disponible",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "On ne décloisonne pas une vie par décision générale, mais par un lieu à la fois.",
             "question": "Dans ce lieu précis, qu’est-ce qui pourrait commencer à s’y voir cette semaine ?"
           }
@@ -2796,7 +2796,7 @@
           {
             "id": "f13-s2-q4",
             "fonction": "experimenter",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Depuis le début de ce parcours, tu as reçu douze fiches.",
             "question": "Quel enseignement reçu ces dernières semaines n’as-tu encore jamais mis en pratique une seule fois ?"
           }
@@ -2838,7 +2838,7 @@
           {
             "id": "f13-s3-q4",
             "fonction": "servir",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Marcher dans la lumière commence souvent par le dire à quelqu’un.",
             "question": "À qui pourrais-tu en parler — non pour être jugé, mais pour ne plus être seul avec ?"
           }
@@ -2880,14 +2880,14 @@
           {
             "id": "f13-s4-q4",
             "fonction": "se-rendre-disponible",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Le livret parle d’un père, d’une mère spirituelle, d’un aîné. Cela se demande — cela ne s’attribue pas.",
             "question": "Y a-t-il quelqu’un à qui tu pourrais demander cela ? Qu’est-ce qui t’en empêche ?"
           },
           {
             "id": "f13-s4-q5",
             "fonction": "servir",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Le titre de la fiche parle aussi de former d’autres disciples.",
             "question": "Qui, derrière toi, avance là où tu es déjà passé — et à qui tu pourrais rendre ce que tu as reçu ?"
           }
@@ -2953,7 +2953,7 @@
           {
             "id": "f14-s1-q5",
             "fonction": "se-rendre-disponible",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Le livret demande : « Suis-je prêt à manifester la compassion de Jésus aux gens que je rencontre ? »",
             "question": "À quoi te rends-tu disponible cette semaine, dans ce lieu précis — non pas en projet, mais concrètement ?"
           }
@@ -2995,14 +2995,14 @@
           {
             "id": "f14-s2-q4",
             "fonction": "discerner",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Une pierre ne choisit pas sa place seule : elle la reçoit de l’édifice.",
             "question": "Quelle place occupes-tu déjà dans ton assemblée, même sans l’avoir demandée ?"
           },
           {
             "id": "f14-s2-q5",
             "fonction": "experimenter",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Le livret énumère des pièges à éviter pour les églises locales.",
             "question": "Lequel reconnais-tu, et que peux-tu faire à ta place — sans juger l’ensemble ?"
           }
@@ -3044,21 +3044,21 @@
           {
             "id": "f14-s3-q4",
             "fonction": "experimenter",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Le livret demande de savoir annoncer simplement l’amour de Dieu et le plan du salut — il renvoie aux fiches 1, 2 et 3.",
             "question": "Si on te le demandait maintenant, en trois phrases, que dirais-tu ?"
           },
           {
             "id": "f14-s3-q5",
             "fonction": "servir",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Le livret propose d’exposer son témoignage en trois temps : avant Christ, la conversion, les changements depuis.",
             "question": "Écris-le ici, dans tes mots, sans le polir. C’est le tien, pas un modèle."
           },
           {
             "id": "f14-s3-q6",
             "fonction": "se-rendre-disponible",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Une relation ne se force pas, elle se rend possible.",
             "question": "Avec la personne à laquelle tu as pensé, quel geste ordinaire pourrais-tu poser cette semaine ?"
           }
@@ -3116,7 +3116,7 @@
           {
             "id": "f15-s1-q4",
             "fonction": "se-rendre-disponible",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Se rendre disponible se décide avant que l’occasion se présente.",
             "question": "À qui pourrais-tu offrir une heure cette semaine, sans autre but que de le connaître ?"
           }
@@ -3151,14 +3151,14 @@
           {
             "id": "f15-s2-q3",
             "fonction": "discerner",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Une famille se reconnaît à ce qu’on peut y arriver démuni.",
             "question": "À qui, dans ta famille spirituelle, pourrais-tu arriver un mauvais jour sans rien expliquer ?"
           },
           {
             "id": "f15-s2-q4",
             "fonction": "servir",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "On reçoit une famille autant qu’on la construit.",
             "question": "Pour qui pourrais-tu être cette personne-là, sans qu’il ait à le demander ?"
           }
@@ -3207,7 +3207,7 @@
           {
             "id": "f15-s3-q5",
             "fonction": "se-rendre-disponible",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Parler à la personne, c’est le pas que le livret nomme, et le plus rarement franchi.",
             "question": "Si tu décidais de le franchir, à qui, et quand ?"
           }
@@ -3249,7 +3249,7 @@
           {
             "id": "f15-s4-q4",
             "fonction": "servir",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "L’unité se garde par ceux qui font le premier pas, pas par ceux qui ont raison.",
             "question": "Y a-t-il une tension où tu pourrais faire ce pas cette semaine, même si tu n’es pas en tort ?"
           }
@@ -3291,7 +3291,7 @@
           {
             "id": "f15-s5-q4",
             "fonction": "servir",
-            "source": "reponse",
+            "source": "vie",
             "consigne": "Jésus ne supprime pas l’autorité : il en change le sens. Le plus grand devient le serviteur.",
             "question": "Là où tu exerces une responsabilité, même petite, où pourrais-tu servir plutôt que diriger ?"
           }

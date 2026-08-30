@@ -1294,6 +1294,7 @@ function RenduScene({
   onEnregistrer,
   dejaPreparee,
   tempsDuJour,
+  onAvancer,
 }: {
   scene: Scene;
   fiche: FicheLivret;
@@ -1301,6 +1302,7 @@ function RenduScene({
   onEnregistrer: (cle: string, valeur: string) => void;
   dejaPreparee?: boolean;
   tempsDuJour: boolean;
+  onAvancer?: () => void;
 }) {
   switch (scene.type) {
     case 'seuil':
@@ -1441,8 +1443,7 @@ function RenduScene({
       return (
         <ScenePriereImmersive
           reprises={reprises}
-          valeur={reponses[`priere:${scene.id}`] ?? ''}
-          onEnregistrer={(valeur) => onEnregistrer(`priere:${scene.id}`, valeur)}
+          onAvancer={onAvancer}
         />
       );
     }
@@ -1764,174 +1765,184 @@ function distanceCirculaire(index: number, actif: number, total: number): number
   return distance;
 }
 
+const ORIENTATIONS_PRIERE = [
+  {
+    cle: 'adorer',
+    verbe: 'Adorer',
+    icone: '✨',
+    guidance: 'Contemple la grandeur, la majesté et la fidélité de Dieu au-dessus de toute chose.',
+    amorce: '« Seigneur Dieu, je reconnais que Tu règnes avec sainteté, sagesse et amour… »',
+  },
+  {
+    cle: 'remercier',
+    verbe: 'Remercier',
+    icone: '🙏',
+    guidance: 'Exprime ta gratitude pour Sa présence fidèle, Sa grâce et Ses bontés envers toi.',
+    amorce: '« Père céleste, merci parce que Tu es mon refuge, mon appui et… »',
+  },
+  {
+    cle: 'confesser',
+    verbe: 'Confesser',
+    icone: '🕊️',
+    guidance: 'Dépose avec humilité tes doutes, tes peurs ou tes manquements. Il t’accueille avec miséricorde.',
+    amorce: '« Seigneur, je viens devant Toi en vérité, pardonne mes hésitations et mes craintes… »',
+  },
+  {
+    cle: 'remettre',
+    verbe: 'Remettre',
+    icone: '🤲',
+    guidance: 'Remets entre Ses mains souveraines tes fardeaux, tes décisions et tes proches.',
+    amorce: '« Père, je lâche prise et je Te confie totalement cette situation… »',
+  },
+  {
+    cle: 'ecouter',
+    verbe: 'Écouter',
+    icone: '👂',
+    guidance: 'Fais silence. Laisse Sa paix remplir tes pensées et laisse le Saint-Esprit te parler.',
+    amorce: '« Parle, Seigneur, Ton serviteur écoute dans le secret de Ta présence… »',
+  },
+];
+
 function ScenePriereImmersive({
   reprises,
-  valeur,
-  onEnregistrer,
+  onAvancer,
 }: {
   reprises: ReprisePriere[];
-  valeur: string;
-  onEnregistrer: (valeur: string) => void;
+  onAvancer?: () => void;
 }) {
-  const [indexActif, setIndexActif] = useState(0);
-  const debutGlissement = useRef<number | null>(null);
-  const papiers = ['post-it-jaune', 'post-it-bleu', 'post-it-rose'];
-  const repriseActive = reprises[indexActif];
+  const [verbeActif, setVerbeActif] = useState<string>('adorer');
+  const [minuteurActif, setMinuteurActif] = useState(false);
+  const [secondes, setSecondes] = useState(60);
 
-  const avancer = useCallback((direction: number) => {
-    if (reprises.length < 2) return;
-    setIndexActif((index) => (index + direction + reprises.length) % reprises.length);
-  }, [reprises.length]);
+  useEffect(() => {
+    if (!minuteurActif || secondes <= 0) return;
+    const timer = window.setTimeout(() => setSecondes((s) => s - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [minuteurActif, secondes]);
 
-  const terminerGlissement = (positionX: number) => {
-    if (debutGlissement.current === null) return;
-    const distance = debutGlissement.current - positionX;
-    debutGlissement.current = null;
-    if (Math.abs(distance) < 42) return;
-    avancer(distance > 0 ? 1 : -1);
-  };
+  const orientation = ORIENTATIONS_PRIERE.find((o) => o.cle === verbeActif) || ORIENTATIONS_PRIERE[0];
 
   return (
-    <div className="py-8 text-center sm:py-12">
-      <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-or-300/30 bg-or-400/12 text-or-300 shadow-[0_0_28px_rgba(220,168,73,0.12)]">
-        <Flame className="h-7 w-7" strokeWidth={1.5} />
-      </span>
-      <span className="mt-6 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-        Prier la Parole
-      </span>
-      <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-        Parle à Dieu à partir de ce que tu as découvert
-      </h2>
-      <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
-        Fais glisser tes notes, arrête-toi sur l’une d’elles, puis réponds à Dieu avec tes propres
-        mots. Tu peux aussi rester un instant en silence.
-      </p>
+    <div className="mx-auto max-w-3xl space-y-8 py-6 text-center animate-fade-in sm:py-10">
+      {/* ── En-tête du Sanctuaire de Prière ── */}
+      <div className="space-y-3">
+        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-or-400/40 bg-or-500/15 text-or-300 shadow-[0_0_35px_rgba(245,158,11,0.25)]">
+          <Flame className="h-8 w-8 animate-pulse text-or-400" />
+        </span>
+        <span className="block text-2xs font-bold uppercase tracking-[0.28em] text-or-300/80">
+          Sanctuaire de Prière
+        </span>
+        <h2 className="font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
+          Parle à Dieu en toute intimité
+        </h2>
+        <p className="mx-auto max-w-xl text-sm leading-relaxed text-parchemin-100/70">
+          Ce moment est le tien, entre Dieu et toi. Aucun enregistrement, aucune transcription : ouvre simplement ton cœur à ton Père.
+        </p>
+      </div>
 
+      {/* ── Miroir des Découvertes Déposées ── */}
       {reprises.length > 0 && (
-        <div className="tableau-liege mx-auto mt-8 max-w-3xl overflow-hidden rounded-[2rem] border border-[#d2a675]/55 px-3 py-5 text-left shadow-2xl sm:px-6 sm:py-7">
-          <div className="flex items-center justify-between gap-4 px-2 sm:px-3">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-white/85">
-                Les sujets déposés devant Dieu
-              </p>
-              <p className="mt-1 text-xs text-white/60">Glisse ou utilise les flèches pour les parcourir.</p>
-            </div>
-            <span className="shrink-0 rounded-full bg-black/20 px-3 py-1.5 text-xs font-bold text-white/75" aria-live="polite">
-              {indexActif + 1} / {reprises.length}
-            </span>
+        <div className="space-y-3 text-left">
+          <div className="flex items-center gap-2 px-1 text-2xs font-black uppercase tracking-[0.16em] text-or-300/80">
+            <Sparkles className="h-3.5 w-3.5" /> Ce que tu as découvert aujourd&apos;hui
           </div>
 
-          <div
-            className="relative mt-3 h-72 touch-pan-y overflow-hidden [perspective:1200px] sm:h-64"
-            onTouchStart={(event) => {
-              event.stopPropagation();
-              debutGlissement.current = event.touches[0]?.clientX ?? null;
-            }}
-            onTouchEnd={(event) => {
-              event.stopPropagation();
-              terminerGlissement(event.changedTouches[0]?.clientX ?? 0);
-            }}
-            onTouchCancel={(event) => {
-              event.stopPropagation();
-              debutGlissement.current = null;
-            }}
-          >
-            {reprises.map((reprise, indexReprise) => {
-              const distance = distanceCirculaire(indexReprise, indexActif, reprises.length);
-              const active = distance === 0;
-              const visible = Math.abs(distance) <= 1;
-              const transformation = active
-                ? 'translate3d(-50%, 0, 30px) rotateY(0deg) rotateZ(-0.4deg) scale(1)'
-                : distance < 0
-                  ? 'translate3d(-88%, 20px, -80px) rotateY(17deg) rotateZ(-4deg) scale(0.84)'
-                  : 'translate3d(-12%, 20px, -80px) rotateY(-17deg) rotateZ(4deg) scale(0.84)';
+          <div className="grid gap-3 sm:grid-cols-2">
+            {reprises.map((reprise) => (
+              <div
+                key={reprise.id}
+                className="rounded-2xl border border-or-400/25 bg-encre-950/70 p-4 shadow-lg backdrop-blur-md transition-all hover:border-or-400/50 sm:p-5"
+              >
+                <p className="text-3xs font-black uppercase tracking-[0.12em] text-or-400/80">
+                  {reprise.titre}
+                </p>
+                <p className="mt-2.5 font-serif text-base italic leading-relaxed text-parchemin-100 sm:text-lg">
+                  « {reprise.reponse} »
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Piliers de Communion ── */}
+      <div className="space-y-6 rounded-3xl border border-white/12 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl sm:p-7">
+        <div>
+          <p className="mb-3 text-2xs font-black uppercase tracking-[0.2em] text-or-300/90">
+            Piliers de recueillement
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {ORIENTATIONS_PRIERE.map((o) => {
+              const actif = verbeActif === o.cle;
               return (
                 <button
-                  key={reprise.id}
+                  key={o.cle}
                   type="button"
-                  onClick={() => setIndexActif(indexReprise)}
-                  aria-current={active ? 'true' : undefined}
-                  aria-label={`Sujet ${indexReprise + 1} : ${reprise.titre}`}
-                  className={`${papiers[indexReprise % papiers.length]} absolute left-1/2 top-5 h-52 w-[min(33rem,calc(100%-3rem))] overflow-hidden rounded-[5px] p-5 text-left text-encre-950 shadow-2xl transition-[transform,opacity,filter] duration-500 ease-out focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-48 sm:p-6`}
-                  style={{
-                    transform: visible ? transformation : 'translate3d(-50%, 38px, -150px) scale(0.7)',
-                    opacity: visible ? (active ? 1 : 0.48) : 0,
-                    filter: active ? 'saturate(1)' : 'saturate(0.65)',
-                    zIndex: active ? 30 : visible ? 15 : 0,
-                    pointerEvents: visible ? 'auto' : 'none',
-                  }}
+                  onClick={() => setVerbeActif(o.cle)}
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-sm transition-all ${
+                    actif
+                      ? 'scale-105 bg-or-400 text-encre-950 shadow-or-400/30'
+                      : 'border border-white/10 bg-encre-950/60 text-parchemin-100/75 hover:bg-white/10 hover:text-parchemin-100'
+                  }`}
                 >
-                  <span className="punaise-bois absolute -top-1 left-1/2 -translate-x-1/2" aria-hidden="true" />
-                  <span className="block text-xs font-black uppercase tracking-[0.09em] text-encre-700/70">
-                    {reprise.titre}
-                  </span>
-                  <span className="mt-4 line-clamp-5 block font-serif text-lg italic leading-relaxed text-encre-950">
-                    « {reprise.reponse} »
-                  </span>
-                  {active && (
-                    <span className="absolute bottom-3 right-4 text-xs font-bold text-encre-700/55">
-                      Sujet présent
-                    </span>
-                  )}
+                  <span>{o.icone}</span>
+                  <span>{o.verbe}</span>
                 </button>
               );
             })}
           </div>
-
-          {reprises.length > 1 && (
-            <div className="flex items-center justify-center gap-4" aria-label="Parcourir les sujets de prière">
-              <button
-                type="button"
-                onClick={() => avancer(-1)}
-                aria-label="Sujet précédent"
-                className="grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/20 text-white transition-colors hover:bg-black/35 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              >
-                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <div className="flex items-center gap-2" aria-hidden="true">
-                {reprises.map((reprise, indexReprise) => (
-                  <span
-                    key={reprise.id}
-                    className={`block h-2 rounded-full transition-all duration-300 ${
-                      indexReprise === indexActif ? 'w-7 bg-or-300' : 'w-2 bg-white/35'
-                    }`}
-                  />
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => avancer(1)}
-                aria-label="Sujet suivant"
-                className="grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/20 text-white transition-colors hover:bg-black/35 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              >
-                <ArrowRight className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-          )}
         </div>
-      )}
 
-      <div className="mx-auto mt-8 max-w-xl text-left">
-        {repriseActive && (
-          <div className="rounded-2xl border border-or-400/20 bg-or-400/7 px-4 py-3" aria-live="polite">
-            <span className="text-xs font-black uppercase tracking-[0.12em] text-or-300/75">
-              À partir du sujet présent
-            </span>
-            <p className="mt-1.5 font-serif text-lg font-bold leading-relaxed text-parchemin-100">
-              Qu’aimerais-tu dire à Dieu à partir de cette découverte ?
-            </p>
-          </div>
-        )}
-        <ChampEcriture
-          valeur={valeur}
-          onEnregistrer={onEnregistrer}
-          placeholder="Ma prière aujourd’hui…"
-          ariaLabel="Ma prière à partir de mes découvertes"
-          questionPourAudio={repriseActive
-            ? `À partir de ce sujet : ${repriseActive.titre}. Qu’aimerais-tu dire à Dieu ?`
-            : 'Qu’aimerais-tu dire à Dieu maintenant ?'}
-          lignes={5}
-        />
+        {/* Orientation inspirante */}
+        <div className="space-y-2 rounded-2xl border border-or-400/20 bg-or-500/10 p-5 text-center animate-fade-in">
+          <p className="text-sm font-medium leading-relaxed text-parchemin-100/90">
+            {orientation.guidance}
+          </p>
+          <p className="font-serif text-base italic text-or-200 sm:text-lg">
+            {orientation.amorce}
+          </p>
+        </div>
+
+        {/* ── Minuteur Sacré & Respiration ── */}
+        <div className="flex flex-col items-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => setMinuteurActif(!minuteurActif)}
+            className="group relative flex items-center justify-center p-6"
+            aria-label={minuteurActif ? 'Suspendre le recueillement' : 'Prendre 1 minute de silence'}
+          >
+            <span
+              className={`absolute inset-0 rounded-full border-2 border-or-400/40 ${
+                minuteurActif ? 'animate-souffle border-or-400 shadow-[0_0_30px_rgba(245,158,11,0.3)]' : ''
+              }`}
+            />
+            <div className="z-10 flex flex-col items-center gap-1">
+              <Clock3 className="h-5 w-5 text-or-300" />
+              <span className="font-mono text-2xl font-bold text-or-200">
+                {secondes > 0 ? `0:${secondes.toString().padStart(2, '0')}` : '✓'}
+              </span>
+              <span className="text-3xs font-bold uppercase tracking-wider text-parchemin-100/60">
+                {minuteurActif ? 'Recueillement en cours…' : 'Prendre 1 min de silence'}
+              </span>
+            </div>
+          </button>
+
+          <p className="max-w-sm text-xs italic text-parchemin-100/50">
+            Ferme les yeux, respire calmement et parle à ton Père.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Sortie vers la Parole ── */}
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={() => onAvancer?.()}
+          className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-xs font-bold shadow-xl transition-transform hover:scale-105"
+        >
+          <Check className="h-4 w-4" strokeWidth={2.5} />
+          <span>J&apos;ai prié · Poursuivre vers la Parole</span>
+        </button>
       </div>
     </div>
   );
