@@ -36,7 +36,14 @@ interface ParcoursGateProps {
 export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGateProps) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { gate, group } = useParcours();
+  const { gate, group, profile, loading } = useParcours();
+
+  // Un compte qui n'a jamais vu l'accueil n'a rien à faire sur le tableau de
+  // bord : il n'a pas de groupe, et rien sur cette page ne le lui dit. Le
+  // niveau « personnel » ouvre les pratiques à qui attend sa place ; il ne
+  // doit pas servir de porte dérobée à qui n'a pas encore été accueilli.
+  const jamaisAccueilli =
+    !!profile && !profile.groupId && !profile.onboardingCompletedAt && !profile.onboardingSeenAt;
 
   // Les hooks passent avant toute sortie anticipée : un `return` placé plus
   // haut faisait varier leur nombre d'une route à l'autre, ce que React
@@ -50,12 +57,19 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
     }
   }, [acces, authLoading, user, router]);
 
+  useEffect(() => {
+    if (acces === 'decouverte' || authLoading || !user || loading) return;
+    if (jamaisAccueilli) router.replace('/onboarding');
+  }, [acces, authLoading, user, loading, jamaisAccueilli, router]);
+
   // Le mode découverte (Fiche 1 & Lettre du Père) est en accès libre et immédiat
   if (acces === 'decouverte') {
     return <>{children}</>;
   }
 
-  if (authLoading || gate.state === 'chargement') {
+  // `jamaisAccueilli` : la redirection vers l'accueil est en route. On garde
+  // l'écran d'attente plutôt qu'une page blanche le temps qu'elle aboutisse.
+  if (authLoading || gate.state === 'chargement' || jamaisAccueilli) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-parchemin-100">
         <div className="flex flex-col items-center gap-3">

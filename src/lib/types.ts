@@ -214,7 +214,10 @@ export interface UserProfile {
   membershipStatus: MemberStatus | null;
   role: MemberRole | null;
   createdAt: number;
+  /** Renseigné en rejoignant ou en créant un groupe. */
   onboardingCompletedAt?: number;
+  /** L'accueil a été vu et remis à plus tard : on ne le réimpose pas. */
+  onboardingSeenAt?: number;
   /** Préférence de présence par défaut. */
   preferredAttendance?: AttendanceMode;
   bio?: string;

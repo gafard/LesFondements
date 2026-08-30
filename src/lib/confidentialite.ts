@@ -62,6 +62,18 @@ export async function supprimerDonneesDistantes(uid: string): Promise<void> {
     const membreRef = firestore.doc(db, 'groups', donnees.groupId, 'members', uid);
     const membre = await firestore.getDoc(membreRef);
     if (membre.exists()) {
+      // Comme pour un départ volontaire, l'ordre compte : les règles
+      // n'autorisent le décompte qu'à un membre encore actif. Sans ce
+      // décompte, le groupe gardait une place occupée par un compte qui
+      // n'existe plus, et se déclarait complet une personne trop tôt.
+      if (membre.data().status === 'actif') {
+        const groupeRef = firestore.doc(db, 'groups', donnees.groupId);
+        const groupe = await firestore.getDoc(groupeRef);
+        const places = groupe.data()?.membersCount;
+        if (typeof places === 'number') {
+          await firestore.updateDoc(groupeRef, { membersCount: Math.max(0, places - 1) });
+        }
+      }
       await firestore.updateDoc(membreRef, {
         status: 'parti',
         displayName: 'Compte supprimé',

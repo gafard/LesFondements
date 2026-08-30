@@ -90,6 +90,13 @@ export default function OnboardingPage() {
 
   // ── Actions ─────────────────────────────────────────────────
 
+  // L'accueil a été vu : on le note, pour ne pas y ramener la personne à
+  // chaque page. Elle le retrouve depuis la fiche 1 ou son espace.
+  const remettreAPlusTard = async () => {
+    await updateProfile({ onboardingSeenAt: Date.now() });
+    router.push('/fiches/1');
+  };
+
   const validerPosition = async () => {
     if (!place) return;
     await updateProfile({ place });
@@ -286,14 +293,26 @@ export default function OnboardingPage() {
               ))}
             </div>
 
-            <button
-              type="button"
-              onClick={() => setEtape(place ? 'chemin' : 'situer')}
-              className="bouton-or mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
-            >
-              Commencer
-              <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-            </button>
+            <div className="mt-10 flex flex-col items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setEtape(place ? 'chemin' : 'situer')}
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
+              >
+                Commencer
+                <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+
+              {/* Sans cette sortie, le renvoi vers l'accueil enfermerait qui
+                  n'est pas encore prêt à chercher un groupe. */}
+              <button
+                type="button"
+                onClick={remettreAPlusTard}
+                className="text-2xs font-bold text-parchemin-100/40 transition-colors hover:text-parchemin-100/70"
+              >
+                Plus tard — lire d&apos;abord la fiche 1
+              </button>
+            </div>
           </section>
         )}
 
