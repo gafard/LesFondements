@@ -26,7 +26,6 @@ import {
   Flame,
   Mic,
   MicOff,
-  Clock3,
 } from 'lucide-react';
 import ShareableVerseCard from '@/components/ShareableVerseCard';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
@@ -62,6 +61,9 @@ import {
 import type { Bloc, FicheLivret, ResumeSection } from '@/lib/livret';
 import { etapesTempsApart } from '@/lib/tempsApart';
 import { memoriserPassage } from '@/lib/marquePage';
+import { comparer } from '@/lib/recitation';
+import { enregistrerRevision, qualiteDepuisScore } from '@/lib/memorisation';
+import { useAuth } from '@/lib/AuthContext';
 import { decouperEnMoments, momentDe, type Moment } from '@/lib/moments';
 import {
   annoncerAuSysteme,
@@ -1968,6 +1970,8 @@ function SceneAncrageVerset({
   const [etapePassage, setEtapePassage] = useState(0);
   const [copiee, setCopiee] = useState(false);
   const [microActif, setMicroActif] = useState(false);
+  const [scoreRecitation, setScoreRecitation] = useState<number | null>(null);
+  const { user } = useAuth();
   const [indexCarte, setIndexCarte] = useState(() => {
     const indexSelectionne = options.findIndex((option) => option.reference === selection);
     return indexSelectionne >= 0 ? indexSelectionne : 0;
@@ -2008,6 +2012,23 @@ function SceneAncrageVerset({
     []
   );
 
+  // Réciter en immersion ne laissait aucune trace : le micro recopiait ce
+  // qu'on avait dit dans le champ, et c'était tout. Ni score, ni révision —
+  // le même verset restait « jamais travaillé » alors qu'on venait de le
+  // dire. Il compte maintenant comme partout ailleurs.
+  const evaluerRecitation = async (entendu: string) => {
+    if (!entendu.trim()) return;
+    const resultat = comparer(passageMemoire.texte, entendu);
+    setScoreRecitation(resultat.score);
+    if (!user) return;
+    await enregistrerRevision(
+      user.uid,
+      passageMemoire.reference,
+      qualiteDepuisScore(resultat.score),
+      resultat.score
+    );
+  };
+
   const basculerMicro = () => {
     if (microActif) {
       reconnaissance.current?.stop();
@@ -2021,8 +2042,15 @@ function SceneAncrageVerset({
     const instance = new Constructeur();
     reconnaissance.current = instance;
     instance.lang = 'fr-FR';
-    instance.onstart = () => setMicroActif(true);
-    instance.onresult = (event) => onEnregistrer(event.results[0]?.[0]?.transcript ?? '');
+    instance.onstart = () => {
+      setMicroActif(true);
+      setScoreRecitation(null);
+    };
+    instance.onresult = (event) => {
+      const entendu = event.results[0]?.[0]?.transcript ?? '';
+      onEnregistrer(entendu);
+      void evaluerRecitation(entendu);
+    };
     instance.onerror = () => setMicroActif(false);
     instance.onend = () => setMicroActif(false);
     instance.start();
@@ -2336,6 +2364,19 @@ function SceneAncrageVerset({
                   {microActif ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
                 </button>
                 {valeur && <p className="mt-5 rounded-2xl bg-white/6 p-4 font-serif italic text-parchemin-100/75">« {valeur} »</p>}
+                {scoreRecitation !== null && (
+                  <p
+                    className={`mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-2xs font-bold ${
+                      scoreRecitation >= 75
+                        ? 'bg-emerald-400/15 text-emerald-200'
+                        : scoreRecitation >= 50
+                          ? 'bg-or-400/15 text-or-200'
+                          : 'bg-rose-400/15 text-rose-200'
+                    }`}
+                  >
+                    {scoreRecitation}% · gardé dans vos révisions
+                  </p>
+                )}
               </div>
             )}
           </div>
