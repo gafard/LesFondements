@@ -2715,93 +2715,606 @@
   {
     "ficheId": 13,
     "ficheTitre": "Disciple de Jésus — deuxième partie",
+    "parcoursGuide": true,
     "sections": [
       {
         "sectionTitre": "Vivre pour Lui",
-        "versets": [],
+        "versets": [
+          "Jn 15:8"
+        ],
         "questions": [
           {
             "id": "f13-s1-q1",
-            "fonction": "observer+decouvrir-dieu",
-            "question": "Jésus reflétait le cœur du Père partout. Que révèle cela sur la parfaite unité d'intention entre le Père et le Fils ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Jean 15:8. Puis relis-le une seconde fois.",
+            "question": "À quoi le Père est-il glorifié, selon ce verset ?"
           },
           {
             "id": "f13-s1-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "Si vivre pour Jésus signifie « montrer le cœur de Dieu où que nous allions », quelle part de ta vie actuelle montre un tout autre cœur (celui du monde, de l'ambition, ou de l'égoïsme) ?"
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Reste un instant sur le lien entre porter du fruit et devenir disciple.",
+            "question": "Que comprends-tu de l’ordre des choses : le fruit vient-il avant ou après ?"
           },
           {
             "id": "f13-s1-q3",
-            "fonction": "recevoir+repondre",
-            "question": "Accepte de faire du Royaume de Dieu ta préoccupation première aujourd'hui. Quelle décision concrète vas-tu prendre pour réorienter tes priorités ?"
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Ma vie est-elle centrée sur le Christ dans tous les domaines, ou est-elle compartimentée — travail, famille, amis, église ? »",
+            "question": "Nomme les compartiments de ta semaine. Lequel n’a jamais rencontré les autres ?"
+          },
+          {
+            "id": "f13-s1-q4",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Est-ce que je reflète le cœur de Jésus partout où je vais ? »",
+            "question": "Dans lequel de ces compartiments serait-il le plus surprenant, pour ceux qui t’y voient, d’apprendre que tu suis Jésus ?"
+          },
+          {
+            "id": "f13-s1-q5",
+            "fonction": "se-rendre-disponible",
+            "source": "reponse",
+            "consigne": "On ne décloisonne pas une vie par décision générale, mais par un lieu à la fois.",
+            "question": "Dans ce lieu précis, qu’est-ce qui pourrait commencer à s’y voir cette semaine ?"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Quand retournes-tu dans ce lieu ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Qu’y voudrais-tu vivre autrement, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Appliquer l’enseignement reçu",
+        "versets": [
+          "Ph 2:12"
+        ],
+        "questions": [
+          {
+            "id": "f13-s2-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Philippiens 2:12.",
+            "question": "Qu’est-ce qui est demandé, et qu’est-ce qui reste l’œuvre de Dieu ?"
+          },
+          {
+            "id": "f13-s2-q2",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret parle d’appliquer ce qui a été reçu, non de le collectionner.",
+            "question": "Que comprends-tu de la différence entre savoir un enseignement et l’avoir mis en pratique ?"
+          },
+          {
+            "id": "f13-s2-q3",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Est-ce que je grandis ou je stagne dans ma vie avec Dieu ? Pourquoi ? »",
+            "question": "Réponds d’abord à la première question. Puis reste sur le « pourquoi » — c’est là qu’est la réponse utile."
+          },
+          {
+            "id": "f13-s2-q4",
+            "fonction": "experimenter",
+            "source": "reponse",
+            "consigne": "Depuis le début de ce parcours, tu as reçu douze fiches.",
+            "question": "Quel enseignement reçu ces dernières semaines n’as-tu encore jamais mis en pratique une seule fois ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand pourrais-tu le mettre en pratique une première fois ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À quoi cela ressemblerait-il concrètement, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Obéir, marcher dans la lumière, être victorieux",
+        "versets": [
+          "Ph 2:12"
+        ],
+        "questions": [
+          {
+            "id": "f13-s3-q1",
+            "fonction": "observer",
+            "source": "livret",
+            "consigne": "Relis lentement ce que le livret dit des deux stratégies.",
+            "question": "Le livret demande : « En quoi ces deux stratégies sont-elles complètement différentes ? »"
+          },
+          {
+            "id": "f13-s3-q2",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret affirme qu’un disciple qui grandit est décidé à vivre dans la lumière, la vérité et l’honnêteté — envers soi, les autres et Dieu.",
+            "question": "Laquelle des trois est la plus difficile pour toi, et pourquoi celle-là ?"
+          },
+          {
+            "id": "f13-s3-q3",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Est-ce que je marche dans l’obéissance, dans la crainte de Dieu, et donc dans l’amour ? »",
+            "question": "Y a-t-il un domaine où tu sais déjà ce qui serait juste, et où tu diffères depuis un moment ?"
+          },
+          {
+            "id": "f13-s3-q4",
+            "fonction": "servir",
+            "source": "reponse",
+            "consigne": "Marcher dans la lumière commence souvent par le dire à quelqu’un.",
+            "question": "À qui pourrais-tu en parler — non pour être jugé, mais pour ne plus être seul avec ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand pourrais-tu lui en parler ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Que voudrais-tu lui dire, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "La formation de disciple",
+        "versets": [
+          "2 Tm 2:15"
+        ],
+        "questions": [
+          {
+            "id": "f13-s4-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement 2 Timothée 2:15.",
+            "question": "Qu’est-ce qui relève de l’effort, et devant qui se tient-on ?"
+          },
+          {
+            "id": "f13-s4-q2",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret distingue trois voies : la discipline personnelle, l’aide d’un plus mature, et le partage en vis-à-vis ou en petit groupe.",
+            "question": "Laquelle des trois est aujourd’hui la plus présente dans ta vie ? Laquelle est absente ?"
+          },
+          {
+            "id": "f13-s4-q3",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Ai-je compris la nécessité d’avoir des relations privilégiées avec d’autres pour grandir ? »",
+            "question": "Qui, aujourd’hui, connaît assez ta vie pour pouvoir te dire quelque chose de vrai ?"
+          },
+          {
+            "id": "f13-s4-q4",
+            "fonction": "se-rendre-disponible",
+            "source": "reponse",
+            "consigne": "Le livret parle d’un père, d’une mère spirituelle, d’un aîné. Cela se demande — cela ne s’attribue pas.",
+            "question": "Y a-t-il quelqu’un à qui tu pourrais demander cela ? Qu’est-ce qui t’en empêche ?"
+          },
+          {
+            "id": "f13-s4-q5",
+            "fonction": "servir",
+            "source": "reponse",
+            "consigne": "Le titre de la fiche parle aussi de former d’autres disciples.",
+            "question": "Qui, derrière toi, avance là où tu es déjà passé — et à qui tu pourrais rendre ce que tu as reçu ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand pourrais-tu faire cette démarche ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Quel premier pas voudrais-tu poser, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Quand tu regardes l’ensemble, qu’est-ce qui est devenu plus clair pour toi sur cette question : « Qu’est-ce qui me fait grandir, et que puis-je transmettre ? »",
+      "questionVerset": "Parmi les Paroles que tu as choisies dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "Vivre pour Lui",
+        "Appliquer ce qui est reçu",
+        "Marcher dans la lumière",
+        "La formation de disciple"
+      ]
+    }
   },
   {
     "ficheId": 14,
     "ficheTitre": "Le Royaume, l’Église et la mission",
+    "parcoursGuide": true,
     "sections": [
       {
         "sectionTitre": "Le Royaume",
-        "versets": [],
+        "versets": [
+          "Rm 10:13-14"
+        ],
         "questions": [
           {
             "id": "f14-s1-q1",
             "fonction": "observer",
-            "question": "Le texte souligne que « le Royaume n'est pas un territoire, c'est une sphère où Dieu règne ». Est-ce que tu limites l'œuvre de Dieu aux murs de ton église locale ?"
+            "source": "parole",
+            "consigne": "Lis lentement Romains 10:13-14. Puis relis-le une seconde fois, sans chercher tout de suite ce qu’il faudrait en faire.",
+            "question": "Qu’est-ce qui retient ton attention dans l’enchaînement de ces questions ?"
           },
           {
             "id": "f14-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Jésus a prêché le Royaume et guéri les malades. Que cela révèle-t-il sur son désir de libérer la création entière, et non juste d'avoir des fidèles à l'église ?"
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Reste encore un instant avec le texte du livret sur le Royaume.",
+            "question": "Que comprends-tu de ce qu’est le Royaume, au-delà d’un lieu ou d’une époque ?"
           },
           {
             "id": "f14-s1-q3",
-            "fonction": "se-laisser-eclairer",
-            "question": "Le texte lance un avertissement : « Lorsque l'Église devient le but, il y a idolâtrie. » Ton engagement est-il centré sur la gestion d'activités religieuses ou sur l'expansion de l'amour de Dieu dans ta ville ?"
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Que veut dire apporter le Royaume autour de nous — travail, voisinage, lieux publics ? »",
+            "question": "Dans quels lieux ta semaine te conduit-elle réellement, sans que tu les aies choisis ?"
           },
           {
             "id": "f14-s1-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Dieu te demande d'être « le levain » dans ta famille, ton éducation, ton commerce. Quel impact veux-tu avoir cette semaine dans ton domaine d'influence ?"
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret pose la question des domaines dits « profanes » — commerce, arts, politique.",
+            "question": "Dans lequel de ces lieux serais-tu le seul, ou presque, à porter quelque chose du Royaume ?"
+          },
+          {
+            "id": "f14-s1-q5",
+            "fonction": "se-rendre-disponible",
+            "source": "reponse",
+            "consigne": "Le livret demande : « Suis-je prêt à manifester la compassion de Jésus aux gens que je rencontre ? »",
+            "question": "À quoi te rends-tu disponible cette semaine, dans ce lieu précis — non pas en projet, mais concrètement ?"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel lieu de ta semaine voudrais-tu te souvenir que le Royaume s’y avance aussi ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Lorsque tu y seras, à quoi voudrais-tu être attentif que tu ne remarquais pas jusqu’ici ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "L’Église",
+        "versets": [
+          "Ep 2:21-22"
+        ],
+        "questions": [
+          {
+            "id": "f14-s2-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Éphésiens 2:21-22, en t’arrêtant sur l’image de la construction.",
+            "question": "Qu’est-ce que cette image dit de la place de chaque pierre ?"
+          },
+          {
+            "id": "f14-s2-q2",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret demande de repérer les « 4 piliers » de la première Église.",
+            "question": "Lesquels retrouves-tu dans le texte, et lequel te semble le plus fragile là où tu vis ?"
+          },
+          {
+            "id": "f14-s2-q3",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret pose la distinction explicitement.",
+            "question": "Quelle différence fais-tu maintenant entre le Royaume de Dieu et l’Église ?"
+          },
+          {
+            "id": "f14-s2-q4",
+            "fonction": "discerner",
+            "source": "reponse",
+            "consigne": "Une pierre ne choisit pas sa place seule : elle la reçoit de l’édifice.",
+            "question": "Quelle place occupes-tu déjà dans ton assemblée, même sans l’avoir demandée ?"
+          },
+          {
+            "id": "f14-s2-q5",
+            "fonction": "experimenter",
+            "source": "reponse",
+            "consigne": "Le livret énumère des pièges à éviter pour les églises locales.",
+            "question": "Lequel reconnais-tu, et que peux-tu faire à ta place — sans juger l’ensemble ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand retrouves-tu ceux avec qui tu es « édifié ensemble » ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Comment voudrais-tu y arriver autrement, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Une Église en mission",
+        "versets": [
+          "Rm 10:13-14"
+        ],
+        "questions": [
+          {
+            "id": "f14-s3-q1",
+            "fonction": "observer",
+            "source": "livret",
+            "consigne": "Relis le passage du livret sur la mission, lentement.",
+            "question": "Qu’est-ce qui y est présenté comme allant de soi, et que tu n’avais pas vu ainsi ?"
+          },
+          {
+            "id": "f14-s3-q2",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Est-ce que je prends du temps pour avoir des relations avec les non-chrétiens ? »",
+            "question": "Qui, dans ton entourage réel, ne connaît pas Jésus et te connaît déjà, toi ?"
+          },
+          {
+            "id": "f14-s3-q3",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Quel est mon regard sur les peuples non-atteints ? Y a-t-il quelque chose qui brûle en moi ? »",
+            "question": "Y a-t-il un lieu, un peuple ou un milieu qui revient dans tes pensées sans que tu saches pourquoi ?"
+          },
+          {
+            "id": "f14-s3-q4",
+            "fonction": "experimenter",
+            "source": "reponse",
+            "consigne": "Le livret demande de savoir annoncer simplement l’amour de Dieu et le plan du salut — il renvoie aux fiches 1, 2 et 3.",
+            "question": "Si on te le demandait maintenant, en trois phrases, que dirais-tu ?"
+          },
+          {
+            "id": "f14-s3-q5",
+            "fonction": "servir",
+            "source": "reponse",
+            "consigne": "Le livret propose d’exposer son témoignage en trois temps : avant Christ, la conversion, les changements depuis.",
+            "question": "Écris-le ici, dans tes mots, sans le polir. C’est le tien, pas un modèle."
+          },
+          {
+            "id": "f14-s3-q6",
+            "fonction": "se-rendre-disponible",
+            "source": "reponse",
+            "consigne": "Une relation ne se force pas, elle se rend possible.",
+            "question": "Avec la personne à laquelle tu as pensé, quel geste ordinaire pourrais-tu poser cette semaine ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand reverras-tu cette personne ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Que voudrais-tu vivre avec elle ce jour-là, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Quand tu regardes l’ensemble, qu’est-ce qui est devenu plus clair pour toi sur cette question : « Comment ce que j’ai reçu devient-il une vie donnée ? »",
+      "questionVerset": "Parmi les Paroles que tu as choisies dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "Le Royaume",
+        "L’Église",
+        "Une Église en mission"
+      ]
+    }
   },
   {
     "ficheId": 15,
     "ficheTitre": "Une communauté relationnelle",
+    "parcoursGuide": true,
     "sections": [
       {
-        "sectionTitre": "L'homme est créé pour être relationnel",
-        "versets": [],
+        "sectionTitre": "L’homme est créé pour être relationnel",
+        "versets": [
+          "He 10:25"
+        ],
         "questions": [
           {
             "id": "f15-s1-q1",
             "fonction": "observer",
-            "question": "Le texte rappelle que l'isolement est contraire au plan de Dieu. Cultives-tu une indépendance qui te coupe des autres sous prétexte de tranquillité ?"
+            "source": "parole",
+            "consigne": "Lis lentement Hébreux 10:25. Puis relis-le une seconde fois.",
+            "question": "Qu’est-ce qui retient ton attention dans la raison donnée, plus que dans la consigne ?"
           },
           {
             "id": "f15-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Dieu est une trinité (Père, Fils, Esprit) vivant en parfaite communion. Comment cela magnifie-t-il la nature même de l'amour divin ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret demande : « Qu’évoque pour moi cette phrase : nous sommes membres les uns des autres ? »",
+            "question": "Que comprends-tu de ce lien, si l’on prend l’image du corps au sérieux ?"
           },
           {
             "id": "f15-s1-q3",
-            "fonction": "se-laisser-eclairer",
-            "question": "La société occidentale pousse à l'individualisme. Dans quelle mesure as-tu laissé cet individualisme refroidir ton besoin d'une vraie famille spirituelle ?"
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Est-ce que je prends du temps avec les autres, pour les connaître ? »",
+            "question": "À qui as-tu réellement donné du temps ces deux dernières semaines — sans compter les échanges obligés ?"
           },
           {
             "id": "f15-s1-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Accepte que Dieu t'ait créé pour avoir besoin des autres. Vers qui peux-tu te tourner aujourd'hui pour construire ou réparer une relation authentique ?"
+            "fonction": "se-rendre-disponible",
+            "source": "reponse",
+            "consigne": "Se rendre disponible se décide avant que l’occasion se présente.",
+            "question": "À qui pourrais-tu offrir une heure cette semaine, sans autre but que de le connaître ?"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Quand pourrais-tu voir cette personne ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Que voudrais-tu lui offrir ce jour-là, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Une famille spirituelle",
+        "versets": [
+          "He 10:25"
+        ],
+        "questions": [
+          {
+            "id": "f15-s2-q1",
+            "fonction": "observer",
+            "source": "livret",
+            "consigne": "Relis le passage du livret sur la famille spirituelle.",
+            "question": "Qu’est-ce qui distingue une famille d’un groupe de personnes qui se retrouvent ?"
+          },
+          {
+            "id": "f15-s2-q2",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Est-ce que ma famille est ma première église ? »",
+            "question": "Ce que tu vis dans ta cellule, le vis-tu aussi sous ton propre toit ?"
+          },
+          {
+            "id": "f15-s2-q3",
+            "fonction": "discerner",
+            "source": "reponse",
+            "consigne": "Une famille se reconnaît à ce qu’on peut y arriver démuni.",
+            "question": "À qui, dans ta famille spirituelle, pourrais-tu arriver un mauvais jour sans rien expliquer ?"
+          },
+          {
+            "id": "f15-s2-q4",
+            "fonction": "servir",
+            "source": "reponse",
+            "consigne": "On reçoit une famille autant qu’on la construit.",
+            "question": "Pour qui pourrais-tu être cette personne-là, sans qu’il ait à le demander ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand retrouves-tu ta famille spirituelle ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Comment voudrais-tu y être présent, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Construire des relations qui honorent Dieu",
+        "versets": [
+          "He 10:25"
+        ],
+        "questions": [
+          {
+            "id": "f15-s3-q1",
+            "fonction": "observer",
+            "source": "livret",
+            "consigne": "Relis lentement ce que le livret dit de la lumière et de l’honnêteté dans les relations.",
+            "question": "Qu’est-ce qui est présenté comme la condition de relations saines ?"
+          },
+          {
+            "id": "f15-s3-q2",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Est-ce que j’ai la liberté d’encourager ou de reprendre un frère ? Sinon, pourquoi ? »",
+            "question": "Qu’est-ce qui te retient, quand quelque chose mériterait d’être dit ?"
+          },
+          {
+            "id": "f15-s3-q3",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret retourne la question : « Comment est-ce que je réagis quand un frère m’encourage ou me reprend ? »",
+            "question": "Que se passe-t-il en toi dans les premières secondes — avant même que tu répondes ?"
+          },
+          {
+            "id": "f15-s3-q4",
+            "fonction": "experimenter",
+            "source": "livret",
+            "consigne": "Le livret propose la règle des « 3P » : prier, parler à la personne, pardonner.",
+            "question": "Y a-t-il une relation où tu es resté au premier P, sans jamais passer au deuxième ?"
+          },
+          {
+            "id": "f15-s3-q5",
+            "fonction": "se-rendre-disponible",
+            "source": "reponse",
+            "consigne": "Parler à la personne, c’est le pas que le livret nomme, et le plus rarement franchi.",
+            "question": "Si tu décidais de le franchir, à qui, et quand ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand pourrais-tu avoir cette conversation ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Comment voudrais-tu l’aborder, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "L’unité",
+        "versets": [
+          "He 10:25"
+        ],
+        "questions": [
+          {
+            "id": "f15-s4-q1",
+            "fonction": "observer",
+            "source": "livret",
+            "consigne": "Relis les passages que le livret rassemble sur l’unité.",
+            "question": "Qu’est-ce qui y est demandé, et qui ne dépend pas des autres ?"
+          },
+          {
+            "id": "f15-s4-q2",
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Le livret affirme que l’unité est la base de la communauté en Christ.",
+            "question": "Que comprends-tu de la différence entre l’unité et l’accord sur tout ?"
+          },
+          {
+            "id": "f15-s4-q3",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Comment est-ce que je réagis quand je sens une tension, un malentendu ? »",
+            "question": "Quelle est ta pente naturelle — expliquer, se taire, s’éloigner, réparer ?"
+          },
+          {
+            "id": "f15-s4-q4",
+            "fonction": "servir",
+            "source": "reponse",
+            "consigne": "L’unité se garde par ceux qui font le premier pas, pas par ceux qui ont raison.",
+            "question": "Y a-t-il une tension où tu pourrais faire ce pas cette semaine, même si tu n’es pas en tort ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quand reverras-tu cette personne ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Que voudrais-tu poser comme geste, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Direction spirituelle et autorité",
+        "versets": [
+          "Lc 22:25-26"
+        ],
+        "questions": [
+          {
+            "id": "f15-s5-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement Luc 22:25-26. Puis relis-le une seconde fois.",
+            "question": "Qu’est-ce que Jésus renverse exactement dans la manière de conduire ?"
+          },
+          {
+            "id": "f15-s5-q2",
+            "fonction": "discerner",
+            "source": "livret",
+            "consigne": "Le livret demande : « Qu’évoque pour moi le mot soumission : positif ou négatif ? »",
+            "question": "Qu’est-ce qui, dans ton histoire, explique cette réaction-là ?"
+          },
+          {
+            "id": "f15-s5-q3",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret pose la question de l’abus d’autorité — autoritarisme, manipulation.",
+            "question": "Selon ce passage, qu’est-ce qui distingue une autorité qui sert d’une autorité qui domine ?"
+          },
+          {
+            "id": "f15-s5-q4",
+            "fonction": "servir",
+            "source": "reponse",
+            "consigne": "Jésus ne supprime pas l’autorité : il en change le sens. Le plus grand devient le serviteur.",
+            "question": "Là où tu exerces une responsabilité, même petite, où pourrais-tu servir plutôt que diriger ?"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment de responsabilité voudrais-tu te souvenir de cette Parole ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Comment voudrais-tu l’exercer autrement, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Quand tu regardes l’ensemble, qu’est-ce qui est devenu plus clair pour toi sur cette question : « Comment est-ce que je vis avec les autres ce que j’ai reçu ? »",
+      "questionVerset": "Parmi les Paroles que tu as choisies dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "Créé pour être relationnel",
+        "Une famille spirituelle",
+        "Des relations qui honorent Dieu",
+        "L’unité",
+        "Autorité et service"
+      ]
+    }
   },
   {
     "ficheId": 16,

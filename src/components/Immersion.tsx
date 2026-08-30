@@ -26,6 +26,7 @@ import {
   Flame,
   Mic,
   MicOff,
+  Clock3,
 } from 'lucide-react';
 import ShareableVerseCard from '@/components/ShareableVerseCard';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
@@ -110,6 +111,7 @@ interface FicheMeditation {
     question: string;
     questionVerset: string;
     etapes?: string[];
+    reprises?: Array<{ titre: string; questionId: string }>;
   };
 }
 
@@ -131,7 +133,14 @@ type Scene = { piste?: string } & (
   | { type: 'lecture'; texte: string }
   | { type: 'question'; id: string; texte: string; section?: string }
   | { type: 'pas'; id?: string; reference?: string; options?: PassageAncrage[]; pratique?: SectionMeditation['pratique'] }
-  | { type: 'synthese-fiche'; id: string; question: string; questionVerset: string; etapes?: string[] }
+  | {
+      type: 'synthese-fiche';
+      id: string;
+      question: string;
+      questionVerset: string;
+      etapes?: string[];
+      reprises?: Array<{ titre: string; questionId: string }>;
+    }
   | { type: 'cloture' }
 );
 
@@ -841,6 +850,7 @@ export default function Immersion({
                 onEnregistrer={onEnregistrer}
                 dejaPreparee={dejaPreparee}
                 tempsDuJour={sectionIndex !== null}
+                onAvancer={() => aller(1)}
               />
             </div>
           )}
@@ -1608,6 +1618,11 @@ function RenduScene({
       const etapes = scene.etapes?.length
         ? scene.etapes
         : ['Péché', 'Loi', 'Salut', 'Grâce'];
+      const reprises = (scene.reprises ?? []).flatMap((reprise) => {
+        const reponse = reponses[`q:${reprise.questionId}`]?.trim();
+        return reponse ? [{ ...reprise, reponse }] : [];
+      });
+      const papiersSynthese = ['post-it-jaune pose-1', 'post-it-bleu pose-2', 'post-it-rose pose-3'];
       const versetsChoisis = Array.from({ length: etapes.length }, (_, indexSection) =>
         reponses[`verset-choisi:f${fiche.id}-s${indexSection + 1}`]
       ).filter((reference): reference is string => Boolean(reference));
@@ -1639,6 +1654,39 @@ function RenduScene({
               </span>
             ))}
           </div>
+          {reprises.length > 0 && (
+            <section className="mt-9" aria-labelledby="synthese-identifie">
+              <h3
+                id="synthese-identifie"
+                className="text-2xs font-black uppercase tracking-[0.18em] text-or-300/75"
+              >
+                Ce que j’ai identifié aujourd’hui
+              </h3>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {reprises.map((reprise, indexReprise) => (
+                  <article
+                    key={reprise.questionId}
+                    className={`${papiersSynthese[indexReprise % papiersSynthese.length]} relative rounded-[4px] p-5 text-encre-950 shadow-xl`}
+                  >
+                    <span
+                      className={`punaise -top-2.5 ${indexReprise % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
+                      aria-hidden="true"
+                    />
+                    <p className="text-xs font-black uppercase tracking-[0.1em] text-encre-700/65">
+                      {reprise.titre}
+                    </p>
+                    <p className="mt-3 font-serif text-base font-bold leading-relaxed sm:text-lg">
+                      {reprise.reponse}
+                    </p>
+                  </article>
+                ))}
+              </div>
+              <p className="mt-5 text-sm leading-relaxed text-parchemin-100/60">
+                Tu n’as pas besoin de tout régler aujourd’hui. Choisis une seule chose à continuer
+                de travailler avec Dieu.
+              </p>
+            </section>
+          )}
           <p className="mt-8 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
             {scene.question}
           </p>

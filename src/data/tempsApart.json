@@ -47,5 +47,26 @@
     { "section": 3, "titre": "Marcher par la chair ou par l’Esprit ?", "avec": [2], "ordre": [2, 3] },
     { "section": 4, "titre": "Renouveler ma manière de penser", "depuis": "renouvelant notre manière de pensée", "jusqua": "apprenant à marcher par l'esprit", "surTexte": true },
     { "section": 4, "titre": "Apprendre à marcher par l’Esprit", "depuis": "apprenant à marcher par l'esprit", "surTexte": true }
+  ],
+
+  "13": [
+    { "section": 0, "titre": "Vivre pour Lui" },
+    { "section": 1, "titre": "Appliquer l’enseignement reçu" },
+    { "section": 2, "titre": "Obéir, marcher dans la lumière, être victorieux" },
+    { "section": 3, "titre": "La formation de disciple", "avec": [4, 5, 6] }
+  ],
+
+  "14": [
+    { "section": 0, "titre": "Le Royaume" },
+    { "section": 1, "titre": "L’Église" },
+    { "section": 2, "titre": "Une Église en mission" }
+  ],
+
+  "15": [
+    { "section": 0, "titre": "L’homme est créé pour être relationnel" },
+    { "section": 1, "titre": "Une famille spirituelle" },
+    { "section": 2, "titre": "Construire des relations qui honorent Dieu" },
+    { "section": 3, "titre": "L’unité" },
+    { "section": 4, "titre": "Direction spirituelle et autorité" }
   ]
 }
