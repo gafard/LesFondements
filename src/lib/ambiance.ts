@@ -1,5 +1,6 @@
 import { preparerPourLaVoix } from './prononciation.mjs';
-import { urlVoixStudio, voixStudioEcartee, voixStudioPossible } from './voixStudio';
+import { decouperTextePourStudio } from './decoupageVoix';
+import { urlVoixStudio, voixStudioPossible } from './voixStudio';
 import { chargerManifesteVoix } from './voix';
 import { chargerManifesteVivienne, pisteVivienne } from './voixVivienne';
 
@@ -438,24 +439,63 @@ async function urlDePiste(id?: string, genre: GenreVoix = getGenreVoix()): Promi
     return pisteVivienne(await chargerManifesteVivienne(), id);
   }
   const manifeste = await chargerManifesteVoix();
-  return manifeste?.pistes[id]?.url ?? `/voix/eleven/${id}.mp3`;
+  return manifeste?.pistes[id]?.url ?? null;
+}
+
+type OptionsLecture = {
+  vitesse?: number;
+  genre?: GenreVoix;
+  onDebut?: () => void;
+  onFin?: () => void;
+  onErreur?: () => void;
+  /** Piste prégénérée à préférer, ex. `pisteId.verset('Ps 37:4')`. */
+  piste?: string;
+  /** Autorise la voix système lorsque le studio est indisponible. */
+  repliNavigateur?: boolean;
+};
+
+function jouerPisteStudio(
+  url: string,
+  vitesse: number,
+  mien: number,
+  onPremierDebut?: () => void
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (mien !== jeton) {
+      resolve();
+      return;
+    }
+
+    const audio = new Audio(url);
+    audio.playbackRate = vitesse;
+    audio.volume = 1;
+    lecteur = audio;
+
+    audio.onplay = () => onPremierDebut?.();
+    audio.onended = () => {
+      if (lecteur === audio) lecteur = null;
+      resolve();
+    };
+    audio.onerror = () => {
+      if (lecteur === audio) lecteur = null;
+      reject(new Error('Piste studio illisible'));
+    };
+    audio.onpause = () => {
+      if (mien !== jeton) resolve();
+    };
+
+    void audio.play().catch(reject);
+  });
 }
 
 export function lireAVoixHaute(
   texte: string,
-  options: {
-    vitesse?: number;
-    genre?: GenreVoix;
-    onDebut?: () => void;
-    onFin?: () => void;
-    onErreur?: () => void;
-    /** Piste prégénérée à préférer, ex. `pisteId.verset('Ps 37:4')`. */
-    piste?: string;
-  } = {}
+  options: OptionsLecture = {}
 ): boolean {
   const genre = options.genre ?? getGenreVoix();
   const dit = preparerPourLaVoix(texte);
   arreterLecture();
+  if (!dit.trim()) return false;
 
   // Atténuation automatique de la musique pendant que la voix parle
   const sourceDucking = Symbol('lecture-vocale');
@@ -475,46 +515,78 @@ export function lireAVoixHaute(
     onErreurOriginal?.();
   };
 
-  const optionsEnveloppees = {
+  const optionsEnveloppees: OptionsLecture = {
     ...options,
     genre,
     onFin: onFinWrap,
     onErreur: onErreurWrap,
   };
 
-  // Une piste gravée d'abord ; la voix de studio à la demande ensuite ; la
-  // synthèse du navigateur en dernier recours.
+  const replierOuSignaler = () => {
+    if (options.repliNavigateur !== false) {
+      lireAvecLeNavigateur(dit, optionsEnveloppees);
+    } else {
+      onErreurWrap();
+    }
+  };
+
+  // Une piste gravée d'abord ; sinon la voix de studio est produite par
+  // morceaux naturels. Le morceau suivant se prépare pendant que le courant
+  // joue : pas de voix robotique, ni de longue coupure entre deux phrases.
   if (options.piste || voixStudioPossible()) {
     const mien = jeton;
-    void urlDePiste(options.piste, genre)
-      .then((gravee) => gravee ?? (voixStudioPossible() ? urlVoixStudio(dit) : null))
-      .then((url) => {
-        if (mien !== jeton) return; // arrêté entre-temps
-        if (!url) {
-          if (voixStudioPossible()) voixStudioEcartee();
-          lireAvecLeNavigateur(dit, optionsEnveloppees);
-          return;
+    void (async () => {
+      let lectureCommencee = false;
+      try {
+        const gravee = await urlDePiste(options.piste, genre);
+        if (mien !== jeton) return;
+
+        if (gravee) {
+          await jouerPisteStudio(gravee, options.vitesse ?? 1, mien, () => {
+            lectureCommencee = true;
+            optionsEnveloppees.onDebut?.();
+          });
+        } else {
+          if (!voixStudioPossible()) {
+            replierOuSignaler();
+            return;
+          }
+
+          const morceaux = decouperTextePourStudio(dit);
+          let prochaineUrl = urlVoixStudio(morceaux[0]);
+          for (let indexMorceau = 0; indexMorceau < morceaux.length; indexMorceau += 1) {
+            const url = await prochaineUrl;
+            if (mien !== jeton) return;
+            if (!url) throw new Error('Voix studio indisponible');
+
+            prochaineUrl = indexMorceau + 1 < morceaux.length
+              ? urlVoixStudio(morceaux[indexMorceau + 1])
+              : Promise.resolve(null);
+            await jouerPisteStudio(url, options.vitesse ?? 1, mien, () => {
+              if (lectureCommencee) return;
+              lectureCommencee = true;
+              optionsEnveloppees.onDebut?.();
+            });
+          }
         }
-        const audio = new Audio(url);
-        audio.playbackRate = options.vitesse ?? 1;
-        audio.volume = 1.0; // Voix à 100% de clarté
-        audio.onplay = () => optionsEnveloppees.onDebut?.();
-        audio.onended = () => optionsEnveloppees.onFin();
-        audio.onerror = () => {
-          if (mien === jeton) lireAvecLeNavigateur(dit, optionsEnveloppees);
-        };
-        lecteur = audio;
-        void audio.play().catch(() => {
-          if (mien === jeton) lireAvecLeNavigateur(dit, optionsEnveloppees);
-        });
-      })
-      .catch(() => {
-        if (mien === jeton) lireAvecLeNavigateur(dit, optionsEnveloppees);
-      });
+
+        if (mien === jeton) optionsEnveloppees.onFin?.();
+      } catch {
+        if (mien !== jeton) return;
+        // Ne jamais recommencer tout le texte avec une autre voix après
+        // qu'une partie a déjà été entendue.
+        if (lectureCommencee) onErreurWrap();
+        else replierOuSignaler();
+      }
+    })();
     return true;
   }
 
-  return lireAvecLeNavigateur(dit, optionsEnveloppees);
+  if (options.repliNavigateur !== false) {
+    return lireAvecLeNavigateur(dit, optionsEnveloppees);
+  }
+  onErreurWrap();
+  return false;
 }
 
 /** La synthèse du navigateur : le repli, jamais le premier choix. */

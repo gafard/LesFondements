@@ -323,6 +323,7 @@ export default function Immersion({
   const [cloture, setCloture] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [audioAvancement, setAudioAvancement] = useState(0);
+  const [erreurVoix, setErreurVoix] = useState<string | null>(null);
   const [noteOuverte, setNoteOuverte] = useState(false);
   // Le chrome s'efface pour laisser la scène seule ; un toucher le rappelle.
   const [chrome, setChrome] = useState(true);
@@ -438,6 +439,7 @@ export default function Immersion({
       if (delta > 0 && !ancragePret) return;
       // On change de scène : les commandes reviennent le temps de se repérer.
       setChrome(true);
+      setErreurVoix(null);
       arreterLecture();
       setIndex((valeur) => Math.max(0, Math.min(scenario.length - 1, valeur + delta)));
     },
@@ -448,22 +450,30 @@ export default function Immersion({
     enchainerRef.current = enchainer;
   }, [enchainer]);
 
-  const lireSceneAvecLeNavigateur = useCallback(
+  const lireScene = useCallback(
     (courante: Scene) => {
       const texte = texteDeLaScene(courante);
       if (!texte) {
         setAudioEnCours(false);
         return false;
       }
+      setErreurVoix(null);
       const demarree = lireAVoixHaute(texte, {
         genre: genreVoixLocal,
-        onDebut: () => setAudioEnCours(true),
+        repliNavigateur: false,
+        onDebut: () => {
+          setErreurVoix(null);
+          setAudioEnCours(true);
+        },
         onFin: () => {
           setAudioEnCours(false);
           setAudioAvancement(1);
           if (enchainerRef.current) aller(1);
         },
-        onErreur: () => setAudioEnCours(false),
+        onErreur: () => {
+          setAudioEnCours(false);
+          setErreurVoix('Voix studio momentanément indisponible');
+        },
       });
       return demarree;
     },
@@ -593,7 +603,7 @@ export default function Immersion({
         const p = el.play();
         if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
       } else {
-        lireSceneAvecLeNavigateur(scene);
+        lireScene(scene);
       }
       return;
     }
@@ -607,10 +617,10 @@ export default function Immersion({
         const p = el.play();
         if (p) p.then(() => setAudioEnCours(true)).catch((e) => console.warn(e));
       } else {
-        lireSceneAvecLeNavigateur(scene);
+        lireScene(scene);
       }
     }
-  }, [lecture, audioEnCours, pisteCourante, scene, lireSceneAvecLeNavigateur]);
+  }, [lecture, audioEnCours, pisteCourante, scene, lireScene]);
 
   useEffect(() => {
     if (!lecture || pisteCourante) {
@@ -620,12 +630,12 @@ export default function Immersion({
     // La synthèse appelle ses callbacks d'état dès le démarrage. La lancer
     // après l'effet évite une cascade de rendu synchrone et laisse React
     // stabiliser la scène courante avant que la voix prenne la main.
-    const minuteur = window.setTimeout(() => lireSceneAvecLeNavigateur(scene), 0);
+    const minuteur = window.setTimeout(() => lireScene(scene), 0);
     return () => {
       window.clearTimeout(minuteur);
       arreterLecture();
     };
-  }, [lecture, scene, pisteCourante, lireSceneAvecLeNavigateur]);
+  }, [lecture, scene, pisteCourante, lireScene]);
 
   // Lecture de la piste audio studio / ElevenLabs / Vivienne
   useEffect(() => {
@@ -849,7 +859,7 @@ export default function Immersion({
                 </div>
                 <div className="flex items-center justify-between mt-1 text-3xs text-parchemin-100/50">
                   <span className="truncate">
-                    {lecture ? (pisteCourante ? 'Voix Studio' : 'Synthèse') : 'Mode lecture'}
+                    {erreurVoix ?? (lecture ? 'Voix studio' : 'Mode lecture')}
                   </span>
                   <span className="shrink-0 ml-2">
                     {index + 1} / {scenario.length}
@@ -965,7 +975,7 @@ export default function Immersion({
         }}
         onError={() => {
           activerDuckingVoix(false, sourceDuckingAudio.current);
-          if (lecture) lireSceneAvecLeNavigateur(scene);
+          if (lecture) lireScene(scene);
         }}
       />
     </div>
@@ -1837,7 +1847,7 @@ function SceneAncrageVerset({
               <button type="button" onClick={copierVerset} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Copier le verset">
                 {copiee ? <Check className="h-4 w-4 text-emerald-300" /> : <Copy className="h-4 w-4" />}
               </button>
-              <button type="button" onClick={() => lireAVoixHaute(`${passageMemoire.reference}. ${passageMemoire.texte}`)} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Écouter le verset">
+              <button type="button" onClick={() => lireAVoixHaute(`${passageMemoire.reference}. ${passageMemoire.texte}`, { repliNavigateur: false })} className="grid h-11 w-11 place-items-center rounded-full bg-white/7 text-parchemin-100/70 hover:bg-white/12" aria-label="Écouter le verset">
                 <Volume2 className="h-4 w-4" />
               </button>
             </div>
