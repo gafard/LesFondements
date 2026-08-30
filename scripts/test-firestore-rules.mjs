@@ -80,6 +80,10 @@ try {
     })
   );
 
+  // La réparation d'annuaire ne s'ouvre qu'à l'animateur : un membre simple
+  // qui republierait pourrait remettre en ligne un groupe archivé.
+  await assertFails(setDoc(doc(bob, 'groupDirectory/g1'), annuaireValide));
+
   await assertFails(updateDoc(doc(bob, 'groups/g1'), { membersCount: 1 }));
   await assertSucceeds(updateDoc(doc(bob, 'groups/g1'), { membersCount: 2 }));
   await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { role: 'animateur' }));

@@ -471,6 +471,41 @@ function publicGroup(group: ParcoursGroup): ParcoursGroup {
   };
 }
 
+/** Groupes déjà vérifiés dans cette session : une lecture suffit. */
+const annuaireVerifie = new Set<string>();
+
+/**
+ * Réinscrit un groupe dans l'annuaire si son entrée manque.
+ *
+ * L'annuaire est plus récent que les groupes. Ceux créés avant lui n'y ont
+ * jamais eu d'entrée, et rien ne les y a inscrits après coup : `writeGroup`
+ * ne la pose qu'en écrivant le groupe, ce qui n'arrive qu'à sa création ou
+ * à sa modification.
+ *
+ * Or tout passe par l'annuaire, y compris ce qu'on n'y attendrait pas : la
+ * recherche par ville, mais aussi la résolution d'un code d'invitation, qui
+ * remonte au groupe par là. Un groupe absent de l'annuaire est donc
+ * introuvable même pour qui tient son code en main — le code se résout, le
+ * groupe reste invisible, et l'écran annonce un code invalide.
+ *
+ * Les règles ne laissent que son animateur l'y inscrire : on le fait à sa
+ * prochaine ouverture de l'application.
+ */
+export async function republierAnnuaireSiAbsent(group: ParcoursGroup): Promise<void> {
+  if (annuaireVerifie.has(group.id)) return;
+  const client = await getClient();
+  if (!client) return;
+  annuaireVerifie.add(group.id);
+  try {
+    const ref = client.f.doc(client.db, 'groupDirectory', group.id);
+    if ((await client.f.getDoc(ref)).exists()) return;
+    await client.f.setDoc(ref, publicGroup(group));
+  } catch (error) {
+    annuaireVerifie.delete(group.id);
+    noterEchec('Publication du groupe dans l’annuaire', error);
+  }
+}
+
 export async function getPublicGroup(groupId: string): Promise<ParcoursGroup | null> {
   const client = await getClient();
   if (client) {

@@ -16,6 +16,7 @@ import {
   getMembers,
   getPublicGroup,
   hasRemoteBackend,
+  republierAnnuaireSiAbsent,
   saveProfile,
   subscribe,
   type ParcoursGate,
@@ -167,6 +168,16 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
     const groupId = group && membership?.status === 'actif' ? group.id : undefined;
     void synchroniserNotifications(chargerPreferencesLocales(), { groupId });
   }, [user, loadedUid, group, membership?.status]);
+
+  // Un groupe antérieur à l'annuaire n'y a pas d'entrée, et sans entrée il
+  // est introuvable — y compris par son code d'invitation, qui passe par là.
+  // Seul son animateur peut l'y inscrire : il le fait en ouvrant l'appli.
+  useEffect(() => {
+    if (!group || group.demo) return;
+    if (membership?.status !== 'actif') return;
+    if (membership.role !== 'animateur' && membership.role !== 'co_animateur') return;
+    void republierAnnuaireSiAbsent(group);
+  }, [group, membership?.status, membership?.role]);
 
   /**
    * Groupes d'exemple (mode local, sans backend) : leur animateur n'existe
