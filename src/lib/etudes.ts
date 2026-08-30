@@ -140,11 +140,9 @@ export async function lirePassage(reference: ReferenceBiblique): Promise<Passage
 
   return {
     reference: { ...reference, chapitre: numeroChapitre },
-    titre: `${livre.nom} ${numeroChapitre}${
-      debut === undefined ? '' : `:${debut}${fin && fin !== debut ? `-${fin}` : ''}`
-    }`,
-    versets: versets.length ? versets : tous,
-    chapitreEntier: debut === undefined,
+    titre: `${livre.nom} ${numeroChapitre}`,
+    versets: tous,
+    chapitreEntier: true,
     nbChapitres: chapitres.length,
   };
 }

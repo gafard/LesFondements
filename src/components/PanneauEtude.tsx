@@ -437,19 +437,37 @@ function TexteDuPassage({
   onVerset: (verset: number) => void;
   onStrong: (code: number) => void;
 }) {
+  const versetActifRef = useRef<HTMLParagraphElement | null>(null);
+
+  useEffect(() => {
+    if (versetActif && versetActifRef.current) {
+      versetActifRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [versetActif, passage.reference.chapitre]);
+
   return (
     <div className="feuille relative rounded-3xl p-5 sm:p-6 shadow-md border border-parchemin-300">
       <span className="ruban -top-2.5 left-10 -rotate-1 rounded-[2px]" />
       <span className="attache-pince -top-3 right-8" />
 
+      <div className="mb-4 flex items-center justify-between border-b border-parchemin-300/80 pb-2.5 text-2xs font-bold text-or-800">
+        <span>Chapitre {passage.reference.chapitre} complet ({passage.versets.length} versets)</span>
+        {versetActif && (
+          <span className="rounded-full bg-or-400/20 px-2.5 py-0.5 text-3xs font-bold text-or-900">
+            Verset {versetActif} sélectionné
+          </span>
+        )}
+      </div>
+
       <div className="space-y-1.5">
         {passage.versets.map((verset) => (
           <p
             key={verset.v}
+            ref={versetActif === verset.v ? versetActifRef : undefined}
             onClick={() => onVerset(verset.v)}
             className={`cursor-pointer rounded-2xl px-3.5 py-2 font-serif text-base leading-[1.95] transition-all ${
               versetActif === verset.v
-                ? 'bg-or-100/70 text-encre-950 ring-1 ring-or-300 shadow-xs'
+                ? 'bg-or-200/60 text-encre-950 ring-2 ring-or-400 shadow-sm font-medium'
                 : 'text-encre-900 hover:bg-parchemin-100/80'
             }`}
           >

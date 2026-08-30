@@ -438,7 +438,7 @@ export default function BulleVerset() {
             className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-encre-950 px-3.5 py-1.5 text-2xs font-bold text-parchemin-100 shadow-xs transition-colors hover:bg-or-600 hover:text-white"
           >
             <BookOpen className="h-3.5 w-3.5" />
-            Étude complète
+            Lire tout le chapitre {bulle.reference.chapitre}
           </button>
         </div>
       </div>
