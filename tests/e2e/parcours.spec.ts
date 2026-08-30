@@ -42,6 +42,7 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('La Parole que je garde', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Choisir un verset' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Parole suivante' }).click();
   await page.getByRole('button', { name: /^Ps 46:11/ }).click();
   await expect(page.getByRole('button', { name: /^Ps 46:11/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByText('Mémoriser la Parole', { exact: true })).toBeVisible();
@@ -117,7 +118,7 @@ test('fiche 1 · partie 3 : les textes conduisent à une prière issue des déco
   ).fill('Dieu est un et se fait connaître dans une communion vivante.');
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Tes notes rassemblées devant Dieu')).toBeVisible();
+  await expect(page.getByText('Les sujets déposés devant Dieu')).toBeVisible();
   await expect(page.locator('.tableau-liege')).toBeVisible();
   await expect(page.getByText('Ce que j’ai découvert de Dieu comme Père')).toBeVisible();
   await expect(page.getByText('Je découvre un Père qui m’accueille comme son enfant.')).toBeVisible();
@@ -182,11 +183,12 @@ test('fiche 2 : péché, Loi, salut et grâce forment quatre traversées complè
   );
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Tes notes rassemblées devant Dieu')).toBeVisible();
+  await expect(page.getByText('Les sujets déposés devant Dieu')).toBeVisible();
   await expect(page.getByText('Ce que j’ai découvert de Dieu dans Éphésiens 2')).toBeVisible();
   await expect(page.getByText('Ce que j’ai compris de la grâce')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: 'Parole suivante' }).click();
   await page.getByRole('button', { name: /^Ep 2:8-9/ }).click();
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('Dans quelle situation aujourd’hui serais-tu tenté de vivre comme si tu devais mériter ce que Dieu donne ?')).toBeVisible();
@@ -267,7 +269,7 @@ test('fiche 3 : six découvertes distinctes conduisent à une Parole principale'
   );
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Tes notes rassemblées devant Dieu')).toBeVisible();
+  await expect(page.getByText('Les sujets déposés devant Dieu')).toBeVisible();
   await expect(page.getByText('Ce que j’ai compris du baptême')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
@@ -359,6 +361,7 @@ test('fiche 4 : la Parole et l’interprétation du livret restent distinctes da
   await expect(page.getByText('La Parole que je veux garder devant moi')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: 'Parole suivante' }).click();
   await page.getByRole('button', { name: /^Ep 2:10/ }).click();
   await page.getByRole('button', { name: 'Continuer' }).click();
   await page.getByPlaceholder('Je veux revenir à cette Parole lorsque…').fill(

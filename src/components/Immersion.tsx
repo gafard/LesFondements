@@ -954,7 +954,7 @@ export default function Immersion({
           type="button"
           aria-label="Afficher les commandes"
           onClick={() => setChrome(true)}
-          className="absolute inset-0 z-10 cursor-default"
+          className="absolute inset-0 z-0 cursor-default"
         />
       )}
 
@@ -1423,52 +1423,12 @@ function RenduScene({
       });
       const reprisesPrioritaires = toutesLesReprises.filter((reprise) => reprise.prioritaire);
       const reprises = reprisesPrioritaires.length > 0 ? reprisesPrioritaires : toutesLesReprises;
-      const papiers = ['post-it-jaune pose-1', 'post-it-bleu pose-2', 'post-it-rose pose-3'];
       return (
-        <div className="py-8 text-center sm:py-12">
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-or-300/30 bg-or-400/12 text-or-300 shadow-[0_0_28px_rgba(220,168,73,0.12)]">
-            <Flame className="h-7 w-7" strokeWidth={1.5} />
-          </span>
-          <span className="mt-6 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-            Prier la Parole
-          </span>
-          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-            Parle à Dieu à partir de ce que tu as découvert
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
-            Relis ce que tu viens d&apos;écrire. Puis prends le temps de lui répondre avec tes propres
-            mots. Tu peux aussi rester un instant en silence.
-          </p>
-          {reprises.length > 0 && (
-            <div className="tableau-liege mx-auto mt-7 max-w-2xl rounded-3xl border border-[#d2a675]/55 p-5 text-left shadow-2xl sm:p-7">
-              <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/80">
-                Tes notes rassemblées devant Dieu
-              </p>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                {reprises.map((reprise, indexReprise) => (
-                  <article
-                    key={reprise.id}
-                    className={`${papiers[indexReprise % papiers.length]} relative rounded-[4px] p-4 text-encre-950 shadow-lg`}
-                  >
-                    <span className="punaise-bois absolute -top-2 left-1/2 -translate-x-1/2" aria-hidden="true" />
-                    <p className="line-clamp-2 text-xs font-bold leading-relaxed text-encre-700">{reprise.titre}</p>
-                    <p className="mt-3 font-serif text-base italic leading-relaxed text-encre-950">
-                      « {reprise.reponse} »
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="mx-auto mt-7 max-w-xl text-left">
-            <ChampEcriture
-              valeur={reponses[`priere:${scene.id}`] ?? ''}
-              onEnregistrer={(valeur) => onEnregistrer(`priere:${scene.id}`, valeur)}
-              placeholder="Ma prière aujourd’hui…"
-              lignes={5}
-            />
-          </div>
-        </div>
+        <ScenePriereImmersive
+          reprises={reprises}
+          valeur={reponses[`priere:${scene.id}`] ?? ''}
+          onEnregistrer={(valeur) => onEnregistrer(`priere:${scene.id}`, valeur)}
+        />
       );
     }
 
@@ -1718,6 +1678,193 @@ function RenduScene({
 
 // ─────────────────────────────────────────────────────────────
 
+interface ReprisePriere {
+  id: string;
+  titre: string;
+  reponse: string;
+}
+
+function distanceCirculaire(index: number, actif: number, total: number): number {
+  if (total <= 1) return 0;
+  let distance = index - actif;
+  if (distance > total / 2) distance -= total;
+  if (distance < -total / 2) distance += total;
+  return distance;
+}
+
+function ScenePriereImmersive({
+  reprises,
+  valeur,
+  onEnregistrer,
+}: {
+  reprises: ReprisePriere[];
+  valeur: string;
+  onEnregistrer: (valeur: string) => void;
+}) {
+  const [indexActif, setIndexActif] = useState(0);
+  const debutGlissement = useRef<number | null>(null);
+  const papiers = ['post-it-jaune', 'post-it-bleu', 'post-it-rose'];
+  const repriseActive = reprises[indexActif];
+
+  const avancer = useCallback((direction: number) => {
+    if (reprises.length < 2) return;
+    setIndexActif((index) => (index + direction + reprises.length) % reprises.length);
+  }, [reprises.length]);
+
+  const terminerGlissement = (positionX: number) => {
+    if (debutGlissement.current === null) return;
+    const distance = debutGlissement.current - positionX;
+    debutGlissement.current = null;
+    if (Math.abs(distance) < 42) return;
+    avancer(distance > 0 ? 1 : -1);
+  };
+
+  return (
+    <div className="py-8 text-center sm:py-12">
+      <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-or-300/30 bg-or-400/12 text-or-300 shadow-[0_0_28px_rgba(220,168,73,0.12)]">
+        <Flame className="h-7 w-7" strokeWidth={1.5} />
+      </span>
+      <span className="mt-6 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+        Prier la Parole
+      </span>
+      <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
+        Parle à Dieu à partir de ce que tu as découvert
+      </h2>
+      <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
+        Fais glisser tes notes, arrête-toi sur l’une d’elles, puis réponds à Dieu avec tes propres
+        mots. Tu peux aussi rester un instant en silence.
+      </p>
+
+      {reprises.length > 0 && (
+        <div className="tableau-liege mx-auto mt-8 max-w-3xl overflow-hidden rounded-[2rem] border border-[#d2a675]/55 px-3 py-5 text-left shadow-2xl sm:px-6 sm:py-7">
+          <div className="flex items-center justify-between gap-4 px-2 sm:px-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-white/85">
+                Les sujets déposés devant Dieu
+              </p>
+              <p className="mt-1 text-xs text-white/60">Glisse ou utilise les flèches pour les parcourir.</p>
+            </div>
+            <span className="shrink-0 rounded-full bg-black/20 px-3 py-1.5 text-xs font-bold text-white/75" aria-live="polite">
+              {indexActif + 1} / {reprises.length}
+            </span>
+          </div>
+
+          <div
+            className="relative mt-3 h-72 touch-pan-y overflow-hidden [perspective:1200px] sm:h-64"
+            onTouchStart={(event) => {
+              event.stopPropagation();
+              debutGlissement.current = event.touches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(event) => {
+              event.stopPropagation();
+              terminerGlissement(event.changedTouches[0]?.clientX ?? 0);
+            }}
+            onTouchCancel={(event) => {
+              event.stopPropagation();
+              debutGlissement.current = null;
+            }}
+          >
+            {reprises.map((reprise, indexReprise) => {
+              const distance = distanceCirculaire(indexReprise, indexActif, reprises.length);
+              const active = distance === 0;
+              const visible = Math.abs(distance) <= 1;
+              const transformation = active
+                ? 'translate3d(-50%, 0, 30px) rotateY(0deg) rotateZ(-0.4deg) scale(1)'
+                : distance < 0
+                  ? 'translate3d(-88%, 20px, -80px) rotateY(17deg) rotateZ(-4deg) scale(0.84)'
+                  : 'translate3d(-12%, 20px, -80px) rotateY(-17deg) rotateZ(4deg) scale(0.84)';
+              return (
+                <button
+                  key={reprise.id}
+                  type="button"
+                  onClick={() => setIndexActif(indexReprise)}
+                  aria-current={active ? 'true' : undefined}
+                  aria-label={`Sujet ${indexReprise + 1} : ${reprise.titre}`}
+                  className={`${papiers[indexReprise % papiers.length]} absolute left-1/2 top-5 h-52 w-[min(33rem,calc(100%-3rem))] overflow-hidden rounded-[5px] p-5 text-left text-encre-950 shadow-2xl transition-[transform,opacity,filter] duration-500 ease-out focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-48 sm:p-6`}
+                  style={{
+                    transform: visible ? transformation : 'translate3d(-50%, 38px, -150px) scale(0.7)',
+                    opacity: visible ? (active ? 1 : 0.48) : 0,
+                    filter: active ? 'saturate(1)' : 'saturate(0.65)',
+                    zIndex: active ? 30 : visible ? 15 : 0,
+                    pointerEvents: visible ? 'auto' : 'none',
+                  }}
+                >
+                  <span className="punaise-bois absolute -top-1 left-1/2 -translate-x-1/2" aria-hidden="true" />
+                  <span className="block text-xs font-black uppercase tracking-[0.09em] text-encre-700/70">
+                    {reprise.titre}
+                  </span>
+                  <span className="mt-4 line-clamp-5 block font-serif text-lg italic leading-relaxed text-encre-950">
+                    « {reprise.reponse} »
+                  </span>
+                  {active && (
+                    <span className="absolute bottom-3 right-4 text-xs font-bold text-encre-700/55">
+                      Sujet présent
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {reprises.length > 1 && (
+            <div className="flex items-center justify-center gap-4" aria-label="Parcourir les sujets de prière">
+              <button
+                type="button"
+                onClick={() => avancer(-1)}
+                aria-label="Sujet précédent"
+                className="grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/20 text-white transition-colors hover:bg-black/35 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <div className="flex items-center gap-2" aria-hidden="true">
+                {reprises.map((reprise, indexReprise) => (
+                  <span
+                    key={reprise.id}
+                    className={`block h-2 rounded-full transition-all duration-300 ${
+                      indexReprise === indexActif ? 'w-7 bg-or-300' : 'w-2 bg-white/35'
+                    }`}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => avancer(1)}
+                aria-label="Sujet suivant"
+                className="grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/20 text-white transition-colors hover:bg-black/35 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="mx-auto mt-8 max-w-xl text-left">
+        {repriseActive && (
+          <div className="rounded-2xl border border-or-400/20 bg-or-400/7 px-4 py-3" aria-live="polite">
+            <span className="text-xs font-black uppercase tracking-[0.12em] text-or-300/75">
+              À partir du sujet présent
+            </span>
+            <p className="mt-1.5 font-serif text-lg font-bold leading-relaxed text-parchemin-100">
+              Qu’aimerais-tu dire à Dieu à partir de cette découverte ?
+            </p>
+          </div>
+        )}
+        <ChampEcriture
+          valeur={valeur}
+          onEnregistrer={onEnregistrer}
+          placeholder="Ma prière aujourd’hui…"
+          ariaLabel="Ma prière à partir de mes découvertes"
+          questionPourAudio={repriseActive
+            ? `À partir de ce sujet : ${repriseActive.titre}. Qu’aimerais-tu dire à Dieu ?`
+            : 'Qu’aimerais-tu dire à Dieu maintenant ?'}
+          lignes={5}
+        />
+      </div>
+    </div>
+  );
+}
+
 type NiveauMemoire = 1 | 2 | 3 | 4;
 
 interface ResultatReconnaissance {
@@ -1808,6 +1955,11 @@ function SceneAncrageVerset({
   const [etapePassage, setEtapePassage] = useState(0);
   const [copiee, setCopiee] = useState(false);
   const [microActif, setMicroActif] = useState(false);
+  const [indexCarte, setIndexCarte] = useState(() => {
+    const indexSelectionne = options.findIndex((option) => option.reference === selection);
+    return indexSelectionne >= 0 ? indexSelectionne : 0;
+  });
+  const debutGlissementCarte = useRef<number | null>(null);
   const reconnaissance = useRef<ReconnaissanceVocale | null>(null);
   const selectionValide = options.length === 1
     || options.some((option) => option.reference === selection);
@@ -1825,6 +1977,18 @@ function SceneAncrageVerset({
     () => mots.map((mot) => (mot.length <= 1 ? mot : `${mot[0]}…`)).join(' '),
     [mots]
   );
+  const feuilleter = useCallback((direction: number) => {
+    if (options.length < 2) return;
+    setIndexCarte((index) => (index + direction + options.length) % options.length);
+  }, [options.length]);
+
+  const terminerGlissementCarte = (positionX: number) => {
+    if (debutGlissementCarte.current === null) return;
+    const distance = debutGlissementCarte.current - positionX;
+    debutGlissementCarte.current = null;
+    if (Math.abs(distance) < 42) return;
+    feuilleter(distance > 0 ? 1 : -1);
+  };
 
   useEffect(
     () => () => reconnaissance.current?.stop(),
@@ -1921,39 +2085,139 @@ function SceneAncrageVerset({
       </h2>
 
       {options.length > 1 && (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2" role="group" aria-label="Choisir le verset à mémoriser">
-          {options.map((option) => {
-            const choisi = option.reference === selection;
-            return (
+        <div className="mt-7" role="group" aria-label="Feuilleter et choisir le verset à mémoriser">
+          <div className="flex items-center justify-between gap-4">
+            <p className="max-w-xl text-sm leading-relaxed text-parchemin-100/60">
+              Fais glisser les cartes. Arrête-toi sur la Parole que tu souhaites emporter.
+            </p>
+            <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-parchemin-100/55" aria-live="polite">
+              {indexCarte + 1} / {options.length}
+            </span>
+          </div>
+
+          <div
+            className="relative mt-4 h-80 touch-pan-y overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_35%,rgba(216,170,85,0.12),transparent_58%)] [perspective:1400px] sm:h-72"
+            onTouchStart={(event) => {
+              event.stopPropagation();
+              debutGlissementCarte.current = event.touches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(event) => {
+              event.stopPropagation();
+              terminerGlissementCarte(event.changedTouches[0]?.clientX ?? 0);
+            }}
+            onTouchCancel={(event) => {
+              event.stopPropagation();
+              debutGlissementCarte.current = null;
+            }}
+          >
+            {options.map((option, indexOption) => {
+              const distance = distanceCirculaire(indexOption, indexCarte, options.length);
+              const active = distance === 0;
+              const choisi = option.reference === selection;
+              const visible = Math.abs(distance) <= 1;
+              const transformation = active
+                ? 'translate3d(-50%, 0, 40px) rotateY(0deg) rotateZ(0deg) scale(1)'
+                : distance < 0
+                  ? 'translate3d(-91%, 26px, -100px) rotateY(20deg) rotateZ(-3deg) scale(0.82)'
+                  : 'translate3d(-9%, 26px, -100px) rotateY(-20deg) rotateZ(3deg) scale(0.82)';
+              return (
+                <button
+                  key={option.reference}
+                  type="button"
+                  onClick={() => {
+                    setIndexCarte(indexOption);
+                    onChoisir(option.reference);
+                  }}
+                  aria-pressed={choisi}
+                  aria-current={active ? 'true' : undefined}
+                  aria-label={`${option.reference} — ${
+                    choisi ? 'Parole choisie' : active ? 'Choisir cette Parole' : 'Afficher et choisir cette Parole'
+                  }`}
+                  className={`absolute left-1/2 top-5 flex h-64 w-[min(36rem,calc(100%-3.5rem))] flex-col overflow-hidden rounded-[1.75rem] border p-5 text-left shadow-2xl transition-[transform,opacity,filter,border-color] duration-500 ease-out focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-60 sm:p-7 ${
+                    choisi
+                      ? 'border-or-300 bg-[linear-gradient(145deg,rgba(216,170,85,0.22),rgba(11,29,56,0.98)_58%)]'
+                      : 'border-white/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.09),rgba(11,29,56,0.98)_58%)]'
+                  }`}
+                  style={{
+                    transform: visible ? transformation : 'translate3d(-50%, 42px, -180px) scale(0.68)',
+                    opacity: visible ? (active ? 1 : 0.38) : 0,
+                    filter: active ? 'saturate(1)' : 'saturate(0.6)',
+                    zIndex: active ? 30 : visible ? 15 : 0,
+                    pointerEvents: visible ? 'auto' : 'none',
+                  }}
+                >
+                  <span className="flex items-center justify-between gap-4">
+                    <span>
+                      <span className="block text-xs font-black uppercase tracking-[0.15em] text-or-300/65">
+                        Parole {indexOption + 1}
+                      </span>
+                      <span className="mt-1 block font-serif text-2xl font-bold text-parchemin-100">
+                        {option.reference}
+                      </span>
+                    </span>
+                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border ${
+                      choisi
+                        ? 'border-or-300 bg-or-400 text-encre-950'
+                        : 'border-white/20 bg-white/5 text-parchemin-100/55'
+                    }`}>
+                      {choisi
+                        ? <Check className="h-5 w-5" aria-hidden="true" />
+                        : <Bookmark className="h-5 w-5" aria-hidden="true" />}
+                    </span>
+                  </span>
+                  <span className="mt-5 line-clamp-4 block font-serif text-lg italic leading-relaxed text-parchemin-100/82 sm:text-xl">
+                    « {option.texte} »
+                  </span>
+                  {active && (
+                    <span className={`mt-auto inline-flex min-h-11 items-center justify-center self-start rounded-full px-5 text-sm font-bold ${
+                      choisi
+                        ? 'bg-or-400/15 text-or-200'
+                        : 'bg-or-400 text-encre-950 shadow-[0_10px_28px_rgba(216,170,85,0.22)]'
+                    }`}>
+                      {choisi ? 'Parole choisie' : 'Choisir cette Parole'}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => feuilleter(-1)}
+              aria-label="Parole précédente"
+              className="absolute left-2 top-1/2 z-40 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-encre-950/80 text-parchemin-100 shadow-xl backdrop-blur transition-colors hover:border-or-300/50 hover:text-or-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-300 sm:left-4"
+            >
+              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={() => feuilleter(1)}
+              aria-label="Parole suivante"
+              className="absolute right-2 top-1/2 z-40 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-encre-950/80 text-parchemin-100 shadow-xl backdrop-blur transition-colors hover:border-or-300/50 hover:text-or-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-300 sm:right-4"
+            >
+              <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="mt-4 flex items-center justify-center gap-2" aria-label="Choisir une carte Parole">
+            {options.map((option, indexOption) => (
               <button
                 key={option.reference}
                 type="button"
-                onClick={() => onChoisir(option.reference)}
-                aria-pressed={choisi}
-                className={`min-h-28 rounded-3xl border p-4 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-300 ${
-                  choisi
-                    ? 'border-or-300 bg-or-400/16 shadow-[0_0_0_1px_rgba(216,170,85,0.2)]'
-                    : 'border-white/12 bg-white/5 hover:border-or-400/35 hover:bg-white/8'
-                }`}
+                onClick={() => setIndexCarte(indexOption)}
+                aria-label={`Afficher ${option.reference}`}
+                aria-current={indexOption === indexCarte ? 'true' : undefined}
+                className="group grid h-11 w-11 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-300"
               >
-                <span className="flex items-center justify-between gap-3">
-                  <span className={`font-serif text-lg font-bold ${choisi ? 'text-or-200' : 'text-parchemin-100'}`}>
-                    {option.reference}
-                  </span>
-                  <span className={`grid h-7 w-7 place-items-center rounded-full border ${
-                    choisi
-                      ? 'border-or-300 bg-or-400 text-encre-950'
-                      : 'border-white/20 text-transparent'
-                  }`}>
-                    <Check className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                </span>
-                <span className="mt-3 block line-clamp-2 font-serif text-sm italic leading-relaxed text-parchemin-100/65">
-                  « {option.texte} »
-                </span>
+                <span
+                  aria-hidden="true"
+                  className={`block h-2.5 rounded-full transition-all duration-300 ${
+                    indexOption === indexCarte ? 'w-8 bg-or-300' : 'w-2.5 bg-white/25 group-hover:bg-white/45'
+                  }`}
+                />
               </button>
-            );
-          })}
+            ))}
+          </div>
         </div>
       )}
 
