@@ -13,6 +13,7 @@
     "test:content": "node scripts/verifier-contenu.mjs",
     "test:rappels": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-rappels.mjs",
     "test:prononciation": "node scripts/test-prononciation.mjs",
+    "test:temps": "esbuild scripts/test-temps-apart.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-temps.mjs --log-level=warning && node /tmp/lesfondements-test-temps.mjs",
     "test:voix": "esbuild scripts/test-decoupage-voix.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-decoupage-voix.mjs --log-level=warning && node /tmp/lesfondements-test-decoupage-voix.mjs && esbuild scripts/test-lecture-voix.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-lecture-voix.mjs --log-level=warning && node /tmp/lesfondements-test-lecture-voix.mjs",
     "test:ducking": "esbuild scripts/test-ducking.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-ducking.mjs --log-level=warning && node /tmp/lesfondements-test-ducking.mjs",
     "test:rules": "npx -y firebase-tools@15.28.2 emulators:exec --only firestore --project lesfondements-rules-test \"node scripts/test-firestore-rules.mjs\"",

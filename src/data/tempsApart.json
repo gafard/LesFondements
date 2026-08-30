@@ -1,0 +1,51 @@
+{
+  "_lisezMoi": [
+    "Les découpages en temps quotidiens, déclarés plutôt que codés.",
+    "",
+    "Chaque fiche liste ses étapes dans l'ordre. Une étape reprend une section",
+    "entière du livret, ou une partie d'une section quand le livret regroupe",
+    "plusieurs mouvements sur une même page.",
+    "",
+    "  section  : l'index de la section dans le livret canonique",
+    "  titre    : le nom donné au temps (celui du livret, ou son sous-titre)",
+    "  depuis   : un sous-titre où la coupe commence — omis, on part du début",
+    "  jusqua   : un sous-titre où la coupe s'arrête — omis, on va jusqu'au bout",
+    "  avec     : d'autres sections à joindre à celle-ci",
+    "",
+    "Le livret n'est jamais modifié : on ne fait que déclarer où le déplier.",
+    "Un repère introuvable est signalé (voir tempsApart.ts) au lieu d'être",
+    "silencieusement ignoré — c'était le défaut de la version précédente."
+  ],
+
+  "2": [
+    { "section": 0, "titre": "Le péché" },
+    { "section": 1, "titre": "La Loi" },
+    { "section": 2, "titre": "Le Salut", "jusqua": "grâce me suffit" },
+    { "section": 2, "titre": "La Grâce", "depuis": "grâce me suffit" }
+  ],
+
+  "3": [
+    { "section": 0, "titre": "La foi" },
+    { "section": 1, "titre": "La grâce et la foi" },
+    { "section": 2, "titre": "La nécessité d’une nouvelle naissance", "jusqua": "nouvelle créature" },
+    { "section": 2, "titre": "Une nouvelle création", "depuis": "nouvelle créature", "jusqua": "enfant de Dieu, adopté" },
+    { "section": 2, "titre": "Enfant de Dieu, adopté du Père", "depuis": "enfant de Dieu, adopté" },
+    { "section": 3, "titre": "Après la nouvelle naissance : le baptême" }
+  ],
+
+  "4": [
+    { "section": 0, "titre": "Qu’est-ce que la grâce ?" },
+    { "section": 1, "titre": "Pourquoi est-il difficile de vivre dans la grâce ?" },
+    { "section": 2, "titre": "Comment Dieu me fait-il croître dans la grâce ?" },
+    { "section": 3, "titre": "Ma part : l’obéissance", "jusqua": "école de la souffrance" },
+    { "section": 3, "titre": "Dans la faiblesse et l’épreuve", "depuis": "école de la souffrance" },
+    { "section": 4, "titre": "Le repos" }
+  ],
+
+  "6": [
+    { "section": 1, "titre": "Se dépouiller et se revêtir" },
+    { "section": 3, "titre": "Marcher par la chair ou par l’Esprit ?", "avec": [2], "ordre": [2, 3] },
+    { "section": 4, "titre": "Renouveler ma manière de penser", "depuis": "renouvelant notre manière de pensée", "jusqua": "apprenant à marcher par l'esprit", "surTexte": true },
+    { "section": 4, "titre": "Apprendre à marcher par l’Esprit", "depuis": "apprenant à marcher par l'esprit", "surTexte": true }
+  ]
+}
