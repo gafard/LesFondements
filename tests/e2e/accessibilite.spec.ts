@@ -40,7 +40,7 @@ test('accessibilité applicative : méditation, prière et mémorisation de Dieu
   expect(resultat.violations).toEqual([]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de ce que tu as découvert' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
   resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
   expect(resultat.violations).toEqual([]);
 

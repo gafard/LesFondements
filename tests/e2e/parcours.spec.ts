@@ -36,7 +36,7 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
 
   await page.locator('textarea').first().fill('Dieu règne même lorsque je ne maîtrise pas la situation.');
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de ce que tu as découvert' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
   await page.getByPlaceholder('Ma prière aujourd’hui…').fill('Père, apprends-moi à te faire confiance.');
 
   await page.getByRole('button', { name: 'Continuer' }).click();
