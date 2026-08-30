@@ -2424,7 +2424,7 @@
         }
       },
       {
-        "sectionTitre": "Ai-je besoin de délivrance ? Le discernement du livret",
+        "sectionTitre": "Ai-je besoin de délivrance ?",
         "versets": [
           "Rm 6:12-14",
           "1 Co 10:13",
@@ -2667,219 +2667,640 @@
   {
     "ficheId": 9,
     "ficheTitre": "Le Saint-Esprit : sa demeure en nous",
+    "parcoursGuide": true,
     "sections": [
       {
-        "sectionTitre": "Introduction",
-        "versets": [],
+        "sectionTitre": "Le Saint-Esprit habite en nous",
+        "versets": [
+          "Jn 16:7-11",
+          "Ep 2:21-22",
+          "1 Co 6:19"
+        ],
         "questions": [
           {
             "id": "f9-s1-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte mentionne que le Saint-Esprit agit dans la \"conviction de péché\" et la \"sanctification\". Laquelle de ces deux actions as-tu le plus de mal à accepter en ce moment : te laisser reprendre quand tu désobéis, ou te laisser guider pour faire Sa volonté ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Jean 16:7-11. Jésus parle du consolateur, qu’il va envoyer.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Jésus annonce sa venue ?"
           },
           {
             "id": "f9-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le Saint-Esprit ne te force pas, il te rend « libre de choisir et de vouloir faire la volonté du Maître ». Qu'est-ce que ce doux respect de ta volonté t'apprend sur le caractère de Dieu ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret rappelle trois œuvres du Saint-Esprit dans le croyant. La conviction du péché : « il nous montre quand nous lui désobéissons ». La régénération, qui nous fait « passer de la mort spirituelle à la vie » — et le livret précise : « c’est instantané ». La sanctification, qui « nous rend libres de choisir et de vouloir faire la volonté du Maître en tout temps » — et là il précise : « c’est progressif ».",
+            "question": "Que comprends-tu de cette différence entre ce qui est déjà donné d’un coup, et ce qui se construit lentement ?"
           },
           {
             "id": "f9-s1-q3",
-            "fonction": "recevoir+repondre",
-            "question": "Accepte aujourd'hui cette œuvre de conviction et de sanctification. Dans quelle situation précise aujourd'hui dois-tu faire le choix (rendu possible par l'Esprit) de faire la volonté du Maître ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Éphésiens 2:21-22.",
+            "question": "De quoi ce passage dit-il que nous formons ensemble la construction ?"
+          },
+          {
+            "id": "f9-s1-q4",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis 1 Corinthiens 6:19. Une seule phrase, mais elle affirme deux choses.",
+            "question": "Quelles sont ces deux choses, et laquelle te surprend le plus ?"
+          },
+          {
+            "id": "f9-s1-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret situe un déplacement : « Sous l’Ancienne Alliance, l’Esprit de Dieu demeurait dans le Tabernacle, lieu de sa présence dans le Temple. Dans la Nouvelle Alliance […] la demeure de l’Esprit est dans l’Église, c’est-à-dire dans chaque croyant né de nouveau. »",
+            "question": "Que change ce déplacement, du bâtiment vers la personne ?"
+          },
+          {
+            "id": "f9-s1-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret insiste sur la portée pratique : la présence de Dieu est avec nous « pas seulement aux réunions d’église mais toujours, partout, à chaque instant (au travail, à la maison, dans la rue, la voiture, au magasin etc.) ».",
+            "question": "Dans quel lieu ou quel moment de ta semaine as-tu le plus de mal à te souvenir qu’il est là ?"
+          },
+          {
+            "id": "f9-s1-q7",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret en tire une conséquence, à la première personne : « Dieu vit en moi, mon corps est le temple du Saint-Esprit. Par conséquent je ne veux pas me souiller, je veux avoir la haine du mal, la crainte de Dieu. »",
+            "question": "Y a-t-il quelque chose que tu laisses entrer chez toi sans y penser, et que tu ne laisserais pas entrer si tu te souvenais de qui habite là ?"
+          },
+          {
+            "id": "f9-s1-q8",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Ne cherche pas à corriger quoi que ce soit tout de suite.",
+            "question": "Parle à Dieu de sa présence en toi, telle que tu viens de la comprendre."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment de ta journée voudrais-tu te rappeler qu’il est là ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À ce moment-là, que voudrais-tu faire ou dire à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Le Saint-Esprit habite en nous",
-        "versets": [],
+        "sectionTitre": "Vivre dans l’intimité du Père",
+        "versets": [
+          "Ps 63:1",
+          "Lc 10:38-42",
+          "2 Co 3:18"
+        ],
         "questions": [
           {
             "id": "f9-s2-q1",
             "fonction": "observer",
-            "question": "Le texte insiste sur le fait que Dieu vit avec nous « pas seulement aux réunions d'église mais toujours, partout... (au travail, à la maison, dans la rue...) ». As-tu tendance à compartimenter ta vie spirituelle, en oubliant Sa présence quand tu quittes l'église ou ton temps de prière ?"
+            "source": "parole",
+            "consigne": "Lis le Psaume 63:1. Lis-le lentement, à voix basse si tu peux.",
+            "question": "Quels mots emploie-t-il pour dire son désir de Dieu ?"
           },
           {
             "id": "f9-s2-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Dans l'Ancien Testament, Dieu habitait dans le Tabernacle ; aujourd'hui, Il a choisi d'habiter en toi (1 Co 6:19). Que te révèle ce mystère sur le désir profond de proximité et d'habitation intime que Dieu a pour toi ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Marc 1:35. Jésus vient de guérir toute une ville, et voici ce qu’il fait le lendemain.",
+            "question": "Qu’est-ce que ce verset te dit de ce qui passait en premier pour lui ?"
           },
           {
             "id": "f9-s2-q3",
-            "fonction": "se-laisser-eclairer",
-            "question": "« Je ne veux pas me souiller, je veux avoir la haine du mal ». Si ton corps et ta vie entière sont sa maison, y a-t-il une \"pièce\" de cette maison que tu gardes sale ou encombrée, pensant que l'Esprit n'y fera pas attention ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret distingue deux façons de connaître : « La connaissance selon la Bible ne se réduit pas à un savoir intellectuel mais à une dimension expérimentale : intimité, communion, profondeur. »",
+            "question": "Laquelle des deux décrit le mieux ta connaissance de Dieu en ce moment ?"
           },
           {
             "id": "f9-s2-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Si le Saint-Esprit est avec toi à chaque instant, comment vas-tu concrètement honorer sa présence lors de ta prochaine sortie dans \"la rue, la voiture, au magasin\" aujourd'hui ?"
+            "fonction": "chercher-dans-la-parole",
+            "source": "parole",
+            "consigne": "Le livret demande de lire le passage de Marthe et Marie (Luc 10:38-42), puis il pose lui-même la question : « À laquelle des deux peux-tu t’identifier ? »",
+            "question": "À laquelle des deux te reconnais-tu aujourd’hui, et pourquoi ?"
+          },
+          {
+            "id": "f9-s2-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret formule ainsi ce que le passage lui enseigne : « Notre relation est premièrement basée sur l’être et non pas sur le faire. »",
+            "question": "Que comprends-tu de cette phrase ? Qu’est-ce qu’elle ne dit pas ?"
+          },
+          {
+            "id": "f9-s2-q6",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Luc 15:25-32, le frère aîné dans la parabole du fils prodigue. Le livret le donne comme portrait : « il ne connaissait pas le cœur de son père et de ce fait, il se comportait comme un serviteur et vivait comme un serviteur dans la maison du père. »",
+            "question": "Qu’est-ce que le frère aîné dit de lui-même, dans sa réponse au père ?"
+          },
+          {
+            "id": "f9-s2-q7",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Reste sur ce portrait avant de passer à autre chose.",
+            "question": "Y a-t-il un endroit où tu sers Dieu comme un serviteur qui compte ses années, plutôt que comme un enfant chez lui ?"
+          },
+          {
+            "id": "f9-s2-q8",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret décrit ce que serait le contraire : « prendre un temps à part pour s’exposer à Son amour et recevoir de lui. C’est un repos actif : je choisis de m’ouvrir, d’être vulnérable, d’être dans une attitude d’accueil. »",
+            "question": "Qu’est-ce qui te rend difficile de simplement recevoir, sans rien produire ?"
+          },
+          {
+            "id": "f9-s2-q9",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Le livret dit que notre part est « de l’aimer, d’être à son écoute, et de le laisser nous transformer en son image ».",
+            "question": "Dis-lui ce que tu voudrais vraiment de cette relation."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Quel moment de ta semaine pourrais-tu réellement mettre à part pour être avec lui sans rien faire d’autre ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À partir de cette Parole, comment veux-tu vivre ce moment-là ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Vivre dans l'intimité du Père",
-        "versets": [],
+        "sectionTitre": "Conduits par l’Esprit",
+        "versets": [
+          "Mt 11:28-30",
+          "Jn 15:5",
+          "Jn 5:19"
+        ],
         "questions": [
           {
             "id": "f9-s3-q1",
             "fonction": "observer",
-            "question": "Relis cette phrase centrale : « Notre relation est premièrement basée sur l'être et non pas sur le faire ». Actuellement, définis-tu ta vie chrétienne par le nombre de choses que tu fais pour Dieu, ou par le temps que tu passes simplement à être avec Lui ?"
+            "source": "parole",
+            "consigne": "Lis Matthieu 11:28-30.",
+            "question": "Qu’est-ce qui te frappe dans ce que Jésus promet à ceux qui prennent son joug ?"
           },
           {
             "id": "f9-s3-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "Comme le fils aîné (Lc 15) qui vivait « comme un serviteur » sans connaître le cœur du père, te surprends-tu à te fatiguer dans le service tout en gardant un cœur amer, fermé ou méritant ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret explique l’image : la marche par l’Esprit « se fait côte à côte avec Jésus, un pas après l’autre, à son rythme, comme l’image de 2 bêtes avançant sous un même joug ».",
+            "question": "Sous un même joug, que se passe-t-il si l’une des deux bêtes va plus vite que l’autre ?"
           },
           {
             "id": "f9-s3-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte parle de Dieu qui veut te « transformer en son image » pendant que tu te reposes dans sa présence. Que te révèle cette promesse sur la douceur de Dieu, qui travaille pendant que tu t'arrêtes ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Jean 15:5, et Romains 8:14 si tu l’as sous la main.",
+            "question": "Qu’est-ce que Jésus dit exactement de ce que nous pouvons faire sans lui ?"
           },
           {
             "id": "f9-s3-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Entrer dans l'intimité demande d'être « vulnérable, d'être dans une attitude d'accueil ». Accueille cet amour : que dois-tu déposer comme \"masque de serviteur\" pour pouvoir passer un moment authentique, aujourd'hui, seul à seul avec ton Père ?"
-          }
-        ]
-      },
-      {
-        "sectionTitre": "Conduits par l'Esprit",
-        "versets": [],
-        "questions": [
-          {
-            "id": "f9-s4-q1",
             "fonction": "observer",
-            "question": "Le texte utilise l'image du joug (avancer côte à côte à son rythme). As-tu plutôt l'habitude de courir devant le Seigneur, ou de traîner les pieds loin derrière lui ?"
+            "source": "parole",
+            "consigne": "Lis Jean 5:19. C’est Jésus qui parle de lui-même.",
+            "question": "Qu’est-ce que cela révèle de sa manière de travailler avec le Père ?"
           },
           {
-            "id": "f9-s4-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "« Si nous dressons le plan de notre travail et demandons ensuite à Dieu de le bénir, il est vain d'espérer... » Quel projet récent as-tu entièrement organisé par toi-même avant de demander distraitement à Dieu de l'approuver ?"
+            "id": "f9-s3-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret en tire une conséquence directe pour nos projets : « Si nous dressons le plan de notre travail et demandons ensuite à Dieu de le bénir, il est vain d’espérer le voir s’engager en notre faveur. »",
+            "question": "Que comprends-tu de l’ordre que le livret propose ici ?"
           },
           {
-            "id": "f9-s4-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Jésus affirmait ne faire que ce qu'il voyait le Père faire (Jn 5:19). Que t'apprend la dépendance absolue de Jésus sur la façon dont le Dieu trinitaire travaille en communion ?"
+            "id": "f9-s3-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret pose lui-même cette question : « As-tu un exemple personnel d’avoir marché par l’Esprit / par la chair ? »",
+            "question": "Repense à une décision récente. L’as-tu portée devant lui avant, ou seulement après l’avoir arrêtée ?"
           },
           {
-            "id": "f9-s4-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Être religieux, c'est « vivre pour Dieu » sans le connaître. Refuse ce formalisme religieux aujourd'hui. Comment vas-tu t'attendre au Saint-Esprit aujourd'hui avant de prendre ta prochaine décision ?"
+            "id": "f9-s3-q7",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret donne un nom à la contrefaçon : « Être religieux, par contre, c’est vivre pour Dieu sans vraiment le connaître, c’est faire des choses par formalisme, sans être connecté ou conduit par l’Esprit. »",
+            "question": "Y a-t-il une chose que tu continues de faire par habitude, sans savoir s’il te l’a demandée ?"
+          },
+          {
+            "id": "f9-s3-q8",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Le livret ajoute que certaines choses « ne peuvent être faites que par lui », et d’autres « nous ont clairement été confiées par Dieu, et si nous ne les faisons pas, elles ne seront jamais réalisées ».",
+            "question": "Demande-lui de te montrer, dans ce que tu portes en ce moment, ce qui est à lui et ce qui est à toi."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Quelle décision as-tu à prendre bientôt ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Avant de la prendre, quel pas veux-tu poser à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
         "sectionTitre": "Écouter la voix de Dieu",
         "versets": [
-          "Jb 33:14"
+          "Jn 10:27",
+          "Jb 33:14",
+          "Es 50:4"
         ],
         "questions": [
           {
-            "id": "f9-s5-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte dit vrai : nous avons appris à demander, mais pas à « écouter Dieu parler ». Quand tu pries, quel pourcentage de ton temps est consacré à parler par rapport au temps passé en silence pour écouter ? Pourquoi fuis-tu ce silence ?"
+            "id": "f9-s4-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Jean 10:27.",
+            "question": "Qui fait quoi, dans ce verset ? Note l’ordre des trois verbes."
           },
           {
-            "id": "f9-s5-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le texte affirme que la voix de Dieu ne t'« accuse jamais, ne [te] culpabilise jamais, n'apporte jamais la confusion ». Que découvres-tu sur le ton de voix de ton Berger, par opposition à celui de l'ennemi ou de ta propre culpabilité ?"
+            "id": "f9-s4-q2",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Job 33:14, puis Ésaïe 50:4.",
+            "question": "Qu’est-ce que ces deux versets disent de Dieu, et qu’est-ce qu’ils disent de nous ?"
           },
           {
-            "id": "f9-s5-q3",
-            "fonction": "recevoir",
-            "question": "Tu es sous la Nouvelle Alliance, ce qui signifie que tu dépends « de Dieu directement ». Es-tu convaincu que Dieu veut *te* parler personnellement, ou te reposes-tu encore sur les responsables ou les enseignements des autres pour entendre Dieu ?"
+            "id": "f9-s4-q3",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret fait un constat : « La plupart d’entre nous avons appris à louer, à intercéder, à bénir mais pas à écouter Dieu parler à notre âme, de lui-même pour nous-mêmes. »",
+            "question": "Est-ce que ce constat te ressemble ?"
           },
           {
-            "id": "f9-s5-q4",
+            "id": "f9-s4-q4",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Repense à tes derniers temps de prière, honnêtement.",
+            "question": "Quelle place le silence y occupe-t-il, comparé à ce que tu dis ?"
+          },
+          {
+            "id": "f9-s4-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret énumère les manières dont l’Esprit parle au cœur : « des pensées, des impressions, des visions, des images » ; « une révélation des Écritures » ; « le témoignage intérieur : paix ou malaise » ; « la voix de notre esprit » ; et aussi « par d’autres personnes (croyantes ou pas), des circonstances, la nature, des anges, une voix audible ».",
+            "question": "Laquelle de ces manières reconnais-tu déjà dans ton expérience ?"
+          },
+          {
+            "id": "f9-s4-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret pose la question ainsi : « Comment Dieu te parle-t-il le plus souvent ? »",
+            "question": "Rappelle-toi une fois où tu as su que c’était lui. Comment est-ce venu ?"
+          },
+          {
+            "id": "f9-s4-q7",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret décrit un apprentissage, et non un état passif : « ne pas rendre l’intelligence passive (ce n’est pas le vide mental), mais amorcer sa pompe spirituelle : d’abord avec l’intelligence naturelle, poser des questions et prier en même temps. Et à un moment donné une sorte de paix vient. » Il ajoute : « Parfois, il faut aussi attendre », et « la foi est la clé ».",
+            "question": "Qu’est-ce que cela change, de comprendre l’écoute comme quelque chose qui s’exerce ?"
+          },
+          {
+            "id": "f9-s4-q8",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret donne un critère net : « La voix de Dieu ne nous accuse jamais, ne nous culpabilise jamais, n’apporte jamais la confusion. Sinon ce n’est pas la voix de Dieu. Elle nous amène à la libération. » Il ajoute trois repères : « la paix dans notre cœur, la non-contradiction avec l’Écriture, le discernement des frères ».",
+            "question": "Que te permet d’écarter ce premier critère, dès maintenant ?"
+          },
+          {
+            "id": "f9-s4-q9",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret pose la question du discernement sans la simplifier : « Est-ce que j’arrive à entendre Sa voix ? À discerner ce qui vient de lui, de moi ou du diable ? » Sur les signes extérieurs, il précise sa position : dans la Nouvelle Alliance « nous n’avons plus à poser de toison », mais nous pouvons demander « une direction ou une confirmation de quelque chose, avec discernement, et en le laissant libre de la manière dont il répondra ».",
+            "question": "Y a-t-il une voix intérieure que tu as prise pour la sienne, et qui t’accusait ?"
+          },
+          {
+            "id": "f9-s4-q10",
             "fonction": "repondre",
-            "question": "L'écoute demande de s'exercer, d'être disponible et de faire silence. Comment vas-tu organiser ton temps, dès demain matin, pour y intégrer un réel moment d'écoute volontaire du Saint-Esprit ?"
+            "source": "vie",
+            "consigne": "Le livret conclut : « Plus on écoute Dieu, plus on l’entend, et plus on l’entend, plus notre oreille s’affine. »",
+            "question": "Demande-lui de te parler, puis reste en silence un moment avant d’écrire ce qui vient."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "À quel moment, cette semaine, veux-tu faire silence pour l’écouter ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Comment veux-tu t’y prendre concrètement, à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Cette fiche a parlé d’une présence, d’une intimité, d’une conduite et d’une voix. Parmi ces quatre, laquelle veux-tu apprendre en premier avec Dieu ?",
+      "questionVerset": "Parmi les Paroles que tu as gardées dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "Il habite en moi",
+        "L’intimité que je désire",
+        "Marcher à son rythme",
+        "Apprendre à écouter sa voix"
+      ]
+    }
   },
   {
     "ficheId": 10,
     "ficheTitre": "Le Saint-Esprit : un revêtement de puissance",
+    "parcoursGuide": true,
     "sections": [
       {
         "sectionTitre": "Le baptême dans le Saint-Esprit : une expérience",
         "versets": [
+          "Lc 24:49",
+          "Ac 2:1-4",
           "Ac 1:4-5"
         ],
         "questions": [
           {
             "id": "f10-s1-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte fait une différence entre \"recevoir le Saint-Esprit\" (à la conversion) et \"être revêtu de sa puissance\". As-tu conscience de te contenter de ta conversion initiale sans chercher cette puissance supplémentaire d'en haut pour servir Dieu ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Luc 24:49. Ce sont les dernières consignes de Jésus avant de les quitter.",
+            "question": "Que leur demande-t-il de faire, et jusqu’à quand ?"
           },
           {
             "id": "f10-s1-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Dieu a promis que ce baptême donnerait à ses enfants « la puissance pour servir Dieu ». Que découvres-tu sur un Père qui ne t'envoie jamais au combat ou au service sans t'avoir préalablement équipé de ses propres armes divines ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Actes 2:1-4, le jour où cette attente prend fin.",
+            "question": "Qu’est-ce qui te frappe dans la manière dont cela leur arrive ?"
           },
           {
             "id": "f10-s1-q3",
-            "fonction": "recevoir+repondre",
-            "question": "Le seul critère pour recevoir est de « le croire et le vouloir ! » Au fond de toi, veux-tu vraiment que le feu du Saint-Esprit bouleverse ton confort chrétien ? Si oui, demande-lui aujourd'hui avec soif de te remplir de nouveau."
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret distingue deux moments : « Les apôtres avaient reçu l’Esprit-Saint (Jn 20:22) mais n’avaient pas été revêtus de sa puissance. C’est à la Pentecôte que cela se produisit. » Il précise ailleurs : « Tout chrétien a l’Esprit de Dieu, mais n’est pas forcément rempli / revêtu du Saint-Esprit. » C’est la lecture que le livret propose de ces passages ; d’autres chrétiens les articulent autrement.",
+            "question": "Que comprends-tu de la distinction que le livret pose ici ?"
+          },
+          {
+            "id": "f10-s1-q4",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Jean 20:22, puis Actes 19:5-6. Deux scènes, deux moments.",
+            "question": "Qu’est-ce que chacune raconte ?"
+          },
+          {
+            "id": "f10-s1-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret dit ce qui est reçu : « Quand nous sommes revêtus de l’Esprit, nous recevons la puissance pour servir Dieu et vivre selon sa volonté. » Et il refuse d’en faire une épreuve à mériter : « il n’est pas nécessaire d’attendre longtemps, le seul critère est : le croire et le vouloir ! »",
+            "question": "Que dit ce critère de la manière dont Dieu donne ?"
+          },
+          {
+            "id": "f10-s1-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret pose lui-même la question : « Est-ce que j’ai reçu le baptême du Saint-Esprit ? Qu’est-ce que cela a changé ? » Si tu ne sais pas quoi répondre, écris-le : ne pas savoir est une réponse honnête.",
+            "question": "Où en es-tu, aujourd’hui, avec ce que tu viens de lire ?"
+          },
+          {
+            "id": "f10-s1-q7",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Le livret ramène tout à deux verbes : le croire, et le vouloir.",
+            "question": "Dis-lui simplement si tu le veux, et ce qui te retient s’il y a quelque chose."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Quand veux-tu revenir devant Dieu sur cette question, sans te presser ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À partir de cette Parole, que voudrais-tu lui demander à ce moment-là ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Quelques résultats du baptême dans le Saint-Esprit",
+        "sectionTitre": "La puissance pour le témoignage",
         "versets": [
-          "Ac 4:33",
-          "Jn 21:25"
+          "Ac 1:8",
+          "1 Co 4:20",
+          "Ac 4:33"
         ],
         "questions": [
           {
             "id": "f10-s2-q1",
             "fonction": "observer",
-            "question": "Le texte affirme que le royaume de Dieu ne consiste pas en de simples paroles mais en « puissance explosive » qui démontre l'Évangile. À quel point as-tu remplacé l'attente de miracles par de simples raisonnements intellectuels pour convaincre les autres ?"
+            "source": "parole",
+            "consigne": "Lis Actes 1:8. Une promesse, puis une conséquence.",
+            "question": "Dans quel ordre viennent-elles, et à quoi la puissance est-elle destinée ?"
           },
           {
             "id": "f10-s2-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "L'Esprit nous donne de l'assurance face au monde, de sorte que le croyant rempli « n'a plus peur ». Dans quel domaine (témoignage au travail, famille) es-tu paralysé par la crainte des hommes parce qu'il te manque ce feu ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis 1 Corinthiens 4:20, puis Actes 4:33.",
+            "question": "Qu’est-ce que ces deux versets opposent l’un à l’autre ?"
           },
           {
             "id": "f10-s2-q3",
-            "fonction": "decouvrir-dieu",
-            "question": "Le Saint-Esprit t'aide à prier au-delà de ta compréhension limitée (Rm 8:26-27). Qu'est-ce que cela te dit de l'infinie tendresse de Dieu, qui met ses propres paroles dans ta bouche quand tu ne sais plus quoi lui dire ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret s’arrête sur le mot : « Paul utilise le mot “dynamis” = puissance explosive ! C’est cette puissance qui rend le témoignage efficace. Et la clé de cette puissance spirituelle, c’est le baptême dans le Saint-Esprit. Il est irremplaçable. »",
+            "question": "Que comprends-tu de ce que le livret appelle ici irremplaçable ?"
           },
           {
             "id": "f10-s2-q4",
-            "fonction": "recevoir+repondre",
-            "question": "Si l'effusion de l'Esprit est donnée \"avant tout pour ceux du dehors\", accepte de ne pas la chercher seulement pour ton bien-être. Vers qui Dieu t'appelle-t-il aujourd'hui à manifester cette \"puissance pour le témoignage\" ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret pose aussitôt une orientation qui protège de bien des dérives : « L’effusion du Saint-Esprit est donnée avant tout pour ceux du dehors. Ce n’est pas pour nous “faire du bien” entre nous. Cela répond à l’ordre missionnaire de Jésus. »",
+            "question": "À quoi sert donc la puissance, selon cette phrase ? Et à quoi ne sert-elle pas ?"
+          },
+          {
+            "id": "f10-s2-q5",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Actes 19:11, puis Marc 16:20.",
+            "question": "Quel lien ces textes établissent-ils entre la parole annoncée et les signes ?"
+          },
+          {
+            "id": "f10-s2-q6",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret propose un exercice de lecture, et pose lui-même le défi : « Essayez donc de trouver un chapitre du livre des Actes des apôtres sans intervention surnaturelle ! » Il en conclut : « la proclamation de la Bonne Nouvelle et les signes qui l’accompagnent sont inséparables. »",
+            "question": "Si tu as le temps, ouvre un chapitre des Actes au hasard. Qu’y trouves-tu ?"
+          },
+          {
+            "id": "f10-s2-q7",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret pose cette question sans y répondre à ta place : « L’Église d’aujourd’hui reflète-t-elle la puissance de la première Église ? Pourquoi ? »",
+            "question": "Qu’en penses-tu, à partir de ce que tu connais et de ce que tu as vu ?"
+          },
+          {
+            "id": "f10-s2-q8",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret dit que si l’on se contente d’annoncer la Parole « sans en manifester la puissance, on limite son impact ». Reviens à ce qui est à ta portée.",
+            "question": "Vers qui, autour de toi, aurais-tu besoin de plus que tes seuls mots ?"
+          },
+          {
+            "id": "f10-s2-q9",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Ne demande pas la puissance pour toi.",
+            "question": "Nomme devant Dieu cette personne, et demande-lui ce dont elle a besoin."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Quand vas-tu revoir cette personne ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À partir de cette Parole, quel pas veux-tu poser vers elle ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "Comment garder ce feu ?",
-        "versets": [],
+        "sectionTitre": "Une prière et une assurance nouvelles",
+        "versets": [
+          "Rm 8:26-27",
+          "Ep 6:18",
+          "Ep 1:13-14"
+        ],
         "questions": [
           {
             "id": "f10-s3-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "L'injonction n'est pas de vivre une expérience d'un soir, mais d'entrer dans une « action continue ». Es-tu tombé dans le piège de chercher des sensations fortes spirituelles sporadiques (lors de grands rassemblements) au lieu de cultiver un feu quotidien ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Romains 8:26-27, lentement.",
+            "question": "Que fait l’Esprit, exactement, quand nous ne savons pas prier ?"
           },
           {
             "id": "f10-s3-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le commandement est : « laissez-vous constamment remplir ». Que découvres-tu sur la nature de Dieu qui veut être ta source inépuisable, un fleuve coulant en permanence plutôt qu'un réservoir qui s'assèche ?"
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret explique pourquoi cette aide est nécessaire : « Nous ne savons pas que demander dans nos prières, parce que nous ne connaissons pas parfaitement la volonté de Dieu. Seul le Saint-Esprit peut nous diriger dans notre prière. »",
+            "question": "Qu’est-ce que cela enlève comme pression sur ta manière de prier ?"
           },
           {
             "id": "f10-s3-q3",
-            "fonction": "recevoir",
-            "question": "La règle d'or est posée : « Ce n'est pas passer une heure avec Dieu qui est important, mais c'est ne jamais passer une minute sans lui ! » Es-tu prêt à recevoir ce changement radical de mentalité pour ta journée ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Éphésiens 6:18, puis 1 Thessaloniciens 5:17-19.",
+            "question": "Que demandent ces versets, et qu’est-ce qu’ils demandent de ne pas faire ?"
           },
           {
             "id": "f10-s3-q4",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret présente ici la prière en langues : elle « est importante pour maintenir ce flux continu », elle « permet de s’édifier soi-même mais aussi d’être inspiré et porté par l’Esprit dans l’intercession ou la louange ». C’est l’enseignement du livret, dans sa tradition ; tu peux le recevoir, le questionner, ou y revenir plus tard.",
+            "question": "Qu’est-ce que cette description te fait comprendre de ce qu’elle cherche à décrire ?"
+          },
+          {
+            "id": "f10-s3-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret note un autre effet, en s’appuyant sur le vocabulaire des Actes : « Le mot “assurance” revient en effet souvent dans les Actes pour décrire le croyant rempli du Saint-Esprit, il n’a plus peur ! »",
+            "question": "Que comprends-tu de ce lien entre être rempli et ne plus avoir peur ?"
+          },
+          {
+            "id": "f10-s3-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Reviens à ta vie ordinaire, là où c’est concret.",
+            "question": "Dans quel lieu — travail, famille, amitié — la crainte de ce que les autres penseront te fait-elle taire ?"
+          },
+          {
+            "id": "f10-s3-q7",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret cite deux derniers effets, moins spectaculaires : « une plus grande communion avec Dieu […] une plus grande proximité qui nous amène à mieux le connaître » ; et « l’Esprit-Saint nous révèle des vérités de la Parole de Dieu et renverse nos compréhensions intellectuelles ».",
+            "question": "Lequel de ces deux effets désires-tu le plus, et pourquoi celui-là ?"
+          },
+          {
+            "id": "f10-s3-q8",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret dit du croyant conduit par l’Esprit dans la prière qu’il « n’est plus retenu par ses pensées, sa compréhension ou ses sentiments ».",
+            "question": "Qu’est-ce qui retient le plus ta prière en ce moment : le manque de mots, le manque de temps, ou le doute qu’il écoute ?"
+          },
+          {
+            "id": "f10-s3-q9",
             "fonction": "repondre",
-            "question": "Comment vas-tu t'y prendre très concrètement aujourd'hui, au milieu de tes activités, pour te maintenir dans cet état « d'action continue » sans oublier Sa présence à la minute qui suit ?"
+            "source": "vie",
+            "consigne": "Tu n’as pas besoin de bien formuler.",
+            "question": "Prie maintenant pour la situation où tu ne sais pas quoi demander, et laisse-la devant lui."
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quelle situation ne sais-tu pas quoi demander à Dieu ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À partir de cette Parole, comment veux-tu prier pour elle cette semaine ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Comment garder ce feu ?",
+        "versets": [
+          "Ep 5:18",
+          "Ac 4:29-31",
+          "Lc 11:13"
+        ],
+        "questions": [
+          {
+            "id": "f10-s4-q1",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Éphésiens 5:18. Un interdit, puis un ordre.",
+            "question": "Que met-il en vis-à-vis l’un de l’autre ?"
+          },
+          {
+            "id": "f10-s4-q2",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret s’arrête sur la forme du verbe : « Le temps du verbe remplir en grec ici, indique une action continue plutôt que ponctuelle. » Et il en tire ceci : « Il ne s’agit pas de la recherche d’un “sommet”, d’une expérience éphémère, mais d’un état : être constamment rempli de l’Esprit, immergé dans l’Esprit. »",
+            "question": "Quelle différence fais-tu entre chercher un sommet et rester dans un état ?"
+          },
+          {
+            "id": "f10-s4-q3",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Le livret renvoie à Actes 4:29-31 : les apôtres, de nouveau remplis du Saint-Esprit — et c’est après la Pentecôte.",
+            "question": "Que demandent-ils dans leur prière, et que reçoivent-ils ?"
+          },
+          {
+            "id": "f10-s4-q4",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Luc 11:13.",
+            "question": "À quoi Jésus compare-t-il la manière dont le Père donne l’Esprit ?"
+          },
+          {
+            "id": "f10-s4-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "consigne": "Le livret résume tout dans une phrase encadrée : « Ce n’est pas passer une heure avec Dieu qui est important, mais c’est ne jamais passer une minute sans lui ! »",
+            "question": "Cette phrase te soulage-t-elle, ou t’accable-t-elle ? Écris pourquoi."
+          },
+          {
+            "id": "f10-s4-q6",
+            "fonction": "identifier",
+            "source": "vie",
+            "consigne": "Le livret pose sa question : « Est-ce que je suis constamment en train d’être rempli par l’Esprit ? Comment l’être ? »",
+            "question": "À quel moment de la journée le perds-tu de vue le plus vite ?"
+          },
+          {
+            "id": "f10-s4-q7",
+            "fonction": "examiner",
+            "source": "vie",
+            "consigne": "Le livret ajoute une condition tenue en un mot : « Avoir soif ! »",
+            "question": "Qu’est-ce qui, dans ta vie actuelle, éteint ta soif avant même qu’elle se réveille ?"
+          },
+          {
+            "id": "f10-s4-q8",
+            "fonction": "repondre",
+            "source": "vie",
+            "consigne": "Le livret propose, pour le petit groupe, de « prier pour recevoir le Saint-Esprit, ou être renouvelé », et rappelle la condition : « le croire, le vouloir, le demander et le recevoir par la foi ! » Tu peux le faire ici, seul, et le redire avec ton groupe.",
+            "question": "Demande-lui. Puis écris ce que tu lui as demandé."
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Quel moment ordinaire de ta journée veux-tu transformer en repère pour revenir à lui ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "À partir de cette Parole, que veux-tu faire à ce moment-là ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Cette fiche a parlé d’un revêtement, d’une puissance donnée pour d’autres, d’une prière soutenue et d’un feu à garder. Où en es-tu, sincèrement, et qu’est-ce que tu demandes à Dieu à partir de là ?",
+      "questionVerset": "Parmi les Paroles que tu as gardées dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "Ce que le livret appelle le revêtement",
+        "La puissance, et ceux à qui elle est destinée",
+        "Ma prière et mon assurance",
+        "Rester rempli"
+      ]
+    }
   },
   {
     "ficheId": 11,

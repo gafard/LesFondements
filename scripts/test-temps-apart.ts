@@ -7,15 +7,27 @@
  * alors sur ses sections d'origine, et personne ne s'en aperçoit avant qu'un
  * disciple ouvre son temps du jour.
  *
- * Ce contrôle échoue à la place.
+ * Ce contrôle échoue à la place. Il vérifie aussi que chaque temps a bien la
+ * série de questions qui lui correspond : les deux se rejoignent par leur
+ * position, si bien qu'un temps ajouté d'un côté et pas de l'autre ferait
+ * lire les questions du mardi le lundi, sans rien casser d'apparent.
  */
 import decoupages from '../src/data/tempsApart.json' with { type: 'json' };
 import livret from '../src/data/livret.json' with { type: 'json' };
+import meditations from '../src/data/meditation-questions.json' with { type: 'json' };
 import { etapesTempsApart } from '../src/lib/tempsApart';
 import type { FicheLivret } from '../src/lib/livret';
 
 const fiches = (livret as { fiches: FicheLivret[] }).fiches;
 const declarees = Object.keys(decoupages).filter((c) => !c.startsWith('_'));
+
+interface FicheMeditation {
+  ficheId: number;
+  /** Les fiches réécrites promettent une série de questions par temps. */
+  parcoursGuide?: boolean;
+  sections: { sectionTitre: string }[];
+}
+const parcours = meditations as FicheMeditation[];
 
 let echecs = 0;
 
@@ -62,6 +74,44 @@ for (const fiche of fiches) {
     );
     echecs += 1;
   }
+}
+
+// Chaque temps tire ses questions de la série de même rang : un décalage
+// donnerait au jour 2 les questions du jour 3.
+for (const fiche of fiches) {
+  const meditation = parcours.find((m) => m.ficheId === fiche.id);
+  if (!meditation) continue;
+
+  const temps = etapesTempsApart(fiche);
+  if (temps.length !== meditation.sections.length) {
+    const orphelins = temps.length - meditation.sections.length;
+    if (meditation.parcoursGuide) {
+      console.error(
+        `✗ fiche ${fiche.id} : ${temps.length} temps mais ${meditation.sections.length} série(s) de questions`
+      );
+      echecs += 1;
+      continue;
+    }
+    // Fiches pas encore réécrites : les derniers jours retombent sur les trois
+    // questions génériques. Ce n'est pas un accident de découpage, c'est du
+    // contenu qui reste à écrire — on le dit sans bloquer le reste.
+    console.warn(
+      `· fiche ${fiche.id} : ${orphelins} jour(s) sur ${temps.length} sans questions propres — ` +
+        `à écrire (${temps.slice(meditation.sections.length).map((e) => e.section.titre ?? '?').join(', ')})`
+    );
+    continue;
+  }
+
+  temps.forEach((etape, rang) => {
+    const attendu = meditation.sections[rang].sectionTitre;
+    if (etape.section.titre && etape.section.titre !== attendu) {
+      console.error(
+        `✗ fiche ${fiche.id}, jour ${rang + 1} : le temps « ${etape.section.titre} » ` +
+          `reçoit les questions de « ${attendu} »`
+      );
+      echecs += 1;
+    }
+  });
 }
 
 console.log(

@@ -1,4 +1,258 @@
 {
+  "2": [
+    {
+      "section": 0,
+      "titre": "Le péché"
+    },
+    {
+      "section": 1,
+      "titre": "La Loi"
+    },
+    {
+      "section": 2,
+      "titre": "Le Salut",
+      "jusqua": "grâce me suffit"
+    },
+    {
+      "section": 2,
+      "titre": "La Grâce",
+      "depuis": "grâce me suffit"
+    }
+  ],
+  "3": [
+    {
+      "section": 0,
+      "titre": "La foi"
+    },
+    {
+      "section": 1,
+      "titre": "La grâce et la foi"
+    },
+    {
+      "section": 2,
+      "titre": "La nécessité d’une nouvelle naissance",
+      "jusqua": "nouvelle créature"
+    },
+    {
+      "section": 2,
+      "titre": "Une nouvelle création",
+      "depuis": "nouvelle créature",
+      "jusqua": "enfant de Dieu, adopté"
+    },
+    {
+      "section": 2,
+      "titre": "Enfant de Dieu, adopté du Père",
+      "depuis": "enfant de Dieu, adopté"
+    },
+    {
+      "section": 3,
+      "titre": "Après la nouvelle naissance : le baptême"
+    }
+  ],
+  "4": [
+    {
+      "section": 0,
+      "titre": "Qu’est-ce que la grâce ?"
+    },
+    {
+      "section": 1,
+      "titre": "Pourquoi est-il difficile de vivre dans la grâce ?"
+    },
+    {
+      "section": 2,
+      "titre": "Comment Dieu me fait-il croître dans la grâce ?"
+    },
+    {
+      "section": 3,
+      "titre": "Ma part : l’obéissance",
+      "jusqua": "école de la souffrance"
+    },
+    {
+      "section": 3,
+      "titre": "Dans la faiblesse et l’épreuve",
+      "depuis": "école de la souffrance"
+    },
+    {
+      "section": 4,
+      "titre": "Le repos"
+    }
+  ],
+  "6": [
+    {
+      "section": 1,
+      "titre": "Se dépouiller et se revêtir"
+    },
+    {
+      "section": 3,
+      "titre": "Marcher par la chair ou par l’Esprit ?",
+      "avec": [
+        2
+      ],
+      "ordre": [
+        2,
+        3
+      ]
+    },
+    {
+      "section": 4,
+      "titre": "Renouveler ma manière de penser",
+      "depuis": "renouvelant notre manière de pensée",
+      "jusqua": "apprenant à marcher par l'esprit",
+      "surTexte": true
+    },
+    {
+      "section": 4,
+      "titre": "Apprendre à marcher par l’Esprit",
+      "depuis": "apprenant à marcher par l'esprit",
+      "surTexte": true
+    }
+  ],
+  "7": [
+    {
+      "section": 1,
+      "titre": "Où est-ce que je cherche à être comblé ?"
+    },
+    {
+      "section": 2,
+      "titre": "Comprendre ce que mes émotions signalent"
+    },
+    {
+      "section": 3,
+      "titre": "Gagner la bataille dans mes pensées"
+    },
+    {
+      "section": 4,
+      "titre": "Blessures et guérison intérieure",
+      "jusqua": "Le pardon"
+    },
+    {
+      "section": 4,
+      "titre": "Le pardon",
+      "depuis": "Le pardon"
+    }
+  ],
+  "8": [
+    {
+      "section": 1,
+      "titre": "Jésus est vainqueur",
+      "jusqua": "La délivrance des démons"
+    },
+    {
+      "section": 1,
+      "titre": "Ai-je besoin de délivrance ?",
+      "depuis": "La délivrance des démons",
+      "jusqua": "La libération des liens de l’âme"
+    },
+    {
+      "section": 1,
+      "titre": "Les liens de l’âme et les liens héréditaires",
+      "depuis": "La libération des liens de l’âme"
+    },
+    {
+      "section": 2,
+      "titre": "Les conditions pour être libéré"
+    }
+  ],
+  "9": [
+    {
+      "section": 0,
+      "titre": "Le Saint-Esprit habite en nous",
+      "avec": [
+        1
+      ]
+    },
+    {
+      "section": 2,
+      "titre": "Vivre dans l’intimité du Père"
+    },
+    {
+      "section": 3,
+      "titre": "Conduits par l’Esprit"
+    },
+    {
+      "section": 4,
+      "titre": "Écouter la voix de Dieu"
+    }
+  ],
+  "10": [
+    {
+      "section": 0,
+      "titre": "Le baptême dans le Saint-Esprit : une expérience"
+    },
+    {
+      "section": 1,
+      "titre": "La puissance pour le témoignage",
+      "jusqua": "Une vie de prière transformée"
+    },
+    {
+      "section": 1,
+      "titre": "Une prière et une assurance nouvelles",
+      "depuis": "Une vie de prière transformée"
+    },
+    {
+      "section": 2,
+      "titre": "Comment garder ce feu ?"
+    }
+  ],
+  "13": [
+    {
+      "section": 0,
+      "titre": "Vivre pour Lui"
+    },
+    {
+      "section": 1,
+      "titre": "Appliquer l’enseignement reçu"
+    },
+    {
+      "section": 2,
+      "titre": "Obéir, marcher dans la lumière, être victorieux"
+    },
+    {
+      "section": 3,
+      "titre": "La formation de disciple",
+      "avec": [
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "14": [
+    {
+      "section": 0,
+      "titre": "Le Royaume"
+    },
+    {
+      "section": 1,
+      "titre": "L’Église"
+    },
+    {
+      "section": 2,
+      "titre": "Une Église en mission"
+    }
+  ],
+  "15": [
+    {
+      "section": 0,
+      "titre": "L’homme est créé pour être relationnel"
+    },
+    {
+      "section": 1,
+      "titre": "Une famille spirituelle"
+    },
+    {
+      "section": 2,
+      "titre": "Construire des relations qui honorent Dieu"
+    },
+    {
+      "section": 3,
+      "titre": "L’unité"
+    },
+    {
+      "section": 4,
+      "titre": "Direction spirituelle et autorité"
+    }
+  ],
   "_lisezMoi": [
     "Les découpages en temps quotidiens, déclarés plutôt que codés.",
     "",
@@ -15,73 +269,5 @@
     "Le livret n'est jamais modifié : on ne fait que déclarer où le déplier.",
     "Un repère introuvable est signalé (voir tempsApart.ts) au lieu d'être",
     "silencieusement ignoré — c'était le défaut de la version précédente."
-  ],
-
-  "2": [
-    { "section": 0, "titre": "Le péché" },
-    { "section": 1, "titre": "La Loi" },
-    { "section": 2, "titre": "Le Salut", "jusqua": "grâce me suffit" },
-    { "section": 2, "titre": "La Grâce", "depuis": "grâce me suffit" }
-  ],
-
-  "3": [
-    { "section": 0, "titre": "La foi" },
-    { "section": 1, "titre": "La grâce et la foi" },
-    { "section": 2, "titre": "La nécessité d’une nouvelle naissance", "jusqua": "nouvelle créature" },
-    { "section": 2, "titre": "Une nouvelle création", "depuis": "nouvelle créature", "jusqua": "enfant de Dieu, adopté" },
-    { "section": 2, "titre": "Enfant de Dieu, adopté du Père", "depuis": "enfant de Dieu, adopté" },
-    { "section": 3, "titre": "Après la nouvelle naissance : le baptême" }
-  ],
-
-  "4": [
-    { "section": 0, "titre": "Qu’est-ce que la grâce ?" },
-    { "section": 1, "titre": "Pourquoi est-il difficile de vivre dans la grâce ?" },
-    { "section": 2, "titre": "Comment Dieu me fait-il croître dans la grâce ?" },
-    { "section": 3, "titre": "Ma part : l’obéissance", "jusqua": "école de la souffrance" },
-    { "section": 3, "titre": "Dans la faiblesse et l’épreuve", "depuis": "école de la souffrance" },
-    { "section": 4, "titre": "Le repos" }
-  ],
-
-  "6": [
-    { "section": 1, "titre": "Se dépouiller et se revêtir" },
-    { "section": 3, "titre": "Marcher par la chair ou par l’Esprit ?", "avec": [2], "ordre": [2, 3] },
-    { "section": 4, "titre": "Renouveler ma manière de penser", "depuis": "renouvelant notre manière de pensée", "jusqua": "apprenant à marcher par l'esprit", "surTexte": true },
-    { "section": 4, "titre": "Apprendre à marcher par l’Esprit", "depuis": "apprenant à marcher par l'esprit", "surTexte": true }
-  ],
-
-  "13": [
-    { "section": 0, "titre": "Vivre pour Lui" },
-    { "section": 1, "titre": "Appliquer l’enseignement reçu" },
-    { "section": 2, "titre": "Obéir, marcher dans la lumière, être victorieux" },
-    { "section": 3, "titre": "La formation de disciple", "avec": [4, 5, 6] }
-  ],
-
-  "14": [
-    { "section": 0, "titre": "Le Royaume" },
-    { "section": 1, "titre": "L’Église" },
-    { "section": 2, "titre": "Une Église en mission" }
-  ],
-
-  "15": [
-    { "section": 0, "titre": "L’homme est créé pour être relationnel" },
-    { "section": 1, "titre": "Une famille spirituelle" },
-    { "section": 2, "titre": "Construire des relations qui honorent Dieu" },
-    { "section": 3, "titre": "L’unité" },
-    { "section": 4, "titre": "Direction spirituelle et autorité" }
-  ],
-
-  "7": [
-    { "section": 1, "titre": "Où est-ce que je cherche à être comblé ?" },
-    { "section": 2, "titre": "Comprendre ce que mes émotions signalent" },
-    { "section": 3, "titre": "Gagner la bataille dans mes pensées" },
-    { "section": 4, "titre": "Blessures et guérison intérieure", "jusqua": "Le pardon" },
-    { "section": 4, "titre": "Le pardon", "depuis": "Le pardon" }
-  ],
-
-  "8": [
-    { "section": 1, "titre": "Jésus est vainqueur", "jusqua": "La délivrance des démons" },
-    { "section": 1, "titre": "Ai-je besoin de délivrance ?", "depuis": "La délivrance des démons", "jusqua": "La libération des liens de l’âme" },
-    { "section": 1, "titre": "Les liens de l’âme et les liens héréditaires", "depuis": "La libération des liens de l’âme" },
-    { "section": 2, "titre": "Les conditions pour être libéré" }
   ]
 }
