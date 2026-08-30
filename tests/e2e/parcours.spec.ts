@@ -383,6 +383,94 @@ test('fiche 4 : la Parole et l’interprétation du livret restent distinctes da
   await expect(page.getByRole('button', { name: 'Ep 2:10' })).toBeVisible();
 });
 
+test('fiche 5 : quatre traversées bibliques conduisent à une identité reçue en Christ', async ({ page }) => {
+  await page.addInitScript(
+    ({ uid, groupeId }) => {
+      const groupes = JSON.parse(localStorage.getItem('lf.groups') || '[]');
+      localStorage.setItem(
+        'lf.groups',
+        JSON.stringify(groupes.map((groupe: { id: string }) =>
+          groupe.id === groupeId ? { ...groupe, currentStep: 5 } : groupe
+        ))
+      );
+      localStorage.setItem(
+        `lesfondements_prog_${uid}`,
+        JSON.stringify({
+          5: {
+            completed: false,
+            answers: {
+              'verset-choisi:f5-s1': 'Rm 6:3-4',
+              'verset-choisi:f5-s2': 'Ep 1:3',
+              'verset-choisi:f5-s3': '2 Co 5:21',
+            },
+            lastUpdated: Date.now(),
+          },
+        })
+      );
+    },
+    { uid: UTILISATEUR.uid, groupeId: GROUPE.id }
+  );
+
+  await page.goto('/dashboard');
+  await expect(page.getByText('0 / 4 étapes')).toBeVisible();
+  await expect(page.getByText('Morts et ressuscités avec Jésus-Christ', { exact: true })).toBeVisible();
+  await expect(page.getByText('Assis avec le Christ dans les lieux célestes', { exact: true })).toBeVisible();
+  await expect(page.getByText("L'échange divin", { exact: true })).toBeVisible();
+  await expect(page.getByText('Notre réelle identité', { exact: true })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=5&section=2&scene=3');
+  await expect(page.getByText('Lis lentement Ésaïe 53:4-6', { exact: false })).toBeVisible();
+  await expect(page.getByText('📖 La Parole', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('📘 Le livret · interprétation proposée', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Garde distincts ce que les passages affirment directement', { exact: false })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=5&section=3&scene=3');
+  await expect(page.getByText('Explore maintenant ces huit cartes', { exact: false })).toBeVisible();
+  await expect(page.getByText('sans fabriquer une déclaration positive', { exact: false })).toBeVisible();
+  await page.getByLabel('Comment répondrais-tu aujourd’hui à cette question : qui suis-je en Christ ?').fill(
+    'Je reçois mon identité de ce que Dieu a accompli et affirme en Christ.'
+  );
+  await page.getByLabel(
+    'Quelle affirmation biblique sur ton identité as-tu le plus besoin de garder présente aujourd’hui ?'
+  ).fill('Jean 1:12 me rappelle que je suis enfant de Dieu.');
+  await page.getByLabel('Qu’est-ce que ce passage vient éclairer ou corriger dans ta manière de te voir ?').fill(
+    'Je n’ai pas à construire ma valeur sur le regard des autres.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Ce que la Parole dit de moi en Christ')).toBeVisible();
+  await expect(page.getByText('Le passage qui m’a particulièrement arrêté')).toBeVisible();
+  await expect(page.getByText('Ce que ce passage vient éclairer ou corriger')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('La Parole que je garde', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Jn 1:12/ })).toBeVisible();
+  await page.getByRole('button', { name: /^Jn 1:12/ }).click();
+  await expect(page.getByRole('button', { name: /^Jn 1:12/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Parole précédente' }).click();
+  await expect(page.getByRole('button', { name: /^1 Co 6:19/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Parole suivante' }).click();
+  await page.getByRole('button', { name: /^Jn 1:12/ }).click();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('La Parole que tu gardes · Jn 1:12')).toBeVisible();
+  await page.getByPlaceholder('Je risque d’oublier cette Parole lorsque…').fill(
+    'Je laisse une critique définir ma valeur.'
+  );
+  await page.getByPlaceholder('Je voudrais revenir à cette Parole en…').fill(
+    'Relisant ce que Dieu affirme avant de répondre.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Regarde le chemin parcouru.' })).toBeVisible();
+  await expect(page.getByText('Vie nouvelle avec Christ', { exact: true })).toBeVisible();
+  await expect(page.getByText('Position en Christ', { exact: true })).toBeVisible();
+  await expect(page.getByText('La croix', { exact: true })).toBeVisible();
+  await expect(page.getByText('Identité reçue', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Rm 6:3-4' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Jn 1:12' })).toBeVisible();
+});
+
 test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/dashboard');

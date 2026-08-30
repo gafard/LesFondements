@@ -1305,118 +1305,410 @@
   {
     "ficheId": 5,
     "ficheTitre": "Mon identité en Christ",
+    "parcoursGuide": true,
     "sections": [
       {
         "sectionTitre": "Morts et ressuscités avec Jésus-Christ",
         "versets": [
+          "Rm 6:3-4",
+          "Col 1:13",
+          "2 Co 5:17",
           "Ep 5:8"
         ],
         "questions": [
           {
             "id": "f5-s1-q1",
             "fonction": "observer",
-            "question": "Le texte déclare une vérité radicale : « Le pécheur est devenu un saint. » En observant honnêtement tes pensées, lorsque tu penses à toi-même devant Dieu, te considères-tu spontanément comme un pécheur luttant pour s'en sortir, ou comme un saint ?"
+            "source": "parole",
+            "consigne": "Lis lentement Romains 6:3-4. Puis relis-le une seconde fois.",
+            "question": "Qu’est-ce qui retient ton attention dans ce passage ?"
           },
           {
             "id": "f5-s1-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "L'enseignement précise que « notre esprit a été rendu parfait... il ne peut être souillé. » Comment cette certitude vient-elle éclairer ou bousculer ta tendance à te sentir indigne ou \"sale\" spirituellement après chaque échec dans ton comportement ?"
+            "fonction": "comprendre",
+            "source": "contemplation",
+            "consigne": "Reste encore un instant avec les mots du texte, sans chercher une formule apprise.",
+            "question": "Que comprends-tu de ce qui s’est passé pour celui qui appartient à Jésus ?"
           },
           {
             "id": "f5-s1-q3",
-            "fonction": "decouvrir-dieu+recevoir",
-            "question": "« Nous ne pouvons rien faire pour améliorer la transformation que Dieu a opérée en nous. Il attend uniquement que nous croyions ce qu'il a fait. » Qu'est-ce que cela te révèle sur la puissance définitive de l'œuvre de Dieu, et es-tu enfin prêt à cesser d'essayer de \"finir le travail\" toi-même ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Colossiens 1:13. Prends ton temps.",
+            "question": "Qu’est-ce qui te frappe dans cette affirmation ?"
           },
           {
             "id": "f5-s1-q4",
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Garde Colossiens 1:13 à côté de Romains 6:3-4.",
+            "question": "Lorsque tu rapproches ces deux passages, qu’est-ce qui a changé ?"
+          },
+          {
+            "id": "f5-s1-q5",
+            "fonction": "comprendre",
+            "source": "parole",
+            "consigne": "Lis maintenant 2 Corinthiens 5:17 après les deux passages précédents.",
+            "question": "Quel sens nouveau ou plus profond ce verset prend-il pour toi ?"
+          },
+          {
+            "id": "f5-s1-q6",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret résume la régénération comme un passage de la mort à la vie, des ténèbres à la lumière, et comme une nouvelle création. Reviens ensuite aux trois passages bibliques.",
+            "question": "Qu’est-ce que cette synthèse t’aide à mieux comprendre ?"
+          },
+          {
+            "id": "f5-s1-q7",
+            "fonction": "rester-ouvert",
+            "source": "livret",
+            "consigne": "Le livret affirme aussi que « notre vieille nature a été détruite pour toujours », que « notre esprit a été rendu parfait » et qu’il « ne peut être souillé ». Ces formulations sont une interprétation doctrinale proposée par le livret ; elles ne sont pas présentées ici comme des citations directes des passages.",
+            "question": "Après avoir relu les textes, qu’est-ce que tu comprends, qu’est-ce que tu questionnes ou qu’est-ce qui reste ouvert pour toi ?"
+          },
+          {
+            "id": "f5-s1-q8",
             "fonction": "repondre",
-            "question": "Si tu es réellement mort à ton ancienne vie, quelle \"vieille valise\" de ton passé (une culpabilité, une ancienne réputation, un vieux défaut) dois-tu lâcher aujourd'hui en réalisant qu'elle ne t'appartient plus ?"
+            "source": "contemplation",
+            "consigne": "Appuie-toi sur les passages que tu viens de parcourir.",
+            "question": "Avec tes propres mots, que comprends-tu maintenant de ton identité en Christ ?",
+            "priereTitre": "Ce que j’ai compris de mon identité en Christ"
+          },
+          {
+            "id": "f5-s1-q9",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Tu n’as pas besoin de tout résumer.",
+            "question": "Qu’est-ce qui est devenu plus clair pour toi ?",
+            "priereTitre": "Ce qui est devenu plus clair pour moi"
+          },
+          {
+            "id": "f5-s1-q10",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Reviens à la phrase ou au verset qui est resté avec toi.",
+            "question": "Quelle vérité t’a particulièrement arrêté ?",
+            "priereTitre": "La vérité qui m’a particulièrement arrêté"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment concret de ta journée voudrais-tu te souvenir de cette Parole ?",
+          "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir de ce qu’elle affirme ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
         "sectionTitre": "Assis avec le Christ dans les lieux célestes",
         "versets": [
+          "Ep 2:4-6",
+          "Ep 1:3",
           "Col 2:10"
         ],
         "questions": [
           {
             "id": "f5-s2-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte renverse notre logique : « La vie chrétienne ne commence pas par \"marcher\" ; elle commence par \"être assis\". » Dans ta vie spirituelle, as-tu l'impression d'être toujours en train de courir, de chercher à \"atteindre\" Dieu, au lieu d'être assis avec lui ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Éphésiens 2:4-6 dans son ensemble. Relis-le lentement.",
+            "question": "Qu’est-ce qui retient ton attention dans ce que Dieu fait ?"
           },
           {
             "id": "f5-s2-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le Seigneur nous convie à « nous asseoir et à jouir de ce que Dieu a fait pour nous. » Que te révèle cette invitation sur le cœur d'un Dieu qui veut te voir te reposer en Lui plutôt que de t'épuiser pour Lui ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Éphésiens 1:3 et garde-le à côté d’Éphésiens 2:4-6.",
+            "question": "Qu’est-ce que ce passage ajoute ?"
           },
           {
             "id": "f5-s2-q3",
-            "fonction": "recevoir",
-            "question": "« Quelque chose a été accompli, l'effort cesse... » As-tu profondément reçu cette vérité au point que tu puisses te détendre intérieurement, sachant que la bataille principale a déjà été gagnée à la croix ?"
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Reviens aux deux passages sans chercher à répéter une conclusion déjà connue.",
+            "question": "Lorsque tu les gardes ensemble, que comprends-tu de la position du croyant « en Christ » ?"
           },
           {
             "id": "f5-s2-q4",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret propose cette image : « Être assis est une position de repos. » Il explique que la vie chrétienne commence par recevoir ce que Dieu a accompli plutôt que par chercher à l’atteindre par ses propres forces. Cette image ne signifie pas que toute action ou tout effort devient inutile.",
+            "question": "Après Éphésiens 2:4-6, qu’est-ce que cette image t’aide à comprendre ?"
+          },
+          {
+            "id": "f5-s2-q5",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Colossiens 2:10. Relis-le une seconde fois.",
+            "question": "Qu’est-ce qui t’arrête dans ce verset ?"
+          },
+          {
+            "id": "f5-s2-q6",
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Rapproche Colossiens 2:10 des deux passages d’Éphésiens.",
+            "question": "Qu’est-ce que cela ajoute à ce que tu viens de découvrir ?"
+          },
+          {
+            "id": "f5-s2-q7",
             "fonction": "repondre",
-            "question": "Être assis, c'est « faire reposer tout notre poids - notre fardeau, nous-mêmes, notre avenir, tout — sur le Seigneur. » Quel est précisément le fardeau lié à ton avenir que tu portes encore sur tes propres épaules et que tu dois consciemment déposer sur Lui aujourd'hui ?"
+            "source": "contemplation",
+            "consigne": "Regarde l’ensemble du chemin parcouru dans cette partie.",
+            "question": "Que comprends-tu maintenant de cette image : commencer la vie chrétienne assis avec Christ ?",
+            "priereTitre": "Ce que j’ai compris de ma position en Christ"
+          },
+          {
+            "id": "f5-s2-q8",
+            "fonction": "decouvrir-dieu",
+            "source": "contemplation",
+            "consigne": "Reviens à ce que les textes disent de l’action de Dieu.",
+            "question": "Qu’est-ce que tu as découvert de Dieu ?",
+            "priereTitre": "Ce que j’ai découvert de Dieu"
+          },
+          {
+            "id": "f5-s2-q9",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Tu peux garder un mot, une phrase ou un verset.",
+            "question": "Quelle Parole t’a particulièrement marqué ?",
+            "priereTitre": "La Parole qui m’a particulièrement marqué"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment aujourd’hui aurais-tu besoin de revenir à ce que cette Parole affirme ?",
+          "placeholderMoment": "J’aurai besoin de cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir d’elle ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
         "sectionTitre": "L'échange divin",
-        "versets": [],
+        "versets": [
+          "Es 53:4-6",
+          "2 Co 5:21",
+          "Ga 3:13-14",
+          "Rm 8:32"
+        ],
         "questions": [
           {
             "id": "f5-s3-q1",
             "fonction": "observer",
-            "question": "Le texte dresse la liste incroyable de l'échange divin : blessures contre guérison, pauvreté contre abondance, honte contre gloire, rejet contre acceptation. En relisant cette liste, quelle est la ligne qui te bouleverse le plus face à ce que Jésus a pris sur lui pour toi ?"
+            "source": "parole",
+            "consigne": "Lis lentement Ésaïe 53:4-6. Puis relis le passage.",
+            "question": "Qu’est-ce qui retient ton attention dans ce qui arrive au serviteur et dans ce qui concerne les autres ?"
           },
           {
             "id": "f5-s3-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "« Jésus a subi notre rejet... afin que nous soyons acceptés par le Père. » Le sentiment de rejet (par tes parents, la société, etc.) est-il encore vivace en toi ? En quoi cette phrase illumine-t-elle la fausseté de ce rejet par rapport à la réalité céleste ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant 2 Corinthiens 5:21.",
+            "question": "Qu’est-ce qui te frappe dans ce verset ?"
           },
           {
             "id": "f5-s3-q3",
-            "fonction": "decouvrir-dieu+recevoir",
-            "question": "Le Père a organisé cet échange pour toi. « Nous n'avons pas à supplier pour les obtenir, mais simplement à les recevoir par la foi. » Es-tu prêt à arrêter tes prières de mendiant pour enfin recevoir avec assurance l'héritage d'un Prince du ciel ?"
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Garde 2 Corinthiens 5:21 à côté d’Ésaïe 53:4-6.",
+            "question": "Lorsque tu rapproches ces passages, que comprends-tu de ce qui se passe à la croix ?"
           },
           {
             "id": "f5-s3-q4",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis Galates 3:13-14 et prends quelques instants avec le texte.",
+            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de méditer ?"
+          },
+          {
+            "id": "f5-s3-q5",
+            "fonction": "decouvrir-dieu",
+            "source": "parole",
+            "consigne": "Lis maintenant Romains 8:32. Relis-le lentement.",
+            "question": "Qu’est-ce qui retient ton attention dans ce que Paul dit de Dieu ?"
+          },
+          {
+            "id": "f5-s3-q6",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret propose une synthèse doctrinale de « l’échange divin » : Jésus brisé afin que nous recevions le pardon ; meurtri afin que nous soyons guéris ; fait péché afin que nous soyons justifiés ; mort afin que nous recevions sa vie ; dans la pauvreté afin que nous partagions son abondance ; portant la honte afin que nous partagions sa gloire ; rejeté afin que nous soyons acceptés ; fait malédiction afin que nous entrions dans la bénédiction.",
+            "question": "Quelles lignes de cette synthèse reconnais-tu dans les passages bibliques que tu viens de lire ?"
+          },
+          {
+            "id": "f5-s3-q7",
+            "fonction": "rester-ouvert",
+            "source": "livret",
+            "consigne": "Garde distincts ce que les passages affirment directement et la manière dont le livret les rassemble.",
+            "question": "Quelle ligne t’interpelle le plus, et pourquoi ?"
+          },
+          {
+            "id": "f5-s3-q8",
             "fonction": "repondre",
-            "question": "Concrètement, le texte t'invite à remercier Dieu « de ce qu'il a accompli et prévu pour nous. » Prends un instant aujourd'hui : comment vas-tu formuler ta reconnaissance pour la ligne de \"l'échange divin\" dont tu as le plus besoin en ce moment ?"
+            "source": "contemplation",
+            "consigne": "Reviens aux textes plutôt qu’à une formule toute faite.",
+            "question": "Qu’as-tu compris de la croix que tu n’avais peut-être pas considéré ainsi auparavant ?",
+            "priereTitre": "Ce que j’ai contemplé de la croix"
+          },
+          {
+            "id": "f5-s3-q9",
+            "fonction": "decouvrir-dieu",
+            "source": "contemplation",
+            "consigne": "Reste avec ce que les passages t’ont montré.",
+            "question": "Qu’est-ce que tu as découvert du cœur de Dieu ?",
+            "priereTitre": "Ce que j’ai découvert du cœur de Dieu"
+          },
+          {
+            "id": "f5-s3-q10",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Tu n’as pas besoin de tout emporter.",
+            "question": "Quelle vérité t’a le plus marqué ?",
+            "priereTitre": "La vérité qui m’a le plus marqué"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quelle situation cette Parole pourrait-elle changer ta manière de voir Dieu, de te voir toi-même ou de regarder ce que tu traverses ?",
+          "placeholderMoment": "Cette Parole pourrait changer mon regard lorsque…",
+          "questionAction": "Lorsque cette situation arrivera, comment voudrais-tu revenir à cette vérité ?",
+          "placeholderAction": "Je voudrais revenir à cette vérité en…"
+        }
       },
       {
         "sectionTitre": "Notre réelle identité",
         "versets": [
-          "Ep 2:10"
+          "Jn 1:12",
+          "2 Co 5:17",
+          "Col 3:12",
+          "Ep 2:19",
+          "Rm 8:1",
+          "He 4:16",
+          "Ep 2:10",
+          "1 Co 6:19"
         ],
         "questions": [
           {
             "id": "f5-s4-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Relis ce principe clé : « Ce n'est pas ce que nous faisons qui détermine ce que nous sommes, mais c'est ce que nous sommes qui détermine ce que nous faisons. » Jusqu'à quel point ta valeur personnelle dépend-elle encore de tes réussites professionnelles, spirituelles ou relationnelles aujourd'hui ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis lentement 1 Jean 3:1-2. Puis relis-le encore une fois.",
+            "question": "Qu’est-ce qui retient ton attention dans ce que Jean affirme ?"
           },
           {
             "id": "f5-s4-q2",
             "fonction": "decouvrir-dieu",
-            "question": "Dieu t'appelle « saint » et « créature nouvelle », alors que tu as lutté peut-être hier avec le péché. Que découvres-tu sur le regard de Dieu, qui voit ton identité spirituelle avant de juger tes actes ?"
+            "source": "contemplation",
+            "consigne": "Reste encore un instant avec les mots de 1 Jean 3:1-2.",
+            "question": "Qu’est-ce que ce texte te fait comprendre de la manière dont Dieu te regarde en Christ ?"
           },
           {
             "id": "f5-s4-q3",
-            "fonction": "recevoir",
-            "question": "« Je suis libre de la reconnaissance ou de l'approbation des autres, Dieu est pour moi, il n'est pas contre moi. » Es-tu prêt à recevoir cette acceptation totale de Dieu et à te libérer enfin de l'esclavage du regard des autres ?"
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant 1 Pierre 2:9-10. Prends ton temps.",
+            "question": "Quels mots ou expressions t’arrêtent particulièrement ?"
           },
           {
             "id": "f5-s4-q4",
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Garde ce passage à côté de 1 Jean 3:1-2.",
+            "question": "Qu’est-ce qu’il ajoute à ta compréhension de ton identité ?"
+          },
+          {
+            "id": "f5-s4-q5",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Éphésiens 2:10.",
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont ce verset parle de ce que tu es et de ce pour quoi tu as été créé ?"
+          },
+          {
+            "id": "f5-s4-q6",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis 1 Corinthiens 1:2.",
+            "question": "Comment Paul désigne-t-il les croyants auxquels il écrit ?"
+          },
+          {
+            "id": "f5-s4-q7",
+            "fonction": "comparer",
+            "source": "contemplation",
+            "consigne": "Garde 1 Corinthiens 1:2 avec les passages précédents.",
+            "question": "Qu’est-ce que cela ajoute à ce que tu viens de méditer ?"
+          },
+          {
+            "id": "f5-s4-q8",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret propose cette phrase centrale : « Ce n’est pas ce que nous faisons qui détermine ce que nous sommes, mais c’est ce que nous sommes qui détermine ce que nous faisons. » Relis-la lentement, puis reviens à 1 Jean 3, 1 Pierre 2 et Éphésiens 2.",
+            "question": "Quel sens cette phrase prend-elle après les textes que tu viens de lire ?"
+          },
+          {
+            "id": "f5-s4-q9",
+            "fonction": "observer",
+            "source": "parole",
+            "consigne": "Lis maintenant Psaume 118:6.",
+            "question": "Qu’est-ce qui te frappe dans ce verset ?"
+          },
+          {
+            "id": "f5-s4-q10",
+            "fonction": "relire-le-livret",
+            "source": "livret",
+            "consigne": "Le livret poursuit : « Je ne dois pas construire mon identité sur ce que disent ou pensent les autres de moi mais sur ce que Dieu dit de moi. » Garde cette proposition à côté de tous les textes de cette section.",
+            "question": "Qu’est-ce que tu en comprends maintenant ?"
+          },
+          {
+            "id": "f5-s4-q11",
+            "fonction": "se-laisser-eclairer",
+            "source": "contemplation",
+            "consigne": "Il ne s’agit pas de supposer que ta manière de te voir est forcément fausse, mais de la laisser rencontrer les textes.",
+            "question": "Y a-t-il une différence entre la manière dont tu te décris habituellement et ce que les passages que tu viens de lire disent de toi en Christ ?"
+          },
+          {
+            "id": "f5-s4-q12",
+            "fonction": "explorer",
+            "source": "parole",
+            "consigne": "Explore maintenant ces huit cartes de l’annexe et ouvre réellement chaque passage : enfant de Dieu — Jean 1:12 ; nouvelle création — 2 Corinthiens 5:17 ; choisi, saint et bien-aimé — Colossiens 3:12 ; membre de la famille de Dieu — Éphésiens 2:19 ; libre de la condamnation — Romains 8:1 ; accès auprès de Dieu — Hébreux 4:16 ; ouvrage de Dieu — Éphésiens 2:10 ; temple du Saint-Esprit — 1 Corinthiens 6:19.",
+            "question": "Parmi ces passages, lequel t’arrête particulièrement aujourd’hui, et pourquoi ?"
+          },
+          {
+            "id": "f5-s4-q13",
             "fonction": "repondre",
-            "question": "Le texte affirme fermement : « Je ne dois pas construire mon identité sur ce que disent ou pensent les autres de moi mais sur ce que Dieu dit de moi ! » Quelle étiquette toxique posée sur toi par ton entourage ou ton passé vas-tu arracher aujourd'hui pour la remplacer par \"enfant de Dieu\" ?"
+            "source": "contemplation",
+            "consigne": "Réponds à partir des textes plutôt qu’à partir d’un slogan.",
+            "question": "Comment répondrais-tu aujourd’hui à cette question : qui suis-je en Christ ?",
+            "priereTitre": "Ce que la Parole dit de moi en Christ"
+          },
+          {
+            "id": "f5-s4-q14",
+            "fonction": "recevoir",
+            "source": "contemplation",
+            "consigne": "Reviens au passage qui t’a particulièrement arrêté.",
+            "question": "Quelle affirmation biblique sur ton identité as-tu le plus besoin de garder présente aujourd’hui ?",
+            "priereTitre": "Le passage qui m’a particulièrement arrêté"
+          },
+          {
+            "id": "f5-s4-q15",
+            "fonction": "se-laisser-eclairer",
+            "source": "contemplation",
+            "consigne": "Laisse cette Parole rencontrer ta manière de te voir, sans fabriquer une déclaration positive.",
+            "question": "Qu’est-ce que ce passage vient éclairer ou corriger dans ta manière de te voir ?",
+            "priereTitre": "Ce que ce passage vient éclairer ou corriger"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quelle situation aujourd’hui risques-tu de te regarder, de te définir ou d’agir comme si cette Parole n’était pas vraie ?",
+          "placeholderMoment": "Je risque d’oublier cette Parole lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu revenir à ce que Dieu dit dans ce verset ?",
+          "placeholderAction": "Je voudrais revenir à cette Parole en…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "Quand tu regardes l’ensemble, qu’est-ce qui est devenu plus clair pour toi sur cette question : « Qui suis-je en Christ ? »",
+      "questionVerset": "Parmi les quatre Paroles que tu as choisies dans cette fiche, laquelle veux-tu garder comme Parole principale ?",
+      "etapes": [
+        "Vie nouvelle avec Christ",
+        "Position en Christ",
+        "La croix",
+        "Identité reçue"
+      ]
+    }
   },
   {
     "ficheId": 6,
