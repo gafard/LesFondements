@@ -105,6 +105,7 @@ interface FicheMeditation {
   synthese?: {
     question: string;
     questionVerset: string;
+    etapes?: string[];
   };
 }
 
@@ -126,7 +127,7 @@ type Scene = { piste?: string } & (
   | { type: 'lecture'; texte: string }
   | { type: 'question'; id: string; texte: string; section?: string }
   | { type: 'pas'; id?: string; reference?: string; options?: PassageAncrage[]; pratique?: SectionMeditation['pratique'] }
-  | { type: 'synthese-fiche'; id: string; question: string; questionVerset: string }
+  | { type: 'synthese-fiche'; id: string; question: string; questionVerset: string; etapes?: string[] }
   | { type: 'cloture' }
 );
 
@@ -1605,7 +1606,10 @@ function RenduScene({
     }
 
     case 'synthese-fiche': {
-      const versetsChoisis = Array.from({ length: 4 }, (_, indexSection) =>
+      const etapes = scene.etapes?.length
+        ? scene.etapes
+        : ['Péché', 'Loi', 'Salut', 'Grâce'];
+      const versetsChoisis = Array.from({ length: etapes.length }, (_, indexSection) =>
         reponses[`verset-choisi:f${fiche.id}-s${indexSection + 1}`]
       ).filter((reference): reference is string => Boolean(reference));
       const versetPrincipal = reponses[`verset-principal:${scene.id}`] ?? '';
@@ -1617,8 +1621,13 @@ function RenduScene({
           <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
             Regarde le chemin parcouru.
           </h2>
-          <div className="mt-6 grid grid-cols-4 gap-2" aria-label="Les quatre mouvements de la fiche">
-            {['Péché', 'Loi', 'Salut', 'Grâce'].map((titre, indexTitre) => (
+          <div
+            className={`mt-6 grid grid-cols-2 gap-2 ${
+              etapes.length <= 4 ? 'sm:grid-cols-4' : 'sm:grid-cols-3 lg:grid-cols-6'
+            }`}
+            aria-label={`Les ${etapes.length} mouvements de la fiche`}
+          >
+            {etapes.map((titre, indexTitre) => (
               <span
                 key={titre}
                 className={`rounded-xl border px-2 py-3 text-center text-2xs font-black uppercase tracking-[0.1em] ${

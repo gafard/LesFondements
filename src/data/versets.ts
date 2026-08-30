@@ -14,6 +14,8 @@ const VERSETS_SELECTIONNES: Record<string, string> = {
   "1 Jn 4:16": "Et nous, nous avons connu l'amour que Dieu a pour nous, et nous y avons cru. Dieu est amour; et celui qui demeure dans l'amour demeure en Dieu, et Dieu demeure en lui.",
   "2 Co 5:17": "Si quelqu'un est en Christ, il est une nouvelle créature. Les choses anciennes sont passées; voici, toutes choses sont devenues nouvelles.",
   "2 Co 5:21": "Celui qui n'a point connu le péché, il l'a fait devenir péché pour nous, afin que nous devenions en lui justice de Dieu.",
+  "2 Co 5:7": "Car nous marchons par la foi et non par la vue.",
+  "Ac 2:37-38": "Après avoir entendu ce discours, ils eurent le cœur vivement touché, et ils dirent à Pierre et aux autres apôtres : Hommes frères, que ferons-nous ? Pierre leur dit : Repentez-vous, et que chacun de vous soit baptisé au nom de Jésus-Christ, pour le pardon de vos péchés ; et vous recevrez le don du Saint-Esprit.",
   "Ap 1:8": "Je suis l'alpha et l'oméga, dit le Seigneur Dieu, celui qui est, qui était, et qui vient, le Tout-Puissant.",
   "Col 1:13": "Qui nous a délivrés de la puissance des ténèbres et nous a transportés dans le royaume du Fils de son amour.",
   "Ep 2:8": "Car c'est par la grâce que vous êtes sauvés, par le moyen de la foi. Et cela ne vient pas de vous, c'est le don de Dieu.",
@@ -21,6 +23,9 @@ const VERSETS_SELECTIONNES: Record<string, string> = {
   "Ep 2:8-9": "Car c'est par la grâce que vous êtes sauvés, par le moyen de la foi. Et cela ne vient pas de vous, c'est le don de Dieu. Ce n'est point par les œuvres, afin que personne ne se glorifie.",
   "Ga 2:20": "J'ai été crucifié avec Christ; et si je vis, ce n'est plus moi qui vis, c'est Christ qui vit en moi.",
   "Ga 3:19-22": "Pourquoi donc la loi ? Elle a été donnée ensuite à cause des transgressions, jusqu'à ce que vînt la postérité à qui la promesse avait été faite ; elle a été promulguée par des anges, au moyen d'un médiateur. Or, le médiateur n'est pas médiateur d'un seul, tandis que Dieu est un seul. La loi est-elle donc contre les promesses de Dieu ? Loin de là ! S'il eût été donné une loi qui pût procurer la vie, la justice viendrait réellement de la loi. Mais l'Écriture a tout renfermé sous le péché, afin que ce qui avait été promis fût donné par la foi en Jésus-Christ à ceux qui croient.",
+  "Ga 4:5-7": "Afin qu'il rachetât ceux qui étaient sous la loi, afin que nous reçussions l'adoption. Et parce que vous êtes fils, Dieu a envoyé dans nos cœurs l'Esprit de son Fils, lequel crie : Abba ! Père ! Ainsi tu n'es plus esclave, mais fils ; et si tu es fils, tu es aussi héritier par la grâce de Dieu.",
+  "He 11:1": "Or la foi est une ferme assurance des choses qu'on espère, une démonstration de celles qu'on ne voit pas.",
+  "He 11:6": "Or sans la foi il est impossible de lui être agréable ; car il faut que celui qui s'approche de Dieu croie que Dieu existe, et qu'il est le rémunérateur de ceux qui le cherchent.",
   "Jn 10:10": "Le voleur ne vient que pour dérober, égorger et détruire; moi, je suis venu afin que les brebis aient la vie, et qu'elles soient dans l'abondance.",
   "Jn 14:6": "Jésus lui dit : Je suis le chemin, la vérité, et la vie. Nul ne vient au Père que par moi.",
   "Jn 15:10": "Si vous gardez mes commandements, vous demeurerez dans mon amour, de même que j'ai gardé les commandements de mon Père, et que je demeure dans son amour.",
@@ -39,6 +44,8 @@ const VERSETS_SELECTIONNES: Record<string, string> = {
   "Rm 5:12": "C'est pourquoi, comme par un seul homme le péché est entré dans le monde, et par le péché la mort, et qu'ainsi la mort s'est étendue sur tous les hommes, parce que tous ont péché...",
   "Rm 5:8": "Mais Dieu prouve son amour envers nous, en ce que, lorsque nous étions encore des pécheurs, Christ est mort pour nous.",
   "Rm 6:23": "Car le salaire du péché, c'est la mort; mais le don gratuit de Dieu, c'est la vie éternelle en Jésus-Christ notre Seigneur.",
+  "Rm 6:3-4": "Ignorez-vous que nous tous qui avons été baptisés en Jésus-Christ, c'est en sa mort que nous avons été baptisés ? Nous avons donc été ensevelis avec lui par le baptême en sa mort, afin que, comme Christ est ressuscité des morts par la gloire du Père, de même nous aussi nous marchions en nouveauté de vie.",
+  "Rm 8:14-16": "Car tous ceux qui sont conduits par l'Esprit de Dieu sont fils de Dieu. Et vous n'avez point reçu un esprit de servitude, pour être encore dans la crainte ; mais vous avez reçu un Esprit d'adoption, par lequel nous crions : Abba ! Père ! L'Esprit lui-même rend témoignage à notre esprit que nous sommes enfants de Dieu.",
   "Rm 8:1": "Il n'y a donc maintenant aucune condamnation pour ceux qui sont en Jésus-Christ.",
 };
 

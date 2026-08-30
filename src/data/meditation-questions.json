@@ -391,122 +391,405 @@
     ],
     "synthese": {
       "question": "En regardant les quatre étapes que tu viens de traverser — péché, Loi, salut et grâce — quelle vérité sur Dieu veux-tu emporter de cette fiche ?",
-      "questionVerset": "Parmi les quatre Paroles que tu as choisies, laquelle veux-tu faire devenir ton verset principal de la semaine ?"
+      "questionVerset": "Parmi les quatre Paroles que tu as choisies, laquelle veux-tu faire devenir ton verset principal de la semaine ?",
+      "etapes": [
+        "Péché",
+        "Loi",
+        "Salut",
+        "Grâce"
+      ]
     }
   },
   {
     "ficheId": 3,
     "ficheTitre": "Devenir enfant de Dieu",
+    "parcoursGuide": true,
     "sections": [
       {
         "sectionTitre": "La foi",
-        "versets": [],
+        "versets": [
+          "He 11:1",
+          "Rm 4:18",
+          "2 Co 5:7"
+        ],
         "questions": [
           {
             "id": "f3-s1-q1",
             "fonction": "observer",
-            "question": "Le texte dit que faire confiance à Dieu demande d'« abandonner toute confiance en ses propres efforts » pour entrer « dans le repos ». Si tu observes ta vie actuelle, es-tu dans ce repos ou es-tu épuisé par tes propres efforts pour tout contrôler ?"
+            "consigne": "Lis Hébreux 11:1 lentement. Puis relis-le une deuxième fois, sans chercher tout de suite à définir la foi.",
+            "question": "Qu’est-ce qui retient ton attention dans ce verset ?"
           },
           {
             "id": "f3-s1-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "« Si j'ai saisi que Dieu m'aime... jamais je ne douterai de lui. Quand bien même tout, autour de moi, semble me montrer le contraire. » Quelle circonstance difficile dans ta vie aujourd'hui semble te crier que Dieu t'a oublié, et te pousse à douter de son amour ?"
+            "fonction": "observer+comparer",
+            "consigne": "Lis maintenant Hébreux 11:6, puis garde-le à côté d’Hébreux 11:1.",
+            "question": "Qu’est-ce que ce second passage ajoute à ta lecture du premier ?"
           },
           {
             "id": "f3-s1-q3",
-            "fonction": "decouvrir-dieu+recevoir",
-            "question": "Le texte souligne que Dieu te bénit « simplement parce qu'il [t']aime », et non « parce que [ta] foi est forte. » Es-tu prêt à recevoir la vérité que ton exaucement ne dépend pas de « tes performances spirituelles », mais de la bonté parfaite de Dieu ?"
+            "fonction": "se-laisser-eclairer",
+            "consigne": "Lis Hébreux 4:3. Reviens ensuite aux deux passages précédents et laisse-les résonner ensemble.",
+            "question": "Qu’est-ce que ce passage déplace ou complète dans ce que tu commençais à comprendre ?"
           },
           {
             "id": "f3-s1-q4",
+            "fonction": "relire-le-livret",
+            "consigne": "Relis cette phrase du livret : « La foi abandonne toute confiance en ses propres efforts, s’appuie entièrement sur l’œuvre de Christ et entre dans le repos. » Garde-la près des textes, sans chercher une formule parfaite.",
+            "question": "Qu’est-ce que cette phrase t’aide à mieux comprendre ?"
+          },
+          {
+            "id": "f3-s1-q5",
+            "fonction": "observer",
+            "consigne": "Lis Romains 4:18 lentement. Reste un instant avec le texte avant de répondre.",
+            "question": "Qu’est-ce qui retient ton attention dans l’attitude d’Abraham ?"
+          },
+          {
+            "id": "f3-s1-q6",
+            "fonction": "comparer",
+            "consigne": "Lis maintenant 2 Corinthiens 5:7, puis rapproche ce verset de Romains 4:18.",
+            "question": "Qu’est-ce que leur rapprochement ouvre dans ta réflexion ?"
+          },
+          {
+            "id": "f3-s1-q7",
+            "fonction": "recevoir",
+            "consigne": "Reviens à cette phrase du livret : « Ma confiance repose sur qui Dieu est et sur qui je suis en lui. » Puis retourne librement aux passages que tu viens de lire.",
+            "question": "Qu’est-ce que cette phrase ajoute à ce que tu as découvert ?"
+          },
+          {
+            "id": "f3-s1-q8",
             "fonction": "repondre",
-            "question": "La foi est décrite comme « un choix » à faire « plutôt que de donner libre cours à mes pensées ». Face à ta plus grande inquiétude du jour, comment vas-tu concrètement choisir la confiance en Dieu et faire taire tes pensées anxieuses ?"
+            "consigne": "Appuie-toi seulement sur les textes parcourus et sur ce qui est devenu clair pour toi.",
+            "question": "Comment expliquerais-tu maintenant la foi avec tes propres mots ?",
+            "priereTitre": "Ce que j’ai compris de la foi"
+          },
+          {
+            "id": "f3-s1-q9",
+            "fonction": "decouvrir-dieu",
+            "consigne": "Regarde une dernière fois le chemin parcouru dans ces passages.",
+            "question": "Qu’est-ce qu’ils t’ont fait découvrir ou redécouvrir de Dieu ?",
+            "priereTitre": "Ce que j’ai découvert de Dieu"
+          },
+          {
+            "id": "f3-s1-q10",
+            "fonction": "recevoir",
+            "consigne": "Tu n’as pas besoin de tout retenir. Reviens à la parole, à l’image ou à la question qui est restée avec toi.",
+            "question": "Qu’est-ce qui t’a particulièrement arrêté ou qui est devenu plus clair ?",
+            "priereTitre": "Ce qui m’a particulièrement arrêté"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?",
+          "placeholderMoment": "Je veux me souvenir de ce verset lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
-        "sectionTitre": "L'équilibre entre la grâce et la foi",
-        "versets": [],
+        "sectionTitre": "La grâce et la foi",
+        "versets": [
+          "Ep 2:8-9",
+          "Jn 3:16"
+        ],
         "questions": [
           {
             "id": "f3-s2-q1",
-            "fonction": "observer+decouvrir-dieu",
-            "question": "Le texte indique que Jésus « veut que tous soient sauvés », mais que la grâce nécessite une réponse humaine. Que découvres-tu sur le caractère de Dieu, qui offre un salut immense tout en respectant la liberté humaine au point de risquer le refus ?"
+            "fonction": "observer",
+            "consigne": "Relis lentement Éphésiens 2:8-9. Ne cherche pas d’abord à séparer ou à définir chaque mot.",
+            "question": "Qu’est-ce qui retient ton attention cette fois-ci dans ce passage ?"
           },
           {
             "id": "f3-s2-q2",
-            "fonction": "se-laisser-eclairer",
-            "question": "L'accès au salut est réservé à « ceux qui se reconnaissent pécheurs ». Est-ce qu'il y a en toi une part d'orgueil qui se rebelle encore à l'idée d'être appelé \"pécheur\" ayant besoin d'être gracié ?"
+            "fonction": "observer",
+            "consigne": "Reste encore un instant dans Éphésiens 2:8-9 et relis la phrase entière.",
+            "question": "Qu’est-ce que tu remarques dans la manière dont la grâce et la foi apparaissent ensemble ?"
           },
           {
             "id": "f3-s2-q3",
-            "fonction": "recevoir",
-            "question": "« ...qui placent leur confiance en Jésus et en son sacrifice. » As-tu réellement placé l'intégralité de ta confiance dans le sacrifice de Jésus, ou gardes-tu un \"plan B\" au cas où ?"
+            "fonction": "comparer",
+            "consigne": "Lis maintenant Jean 3:16, puis garde-le à côté d’Éphésiens 2:8-9.",
+            "question": "Qu’est-ce que ce passage ajoute à ta réflexion ?"
           },
           {
             "id": "f3-s2-q4",
+            "fonction": "relire-le-livret",
+            "consigne": "Le livret explique que Dieu offre le salut et que l’être humain y répond par la foi. Reviens aux deux passages avant de poursuivre.",
+            "question": "Qu’est-ce que cette explication t’aide à mieux comprendre ?"
+          },
+          {
+            "id": "f3-s2-q5",
             "fonction": "repondre",
-            "question": "Si tu as reçu personnellement ce privilège de devenir enfant de Dieu, qui autour de toi a besoin d'entendre que cette faveur imméritée lui est aussi offerte ? Comment peux-tu être un témoin de cette grâce aujourd'hui ?"
+            "consigne": "Reprends le chemin parcouru sans chercher à répéter une définition apprise.",
+            "question": "Comment comprends-tu maintenant la relation entre la grâce et la foi ?",
+            "priereTitre": "Ce que j’ai compris de la grâce et de la foi"
+          },
+          {
+            "id": "f3-s2-q6",
+            "fonction": "decouvrir-dieu",
+            "consigne": "Reviens aux mots qui ont retenu ton attention dans les deux passages.",
+            "question": "Qu’est-ce que tu y reçois de Dieu ?",
+            "priereTitre": "Ce que je reçois de Dieu"
+          },
+          {
+            "id": "f3-s2-q7",
+            "fonction": "rester-ouvert",
+            "consigne": "Tu peux laisser une question ouverte au lieu de chercher à tout résoudre maintenant.",
+            "question": "Qu’est-ce qui demeure difficile ou mystérieux pour toi ?",
+            "priereTitre": "Ce qui demeure difficile ou mystérieux"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?",
+          "placeholderMoment": "Je veux me souvenir de ce verset lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
       },
       {
         "sectionTitre": "La nécessité d’une nouvelle naissance",
         "versets": [
           "Jn 3:36",
-          "Rm 10:9-10",
-          "1 Jn 3:1a"
+          "Rm 10:9-10"
         ],
         "questions": [
           {
             "id": "f3-s3-q1",
             "fonction": "observer",
-            "question": "Le texte affirme fermement : « L’homme est perdu, non pas à cause de ce qu’il fait, mais à cause de ce qu’il est. » Pourquoi est-ce si vital de comprendre que tes mauvaises actions ne sont que le symptôme d'une nature spirituellement morte ?"
+            "consigne": "Lis Jean 3:1-6 lentement. Laisse la conversation se dérouler sans chercher d’abord à expliquer l’expression « naître de nouveau ».",
+            "question": "Qu’est-ce qui retient ton attention dans cette conversation ?"
           },
           {
             "id": "f3-s3-q2",
             "fonction": "se-laisser-eclairer",
-            "question": "Il est écrit : « Je peux être intègre... faire de bonnes œuvres... si je ne passe pas par la nouvelle naissance, je suis perdu. » As-tu longtemps pensé, ou penses-tu encore, que d'être \"une bonne personne\" suffisait pour être en règle avec Dieu ?"
+            "consigne": "Relis le passage une seconde fois et reste particulièrement avec les paroles de Jésus.",
+            "question": "À partir de ce texte, que commences-tu à comprendre de « naître de nouveau » ?"
           },
           {
             "id": "f3-s3-q3",
-            "fonction": "decouvrir-dieu+recevoir",
-            "question": "« Dieu est devenu mon Père, je ne suis plus orphelin. Je n'ai rien à faire pour recevoir son amour ou essayer de lui plaire. » Que ressens-tu profondément face à ce Dieu qui ne t'adopte pas comme un serviteur à l'essai, mais comme un « enfant chéri » ?"
+            "fonction": "relire-le-livret",
+            "consigne": "Le livret explique qu’une naissance spirituelle est nécessaire et que la religion ou les bonnes œuvres ne peuvent pas la remplacer. Garde cette explication à côté de Jean 3:1-6.",
+            "question": "Qu’est-ce que cette explication clarifie pour toi ?"
           },
           {
             "id": "f3-s3-q4",
+            "fonction": "observer",
+            "consigne": "Lis maintenant Actes 3:19. Relis-le sans chercher à appliquer immédiatement le verset à ta vie.",
+            "question": "Qu’est-ce que tu observes dans ce passage ?"
+          },
+          {
+            "id": "f3-s3-q5",
+            "fonction": "comparer",
+            "consigne": "Lis Jean 1:12, puis garde ce verset à côté d’Actes 3:19.",
+            "question": "Qu’est-ce que ce second passage ajoute au premier ?"
+          },
+          {
+            "id": "f3-s3-q6",
+            "fonction": "relire-le-livret",
+            "consigne": "Le livret décrit la repentance comme le fait de se détourner et la foi comme le fait de se tourner vers Dieu. Reviens aux deux passages avant de répondre.",
+            "question": "Comment comprends-tu le mouvement de la conversion à la lumière de ces textes ?"
+          },
+          {
+            "id": "f3-s3-q7",
             "fonction": "repondre",
-            "question": "Le mouvement de la repentance exige de « montrer par mes actes que j'ai changé », en ayant en horreur le mal. Quel objet, pratique, ou habitude de ton \"royaume des ténèbres\" passé dois-tu détruire ou abandonner définitivement aujourd'hui pour être cohérent avec ta nouvelle nature ?"
+            "consigne": "Ne cherche pas une réponse théologique parfaite. Exprime seulement ce que les textes t’ont permis de comprendre.",
+            "question": "Comment expliquerais-tu maintenant la nouvelle naissance avec tes propres mots ?",
+            "priereTitre": "Ce que les paroles de Jésus m’ont fait comprendre"
+          },
+          {
+            "id": "f3-s3-q8",
+            "fonction": "comprendre",
+            "consigne": "Reprends brièvement Jean 3, Actes 3:19 et Jean 1:12.",
+            "question": "Quel lien vois-tu maintenant entre repentance, foi et nouvelle naissance ?",
+            "priereTitre": "Ce que j’ai compris de la repentance et de la foi"
+          },
+          {
+            "id": "f3-s3-q9",
+            "fonction": "recevoir",
+            "consigne": "Reste devant Dieu avec ce que tu viens de découvrir, sans présumer de l’endroit où tu en es.",
+            "question": "Qu’est-ce que ces textes éclairent dans ta propre relation avec Dieu ?",
+            "priereTitre": "Ce que ces textes éclairent dans ma relation avec Dieu"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quelle situation cette Parole pourrait-elle devenir concrète pour toi ?",
+          "placeholderMoment": "Cette Parole pourrait me rejoindre lorsque…",
+          "questionAction": "Lorsque cette situation arrivera, comment voudrais-tu répondre à cette Parole ?",
+          "placeholderAction": "Je voudrais répondre en…"
+        }
       },
       {
-        "sectionTitre": "Après la nouvelle naissance, le baptême2",
-        "versets": [],
+        "sectionTitre": "Une nouvelle création",
+        "versets": [
+          "2 Co 5:17"
+        ],
         "questions": [
           {
             "id": "f3-s4-q1",
-            "fonction": "observer+se-laisser-eclairer",
-            "question": "Le texte dit : « notre vie passée, avec tous nos péchés, reste au fond de l'eau. » Lorsque tu regardes en arrière, y a-t-il des péchés ou des hontes de ton passé que tu t'obstines à \"repêcher\", refusant de croire qu'ils sont engloutis pour toujours ?"
+            "fonction": "observer",
+            "consigne": "Lis 2 Corinthiens 5:17 lentement, puis relis-le une seconde fois.",
+            "question": "Quelles expressions retiennent ton attention ?"
           },
           {
             "id": "f3-s4-q2",
-            "fonction": "decouvrir-dieu",
-            "question": "Le baptême est une expression publique de ce qui s'est passé spirituellement. Que te dit cela sur le désir de Dieu que ton salut ne reste pas une croyance cachée, mais devienne une résurrection visible aux yeux de tous ?"
+            "fonction": "comprendre",
+            "consigne": "Reste dans le verset et regarde la phrase dans son ensemble.",
+            "question": "D’après ce passage, que se passe-t-il pour quelqu’un qui est en Christ ?"
           },
           {
             "id": "f3-s4-q3",
-            "fonction": "recevoir",
-            "question": "Tu es invité à te voir comme ressuscité à « une vie nouvelle ». Es-tu prêt à accepter que ton ancienne identité est morte et que tu ne dois plus te définir par tes échecs passés ?"
+            "fonction": "relire-le-livret",
+            "consigne": "Le livret parle d’une transformation accomplie par le Saint-Esprit et d’un passage de la mort à la vie. Reviens ensuite à 2 Corinthiens 5:17.",
+            "question": "Qu’est-ce que cette explication ajoute à ta lecture du verset ?"
           },
           {
             "id": "f3-s4-q4",
             "fonction": "repondre",
-            "question": "Le texte affirme que « sitôt » qu'on est enfant de Dieu, on « doit » se faire baptiser. As-tu déjà obéi à ce commandement clair de Jésus ? Si non, qu'est-ce qui te retient encore de franchir ce pas d'engagement public ?"
+            "consigne": "Appuie-toi seulement sur ce que tu viens de lire.",
+            "question": "Que signifie maintenant pour toi l’expression « nouvelle créature » ?",
+            "priereTitre": "Ce que j’ai compris de la nouvelle création"
+          },
+          {
+            "id": "f3-s4-q5",
+            "fonction": "decouvrir-dieu",
+            "consigne": "Reviens une dernière fois au sujet de la phrase dans 2 Corinthiens 5:17.",
+            "question": "Qu’est-ce que ce passage te fait découvrir de ce que Dieu accomplit en Christ ?",
+            "priereTitre": "Ce que j’ai découvert de ce que Dieu accomplit en Christ"
           }
-        ]
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment serais-tu tenté de vivre ou de te regarder comme si cette Parole n’était pas vraie ?",
+          "placeholderMoment": "Je pourrais l’oublier lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu revenir à cette Parole ?",
+          "placeholderAction": "Je voudrais revenir à cette Parole en…"
+        }
+      },
+      {
+        "sectionTitre": "Enfant de Dieu, adopté du Père",
+        "versets": [
+          "1 Jn 3:1a",
+          "Ga 4:5-7",
+          "Rm 8:14-16"
+        ],
+        "questions": [
+          {
+            "id": "f3-s5-q1",
+            "fonction": "observer",
+            "consigne": "Lis Galates 4:5-7 lentement. Puis relis-le une deuxième fois.",
+            "question": "Qu’est-ce qui retient ton attention dans ce passage ?"
+          },
+          {
+            "id": "f3-s5-q2",
+            "fonction": "comparer",
+            "consigne": "Lis maintenant Romains 8:14-16, puis garde les deux passages ensemble.",
+            "question": "Qu’est-ce que ce second passage ajoute à ta lecture du premier ?"
+          },
+          {
+            "id": "f3-s5-q3",
+            "fonction": "relire-le-livret",
+            "consigne": "Relis cette phrase du livret : « Dieu est devenu mon Père ; je ne suis plus orphelin, j’appartiens à sa famille. » Reviens ensuite librement aux deux passages.",
+            "question": "Que signifie cette phrase pour toi maintenant ?"
+          },
+          {
+            "id": "f3-s5-q4",
+            "fonction": "se-laisser-eclairer",
+            "consigne": "Lis Hébreux 10:19-22 et prends le temps de rester avec les mots du passage.",
+            "question": "Qu’est-ce que ce texte ajoute à ce que tu découvres de la relation avec Dieu ?"
+          },
+          {
+            "id": "f3-s5-q5",
+            "fonction": "repondre",
+            "consigne": "Reprends simplement les textes que tu viens de parcourir.",
+            "question": "Comment expliquerais-tu avec tes propres mots ce que signifie être enfant de Dieu ?",
+            "priereTitre": "Ce que j’ai compris de ma relation avec Dieu"
+          },
+          {
+            "id": "f3-s5-q6",
+            "fonction": "decouvrir-dieu",
+            "consigne": "Reviens à la parole qui t’a le plus arrêté dans Galates 4, Romains 8 ou Hébreux 10.",
+            "question": "Qu’est-ce que tu y découvres de Dieu comme Père ?",
+            "priereTitre": "Ce que j’ai découvert de Dieu comme Père"
+          },
+          {
+            "id": "f3-s5-q7",
+            "fonction": "recevoir",
+            "consigne": "Tu n’as pas besoin de retenir tout le parcours.",
+            "question": "Quelle parole t’a particulièrement touché ?",
+            "priereTitre": "La Parole qui m’a particulièrement touché"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Dans quel moment concret de ta journée voudrais-tu te souvenir de cette relation avec Dieu ?",
+          "placeholderMoment": "Je veux m’en souvenir lorsque…",
+          "questionAction": "Lorsque ce moment arrivera, comment voudrais-tu vivre à partir de cette Parole ?",
+          "placeholderAction": "À partir de cette Parole, je voudrais…"
+        }
+      },
+      {
+        "sectionTitre": "Après la nouvelle naissance : le baptême",
+        "versets": [
+          "Rm 6:3-4",
+          "Ac 2:37-38"
+        ],
+        "questions": [
+          {
+            "id": "f3-s6-q1",
+            "fonction": "observer",
+            "consigne": "Lis Actes 2:37-38 lentement. Laisse le mouvement du passage apparaître avant d’en tirer une conclusion.",
+            "question": "Qu’est-ce que tu observes dans ce passage ?"
+          },
+          {
+            "id": "f3-s6-q2",
+            "fonction": "observer+comprendre",
+            "consigne": "Lis maintenant Romains 6:3-4. Relis-le une deuxième fois et reste avec les images employées par le texte.",
+            "question": "Qu’est-ce que ces images te font comprendre du baptême ?"
+          },
+          {
+            "id": "f3-s6-q3",
+            "fonction": "relire-le-livret",
+            "consigne": "Le livret présente le baptême comme l’expression publique et visible d’une réalité spirituelle, tout en précisant que le baptême lui-même ne sauve pas. Reviens ensuite aux deux passages.",
+            "question": "Qu’est-ce que cette explication clarifie pour toi ?"
+          },
+          {
+            "id": "f3-s6-q4",
+            "fonction": "repondre",
+            "consigne": "Appuie-toi sur les textes et sur ce que tu viens d’observer.",
+            "question": "Comment expliquerais-tu maintenant le baptême avec tes propres mots ?",
+            "priereTitre": "Ce que j’ai compris du baptême"
+          },
+          {
+            "id": "f3-s6-q5",
+            "fonction": "recevoir",
+            "consigne": "Reste libre de nommer une découverte, une question ou une hésitation.",
+            "question": "Que signifie ce que tu viens de lire pour ta propre marche avec Dieu ?",
+            "priereTitre": "Ce que cela signifie pour ma marche avec Dieu"
+          },
+          {
+            "id": "f3-s6-q6",
+            "fonction": "rester-ouvert",
+            "consigne": "Prends un instant pour rester devant Dieu avec ce qui est présent pour toi.",
+            "question": "Qu’aimerais-tu lui apporter maintenant ?",
+            "priereTitre": "Ce que j’apporte à Dieu"
+          }
+        ],
+        "pratique": {
+          "questionMoment": "Y a-t-il une réponse concrète que cette Parole t’appelle à donner ?",
+          "placeholderMoment": "Ce que cette Parole fait naître en moi…",
+          "questionAction": "Si oui, comment voudrais-tu lui donner une forme concrète ?",
+          "placeholderAction": "La réponse que je souhaite donner…"
+        }
       }
-    ]
+    ],
+    "synthese": {
+      "question": "En regardant les six étapes que tu viens de traverser, qu’est-ce qui est devenu le plus clair pour toi au sujet de « devenir enfant de Dieu » ?",
+      "questionVerset": "Parmi les six Paroles que tu as choisies, laquelle veux-tu garder comme Parole principale pour la semaine ?",
+      "etapes": [
+        "Foi",
+        "Grâce reçue par la foi",
+        "Nouvelle naissance",
+        "Nouvelle création",
+        "Adoption",
+        "Baptême"
+      ]
+    }
   },
   {
     "ficheId": 4,

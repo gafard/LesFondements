@@ -206,6 +206,93 @@ test('fiche 2 : péché, Loi, salut et grâce forment quatre traversées complè
   await expect(page.getByRole('button', { name: 'Ep 2:8-9' })).toBeVisible();
 });
 
+test('fiche 3 : six découvertes distinctes conduisent à une Parole principale', async ({ page }) => {
+  await page.addInitScript(
+    ({ uid, groupeId }) => {
+      const groupes = JSON.parse(localStorage.getItem('lf.groups') || '[]');
+      localStorage.setItem(
+        'lf.groups',
+        JSON.stringify(groupes.map((groupe: { id: string }) =>
+          groupe.id === groupeId ? { ...groupe, currentStep: 3 } : groupe
+        ))
+      );
+      localStorage.setItem(
+        `lesfondements_prog_${uid}`,
+        JSON.stringify({
+          3: {
+            completed: false,
+            answers: {
+              'verset-choisi:f3-s1': 'He 11:1',
+              'verset-choisi:f3-s2': 'Ep 2:8-9',
+              'verset-choisi:f3-s3': 'Jn 3:36',
+              'verset-choisi:f3-s4': '2 Co 5:17',
+              'verset-choisi:f3-s5': '1 Jn 3:1a',
+            },
+            lastUpdated: Date.now(),
+          },
+        })
+      );
+    },
+    { uid: UTILISATEUR.uid, groupeId: GROUPE.id }
+  );
+
+  await page.goto('/dashboard');
+  await expect(page.getByText('0 / 6 étapes')).toBeVisible();
+  await expect(page.getByText('La foi', { exact: true })).toBeVisible();
+  await expect(page.getByText('La grâce et la foi', { exact: true })).toBeVisible();
+  await expect(page.getByText('La nécessité d’une nouvelle naissance', { exact: true })).toBeVisible();
+  await expect(page.getByText('Une nouvelle création', { exact: true })).toBeVisible();
+  await expect(page.getByText('Enfant de Dieu, adopté du Père', { exact: true })).toBeVisible();
+  await expect(page.getByText('Après la nouvelle naissance : le baptême', { exact: true })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=3&section=3&scene=3');
+  await expect(page.getByText('Lis 2 Corinthiens 5:17 lentement', { exact: false })).toBeVisible();
+  await expect(page.getByLabel('Que signifie maintenant pour toi l’expression « nouvelle créature » ?')).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=3&section=4&scene=3');
+  await expect(page.getByText('Lis Galates 4:5-7 lentement', { exact: false })).toBeVisible();
+  await expect(page.getByText('Lis maintenant Romains 8:14-16', { exact: false })).toBeVisible();
+
+  await page.goto('/aujourdhui?fiche=3&section=5&scene=3');
+  await expect(page.getByText('Lis Actes 2:37-38 lentement', { exact: false })).toBeVisible();
+  await expect(page.getByLabel('Comment expliquerais-tu maintenant le baptême avec tes propres mots ?')).toBeVisible();
+  await page.getByLabel('Comment expliquerais-tu maintenant le baptême avec tes propres mots ?').fill(
+    'Un signe visible qui exprime une réalité reçue de Dieu.'
+  );
+  await page.getByLabel('Que signifie ce que tu viens de lire pour ta propre marche avec Dieu ?').fill(
+    'Cela m’invite à regarder honnêtement ma réponse à la Parole.'
+  );
+  await page.getByLabel('Qu’aimerais-tu lui apporter maintenant ?').fill(
+    'Ma question et mon désir de lui répondre librement.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Tes notes rassemblées devant Dieu')).toBeVisible();
+  await expect(page.getByText('Ce que j’ai compris du baptême')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: /^Rm 6:3-4/ }).click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Y a-t-il une réponse concrète que cette Parole t’appelle à donner ?')).toBeVisible();
+  await page.getByPlaceholder('Ce que cette Parole fait naître en moi…').fill(
+    'Prendre le temps de discerner ma réponse devant Dieu.'
+  );
+  await page.getByPlaceholder('La réponse que je souhaite donner…').fill(
+    'En parler avec la personne qui m’accompagne.'
+  );
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Regarde le chemin parcouru.' })).toBeVisible();
+  await expect(page.getByText('Foi', { exact: true })).toBeVisible();
+  await expect(page.getByText('Grâce reçue par la foi', { exact: true })).toBeVisible();
+  await expect(page.getByText('Nouvelle naissance', { exact: true })).toBeVisible();
+  await expect(page.getByText('Nouvelle création', { exact: true })).toBeVisible();
+  await expect(page.getByText('Adoption', { exact: true })).toBeVisible();
+  await expect(page.getByText('Baptême', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'He 11:1' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Rm 6:3-4' })).toBeVisible();
+});
+
 test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/dashboard');
