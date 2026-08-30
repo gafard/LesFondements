@@ -1,17 +1,36 @@
-# 📖 Les Fondements
+# 📖 Les Fondements — Parcours de Discipulat
 
 Application web et mobile progressive (PWA) du parcours **« Le parcours des fondements »** : vingt fiches préparées seul, vingt rencontres vécues en petit groupe (5 à 6 disciples).
 
-La règle qui structure tout le produit vient du livret lui-même (p. 3) :
+---
 
-> *« Un nombre de 5-6 participants semble être un bon équilibre. […] Le but n'est pas de refaire le cours, chacun l'aura déjà travaillé chez lui. »*
+## 🌟 Expérience & Fonctionnalités Clés
 
-Concrètement, dans l'application :
+### 1. 🕊️ « Un Temps à Part » & Moteur d'Immersion Quotidien
+Le parcours quotidien découpe chaque fiche en étapes contemplatives au fil des jours :
+- **Atmosphère sacrée plein écran** : Nuit étoilée, bureau sous-main, vitrail animé et enluminures ciblées.
+- **Voix off vivante Studio & Vivienne** : Lecture phrase par phrase avec atténuation intelligente (*ducking*) de la musique d'ambiance.
+- **Silence sacré** : Moment de recueillement et de respiration au pied du Maître (45s).
+- **Méditation Théocentrique** : Questions profondes axées sur la grandeur et l'amour de Dieu.
+- **Sanctuaire de Prière** : Miroir sacré des pensées notées avec verbes d'adoration (*Adorer · Remercier · Confesser · Demander · Écouter · Remettre*).
+- **Ancrage du Verset (4 niveaux)** : Lecture intégrale, mots à trous interactifs, initiales mémorielles, et récitation vocale avec génération 1-clic de fond d'écran pour mobile.
+- **Pose de pas de vie & Archivage automatique** : Enregistrement transparent dans le Carnet Spirituel (`/journal`).
 
-- **Pas de groupe, pas de parcours.** Tant qu'une personne n'a pas rejoint ou créé une cellule, les fiches sont protégées.
-- **Une fiche à la fois.** La fiche `N + 1` s'ouvre pour tout le groupe au moment où l'animateur clôt la rencontre de la fiche `N`.
-- **Présentiel et visio réunis.** Chacun annonce son mode de présence ; le déroulé de rencontre est synchronisé en direct.
-- **Table de travail vivante.** Interface tactile et chaleureuse en bois noble, parchemins, Post-its, trombones et sceaux de cire.
+### 2. 🎙️ Transcription Vocale Intelligente (Whisper Large v3) & Écoute Audio
+- **Écoute de la question (🔊)** : Bouton pour entendre chaque question lue à voix haute posément.
+- **Réponse vocale (🎙️)** : Possibilité de dicter ses réponses par la voix. Groq Whisper transcrit instantanément les paroles en texte français dans le champ de réponse (avec secours Web Speech API automatique).
+- **Disponible partout** : Dans l'immersion quotidienne, sur les fiches d'étude (`/fiches/[id]`) et dans le Journal Spirituel (`/journal`).
+
+### 3. 📜 Bible d'Étude Complète & Concordance
+- **Lecture du chapitre entier** : Cliquer sur un verset dans le texte permet d'ouvrir instantanément le **chapitre complet** avec le verset ciblé mis en surbrillance dorée et centré automatiquement.
+- **31 103 versets Louis Segond 1910** et comparaison avec la **Bible du Semeur**.
+- **Lexique Strong Grec / Hébreu** (14 627 définitions avec racines et morphologie).
+- **Commentaire de Matthew Henry** et renvois croisés Treasury of Scripture Knowledge.
+
+### 4. 👥 Vie de Cellule & Compagnon de Rencontre
+- Rencontres synchronisées en direct avec mode présentiel et visio.
+- Partage des pas de foi et prières fraternelles.
+- Export PDF « Carnet de Disciple » imprimable en format livre relié.
 
 ---
 
@@ -23,52 +42,11 @@ npm install
 
 # 2. Lancer le serveur de développement (Turbopack)
 npm run dev
+
+# 3. Compiler pour Cloudflare Workers
+npm run build:cloud
+npx wrangler deploy
 ```
-
-L'application fonctionne **100% hors-ligne et sans backend requis** : si aucune clé Firebase n'est renseignée, le stockage bascule automatiquement sur `LocalStorage` / `IndexedDB` et un annuaire de groupes de démonstration est semé autour de la position choisie.
-
-Pour brancher le Cloud Firebase :
-```bash
-cp .env.local.example .env.local     # renseigner les clés NEXT_PUBLIC_FIREBASE_*
-npm run firebase:verifier            # contrôle de l'authentification et de Firestore
-firebase deploy --only firestore:rules,firestore:indexes
-```
-
----
-
-## 🎙️ Moteur Vocal & Studio Audio
-
-L'application dispose d'un pipeline audio complet :
-
-1. **Écoute Continue mains-libres** : Diffusion enchaînée de l'introduction, des sections d'enseignement et du chapitre biblique complet.
-2. **Priorité Voix Studio ElevenLabs** : Chargement direct des enregistrements MP3 (`public/voix/eleven/`) avec bascule transparente sur le Web Speech TTS en secours.
-3. **Voix de studio à la demande** : n'importe quel passage cliqué est lu avec la voix du parcours. Le son est **gravé dans R2** à la première demande — ElevenLabs n'est appelé qu'une fois par passage, pour tout le monde.
-4. **Deux gestes de mémorisation, à ne pas confondre** :
-   - *Lire à voix haute* — le verset reste affiché, la reconnaissance se fait dans le navigateur, aucun audio ne sort de l'appareil.
-   - *Me mettre à l'épreuve* — le verset se retourne avant qu'on parle, et la récitation part vers Whisper. C'est la seule des deux qui mesure quelque chose.
-5. **Pause Sanctuaire** : Minuteur de recueillement avec sablier animé, bougie et ambiances Web Audio (*souffle, pluie, silence*).
-
-```bash
-npm run voix:estimation   # Estime le nombre de caractères sans coût
-node --env-file=.env.voice.local scripts/generer-voix.mjs --fiches 1 # Génère l'audio ElevenLabs
-npm run voix:generer -- --versets   # N'enregistre que les 53 versets du livret
-npm run voix:manifeste    # Régénère le catalogue après ajout de pistes MP3
-```
-
-> Le débit se règle par `ELEVENLABS_FORMAT` et fait partie de l'empreinte :
-> en changer ne régénère que les pistes concernées, sans tout refacturer.
-
----
-
-## 📚 Outils Bibliques Intégrés
-
-Chaque référence scripturaire dans le livret est immédiatement cliquable :
-
-- **Louis Segond 1910** : 31 103 versets complets en JSON statique (chargement par livre) — le compte du canon, après avoir rétabli quatre versets fondus dans leur voisin à l'import.
-- **Lexiques Strong Hébreu / Grec** : 14 627 définitions avec racines, translittération et morphologie.
-- **Treasury of Scripture Knowledge** : 29 169 versets de renvois croisés.
-- **Bible thématique de Nave** : 5 313 thèmes de méditation.
-- **Commentaire de Matthew Henry** : 1 188 chapitres d'explication.
 
 ---
 
@@ -77,44 +55,40 @@ Chaque référence scripturaire dans le livret est immédiatement cliquable :
 ```
 src/
 ├── app/                  # Routes Next.js 16 App Router
-│   ├── dashboard/        # Tableau de bord, rythme et compte disciple
-│   ├── fiches/           # Sentier des 20 fiches et fiches d'étude
-│   ├── groupes/          # Cellules, murs de prière et compagnon de rencontre
-│   ├── memorisation/     # Flashcards et récitation vocale mot à mot
-│   ├── journal/          # Journal spirituel intime
-│   ├── transformation/   # Journal de déclics et pas d'obéissance
-│   ├── recherche/        # Concordance et recherche globale
-│   ├── carnet-export/    # Manuscrit imprimable en format livre relié
-│   └── certificat/       # Attestation d'achèvement sur parchemin
-├── components/           # Composants UI tactiles et interactifs
-│   ├── EcouteContinueFiche.tsx  # Lecteur continu studio & biblique
-│   ├── RecitationVocale.tsx     # Reconnaissance vocale en temps réel
-│   ├── PauseSanctuaire.tsx      # Minuteur et ambiances sonores
-│   ├── EdificeFondements.tsx    # Visualisation architecturale
-│   ├── BulleVerset.tsx          # Bulle biblique instantanée
-│   └── AppShell.tsx             # Barre latérale et navigation mobile
-├── lib/                  # Logique métier, audio, synchro et helpers
-│   ├── voix.ts           # Résolution et manifeste des voix studio
-│   ├── ambiance.ts       # Synthétiseur Web Audio et TTS
-│   ├── firestore.ts      # Accès et cache Firestore
-│   ├── parcoursStore.ts  # Synchronisation locale et Cloud
-│   └── bibleVersions.ts  # Audio biblique et versions des écritures
-└── data/                 # Données du livret, métadonnées et index
+│   ├── (app)/
+│   │   ├── dashboard/    # Tableau de bord unifié et étapes de la semaine
+│   │   ├── aujourdhui/   # Table de travail & lancement de l'Immersion
+│   │   ├── fiches/       # Sentier des 20 fiches et fiches d'étude intégrales
+│   │   ├── journal/      # Journal spirituel intime avec dictée vocale
+│   │   ├── groupes/      # Cellules et compagnon de rencontre en direct
+│   │   ├── memorisation/ # Entraînement et récitation
+│   │   ├── temoignages/  # Mur communautaire et enregistrements audio
+│   │   └── carnet-export/# Export manuscrit imprimable relié
+│   └── api/
+│       ├── transcription/# Transcription vocale Groq Whisper Large v3
+│       ├── memorisation/ # Analyse de récitation de versets
+│       ├── voix/         # Résolution des pistes audio
+│       └── notifications/# Rappels Web Push et cron
+├── components/           # Composants interactifs
+│   ├── Immersion.tsx     # Lecteur plein écran du sanctuaire contemplatif
+│   ├── ChampDictée.tsx   # Champ de réponse avec écoute audio et micro Whisper
+│   ├── PanneauEtude.tsx  # Panneau latéral d'étude biblique (chapitre complet)
+│   ├── BulleVerset.tsx   # Bulle d'accès rapide et d'étude de chapitre
+│   └── ReferenceCliquable.tsx # Détection automatique des références bibliques
+├── data/
+│   ├── livret.json       # Texte intégral canonique des 20 fiches
+│   ├── meditation-questions.json # Questions théocentriques des 20 fiches
+│   └── versets.ts        # Index scripturaire
+└── lib/                  # Services et logique métier
+    ├── transcription.ts  # Enregistreur et client de transcription Whisper
+    ├── voix.ts           # Résolution et manifeste des voix Studio
+    ├── ambiance.ts       # Nappes sonores Web Audio procédurales
+    ├── etudes.ts         # Moteur de chargement des chapitres et Strong
+    └── firestore.ts      # Persistance cloud et cache hors-ligne
 ```
 
 ---
 
-## ⛅ Déploiement Cloudflare Workers
+## 🌐 Déploiement
 
-L'application est optimisée pour le runtime Cloudflare Workers avec `@opennextjs/cloudflare` :
-
-```bash
-# Compilation OpenNext
-npm run build:cloud
-
-# Déploiement en production
-npx wrangler deploy
-```
-
-- **URL de Production** : [https://parcours.lesfondements.workers.dev](https://parcours.lesfondements.workers.dev)
-
+- **URL de production** : [https://parcours.lesfondements.workers.dev](https://parcours.lesfondements.workers.dev)
