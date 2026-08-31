@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { GROUPE, UTILISATEUR, semerSession } from './fixtures';
+import { GROUPE, UTILISATEUR, chercherDansLaPile, deposerLesNotes, semerSession } from './fixtures';
 
 test.beforeEach(async ({ page }) => {
   await semerSession(page);
@@ -37,7 +37,10 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
   await page.locator('textarea').first().fill('Dieu règne même lorsque je ne maîtrise pas la situation.');
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
-  await page.getByPlaceholder('Ma prière aujourd’hui…').fill('Père, apprends-moi à te faire confiance.');
+  // La prière ne se tape pas : elle se dit. L'écran reprend ce qui a été
+  // écrit à la méditation et invite à parler, sans champ à remplir.
+  await expect(page.getByText('Dieu règne même lorsque je ne maîtrise pas la situation.')).toBeVisible();
+  await expect(page.getByText('Parle à Dieu maintenant')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('La Parole que je garde', { exact: true })).toBeVisible();
@@ -98,31 +101,22 @@ test('fiche 1 · partie 3 : les textes conduisent à une prière issue des déco
   await page.goto('/aujourdhui?fiche=1&section=2&scene=17');
 
   await expect(page.getByText('Lis lentement Marc 12:29', { exact: false })).toBeVisible();
-  await expect(page.getByText('Lis Matthieu 28:19 puis 2 Corinthiens 13:13', { exact: false })).toBeVisible();
-  await expect(page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?')).toBeVisible();
-  await expect(
-    page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?').locator('xpath=ancestor::article')
-  ).toHaveClass(/post-it-/);
+  await expect(page.locator('article').first()).toHaveClass(/post-it-/);
 
-  await page.getByLabel('Qu’est-ce que ce passage te fait découvrir de Dieu ?').fill(
-    'Je découvre un Père qui m’accueille comme son enfant.'
-  );
-  await page.getByLabel('Qu’est-ce que cela te fait découvrir de Dieu en regardant Jésus ?').fill(
-    'Dieu s’approche de notre faiblesse.'
-  );
-  await page.getByLabel('À la lumière de ces textes, qu’est-ce que tu comprends de cette affirmation ?').fill(
-    'Le Saint-Esprit agit et demeure avec nous.'
-  );
-  await page.getByLabel(
-    'Lorsque tu mets ensemble ce que tu viens de découvrir, qu’est-ce que tu comprends maintenant de Dieu ?'
-  ).fill('Dieu est un et se fait connaître dans une communion vivante.');
+  await deposerLesNotes(page, [
+    'Je découvre un Père qui m’accueille comme son enfant.',
+    'Dieu s’approche de notre faiblesse.',
+    'Le Saint-Esprit agit et demeure avec nous.',
+    'Dieu est un et se fait connaître dans une communion vivante.',
+  ]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Les sujets déposés devant Dieu')).toBeVisible();
-  await expect(page.locator('.tableau-liege')).toBeVisible();
-  await expect(page.getByText('Ce que j’ai découvert de Dieu comme Père')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
+  // Les découvertes reviennent sur des fiches, empilées : la première est
+  // devant, et c'est bien ce qui a été écrit qui y est repris.
+  await expect(page.locator('article.fiche-bristol')).toBeVisible();
   await expect(page.getByText('Je découvre un Père qui m’accueille comme son enfant.')).toBeVisible();
-  await expect(page.getByText('Ce que l’ensemble m’a fait comprendre de Dieu')).toBeVisible();
+  await expect(page.getByText('1 / 4')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('Mémoriser la Parole', { exact: true })).toBeVisible();
@@ -171,21 +165,16 @@ test('fiche 2 : péché, Loi, salut et grâce forment quatre traversées complè
 
   await page.goto('/aujourdhui?fiche=2&section=3&scene=3');
   await expect(page.getByText('Lis Éphésiens 2:4-9 lentement.', { exact: false })).toBeVisible();
-  await expect(page.getByLabel('Qu’est-ce que tu y découvres de Dieu ?')).toBeVisible();
-  await page.getByLabel('Qu’est-ce que tu y découvres de Dieu ?').fill(
-    'Je découvre un Dieu riche en bonté qui donne la vie.'
-  );
-  await page.getByLabel('Qu’est-ce qu’ils te font comprendre de la grâce ?').fill(
-    'La grâce vient de Dieu et ne se gagne pas.'
-  );
-  await page.getByLabel('Quelle phrase ou quel verset t’a le plus arrêté, et pourquoi ?').fill(
-    'C’est par grâce que vous êtes sauvés.'
-  );
+  await deposerLesNotes(page, [
+    'Je découvre un Dieu riche en bonté qui donne la vie.',
+    'La grâce vient de Dieu et ne se gagne pas.',
+    'C’est par grâce que vous êtes sauvés.',
+  ]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Les sujets déposés devant Dieu')).toBeVisible();
-  await expect(page.getByText('Ce que j’ai découvert de Dieu dans Éphésiens 2')).toBeVisible();
-  await expect(page.getByText('Ce que j’ai compris de la grâce')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
+  await expect(page.getByText('Je découvre un Dieu riche en bonté qui donne la vie.')).toBeVisible();
+  await expect(page.getByText('1 / 3')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await page.getByRole('button', { name: 'Parole suivante' }).click();
@@ -249,28 +238,26 @@ test('fiche 3 : six découvertes distinctes conduisent à une Parole principale'
 
   await page.goto('/aujourdhui?fiche=3&section=3&scene=3');
   await expect(page.getByText('Lis 2 Corinthiens 5:17 lentement', { exact: false })).toBeVisible();
-  await expect(page.getByLabel('Que signifie maintenant pour toi l’expression « nouvelle créature » ?')).toBeVisible();
+  await expect(page.locator('textarea').first()).toBeVisible();
 
   await page.goto('/aujourdhui?fiche=3&section=4&scene=3');
   await expect(page.getByText('Lis Galates 4:5-7 lentement', { exact: false })).toBeVisible();
-  await expect(page.getByText('Lis maintenant Romains 8:14-16', { exact: false })).toBeVisible();
+  // Consigne d'une note suivante : elle attend son tour dans la pile.
+  expect(
+    await chercherDansLaPile(page, page.getByText('Lis maintenant Romains 8:14-16', { exact: false }))
+  ).toBe(true);
 
   await page.goto('/aujourdhui?fiche=3&section=5&scene=3');
   await expect(page.getByText('Lis Actes 2:37-38 lentement', { exact: false })).toBeVisible();
-  await expect(page.getByLabel('Comment expliquerais-tu maintenant le baptême avec tes propres mots ?')).toBeVisible();
-  await page.getByLabel('Comment expliquerais-tu maintenant le baptême avec tes propres mots ?').fill(
-    'Un signe visible qui exprime une réalité reçue de Dieu.'
-  );
-  await page.getByLabel('Que signifie ce que tu viens de lire pour ta propre marche avec Dieu ?').fill(
-    'Cela m’invite à regarder honnêtement ma réponse à la Parole.'
-  );
-  await page.getByLabel('Qu’aimerais-tu lui apporter maintenant ?').fill(
-    'Ma question et mon désir de lui répondre librement.'
-  );
+  await deposerLesNotes(page, [
+    'Un signe visible qui exprime une réalité reçue de Dieu.',
+    'Cela m’invite à regarder honnêtement ma réponse à la Parole.',
+    'Ma question et mon désir de lui répondre librement.',
+  ]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Les sujets déposés devant Dieu')).toBeVisible();
-  await expect(page.getByText('Ce que j’ai compris du baptême')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
+  await expect(page.getByText('Un signe visible qui exprime une réalité reçue de Dieu.')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await page.getByRole('button', { name: /^Rm 6:3-4/ }).click();
@@ -335,30 +322,39 @@ test('fiche 4 : la Parole et l’interprétation du livret restent distinctes da
   await expect(page.getByText('Le repos', { exact: true })).toBeVisible();
 
   await page.goto('/aujourdhui?fiche=4&section=3&scene=3');
-  await expect(page.getByText('📖 La Parole', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('📘 Le livret · interprétation proposée', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('Il s’agit ici d’une interprétation proposée par le livret', { exact: false })).toBeVisible();
+  expect(
+    await chercherDansLaPile(page, page.getByText('📖 La Parole', { exact: true }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(page, page.getByText('📘 Le livret · interprétation proposée', { exact: true }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(
+      page,
+      page.getByText('Il s’agit ici d’une interprétation proposée par le livret', { exact: false })
+    )
+  ).toBe(true);
 
   await page.goto('/aujourdhui?fiche=4&section=4&scene=3');
   await expect(page.getByText('Lis lentement 2 Corinthiens 12:9', { exact: false })).toBeVisible();
-  await expect(page.getByLabel('Qu’est-ce que tu ne comprends pas encore ?')).toBeVisible();
+  await expect(page.locator('textarea').first()).toBeVisible();
 
   await page.goto('/aujourdhui?fiche=4&section=5&scene=3');
   await expect(page.getByText('Lis lentement Hébreux 4:10-11', { exact: false })).toBeVisible();
-  await expect(page.getByText('sans la transformer en promesse générale', { exact: false })).toBeVisible();
-  await page.getByLabel('Comment comprends-tu maintenant le repos dans la grâce ?').fill(
-    'Le repos me semble être une confiance qui demeure active.'
-  );
-  await page.getByLabel('Qu’est-ce que cela t’a fait découvrir de Dieu ?').fill(
-    'Dieu précède et prépare ce qu’il donne à vivre.'
-  );
-  await page.getByLabel('Quelle Parole veux-tu garder devant toi ?').fill(
-    'Éphésiens 2:10 reste devant moi.'
-  );
+  expect(
+    await chercherDansLaPile(page, page.getByText('sans la transformer en promesse générale', { exact: false }))
+  ).toBe(true);
+
+  await page.goto('/aujourdhui?fiche=4&section=5&scene=3');
+  await deposerLesNotes(page, [
+    'Le repos me semble être une confiance qui demeure active.',
+    'Dieu précède et prépare ce qu’il donne à vivre.',
+    'Éphésiens 2:10 reste devant moi.',
+  ]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Ce que j’ai compris du repos')).toBeVisible();
-  await expect(page.getByText('La Parole que je veux garder devant moi')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
+  await expect(page.getByText('Le repos me semble être une confiance qui demeure active.')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await page.getByRole('button', { name: 'Parole suivante' }).click();
@@ -420,27 +416,39 @@ test('fiche 5 : quatre traversées bibliques conduisent à une identité reçue 
 
   await page.goto('/aujourdhui?fiche=5&section=2&scene=3');
   await expect(page.getByText('Lis lentement Ésaïe 53:4-6', { exact: false })).toBeVisible();
-  await expect(page.getByText('📖 La Parole', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('📘 Le livret · interprétation proposée', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('Garde distincts ce que les passages affirment directement', { exact: false })).toBeVisible();
+  expect(
+    await chercherDansLaPile(page, page.getByText('📖 La Parole', { exact: true }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(page, page.getByText('📘 Le livret · interprétation proposée', { exact: true }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(
+      page,
+      page.getByText('Garde distincts ce que les passages affirment directement', { exact: false })
+    )
+  ).toBe(true);
 
   await page.goto('/aujourdhui?fiche=5&section=3&scene=3');
-  await expect(page.getByText('Explore maintenant ces huit cartes', { exact: false })).toBeVisible();
-  await expect(page.getByText('sans fabriquer une déclaration positive', { exact: false })).toBeVisible();
-  await page.getByLabel('Comment répondrais-tu aujourd’hui à cette question : qui suis-je en Christ ?').fill(
-    'Je reçois mon identité de ce que Dieu a accompli et affirme en Christ.'
-  );
-  await page.getByLabel(
-    'Quelle affirmation biblique sur ton identité as-tu le plus besoin de garder présente aujourd’hui ?'
-  ).fill('Jean 1:12 me rappelle que je suis enfant de Dieu.');
-  await page.getByLabel('Qu’est-ce que ce passage vient éclairer ou corriger dans ta manière de te voir ?').fill(
-    'Je n’ai pas à construire ma valeur sur le regard des autres.'
-  );
+  expect(
+    await chercherDansLaPile(page, page.getByText('Explore maintenant ces huit cartes', { exact: false }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(page, page.getByText('sans fabriquer une déclaration positive', { exact: false }))
+  ).toBe(true);
+
+  await page.goto('/aujourdhui?fiche=5&section=3&scene=3');
+  await deposerLesNotes(page, [
+    'Je reçois mon identité de ce que Dieu a accompli et affirme en Christ.',
+    'Jean 1:12 me rappelle que je suis enfant de Dieu.',
+    'Je n’ai pas à construire ma valeur sur le regard des autres.',
+  ]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Ce que la Parole dit de moi en Christ')).toBeVisible();
-  await expect(page.getByText('Le passage qui m’a particulièrement arrêté')).toBeVisible();
-  await expect(page.getByText('Ce que ce passage vient éclairer ou corriger')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
+  await expect(
+    page.getByText('Je reçois mon identité de ce que Dieu a accompli et affirme en Christ.')
+  ).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('La Parole que je garde', { exact: true })).toBeVisible();
@@ -508,29 +516,41 @@ test('fiche 6 : la Parole éclaire une situation réelle puis conduit à un pas 
 
   await page.goto('/aujourdhui?fiche=6&section=0&scene=3');
   await expect(page.getByText('Lis lentement Éphésiens 4:20-24', { exact: false })).toBeVisible();
-  await expect(page.getByText('🪞 Ma vie aujourd’hui', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('Ne choisis qu’une seule chose', { exact: false })).toBeVisible();
+  expect(
+    await chercherDansLaPile(page, page.getByText('🪞 Ma vie aujourd’hui', { exact: true }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(page, page.getByText('Ne choisis qu’une seule chose', { exact: false }))
+  ).toBe(true);
 
   await page.goto('/aujourdhui?fiche=6&section=3&scene=3');
   await expect(page.getByText('Lis lentement Galates 2:20', { exact: false })).toBeVisible();
-  await expect(page.getByText('à la fois de son effort et de la puissance', { exact: false })).toBeVisible();
-  await expect(page.getByText('📘 Le livret · interprétation proposée', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('Ce sont ses formulations interprétatives', { exact: false })).toBeVisible();
+  expect(
+    await chercherDansLaPile(page, page.getByText('à la fois de son effort et de la puissance', { exact: false }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(page, page.getByText('📘 Le livret · interprétation proposée', { exact: true }))
+  ).toBe(true);
+  expect(
+    await chercherDansLaPile(page, page.getByText('Ce sont ses formulations interprétatives', { exact: false }))
+  ).toBe(true);
 
-  await page.getByLabel(
-    'Y a-t-il quelque chose que tu sais juste, mais que tu as beaucoup de mal à vivre par tes propres forces ?'
-  ).fill('Rester disponible et doux lorsque je reçois une critique inattendue.');
-  await page.getByLabel('Qu’est-ce qui se passe généralement ?').fill(
-    'Je me défends immédiatement et je n’écoute plus vraiment.'
-  );
-  await page.getByLabel('Qu’est-ce qu’ils changent dans ta manière d’aborder cette difficulté ?').fill(
-    'Je peux répondre réellement tout en comptant sur la force que Dieu produit en moi.'
-  );
+  await page.goto('/aujourdhui?fiche=6&section=3&scene=3');
+  // La mise en pratique de cette section rappelle la sixième note : il faut
+  // donc aller jusque-là. C'est elle qui portera « la difficulté identifiée ».
+  await deposerLesNotes(page, [
+    'Je sais que Dieu agit, et je continue de tout porter seul.',
+    'Le texte distingue ce qui vient de lui et ce qui vient de moi.',
+    'Je confonds souvent effort et dépendance.',
+    'Je m’épuise avant de demander.',
+    'Je voudrais apprendre à compter sur lui d’abord.',
+    'Rester disponible et doux lorsque je reçois une critique inattendue.',
+  ]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('La difficulté que j’ai identifiée')).toBeVisible();
-  await expect(page.getByText('Ce que je fais ou vis habituellement')).toBeVisible();
-  await expect(page.getByText('Ce que les textes viennent changer dans ma compréhension')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Parle à Dieu à partir de tes découvertes' })).toBeVisible();
+  // La prière reprend les notes dans l'ordre : la première est devant.
+  await expect(page.getByText('Je sais que Dieu agit, et je continue de tout porter seul.')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await page.getByRole('button', { name: 'Parole précédente' }).click();

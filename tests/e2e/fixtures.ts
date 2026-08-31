@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export const UTILISATEUR = {
   uid: 'e2e-alice',
@@ -97,4 +97,43 @@ export async function semerSession(page: Page, options?: { avecGroupe?: boolean 
     },
     { utilisateur: UTILISATEUR, groupe: GROUPE, membres: MEMBRES, groupeActif: avecGroupe }
   );
+}
+
+/**
+ * Déposer les notes de la méditation, dans l'ordre.
+ *
+ * Les questions ne sont plus toutes ouvertes en même temps : une note est
+ * devant, les suivantes attendent derrière. On écrit, on avance d'une
+ * feuille. Les tests de parcours vérifient la traversée, pas la formulation
+ * des questions — celle-ci change avec le livret et se contrôle ailleurs.
+ */
+export async function deposerLesNotes(page: Page, reponses: string[]): Promise<void> {
+  for (let rang = 0; rang < reponses.length; rang += 1) {
+    await page.locator('textarea').first().fill(reponses[rang]);
+    if (rang === reponses.length - 1) break;
+    const suivante = page.getByRole('button', { name: 'Suivante' });
+    if (!(await suivante.count()) || !(await suivante.isEnabled())) break;
+    await suivante.click();
+  }
+}
+
+/**
+ * Avancer dans la pile jusqu'à ce que le repère cherché soit devant.
+ *
+ * Rend `true` s'il a été trouvé. Sert à vérifier qu'une étiquette d'origine
+ * — 📖 la Parole, 📘 le livret — figure bien quelque part dans la section,
+ * sans dépendre du rang qu'elle y occupe.
+ */
+export async function chercherDansLaPile(
+  page: Page,
+  cible: Locator,
+  bornes = 14
+): Promise<boolean> {
+  for (let essai = 0; essai < bornes; essai += 1) {
+    if (await cible.count()) return true;
+    const suivante = page.getByRole('button', { name: 'Suivante' });
+    if (!(await suivante.count()) || !(await suivante.isEnabled())) return false;
+    await suivante.click();
+  }
+  return false;
 }
