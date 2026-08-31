@@ -848,6 +848,19 @@
   backdrop-filter: blur(1px);
 }
 
+/* ─── La feuille qu'on pose ────────────────────────────────── */
+/* La note suivante ne surgit pas : elle remonte de la pile et se pose. Le
+   mouvement porte sur l'enveloppe, jamais sur la feuille elle-même, dont la
+   transformation appartient déjà à son inclinaison. */
+@keyframes note-posee {
+  from { opacity: 0; transform: translate3d(0, 18px, -70px) scale(0.965); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+.note-posee { animation: note-posee 0.42s var(--ease-doux) both; }
+@media (prefers-reduced-motion: reduce) {
+  .note-posee { animation: none; }
+}
+
 /* ─── Les inclinaisons ─────────────────────────────────────── */
 /* Rien n'est jamais parfaitement droit sur une table. */
 .pose-1 { transform: rotate(-1.6deg); }

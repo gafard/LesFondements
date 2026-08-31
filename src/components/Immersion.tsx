@@ -7,6 +7,8 @@ import {
   Bookmark,
   BookOpen,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Image as ImageIcon,
   Loader2,
   Pause,
@@ -1342,11 +1344,6 @@ function RenduScene({
       return <SceneSilence />;
 
     case 'meditation': {
-      const papiers = [
-        'post-it-jaune pose-1',
-        'post-it-bleu pose-2',
-        'post-it-rose pose-3',
-      ];
       return (
         <div className="py-6 sm:py-9">
           <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
@@ -1359,70 +1356,12 @@ function RenduScene({
             Ces repères t&apos;indiquent seulement où regarder. Ils ne te disent pas ce que tu dois
             trouver. Relis, attends, puis écris ce que tu vois.
           </p>
-          <div className="mt-7 space-y-5">
-            {scene.questions.map((question, indexQuestion) => {
-              const reponse = reponses[`q:${question.id}`] ?? '';
-              const etiquetteSource = question.source === 'parole'
-                ? '📖 La Parole'
-                : question.source === 'livret'
-                  ? '📘 Le livret · interprétation proposée'
-                  : question.source === 'vie'
-                    ? '🪞 Ma vie aujourd’hui'
-                  : question.source === 'contemplation'
-                    ? '🌿 Prends le temps'
-                    : null;
-              return (
-                <article
-                  key={question.id}
-                  className={`${papiers[indexQuestion % papiers.length]} relative rounded-[4px] p-5 text-encre-950 shadow-xl transition-transform sm:p-6`}
-                >
-                  <span
-                    className={`punaise -top-2.5 ${indexQuestion % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
-                    aria-hidden="true"
-                  />
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span aria-hidden="true" className="font-serif text-xl italic text-encre-700/55">
-                        {String(indexQuestion + 1).padStart(2, '0')}
-                      </span>
-                      {etiquetteSource && (
-                        <span className="truncate rounded-full border border-encre-700/12 bg-white/35 px-2.5 py-1 text-xs font-black uppercase tracking-[0.06em] text-encre-800/70">
-                          {etiquetteSource}
-                        </span>
-                      )}
-                    </span>
-                    {reponse.trim() && (
-                      <span className="inline-flex items-center gap-1 text-3xs font-black uppercase tracking-[0.12em] text-emerald-900/75">
-                        <Check className="h-3 w-3" /> Note déposée
-                      </span>
-                    )}
-                  </div>
-                  {question.consigne && (
-                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-encre-700 sm:text-base">
-                      <TexteAvecReferences>{question.consigne}</TexteAvecReferences>
-                    </p>
-                  )}
-                  <label
-                    htmlFor={`meditation-${question.id}`}
-                    className="mt-4 block font-serif text-lg font-bold leading-relaxed text-encre-950 sm:text-xl"
-                  >
-                    <TexteAvecReferences>{question.question}</TexteAvecReferences>
-                  </label>
-                  <div className="mt-4">
-                    <ChampDictée
-                      valeur={reponse}
-                      onEnregistrer={(valeur) => onEnregistrer(`q:${question.id}`, valeur)}
-                      placeholder="Écris ou dicte à la voix ce qui vient dans ton cœur…"
-                      ariaLabel={question.question}
-                      questionPourAudio={`${question.consigne ? `${question.consigne}. ` : ''}${question.question}`}
-                      theme="clair"
-                      lignes={3}
-                    />
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <PileDeNotes
+            key={scene.sectionTitre}
+            questions={scene.questions}
+            reponses={reponses}
+            onEnregistrer={onEnregistrer}
+          />
         </div>
       );
     }
@@ -1753,6 +1692,229 @@ interface ReprisePriere {
   id: string;
   titre: string;
   reponse: string;
+}
+
+/** 📖 la Parole, 📘 le livret, 🪞 ma vie, 🌿 le temps qu'on prend. */
+function etiquetteDeSource(source: QuestionMeditation['source']): string | null {
+  if (source === 'parole') return '📖 La Parole';
+  if (source === 'livret') return '📘 Le livret · interprétation proposée';
+  if (source === 'vie') return '🪞 Ma vie aujourd’hui';
+  if (source === 'contemplation') return '🌿 Prends le temps';
+  return null;
+}
+
+/**
+ * La pile de notes.
+ *
+ * La méditation empilait ses questions à la verticale : jusqu'à dix cartes
+ * ouvertes en même temps, un long défilement, et l'impression désagréable
+ * qu'il faut tout remplir d'un coup. Le regard n'avait nulle part où se
+ * poser.
+ *
+ * Ici, une seule note est devant, posée à plat. Les suivantes dépassent
+ * derrière elle, en biais, comme des feuilles laissées sur un coin de table.
+ * On répond, on fait glisser, la feuille suivante remonte. Rien n'a changé
+ * du contenu — c'est la même table, le même papier, la même encre : on a
+ * seulement cessé de tout montrer à la fois.
+ */
+function PileDeNotes({
+  questions,
+  reponses,
+  onEnregistrer,
+}: {
+  questions: QuestionMeditation[];
+  reponses: Record<string, string>;
+  onEnregistrer: (cle: string, valeur: string) => void;
+}) {
+  const [rang, setRang] = useState(0);
+  const departGlissement = useRef<number | null>(null);
+  const total = questions.length;
+  const courant = Math.min(rang, total - 1);
+
+  const papiers = ['post-it-jaune', 'post-it-bleu', 'post-it-rose'];
+  const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
+
+  const aller = useCallback(
+    (delta: number) => setRang((valeur) => Math.max(0, Math.min(total - 1, valeur + delta))),
+    [total]
+  );
+
+  const repondues = questions.filter((q) => (reponses[`q:${q.id}`] ?? '').trim()).length;
+
+  const carte = (question: QuestionMeditation, index: number, devant: boolean) => {
+    const reponse = reponses[`q:${question.id}`] ?? '';
+    const etiquette = etiquetteDeSource(question.source);
+    return (
+      <>
+        <span
+          className={`punaise -top-2.5 ${index % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
+          aria-hidden="true"
+        />
+        <div className="flex items-center justify-between gap-3">
+          <span className="flex min-w-0 items-center gap-2">
+            <span aria-hidden="true" className="font-serif text-xl italic text-encre-700/55">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            {etiquette && (
+              <span className="truncate rounded-full border border-encre-700/12 bg-white/35 px-2.5 py-1 text-xs font-black uppercase tracking-[0.06em] text-encre-800/70">
+                {etiquette}
+              </span>
+            )}
+          </span>
+          {reponse.trim() && (
+            <span className="inline-flex items-center gap-1 text-3xs font-black uppercase tracking-[0.12em] text-emerald-900/75">
+              <Check className="h-3 w-3" /> Note déposée
+            </span>
+          )}
+        </div>
+        {question.consigne && (
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-encre-700 sm:text-base">
+            <TexteAvecReferences>{question.consigne}</TexteAvecReferences>
+          </p>
+        )}
+        <label
+          htmlFor={`meditation-${question.id}`}
+          className="mt-4 block font-serif text-lg font-bold leading-relaxed text-encre-950 sm:text-xl"
+        >
+          <TexteAvecReferences>{question.question}</TexteAvecReferences>
+        </label>
+        {devant && (
+          <div className="mt-4">
+            <ChampDictée
+              valeur={reponse}
+              onEnregistrer={(valeur) => onEnregistrer(`q:${question.id}`, valeur)}
+              placeholder="Écris ou dicte à la voix ce qui vient dans ton cœur…"
+              ariaLabel={question.question}
+              questionPourAudio={`${question.consigne ? `${question.consigne}. ` : ''}${question.question}`}
+              theme="clair"
+              lignes={3}
+            />
+          </div>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <div className="mt-7">
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm leading-relaxed text-parchemin-100/60">
+          Une note à la fois. Fais glisser quand tu as écrit.
+        </p>
+        <span
+          aria-live="polite"
+          className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-parchemin-100/55"
+        >
+          {courant + 1} / {total}
+        </span>
+      </div>
+
+      <div
+        className="relative mt-4 [perspective:1400px]"
+        onTouchStart={(event) => {
+          departGlissement.current = event.touches[0]?.clientX ?? null;
+        }}
+        onTouchEnd={(event) => {
+          if (departGlissement.current === null) return;
+          const distance = departGlissement.current - (event.changedTouches[0]?.clientX ?? 0);
+          departGlissement.current = null;
+          if (Math.abs(distance) < 48) return;
+          aller(distance > 0 ? 1 : -1);
+        }}
+        onTouchCancel={() => {
+          departGlissement.current = null;
+        }}
+      >
+        {/* Les feuilles qui attendent leur tour, entrevues derrière. */}
+        {questions.map((question, index) => {
+          const ecart = index - courant;
+          if (ecart <= 0 || ecart > 3) return null;
+          return (
+            <div
+              key={`derriere-${question.id}`}
+              aria-hidden="true"
+              // L'enveloppe porte le placement : `.post-it-*` impose
+              // `position: relative` depuis la feuille de styles, et l'emporte
+              // sur l'utilitaire `absolute`. La feuille reste donc à
+              // l'intérieur, où elle n'a qu'à se colorer.
+              className="pointer-events-none absolute inset-0 transition-transform duration-500 ease-out motion-reduce:transition-none"
+              style={{
+                // Le recul suffit à les rapetisser : la perspective s'en
+                // charge. Une mise à l'échelle en plus les faisait rentrer
+                // sous la feuille de devant au lieu d'en dépasser.
+                transform: `translate3d(0, ${ecart * 26}px, ${ecart * -60}px) rotate(${
+                  ecart % 2 === 0 ? ecart * 0.9 : ecart * -0.9
+                }deg)`,
+                opacity: 0.85 - ecart * 0.2,
+                zIndex: 3 - ecart,
+              }}
+            >
+              <div className={`${papiers[index % papiers.length]} h-full w-full shadow-xl`} />
+            </div>
+          );
+        })}
+
+        {/* La note posée devant : c'est elle qui donne sa hauteur à la pile.
+            L'enveloppe porte le mouvement, la feuille garde son inclinaison. */}
+        <div key={questions[courant].id} className="note-posee relative z-10">
+          <article
+            className={`${papiers[courant % papiers.length]} ${
+              poses[courant % poses.length]
+            } rounded-[4px] p-5 text-encre-950 shadow-2xl sm:p-6`}
+          >
+            {carte(questions[courant], courant, true)}
+          </article>
+        </div>
+      </div>
+
+      {/* Les feuilles en attente dépassent d'une cinquantaine de pixels sous
+          la note de devant : les commandes se placent en dessous. */}
+      <div className="mt-16 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => aller(-1)}
+          disabled={courant === 0}
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-bold text-parchemin-100/80 transition-colors hover:bg-white/12 disabled:opacity-25"
+        >
+          <ChevronLeft className="h-4 w-4" /> Précédente
+        </button>
+
+        {/* Des repères, pas des commandes : la règle de cible tactile impose
+            44 px à tout bouton, ce qui ferait neuf disques là où il ne faut
+            qu'un fil. On avance par les flèches ou d'un glissement. */}
+        <span className="flex items-center gap-1.5" aria-hidden="true">
+          {questions.map((question, index) => {
+            const ecrite = (reponses[`q:${question.id}`] ?? '').trim().length > 0;
+            return (
+              <span
+                key={`point-${question.id}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  index === courant
+                    ? 'w-5 bg-or-300'
+                    : ecrite
+                      ? 'w-1.5 bg-emerald-300/70'
+                      : 'w-1.5 bg-white/22'
+                }`}
+              />
+            );
+          })}
+        </span>
+
+        <button
+          type="button"
+          onClick={() => aller(1)}
+          disabled={courant === total - 1}
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-bold text-parchemin-100/80 transition-colors hover:bg-white/12 disabled:opacity-25"
+        >
+          Suivante <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+
+      <p className="mt-3 text-center text-2xs text-parchemin-100/40">
+        {repondues} note{repondues > 1 ? 's' : ''} déposée{repondues > 1 ? 's' : ''} sur {total}
+      </p>
+    </div>
+  );
 }
 
 function distanceCirculaire(index: number, actif: number, total: number): number {
