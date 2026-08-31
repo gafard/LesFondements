@@ -1,10 +1,13 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
 import type { NotificationPreferences, TypeEvenementGroupe } from './notifications';
+import tempsTitres from '../data/tempsTitres.json' with { type: 'json' };
 
 export interface CalendrierGroupe {
   groupId: string;
   groupName: string;
   currentStep: number;
+  /** Ouverture de la fiche courante (ms). Situe le temps du jour. */
+  stepOpenedAt?: number;
   rhythm: 'hebdomadaire' | 'bimensuel';
   weekday: number;
   time: string;
@@ -37,6 +40,32 @@ export interface AbonnementRappel {
   evenementsDepuis: number;
   /** Clés de messages déjà servis, persistées pour résister aux relances cron. */
   dedup: Record<string, number>;
+}
+
+const TITRES_DES_TEMPS = tempsTitres as Record<string, string[]>;
+
+/**
+ * Le temps du jour, plutôt qu'un verset au hasard.
+ *
+ * Une fiche se travaille en quatre ou cinq temps, un par jour. Le rappel du
+ * matin ne le savait pas : il envoyait un verset tiré de la Segond par
+ * rotation, sans rapport avec ce qui attendait la personne ce jour-là.
+ *
+ * Le repère est l'ouverture de la fiche : premier jour, premier temps. Passé
+ * le dernier, la préparation est faite et l'on retombe sur le verset — mieux
+ * vaut une Parole qu'un temps déjà vécu qu'on rappellerait indéfiniment.
+ */
+export function tempsDuJour(
+  calendrier: { currentStep: number; stepOpenedAt?: number },
+  maintenant: Date
+): { rang: number; total: number; titre: string } | null {
+  const titres = TITRES_DES_TEMPS[String(calendrier.currentStep)];
+  if (!titres?.length || !calendrier.stepOpenedAt) return null;
+
+  const jours = Math.floor((maintenant.getTime() - calendrier.stepOpenedAt) / 86_400_000);
+  if (jours < 0 || jours >= titres.length) return null;
+
+  return { rang: jours + 1, total: titres.length, titre: titres[jours] };
 }
 
 const PREFIXE_ABONNEMENT = 'abo:';

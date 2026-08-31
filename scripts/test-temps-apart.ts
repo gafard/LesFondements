@@ -15,6 +15,8 @@
 import decoupages from '../src/data/tempsApart.json' with { type: 'json' };
 import livret from '../src/data/livret.json' with { type: 'json' };
 import meditations from '../src/data/meditation-questions.json' with { type: 'json' };
+import titresPublies from '../src/data/tempsTitres.json' with { type: 'json' };
+import { titresDesTemps } from './generer-temps-titres';
 import { etapesTempsApart } from '../src/lib/tempsApart';
 import type { FicheLivret } from '../src/lib/livret';
 
@@ -112,6 +114,24 @@ for (const fiche of fiches) {
       echecs += 1;
     }
   });
+}
+
+// Le rappel du matin lit `tempsTitres.json`, précalculé pour le worker. S'il
+// s'écarte du découpage, la notification annonce un temps que l'application
+// n'ouvre plus. On le compare ici plutôt que de s'en apercevoir un matin.
+{
+  const attendu = titresDesTemps();
+  const publie = titresPublies as Record<string, string[]>;
+  for (const [cle, titres] of Object.entries(attendu)) {
+    const enLigne = publie[cle] ?? [];
+    if (JSON.stringify(enLigne) !== JSON.stringify(titres)) {
+      console.error(
+        `✗ fiche ${cle} : tempsTitres.json est en retard — lancer « npm run temps:titres »`
+      );
+      echecs += 1;
+      break;
+    }
+  }
 }
 
 console.log(

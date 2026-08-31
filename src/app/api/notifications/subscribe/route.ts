@@ -49,6 +49,11 @@ async function calendrierAutorise(
     groupId,
     groupName: String(groupe.name || 'Votre groupe').slice(0, 100),
     currentStep: Math.max(1, Math.min(20, Number(groupe.currentStep) || 1)),
+    // Sans cette date, le rappel du matin ne saurait pas dire à quel temps de
+    // la fiche on en est : il ne connaîtrait que le numéro de la fiche.
+    ...(Number.isFinite(Number(groupe.stepOpenedAt))
+      ? { stepOpenedAt: Number(groupe.stepOpenedAt) }
+      : {}),
     rhythm: groupe.meeting.rhythm === 'bimensuel' ? 'bimensuel' : 'hebdomadaire',
     weekday: Math.max(0, Math.min(6, Number(groupe.meeting.weekday) || 0)),
     time: /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(groupe.meeting.time)

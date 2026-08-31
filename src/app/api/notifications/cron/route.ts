@@ -13,6 +13,7 @@ import {
   oublierAbonnement,
   parcourirAbonnements,
   prochaineRencontre,
+  tempsDuJour,
   type AbonnementRappel,
   type EvenementGroupe,
 } from '@/lib/rappels';
@@ -34,6 +35,19 @@ function goutteDeRosee(jour: string, ficheId?: number): PushPayload | null {
     title: 'Votre table du jour',
     body: `« ${texte} » — ${verset.reference}`,
     url: ficheId ? `/aujourdhui?fiche=${ficheId}` : '/aujourdhui',
+    tag: `rosee-${jour}`,
+  };
+}
+
+function invitationDuTemps(
+  ficheId: number,
+  temps: { rang: number; total: number; titre: string },
+  jour: string
+): PushPayload {
+  return {
+    title: `Fiche ${ficheId} · temps ${temps.rang} sur ${temps.total}`,
+    body: temps.titre,
+    url: `/aujourdhui?fiche=${ficheId}&section=${temps.rang - 1}`,
     tag: `rosee-${jour}`,
   };
 }
@@ -119,7 +133,14 @@ export async function GET(requete: Request) {
       preferences?.goutteDeRosee &&
       estLHeure(preferences.heureMatin || '07:30', heure)
     ) {
-      const message = goutteDeRosee(jour, calendrier?.currentStep);
+      // Nommer le temps du jour quand on le connaît ; sinon la Parole.
+      const temps =
+        preferences.tempsDuJour !== false && calendrier
+          ? tempsDuJour(calendrier, maintenant)
+          : null;
+      const message = temps
+        ? invitationDuTemps(calendrier!.currentStep, temps, jour)
+        : goutteDeRosee(jour, calendrier?.currentStep);
       if (message) await envoyer([`rosee:${jour}`], message);
     }
 
