@@ -10,6 +10,8 @@ export interface NotificationPreferences {
   rappel48h: boolean;      // Rappel 48h avant la rencontre de cellule
   jourDeRencontre: boolean; // Rappel Jour J de la rencontre
   vieDeGroupe: boolean;    // Célébration d'étape clôturée & nouvelles pépites
+  /** Nommer le temps du jour dans le rappel du matin plutôt qu'un verset au hasard. */
+  tempsDuJour?: boolean;
 }
 
 export interface ContexteNotifications {
@@ -25,6 +27,7 @@ export const PREFERENCES_DEFAUT: NotificationPreferences = {
   rappel48h: true,
   jourDeRencontre: true,
   vieDeGroupe: true,
+  tempsDuJour: true,
 };
 
 export interface DiagnosticPWA {

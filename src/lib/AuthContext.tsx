@@ -18,6 +18,7 @@ interface AuthContextType {
   signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   signInAsGuest: (displayName?: string) => Promise<void>;
   logout: () => Promise<void>;
+  renommer: (nom: string) => Promise<void>;
   supprimerCompte: () => Promise<void>;
   isFirebaseConfigured: boolean;
 }
@@ -227,6 +228,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
+  /**
+   * Corriger son nom.
+   *
+   * À l'inscription par e-mail, le nom est déduit de l'adresse — la partie
+   * avant l'arobase. « jean.dupont92 » n'est le nom de personne, et il
+   * s'affichait ainsi à tout le groupe sans qu'on puisse y toucher.
+   */
+  const renommer = async (nom: string) => {
+    const propre = nom.trim().slice(0, 60);
+    if (!propre || !user) return;
+
+    if (isFirebaseConfigured) {
+      const [{ getFirebaseAuth }, { updateProfile }] = await Promise.all([
+        import('./firebase'),
+        import('firebase/auth'),
+      ]);
+      const auth = await getFirebaseAuth();
+      if (auth.currentUser) await updateProfile(auth.currentUser, { displayName: propre });
+    } else {
+      const local = { ...user, displayName: propre };
+      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(local));
+    }
+    setUser({ ...user, displayName: propre });
+  };
+
   const supprimerCompte = async () => {
     if (!user) return;
     const { effacerDonneesLocales, supprimerDonneesDistantes } = await import('./confidentialite');
@@ -259,6 +285,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       signUpWithEmail,
       signInAsGuest,
       logout,
+      renommer,
       supprimerCompte,
       isFirebaseConfigured,
     }}>

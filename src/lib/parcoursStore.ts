@@ -848,6 +848,41 @@ export async function getMembers(groupId: string): Promise<GroupMember[]> {
   return lsGet<GroupMember[]>(KEY.members(groupId), []);
 }
 
+/**
+ * Porter son nom corrigé sur sa ligne d'adhésion.
+ *
+ * Le profil est privé ; c'est le document d'adhésion que le groupe lit. Sans
+ * cette écriture, on se renommait pour soi seul et le groupe continuait de
+ * voir le nom déduit de l'adresse e-mail. Les règles ne laissent toucher ici
+ * qu'à son identité, et sur sa propre ligne : on n'envoie donc que ces
+ * champs-là.
+ */
+export async function renommerDansLeGroupe(
+  groupId: string,
+  uid: string,
+  displayName: string,
+  photoURL?: string | null
+): Promise<void> {
+  const client = await getClient();
+  if (client) {
+    try {
+      await client.f.updateDoc(client.f.doc(client.db, 'groups', groupId, 'members', uid), {
+        displayName,
+        ...(photoURL === undefined ? {} : { photoURL }),
+      });
+    } catch (error) {
+      noterEchec('Mise à jour de votre nom dans le groupe', error);
+    }
+  }
+  const tous = lsGet<GroupMember[]>(KEY.members(groupId), []);
+  const rang = tous.findIndex((m) => m.uid === uid);
+  if (rang >= 0) {
+    tous[rang] = { ...tous[rang], displayName, ...(photoURL === undefined ? {} : { photoURL }) };
+    lsSet(KEY.members(groupId), tous);
+    emit(`members:${groupId}`);
+  }
+}
+
 export async function getMembership(groupId: string, uid: string): Promise<GroupMember | null> {
   const client = await getClient();
   if (client) {

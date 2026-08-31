@@ -81,7 +81,7 @@ const SECONDAIRES: Destination[] = [
   { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Bookmark },
   { href: '/guide-pastoral', label: 'Guide pastoral', court: 'Guide', icon: Shield },
   { href: '/certificat', label: 'Mon attestation', court: 'Attestation', icon: Award },
-  { href: '/parametres/confidentialite', label: 'Confidentialité', court: 'Données', icon: ShieldCheck },
+  { href: '/parametres', label: 'Mes réglages', court: 'Réglages', icon: ShieldCheck },
 ];
 
 const ONGLETS_MOBILES = PRINCIPALES.slice(0, 4);

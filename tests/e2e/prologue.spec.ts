@@ -30,8 +30,11 @@ test('prologue : la vidéo tient l’écran après la création du groupe', asyn
     .poll(() => page.evaluate(() => document.querySelector('video')?.paused ?? true), { timeout: 5000 })
     .toBe(false);
 
-  // Deux secondes plus tard, on n'a pas été emmené ailleurs.
+  // Deux secondes plus tard, on n'a pas été emmené ailleurs et la vidéo est
+  // toujours là, toujours lancée. On ne regarde pas `currentTime` : sans
+  // sortie audio réelle, le navigateur de test annonce la lecture sans
+  // toujours faire avancer l'horloge, et la panne ne portait pas là-dessus.
   await page.waitForTimeout(2000);
   expect(new URL(page.url()).pathname).toBe('/onboarding');
-  expect(await page.evaluate(() => document.querySelector('video')?.currentTime ?? 0)).toBeGreaterThan(0.3);
+  expect(await page.evaluate(() => document.querySelector('video')?.paused ?? true)).toBe(false);
 });

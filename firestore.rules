@@ -178,6 +178,17 @@ service cloud.firestore {
             && moi() == memberId
             && request.resource.data.diff(resource.data).affectedKeys()
               .hasOnly(['preparedSteps', 'personalStep', 'nextAttendance', 'lastSeenAt']))
+          // Corriger son propre nom. À l'inscription par e-mail, le nom est
+          // déduit de l'adresse — « jean.dupont92 » — et se retrouvait affiché
+          // au groupe sans que personne puisse le changer. On ne touche ici
+          // qu'à sa propre ligne, et à rien d'autre qu'à son identité.
+          || (connecte()
+            && moi() == memberId
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['displayName', 'photoURL'])
+            && request.resource.data.displayName is string
+            && request.resource.data.displayName.size() > 0
+            && request.resource.data.displayName.size() <= 60)
           // Partir de son propre chef. Uniquement vers « parti » : se poser
           // soi-même en « actif » reviendrait à s'auto-approuver.
           || (connecte()

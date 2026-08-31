@@ -86,6 +86,14 @@ try {
 
   await assertFails(updateDoc(doc(bob, 'groups/g1'), { membersCount: 1 }));
   await assertSucceeds(updateDoc(doc(bob, 'groups/g1'), { membersCount: 2 }));
+  // Chacun corrige son nom sur sa propre ligne, et sur la sienne seulement.
+  await assertSucceeds(updateDoc(doc(bob, 'groups/g1/members/bob'), { displayName: 'Bob N.' }));
+  await assertFails(updateDoc(doc(bob, 'groups/g1/members/alice'), { displayName: 'Bob' }));
+  await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { displayName: '' }));
+  await assertFails(
+    updateDoc(doc(bob, 'groups/g1/members/bob'), { displayName: 'Bob', role: 'animateur' })
+  );
+
   await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { role: 'animateur' }));
   await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { status: 'actif', role: 'co_animateur' }));
   await assertFails(getDoc(doc(bob, 'profiles/alice')));
