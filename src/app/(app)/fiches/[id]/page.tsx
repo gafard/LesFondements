@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import {
@@ -24,7 +24,7 @@ import {
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
-import Immersion, { ChargementImmersion } from '@/components/Immersion';
+import { ChargementImmersion } from '@/components/Immersion';
 import LettreDuPere from '@/components/LettreDuPere';
 import PauseSanctuaire from '@/components/PauseSanctuaire';
 import AnnotationsFiche from '@/components/AnnotationsFiche';
@@ -40,6 +40,8 @@ import {
   type FicheLivret,
 } from '@/lib/livret';
 import { texteDuVerset } from '@/data/versets';
+import MEDITATIONS from '@/data/meditation-questions.json';
+import TITRES_DES_TEMPS from '@/data/tempsTitres.json';
 import { enregistrerRevision, qualiteDepuisScore } from '@/lib/memorisation';
 import { FICHES_META } from '@/data/fichesMeta';
 import { useDeclarerFondSombre } from '@/lib/fondSombre';
@@ -68,14 +70,11 @@ function ancrePourCle(cle: string): string {
 
 function FicheContent() {
   const params = useParams();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const rawId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const parsedId = rawId ? Number.parseInt(rawId, 10) : NaN;
   const ficheId = Number.isFinite(parsedId) ? parsedId : 1;
   const cleReprise = searchParams.get('reprendre');
-  const sceneDemandee = Number.parseInt(searchParams.get('scene') ?? '0', 10);
-  const sceneInitiale = Number.isFinite(sceneDemandee) ? sceneDemandee : 0;
 
   const { user } = useAuth();
   const { group, membership, unlockedStep, preparationStep, refresh } = useParcours();
@@ -98,7 +97,11 @@ function FicheContent() {
       ficheId
     );
   });
-  const [immersion, setImmersion] = useState(searchParams.get('immersion') === '1');
+  // L'immersion en plein écran de la fiche entière a été retirée : c'était
+  // cette même page en plus grand, une troisième porte vers le même contenu,
+  // vers laquelle rien ne menait dans l'interface. Les réponses qu'elle
+  // recueillait sont celles de cette page — rien n'est perdu, et une adresse
+  // gardée en favori retombe ici.
   const [pauseSanctuaireOuverte, setPauseSanctuaireOuverte] = useState(false);
   const [ecouteContinueOuverte, setEcouteContinueOuverte] = useState(false);
   const [enregistre, setEnregistre] = useState(false);
@@ -148,7 +151,7 @@ function FicheContent() {
   }, [reponses]);
 
   useEffect(() => {
-    if (!fiche || immersion) return;
+    if (!fiche) return;
     const dernier = lireDernierPassage();
     if (
       dernier &&
@@ -161,7 +164,7 @@ function FicheContent() {
       sousTitre: 'Dernière fiche ouverte',
       type: 'fiche',
     });
-  }, [fiche, ficheId, immersion]);
+  }, [fiche, ficheId]);
 
   useEffect(() => {
     if (!fiche || !cleReprise) return;
@@ -250,29 +253,18 @@ function FicheContent() {
     );
   }
 
-  // ── Immersion plein écran ───────────────────────────────────
-  if (immersion) {
-    return (
-      <Immersion
-        fiche={fiche}
-        reponses={reponses}
-        onEnregistrer={enregistrer}
-        onTerminer={marquerPreparee}
-        onQuitter={() => {
-          setImmersion(false);
-          router.replace(`/fiches/${ficheId}`);
-        }}
-        dejaPreparee={preparee}
-        indexInitial={sceneInitiale}
-      />
-    );
-  }
-
   const precedente = ficheId > 1 ? ficheId - 1 : null;
   const suivante = ficheId < 20 && (!group || ficheId < maxFicheAccessible) ? ficheId + 1 : null;
   const nbQuestions = meta.nbQuestions;
+  // Deux jeux de réponses cohabitent sous le préfixe « q: » : celles des
+  // temps à part, écrites jour après jour, et celles du livret, qui se
+  // partagent à la rencontre. Les additionner donnait un compteur faux —
+  // « 18 / 7 » pour qui avait fait sa semaine. On les compte séparément.
+  const notesDeLaSemaine = Object.keys(reponses).filter(
+    (cle) => /^q:f\d+-s\d+-q\d+$/.test(cle) && reponses[cle].trim()
+  ).length;
   const repondu = Object.keys(reponses).filter(
-    (cle) => cle.startsWith('q:') && reponses[cle].trim()
+    (cle) => cle.startsWith('q:') && !/^q:f\d+-s\d+-q\d+$/.test(cle) && reponses[cle].trim()
   ).length;
 
   return (
@@ -370,6 +362,11 @@ function FicheContent() {
             >
               <tab.icon className="h-4 w-4" strokeWidth={1.75} />
               {tab.label}
+              {tab.id === 'partage' && notesDeLaSemaine > 0 && (
+                <span className="rounded-full bg-or-100 px-2 py-0.5 text-3xs font-black text-or-800">
+                  {notesDeLaSemaine}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -501,6 +498,8 @@ function FicheContent() {
               )}
             </div>
 
+            <MaSemaine ficheId={fiche.id} reponses={reponses} />
+
             {fiche.resume.map((section, indexSection) => (
               <section
                 key={indexSection}
@@ -556,6 +555,14 @@ function FicheContent() {
 
                 {section.questions.length > 0 && (
                   <div className="mt-6 space-y-5">
+                    {/* Ces questions sont celles du livret, et elles sont
+                        écrites pour être dites à voix haute. Présentées sans
+                        titre, elles passaient pour une seconde préparation à
+                        faire seul, en plus des temps déjà vécus. */}
+                    <h3 className="flex items-center gap-2 text-2xs font-black uppercase tracking-[0.14em] text-encre-600">
+                      <Users className="h-3.5 w-3.5 text-or-700" />
+                      Ce dont vous parlerez à la rencontre
+                    </h3>
                     {section.questions.map((question, i) => (
                       <BlocQuestion
                         key={i}
@@ -922,6 +929,89 @@ function RenduBloc({
     default:
       return <p>{rendreSurlignable(bloc.texte)}</p>;
   }
+}
+
+/**
+ * Ce que la semaine a déposé.
+ *
+ * On prépare sa fiche jour après jour, dans les temps à part. Puis, avant la
+ * rencontre, on ouvre la fiche pour se relire — et elle était vide : les
+ * réponses des temps vivent sous d'autres clés que celles de cette page, et
+ * n'y apparaissaient nulle part. On avait travaillé quatre jours pour ne rien
+ * retrouver.
+ *
+ * Elles sont ici, dans l'ordre des jours, en lecture seule. On les modifie là
+ * où on les a écrites : dans son temps.
+ */
+interface FicheMeditation {
+  ficheId: number;
+  sections: Array<{
+    sectionTitre: string;
+    questions: Array<{ id: string; question: string }>;
+  }>;
+}
+
+function MaSemaine({ ficheId, reponses }: { ficheId: number; reponses: Record<string, string> }) {
+  const parcours = (MEDITATIONS as FicheMeditation[]).find((m) => m.ficheId === ficheId);
+  const titres = (TITRES_DES_TEMPS as Record<string, string[]>)[String(ficheId)] ?? [];
+  if (!parcours) return null;
+
+  const jours = parcours.sections
+    .map((section, rang) => ({
+      titre: titres[rang] ?? section.sectionTitre,
+      rang,
+      ecrits: section.questions
+        .map((question) => ({ question, reponse: (reponses[`q:${question.id}`] ?? '').trim() }))
+        .filter((entree) => entree.reponse.length > 0),
+    }))
+    .filter((jour) => jour.ecrits.length > 0);
+
+  if (!jours.length) return null;
+  const total = jours.reduce((somme, jour) => somme + jour.ecrits.length, 0);
+
+  return (
+    <section className="feuille rounded-4xl border border-parchemin-300 p-5 shadow-sm sm:p-7">
+      <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-dashed border-encre-900/15 pb-3">
+        <h2 className="font-serif text-xl font-bold text-encre-950">Ce que vous avez écrit cette semaine</h2>
+        <span className="timbre bg-parchemin-100 px-3 py-1 text-2xs font-bold text-encre-800">
+          {total} note{total > 1 ? 's' : ''} · {jours.length} jour{jours.length > 1 ? 's' : ''}
+        </span>
+      </div>
+
+      <div className="mt-5 space-y-6">
+        {jours.map((jour) => (
+          <div key={jour.rang}>
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-serif text-lg italic text-encre-700/55">
+                {String(jour.rang + 1).padStart(2, '0')}
+              </span>
+              <h3 className="font-serif text-base font-bold text-encre-950">{jour.titre}</h3>
+              <Link
+                href={`/aujourdhui?fiche=${ficheId}&section=${jour.rang}&retour=fiche`}
+                className="ml-auto shrink-0 text-2xs font-bold text-encre-600 underline underline-offset-2 hover:text-encre-900"
+              >
+                Rouvrir ce temps
+              </Link>
+            </div>
+            <ul className="mt-2.5 space-y-3">
+              {jour.ecrits.map(({ question, reponse }) => (
+                <li key={question.id} className="border-l-2 border-or-300 pl-3.5">
+                  <p className="text-2xs leading-relaxed text-encre-600">
+                    <TexteAvecReferences>{question.question}</TexteAvecReferences>
+                  </p>
+                  <p className="manuscrit mt-1 text-base leading-relaxed text-encre-950">{reponse}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-5 border-t border-parchemin-300 pt-3 text-2xs text-encre-600">
+        Ces notes se modifient dans le temps où vous les avez écrites.
+      </p>
+    </section>
+  );
 }
 
 function CarteVerset({

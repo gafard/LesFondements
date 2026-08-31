@@ -3,23 +3,13 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-  Award,
-  BookMarked,
   BookOpen,
   Bookmark,
   Check,
   BellRing,
-  MessageCircle,
-  PenLine,
-  Printer,
-  Search,
-  Shield,
-  ShieldCheck,
   RotateCcw,
   Sunrise,
-  TrendingUp,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -30,111 +20,7 @@ import Illumination from '@/components/Illumination';
 import { VERSETS_CONNUS, normaliserReference } from '@/data/versets';
 import { etapesTempsApart } from '@/lib/tempsApart';
 
-interface OutilTable {
-  href: string;
-  titre: string;
-  detail: string;
-  repere: string;
-  icon: LucideIcon;
-  style: string;
-  rotation: string;
-  sombre?: boolean;
-}
 
-const OUTILS_TABLE: OutilTable[] = [
-  {
-    href: '/journal',
-    titre: 'Journal',
-    detail: 'Méditations et prières personnelles',
-    repere: 'Carnet privé',
-    icon: PenLine,
-    style: 'objet-carnet-cuir text-parchemin-100',
-    rotation: '-rotate-1',
-    sombre: true,
-  },
-  {
-    href: '/recherche',
-    titre: 'Mes écrits',
-    detail: 'Retrouver une réponse ou une note',
-    repere: 'Index & notes',
-    icon: Search,
-    style: 'border-parchemin-300 bg-[#faf6ee] text-encre-950',
-    rotation: 'rotate-1',
-  },
-  {
-    href: '/transformation',
-    titre: 'Chemin parcouru',
-    detail: 'Relire ce qui se transforme',
-    repere: 'Croissance',
-    icon: TrendingUp,
-    style: 'border-emerald-200 bg-[#eef6ef] text-encre-950',
-    rotation: '-rotate-1',
-  },
-  {
-    href: '/carnet-export',
-    titre: 'Carnet PDF',
-    detail: 'Imprimer et conserver son parcours',
-    repere: 'Format A4',
-    icon: Printer,
-    style: 'objet-livret-pdf text-encre-950',
-    rotation: 'rotate-1',
-  },
-  {
-    href: '/temoignages',
-    titre: 'Témoignages',
-    detail: 'Écouter et déposer un récit',
-    repere: 'Récits vivants',
-    icon: MessageCircle,
-    style: 'objet-cassette text-parchemin-100',
-    rotation: 'rotate-1',
-    sombre: true,
-  },
-  {
-    href: '/ressources',
-    titre: 'Bibliothèque',
-    detail: 'Ouvrages, ressources et contact',
-    repere: 'Pour approfondir',
-    icon: BookMarked,
-    style: 'border-amber-300 bg-[#fbf3df] text-encre-950',
-    rotation: '-rotate-1',
-  },
-  {
-    href: '/index-thematique',
-    titre: 'Index thématique',
-    detail: 'Retrouver un thème dans le parcours',
-    repere: 'Repères',
-    icon: Bookmark,
-    style: 'border-sky-200 bg-[#eef6f8] text-encre-950',
-    rotation: 'rotate-1',
-  },
-  {
-    href: '/guide-pastoral',
-    titre: 'Guide pastoral',
-    detail: 'Accompagner et prendre soin',
-    repere: 'Accompagnement',
-    icon: Shield,
-    style: 'border-or-300 bg-or-50 text-encre-950',
-    rotation: '-rotate-1',
-  },
-  {
-    href: '/certificat',
-    titre: 'Mon attestation',
-    detail: 'Le sceau de fin du parcours',
-    repere: '20 fondements',
-    icon: Award,
-    style: 'objet-parchemin-sceau text-encre-950',
-    rotation: 'rotate-1',
-  },
-  {
-    href: '/parametres',
-    titre: 'Mes réglages',
-    detail: 'Mon nom, mes rappels, mes données',
-    repere: 'Mon espace',
-    icon: ShieldCheck,
-    style: 'border-slate-200 bg-[#f3f2ef] text-encre-950',
-    rotation: '-rotate-1',
-  },
-];
 
 export default function DashboardPage() {
   return (
@@ -386,56 +272,10 @@ function DashboardContent() {
           </button>
         </div>
 
-        {/* Sur mobile, cette partie est la seconde entrée vers tout ce qui ne
-            tient pas dans la barre d'onglets. Elle garde la métaphore de la
-            table de travail au lieu de devenir une grille d'applications. */}
-        <section aria-labelledby="titre-outils-table" className="space-y-4 pb-2">
-          <div className="flex items-end justify-between gap-4 px-1">
-            <div>
-              <p className="text-3xs font-black uppercase tracking-[0.18em] text-or-700">
-                Aller plus loin
-              </p>
-              <h2 id="titre-outils-table" className="mt-1 font-serif text-2xl font-bold text-encre-950">
-                Les instruments de ta table
-              </h2>
-            </div>
-            <span className="hidden font-serif text-sm italic text-encre-500 sm:block">
-              Tout reste à portée de main
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {OUTILS_TABLE.map((outil, index) => {
-              const Icone = outil.icon;
-              return (
-                <Link
-                  key={outil.href}
-                  href={outil.href}
-                  className={`objet-table relative flex min-h-36 flex-col justify-between overflow-hidden rounded-3xl border p-4 shadow-sm ${outil.style} ${outil.rotation}`}
-                >
-                  {index % 3 === 0 ? (
-                    <span className="ruban -top-2 left-5 rotate-2 rounded-[2px]" />
-                  ) : (
-                    <span className="punaise -top-2 right-5" />
-                  )}
-                  <div className="relative z-10 flex items-start justify-between gap-2 pt-1">
-                    <span className={`text-2xs font-black uppercase tracking-[0.12em] ${outil.sombre ? 'text-parchemin-200' : 'text-encre-700'}`}>
-                      {outil.repere}
-                    </span>
-                    <Icone className={`h-4 w-4 shrink-0 ${outil.sombre ? 'text-or-300' : 'text-or-800'}`} strokeWidth={1.8} />
-                  </div>
-                  <div className="relative z-10 mt-5">
-                    <h3 className="font-serif text-base font-bold leading-tight">{outil.titre}</h3>
-                    <p className={`mt-1 text-xs leading-snug ${outil.sombre ? 'text-parchemin-200' : 'text-encre-700'}`}>{outil.detail}</p>
-                    <span className={`mt-3 inline-block text-2xs font-black uppercase tracking-[0.08em] ${outil.sombre ? 'text-or-300' : 'text-or-900'}`}>
-                      Ouvrir →
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
+        {/* Les dix outils vivaient ici en cartes, et à l'identique sous
+            « Plus » dans la barre du bas : le même menu à deux endroits, sans
+            que rien ne les distingue. La navigation reste à un seul endroit ;
+            ce tableau garde ce qui parle d'aujourd'hui. */}
 
       </div>
 

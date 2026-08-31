@@ -566,7 +566,7 @@ export default function Immersion({
       || (scene.type === 'ancrage-verset' && referenceAncrage !== null);
     memoriserPassage({
       url: sectionIndex === null
-        ? `/fiches/${fiche.id}?immersion=1&scene=${index}`
+        ? `/fiches/${fiche.id}`
         : `/aujourdhui?fiche=${fiche.id}&section=${sectionIndex}&scene=${index}`,
       titre: scene.type === 'verset' || scene.type === 'ancrage-verset'
         ? referenceAncrage ?? `Fiche ${fiche.id}`

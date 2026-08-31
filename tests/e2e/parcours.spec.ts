@@ -576,12 +576,17 @@ test('fiche 6 : la Parole éclaire une situation réelle puis conduit à un pas 
   await expect(page.getByRole('button', { name: 'Ga 5:16' })).toBeVisible();
 });
 
-test('mobile : le menu Plus et la table donnent accès à tous les outils', async ({ page }) => {
+/**
+ * Les dix outils s'affichaient deux fois : en cartes sur le tableau de bord,
+ * et à l'identique sous « Plus » dans la barre du bas. Le même menu à deux
+ * endroits, sans rien pour les distinguer. La navigation tient maintenant en
+ * un seul endroit, et le tableau de bord garde ce qui parle d'aujourd'hui.
+ */
+test('mobile : le menu Plus donne accès à tout, et à un seul endroit', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/dashboard');
 
-  await expect(page.getByRole('heading', { name: 'Les instruments de ta table' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Mes écrits/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Les instruments de ta table' })).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Plus' }).click();
   const menu = page.getByRole('dialog', { name: 'Tous les outils' });
