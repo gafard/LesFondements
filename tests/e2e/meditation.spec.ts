@@ -47,3 +47,34 @@ test('méditation : une note devant, les autres derrière', async ({ page }) => 
     )
     .toContain('accueille');
 });
+
+/**
+ * La prière reprenait les découvertes dans une carte de verre sombre, avec
+ * des onglets « Découverte 1, 2, 3 ». Ni le verre ni les onglets n'étaient de
+ * cette table : elle se prie maintenant sur des fiches posées en pile, comme
+ * on a médité sur des notes.
+ */
+test('prière : les découvertes reprises en pile, sur du papier', async ({ page }) => {
+  await semerSession(page);
+  await page.goto('/aujourdhui?fiche=1&section=2&scene=17');
+
+  for (const texte of ['Dieu est un.', 'Il se donne à connaître.', 'Le Père, le Fils, l’Esprit.']) {
+    await page.locator('textarea').first().fill(texte);
+    await page.getByRole('button', { name: 'Suivante' }).click();
+  }
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Parle à Dieu à partir de tes découvertes')).toBeVisible();
+
+  // Une découverte devant, les deux autres derrière.
+  await expect(page.getByText('1 / 3')).toBeVisible();
+  await expect(page.getByText('Dieu est un.')).toBeVisible();
+  await expect(page.getByText('Il se donne à connaître.')).toHaveCount(0);
+
+  // Le papier, pas le verre.
+  await expect(page.locator('article.fiche-bristol')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Suivante' }).click();
+  await expect(page.getByText('2 / 3')).toBeVisible();
+  await expect(page.getByText('Il se donne à connaître.')).toBeVisible();
+});

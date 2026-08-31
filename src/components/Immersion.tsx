@@ -1704,6 +1704,49 @@ function etiquetteDeSource(source: QuestionMeditation['source']): string | null 
 }
 
 /**
+ * Les feuilles qui attendent leur tour, entrevues derrière celle de devant.
+ *
+ * Deux pièges, payés une fois : les classes de papier — `.post-it-*`,
+ * `.fiche-bristol` — fixent `position: relative` depuis la feuille de styles
+ * et l'emportent sur l'utilitaire `absolute`, qui vit dans une couche ; le
+ * placement tient donc sur une enveloppe, et le papier reste à l'intérieur.
+ * Et l'on ne rapetisse pas les feuilles à la main : le recul s'en charge, là
+ * où une mise à l'échelle les faisait rentrer sous celle de devant
+ * exactement autant que le décalage les en sortait.
+ */
+function FeuillesEnAttente({
+  restantes,
+  papier,
+}: {
+  restantes: number;
+  papier: (ecart: number) => string;
+}) {
+  return (
+    <>
+      {Array.from({ length: Math.max(0, Math.min(restantes, 3)) }, (_, index) => {
+        const ecart = index + 1;
+        return (
+          <div
+            key={`attente-${ecart}`}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 transition-transform duration-500 ease-out motion-reduce:transition-none"
+            style={{
+              transform: `translate3d(0, ${ecart * 26}px, ${ecart * -60}px) rotate(${
+                ecart % 2 === 0 ? ecart * 0.9 : ecart * -0.9
+              }deg)`,
+              opacity: 0.85 - ecart * 0.2,
+              zIndex: 3 - ecart,
+            }}
+          >
+            <div className={`${papier(ecart)} h-full w-full shadow-xl`} />
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+/**
  * La pile de notes.
  *
  * La méditation empilait ses questions à la verticale : jusqu'à dix cartes
@@ -1825,34 +1868,10 @@ function PileDeNotes({
           departGlissement.current = null;
         }}
       >
-        {/* Les feuilles qui attendent leur tour, entrevues derrière. */}
-        {questions.map((question, index) => {
-          const ecart = index - courant;
-          if (ecart <= 0 || ecart > 3) return null;
-          return (
-            <div
-              key={`derriere-${question.id}`}
-              aria-hidden="true"
-              // L'enveloppe porte le placement : `.post-it-*` impose
-              // `position: relative` depuis la feuille de styles, et l'emporte
-              // sur l'utilitaire `absolute`. La feuille reste donc à
-              // l'intérieur, où elle n'a qu'à se colorer.
-              className="pointer-events-none absolute inset-0 transition-transform duration-500 ease-out motion-reduce:transition-none"
-              style={{
-                // Le recul suffit à les rapetisser : la perspective s'en
-                // charge. Une mise à l'échelle en plus les faisait rentrer
-                // sous la feuille de devant au lieu d'en dépasser.
-                transform: `translate3d(0, ${ecart * 26}px, ${ecart * -60}px) rotate(${
-                  ecart % 2 === 0 ? ecart * 0.9 : ecart * -0.9
-                }deg)`,
-                opacity: 0.85 - ecart * 0.2,
-                zIndex: 3 - ecart,
-              }}
-            >
-              <div className={`${papiers[index % papiers.length]} h-full w-full shadow-xl`} />
-            </div>
-          );
-        })}
+        <FeuillesEnAttente
+          restantes={total - courant - 1}
+          papier={(ecart) => papiers[(courant + ecart) % papiers.length]}
+        />
 
         {/* La note posée devant : c'est elle qui donne sa hauteur à la pile.
             L'enveloppe porte le mouvement, la feuille garde son inclinaison. */}
@@ -1965,67 +1984,104 @@ function ScenePriereImmersive({
         </p>
       </div>
 
-      {/* ── Sélecteur d'onglets si plusieurs découvertes ── */}
-      {elements.length > 1 && (
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {elements.map((el, idx) => {
-            const actif = idx === indexActif;
-            return (
-              <button
-                key={el.id}
-                type="button"
-                onClick={() => setIndexActif(idx)}
-                className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-bold transition-all ${
-                  actif
-                    ? 'scale-105 bg-or-400 text-encre-950 shadow-md shadow-or-400/20'
-                    : 'border border-white/10 bg-white/5 text-parchemin-100/65 hover:bg-white/10 hover:text-parchemin-100'
-                }`}
-              >
-                <span>Découverte {idx + 1}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── La Feuille Sacrée de Méditation ── */}
-      <div className="space-y-6 rounded-3xl border border-or-400/30 bg-encre-950/80 p-6 text-left shadow-2xl backdrop-blur-xl sm:p-8">
-        <div>
-          <span className="mb-2 block text-3xs font-black uppercase tracking-[0.18em] text-or-300/80">
-            La vérité que tu as contemplée
+      <div className="flex items-center justify-between gap-4 text-left">
+        <p className="text-sm leading-relaxed text-parchemin-100/60">
+          {elements.length > 1
+            ? 'Une découverte à la fois. Fais glisser quand tu as prié.'
+            : 'Prends le temps.'}
+        </p>
+        {elements.length > 1 && (
+          <span
+            aria-live="polite"
+            className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-parchemin-100/55"
+          >
+            {indexActif + 1} / {elements.length}
           </span>
-          <h3 className="font-serif text-lg font-bold leading-relaxed text-parchemin-100 sm:text-xl">
-            {elementActif.titre}
-          </h3>
-        </div>
-
-        {elementActif.reponse ? (
-          <div className="space-y-2 rounded-2xl border border-or-400/25 bg-or-400/10 p-5 sm:p-6">
-            <span className="block text-3xs font-black uppercase tracking-[0.14em] text-or-300/90">
-              Ce que l&apos;Esprit a déposé dans ton cœur :
-            </span>
-            <p className="font-serif text-lg italic leading-relaxed text-parchemin-100 sm:text-xl">
-              « {elementActif.reponse} »
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm italic text-parchemin-100/60">
-            Médite sur cette vérité et parle à Dieu dans le secret de ton cœur.
-          </div>
         )}
+      </div>
 
-        <div className="space-y-2 border-t border-white/10 pt-5 text-center sm:text-left">
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-or-300">
-            🕊️ Parle à Dieu maintenant :
-          </p>
-          <p className="font-serif text-base italic leading-relaxed text-parchemin-100 sm:text-lg">
-            « Seigneur, à partir de cette vérité que Tu m&apos;as montrée, je Te prie et je Te dis… »
-          </p>
-          <p className="pt-1 text-xs text-parchemin-100/50">
-            Prends le temps de Lui parler librement à voix haute ou dans ton cœur.
-          </p>
+      {/* Les découvertes reprises une à une, sur des fiches posées en pile.
+          La carte de verre sombre d'avant ne tenait pas sur cette table : on
+          prie sur du papier, comme on a médité. */}
+      <div className="relative text-left [perspective:1400px]">
+        <FeuillesEnAttente restantes={elements.length - indexActif - 1} papier={() => 'fiche-bristol'} />
+
+        <div key={elementActif.id} className="note-posee relative z-10">
+          <article className="fiche-bristol pose-2 space-y-5 rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
+            <span className="attache-pince -top-3 left-10" aria-hidden="true" />
+            <div>
+              <span className="block text-3xs font-black uppercase tracking-[0.18em] text-encre-700/60">
+                La vérité que tu as contemplée
+              </span>
+              <h3 className="mt-1.5 font-serif text-lg font-bold leading-relaxed text-encre-950 sm:text-xl">
+                {elementActif.titre}
+              </h3>
+            </div>
+
+            {elementActif.reponse ? (
+              <div className="space-y-1.5 border-l-2 border-or-500/50 pl-4">
+                <span className="block text-3xs font-black uppercase tracking-[0.14em] text-or-800/80">
+                  Ce que tu as écrit
+                </span>
+                <p className="manuscrit text-lg leading-relaxed text-encre-800 sm:text-xl">
+                  {elementActif.reponse}
+                </p>
+              </div>
+            ) : (
+              <p className="border-l-2 border-encre-950/12 pl-4 text-sm italic leading-relaxed text-encre-700">
+                Tu n&apos;as rien écrit ici. Ce n&apos;est pas grave : reste devant cette vérité,
+                et parle à Dieu dans le secret de ton cœur.
+              </p>
+            )}
+
+            <div className="space-y-1.5 border-t border-dashed border-encre-950/15 pt-5">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-or-800">
+                Parle à Dieu maintenant
+              </p>
+              <p className="font-serif text-base italic leading-relaxed text-encre-800 sm:text-lg">
+                « Seigneur, à partir de cette vérité que tu m&apos;as montrée, je te prie et je te
+                dis… »
+              </p>
+              <p className="pt-1 text-xs text-encre-600">
+                À voix haute ou dans ton cœur. Rien à écrire ici.
+              </p>
+            </div>
+          </article>
         </div>
       </div>
+
+      {elements.length > 1 && (
+        <div className="mt-16 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setIndexActif((valeur) => Math.max(0, valeur - 1))}
+            disabled={indexActif === 0}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-bold text-parchemin-100/80 transition-colors hover:bg-white/12 disabled:opacity-25"
+          >
+            <ChevronLeft className="h-4 w-4" /> Précédente
+          </button>
+          <span className="flex items-center gap-1.5" aria-hidden="true">
+            {elements.map((element, index) => (
+              <span
+                key={`priere-point-${element.id}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  index === indexActif ? 'w-5 bg-or-300' : 'w-1.5 bg-white/22'
+                }`}
+              />
+            ))}
+          </span>
+          <button
+            type="button"
+            onClick={() =>
+              setIndexActif((valeur) => Math.min(elements.length - 1, valeur + 1))
+            }
+            disabled={indexActif === elements.length - 1}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-bold text-parchemin-100/80 transition-colors hover:bg-white/12 disabled:opacity-25"
+          >
+            Suivante <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* ── Sortie vers la suite ── */}
       <div className="pt-2">
