@@ -856,9 +856,23 @@
   from { opacity: 0; transform: translate3d(0, 18px, -70px) scale(0.965); }
   to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
+/* Vers l'avant : la feuille suivante vient de la pile, par la droite, et se
+   redresse en se posant. Vers l'arrière, le même geste inversé. La rotation
+   se fait sur l'axe vertical — c'est ce qui donne la profondeur, plutôt
+   qu'un simple glissement à plat. */
+@keyframes note-avant {
+  from { opacity: 0; transform: translate3d(38px, 14px, -140px) rotateY(-16deg) scale(0.94); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0deg) scale(1); }
+}
+@keyframes note-arriere {
+  from { opacity: 0; transform: translate3d(-38px, 14px, -140px) rotateY(16deg) scale(0.94); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0deg) scale(1); }
+}
 .note-posee { animation: note-posee 0.42s var(--ease-doux) both; }
+.note-avant { animation: note-avant 0.46s var(--ease-doux) both; }
+.note-arriere { animation: note-arriere 0.46s var(--ease-doux) both; }
 @media (prefers-reduced-motion: reduce) {
-  .note-posee { animation: none; }
+  .note-posee, .note-avant, .note-arriere { animation: none; }
 }
 
 /* ─── Les inclinaisons ─────────────────────────────────────── */

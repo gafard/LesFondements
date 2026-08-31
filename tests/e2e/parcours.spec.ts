@@ -30,7 +30,7 @@ test('temps du jour : lire, méditer, prier et mémoriser restent dans la même 
   await expect(page.locator('.immersion-bureau')).toBeVisible();
   await expect(page.getByText('Méditer la Parole', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: /Laisser « Dieu règne »/ })).toBeVisible();
-  await expect(page.getByText('Ils ne te disent pas ce que tu dois trouver.', { exact: false })).toBeVisible();
+  await expect(page.getByText('Relis, attends, écris', { exact: false })).toBeVisible();
   await expect(page.getByText('Lis Apocalypse 1:8 lentement une première fois.', { exact: false })).toBeVisible();
   await expect(page.getByText('Qu’est-ce qui retient ton attention dans la manière dont Dieu parle de lui-même ?')).toBeVisible();
 

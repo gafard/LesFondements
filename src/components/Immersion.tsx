@@ -1345,24 +1345,13 @@ function RenduScene({
 
     case 'meditation': {
       return (
-        <div className="py-6 sm:py-9">
-          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-            Méditer la Parole
-          </span>
-          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-            Laisser « {scene.sectionTitre} » descendre dans le cœur
-          </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-parchemin-100/65">
-            Ces repères t&apos;indiquent seulement où regarder. Ils ne te disent pas ce que tu dois
-            trouver. Relis, attends, puis écris ce que tu vois.
-          </p>
-          <PileDeNotes
-            key={scene.sectionTitre}
-            questions={scene.questions}
-            reponses={reponses}
-            onEnregistrer={onEnregistrer}
-          />
-        </div>
+        <PileDeNotes
+          key={scene.sectionTitre}
+          titre={scene.sectionTitre}
+          questions={scene.questions}
+          reponses={reponses}
+          onEnregistrer={onEnregistrer}
+        />
       );
     }
 
@@ -1731,10 +1720,15 @@ function FeuillesEnAttente({
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 transition-transform duration-500 ease-out motion-reduce:transition-none"
             style={{
-              transform: `translate3d(0, ${ecart * 26}px, ${ecart * -60}px) rotate(${
-                ecart % 2 === 0 ? ecart * 0.9 : ecart * -0.9
-              }deg)`,
-              opacity: 0.85 - ecart * 0.2,
+              // Décalées de côté autant que vers le bas : une pile ne se voit
+              // que par les bords qui dépassent. Alignées sur l'axe, les
+              // feuilles disparaissaient derrière celle de devant.
+              transform: `translate3d(${ecart % 2 === 0 ? ecart * 10 : ecart * -10}px, ${
+                ecart * 22
+              }px, ${ecart * -80}px) rotate(${
+                ecart % 2 === 0 ? ecart * 1.5 : ecart * -1.5
+              }deg) scale(${1 - ecart * 0.03})`,
+              opacity: 0.8 - ecart * 0.2,
               zIndex: 3 - ecart,
             }}
           >
@@ -1761,15 +1755,18 @@ function FeuillesEnAttente({
  * seulement cessé de tout montrer à la fois.
  */
 function PileDeNotes({
+  titre,
   questions,
   reponses,
   onEnregistrer,
 }: {
+  titre: string;
   questions: QuestionMeditation[];
   reponses: Record<string, string>;
   onEnregistrer: (cle: string, valeur: string) => void;
 }) {
   const [rang, setRang] = useState(0);
+  const [sens, setSens] = useState<1 | -1 | 0>(0);
   const departGlissement = useRef<number | null>(null);
   const total = questions.length;
   const courant = Math.min(rang, total - 1);
@@ -1778,7 +1775,10 @@ function PileDeNotes({
   const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
 
   const aller = useCallback(
-    (delta: number) => setRang((valeur) => Math.max(0, Math.min(total - 1, valeur + delta))),
+    (delta: number) => {
+      setSens(delta > 0 ? 1 : -1);
+      setRang((valeur) => Math.max(0, Math.min(total - 1, valeur + delta)));
+    },
     [total]
   );
 
@@ -1789,10 +1789,6 @@ function PileDeNotes({
     const etiquette = etiquetteDeSource(question.source);
     return (
       <>
-        <span
-          className={`punaise -top-2.5 ${index % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
-          aria-hidden="true"
-        />
         <div className="flex items-center justify-between gap-3">
           <span className="flex min-w-0 items-center gap-2">
             <span aria-hidden="true" className="font-serif text-xl italic text-encre-700/55">
@@ -1839,21 +1835,33 @@ function PileDeNotes({
   };
 
   return (
-    <div className="mt-7">
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm leading-relaxed text-parchemin-100/60">
-          Une note à la fois. Fais glisser quand tu as écrit.
-        </p>
+    <div className="py-4 sm:py-6">
+      {/* L'en-tête tenait sur trois cent pixels — un intitulé, un grand titre
+          et un paragraphe d'explication — avant même la première note. Sur un
+          téléphone, la note commençait à mi-écran et finissait derrière la
+          barre du bas. Il ne reste ici que ce qu'on relit vraiment. */}
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
+          Méditer la Parole
+        </span>
         <span
           aria-live="polite"
-          className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-parchemin-100/55"
+          className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-2xs font-bold text-parchemin-100/55"
         >
           {courant + 1} / {total}
         </span>
       </div>
+      <h2 className="mt-1.5 font-serif text-xl font-bold leading-snug text-parchemin-100 sm:text-3xl">
+        Laisser « {titre} » descendre dans le cœur
+      </h2>
+      {repondues === 0 && (
+        <p className="mt-2 text-2xs leading-relaxed text-parchemin-100/50">
+          Une note à la fois. Relis, attends, écris — puis fais glisser.
+        </p>
+      )}
 
       <div
-        className="relative mt-4 [perspective:1400px]"
+        className="relative mt-5 [perspective:1400px]"
         onTouchStart={(event) => {
           departGlissement.current = event.touches[0]?.clientX ?? null;
         }}
@@ -1875,13 +1883,27 @@ function PileDeNotes({
 
         {/* La note posée devant : c'est elle qui donne sa hauteur à la pile.
             L'enveloppe porte le mouvement, la feuille garde son inclinaison. */}
-        <div key={questions[courant].id} className="note-posee relative z-10">
+        <div
+          key={questions[courant].id}
+          className={`relative z-10 ${
+            sens === 1 ? 'note-avant' : sens === -1 ? 'note-arriere' : 'note-posee'
+          }`}
+        >
           <article
             className={`${papiers[courant % papiers.length]} ${
               poses[courant % poses.length]
-            } rounded-[4px] p-5 text-encre-950 shadow-2xl sm:p-6`}
+            } rounded-[4px] text-encre-950 shadow-2xl`}
           >
-            {carte(questions[courant], courant, true)}
+            <span
+              className={`punaise -top-2.5 ${courant % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
+              aria-hidden="true"
+            />
+            {/* Le défilement vit à l'intérieur de la feuille. Sans ce plafond,
+                une note longue repoussait « Précédente » et « Suivante » sous
+                la barre du bas, et l'on ne pouvait plus avancer. */}
+            <div className="max-h-[46svh] overflow-y-auto p-5 sm:max-h-[56svh] sm:p-6">
+              {carte(questions[courant], courant, true)}
+            </div>
           </article>
         </div>
       </div>
