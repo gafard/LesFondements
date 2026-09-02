@@ -170,10 +170,17 @@ service cloud.firestore {
             || (request.resource.data.role == 'membre'
               && request.resource.data.status == 'en_attente')
           );
+        // La date d'entrée ne se réécrit pas — sauf à l'admission, qui est
+        // justement le moment où elle prend son sens. Sans cette exception,
+        // l'animateur ne pouvait accueillir personne : l'application date
+        // l'entrée en accueillant, et l'écriture était refusée. La demande
+        // repassait alors en attente au rechargement suivant.
         allow update: if (estAnimateur(groupId)
             && request.resource.data.uid == resource.data.uid
             && request.resource.data.groupId == resource.data.groupId
-            && request.resource.data.joinedAt == resource.data.joinedAt)
+            && (request.resource.data.joinedAt == resource.data.joinedAt
+              || (resource.data.status != 'actif'
+                && request.resource.data.status == 'actif')))
           || (connecte()
             && moi() == memberId
             && request.resource.data.diff(resource.data).affectedKeys()

@@ -124,6 +124,7 @@ function CelluleContent() {
 
   const actifs = useMemo(() => members.filter((m) => m.status === 'actif'), [members]);
   const enAttente = useMemo(() => members.filter((m) => m.status === 'en_attente'), [members]);
+  const [echecAccueil, setEchecAccueil] = useState<string | null>(null);
 
   if (!group || !user) return null;
 
@@ -337,7 +338,14 @@ function CelluleContent() {
                     <div className="flex shrink-0 gap-2">
                       <button
                         onClick={async () => {
-                          await approveMember(group.id, demande.uid);
+                          setEchecAccueil(null);
+                          try {
+                            await approveMember(group.id, demande.uid);
+                          } catch (cause) {
+                            setEchecAccueil(
+                              cause instanceof Error ? cause.message : 'L’admission n’a pas abouti.'
+                            );
+                          }
                           await refresh();
                         }}
                         disabled={actifs.length >= group.capacity}
@@ -364,6 +372,14 @@ function CelluleContent() {
                 </div>
               ))}
             </div>
+            {echecAccueil && (
+              <p
+                role="alert"
+                className="mt-3 rounded-xl border border-rose-300 bg-rose-50 px-3.5 py-2.5 text-2xs font-bold leading-relaxed text-rose-900"
+              >
+                {echecAccueil}
+              </p>
+            )}
             {actifs.length >= group.capacity && (
               <p className="mt-3 rounded-xl bg-parchemin-100 px-3.5 py-2.5 text-2xs leading-relaxed text-encre-500">
                 Le groupe a atteint sa taille maximale ({group.capacity}). Augmentez la capacité ou

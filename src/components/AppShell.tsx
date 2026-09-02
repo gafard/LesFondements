@@ -341,7 +341,15 @@ function BarreOnglets({
   const premierLien = useRef<HTMLAnchorElement>(null);
   const panneauPlus = useRef<HTMLElement>(null);
   const { miseAJourPrete } = useApplication();
+  const { members, isLeader } = useParcours();
   const plusActif = plusOuvert || MENU_MOBILE.some((lien) => estActive(pathname, lien.href));
+
+  // Une demande d'adhésion n'attendait qu'à un seul endroit : l'espace du
+  // groupe, qu'il fallait penser à ouvrir. Quelqu'un pouvait frapper des
+  // jours sans que l'animateur le sache.
+  const demandes = isLeader
+    ? members.filter((membre) => membre.status === 'en_attente').length
+    : 0;
 
   useEffect(() => {
     if (!plusOuvert) return;
@@ -509,11 +517,19 @@ function BarreOnglets({
                 className="flex flex-col items-center gap-1 px-1 pb-2 pt-2.5"
               >
                 <span
-                  className={`grid h-8 w-14 place-items-center rounded-full transition-colors ${
+                  className={`relative grid h-8 w-14 place-items-center rounded-full transition-colors ${
                     actif ? 'bg-or-100 text-or-700' : 'text-encre-400'
                   }`}
                 >
                   <Icone className="h-[18px] w-[18px]" strokeWidth={actif ? 2.25 : 1.75} />
+                  {lien.href === '/groupes' && demandes > 0 && (
+                    <span
+                      className="absolute -top-0.5 right-3 grid h-4 min-w-4 place-items-center rounded-full bg-rose-600 px-1 text-[9px] font-black text-white"
+                      aria-label={`${demandes} demande${demandes > 1 ? 's' : ''} en attente`}
+                    >
+                      {demandes}
+                    </span>
+                  )}
                 </span>
                 <span
                   className={`text-[10px] font-bold leading-none ${

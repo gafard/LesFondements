@@ -806,7 +806,16 @@ export async function requestToJoin(input: JoinRequestInput): Promise<GroupMembe
 // Membres
 // ─────────────────────────────────────────────────────────────
 
-async function writeMember(member: GroupMember): Promise<void> {
+/**
+ * Rend `false` si le serveur a refusé l'écriture.
+ *
+ * L'échec était jusqu'ici avalé : la copie locale partait quand même, l'écran
+ * montrait le changement, puis le rechargement suivant ramenait l'ancien
+ * état. « Ça part, ça revient » — sans qu'aucun message ne dise pourquoi.
+ * Les appelants qui portent une action visible peuvent désormais le dire.
+ */
+async function writeMember(member: GroupMember): Promise<boolean> {
+  let accepte = true;
   const client = await getClient();
   if (client) {
     try {
@@ -816,6 +825,7 @@ async function writeMember(member: GroupMember): Promise<void> {
         { merge: true }
       );
     } catch (error) {
+      accepte = false;
       noterEchec('Écriture du membre', error);
     }
   }
@@ -825,6 +835,7 @@ async function writeMember(member: GroupMember): Promise<void> {
   else all.push(member);
   lsSet(KEY.members(member.groupId), all);
   emit(`members:${member.groupId}`);
+  return accepte;
 }
 
 export function getCachedMembers(groupId: string): GroupMember[] {
@@ -903,7 +914,12 @@ export async function approveMember(groupId: string, uid: string): Promise<void>
   if (!group || !member || member.status === 'actif') return;
   if (group.membersCount >= group.capacity) throw new Error('Le groupe est complet.');
 
-  await writeMember({ ...member, status: 'actif', joinedAt: Date.now() });
+  const accepte = await writeMember({ ...member, status: 'actif', joinedAt: Date.now() });
+  if (!accepte) {
+    throw new Error(
+      'Le serveur a refusé cette admission. Vérifiez que les règles de sécurité sont à jour, puis réessayez.'
+    );
+  }
   await writeGroup({ ...group, membersCount: group.membersCount + 1 });
 
 }

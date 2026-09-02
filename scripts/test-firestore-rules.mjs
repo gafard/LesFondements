@@ -46,6 +46,10 @@ try {
     await setDoc(doc(db, 'groups/g1'), groupe);
     await setDoc(doc(db, 'groups/g1/members/alice'), membre('alice', 'animateur'));
     await setDoc(doc(db, 'groups/g1/members/bob'), membre('bob'));
+    await setDoc(doc(db, 'groups/g1/members/carla'), {
+      ...membre('carla'),
+      status: 'en_attente',
+    });
     await setDoc(doc(db, 'groups/g1/posts/p1'), {
       id: 'p1', groupId: 'g1', authorId: 'alice', authorName: 'Alice', kind: 'priere',
       content: 'Priez pour moi', createdAt: 1, prayedBy: [], amenBy: [],
@@ -93,6 +97,14 @@ try {
   await assertFails(
     updateDoc(doc(bob, 'groups/g1/members/bob'), { displayName: 'Bob', role: 'animateur' })
   );
+
+  // Accueillir quelqu'un date son entrée : c'est cette écriture-là que les
+  // règles refusaient, et l'animateur ne pouvait donc accepter personne.
+  await assertSucceeds(
+    updateDoc(doc(alice, 'groups/g1/members/carla'), { status: 'actif', joinedAt: 99 })
+  );
+  // Une fois membre, sa date d'entrée ne se réécrit plus.
+  await assertFails(updateDoc(doc(alice, 'groups/g1/members/bob'), { joinedAt: 42 }));
 
   await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { role: 'animateur' }));
   await assertFails(updateDoc(doc(bob, 'groups/g1/members/bob'), { status: 'actif', role: 'co_animateur' }));
