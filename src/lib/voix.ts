@@ -40,10 +40,41 @@ export interface Manifeste {
 
 let cache: Promise<Manifeste | null> | null = null;
 
+const ORIGINE_VOIX_CLOUDFLARE = 'https://parcours.lesfondements.workers.dev';
+
+/**
+ * La publication Sites réutilise la médiathèque déjà servie par le site
+ * Cloudflare. Cela évite de dupliquer plus de cent mégaoctets de pistes à
+ * chaque version privée, sans changer les URLs du site principal ni du mode
+ * hors-ligne installé depuis celui-ci.
+ */
+export function urlVoixPubliee(url: string): string {
+  if (
+    typeof window !== 'undefined' &&
+    window.location.hostname.endsWith('.chatgpt.site') &&
+    url.startsWith('/voix/')
+  ) {
+    return `${ORIGINE_VOIX_CLOUDFLARE}${url}`;
+  }
+  return url;
+}
+
 /** Charge le manifeste des voix. Absent = pas de voix off, ce n'est pas une erreur. */
 export function chargerManifesteVoix(): Promise<Manifeste | null> {
   cache ??= fetch('/voix/manifeste.json')
-    .then((reponse) => (reponse.ok ? (reponse.json() as Promise<Manifeste>) : null))
+    .then(async (reponse) => {
+      if (!reponse.ok) return null;
+      const manifeste = (await reponse.json()) as Manifeste;
+      return {
+        ...manifeste,
+        pistes: Object.fromEntries(
+          Object.entries(manifeste.pistes).map(([id, piste]) => [
+            id,
+            { ...piste, url: urlVoixPubliee(piste.url) },
+          ])
+        ),
+      };
+    })
     .catch(() => null);
   return cache;
 }

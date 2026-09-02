@@ -13,7 +13,7 @@ const politiqueContenu = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://*.googleusercontent.com https://*.gstatic.com https://www.gstatic.com",
-  "media-src 'self' data: blob: https://www.wordproaudio.net",
+  "media-src 'self' data: blob: https://www.wordproaudio.net https://parcours.lesfondements.workers.dev",
   "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://bolls.life",
   "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://*.google.com",
   "worker-src 'self' blob:",

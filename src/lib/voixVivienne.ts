@@ -1,5 +1,7 @@
 'use client';
 
+import { urlVoixPubliee } from './voix';
+
 /**
  * Marqueur de publication de la voix Vivienne.
  *
@@ -34,5 +36,5 @@ export function pisteVivienne(
   id?: string
 ): string | null {
   if (!manifeste || !id || !manifeste.pistes.includes(id)) return null;
-  return `/voix/vivienne/${id}.mp3`;
+  return urlVoixPubliee(`/voix/vivienne/${id}.mp3`);
 }

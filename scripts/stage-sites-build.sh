@@ -13,15 +13,21 @@ find "$output_dir" -mindepth 1 -delete
 mkdir -p "$output_dir/server" "$output_dir/client" "$output_dir/.openai"
 # Static assets are uploaded from dist/client. Keeping a second copy under the
 # Worker bundle pushes larger offline-first builds over Cloudflare's Worker
-# size limit without adding any runtime value. Use only POSIX-style utilities:
-# the remote Sites builder does not include rsync.
-cp -R "$source_dir"/. "$output_dir/server"/
-if [ -d "$output_dir/server/assets" ]; then
-  find "$output_dir/server/assets" -mindepth 1 -delete
-  rmdir "$output_dir/server/assets"
-fi
+# size limit without adding any runtime value. Use only utilities available in
+# the remote Sites builder.
+find "$source_dir" -mindepth 1 -maxdepth 1 ! -name assets \
+  -exec cp -R {} "$output_dir/server"/ \;
 cp "$project_dir/scripts/sites-worker-entry.mjs" "$output_dir/server/index.js"
-cp -R "$source_dir/assets"/. "$output_dir/client"/
+
+# Les fichiers audio restent servis par la publication Cloudflare principale.
+# On garde leurs manifestes pour que l'interface sache quelles pistes existent,
+# mais on ne les duplique pas dans chaque archive Sites privée.
+while IFS= read -r -d '' asset; do
+  relative="${asset#"$source_dir/assets/"}"
+  destination="$output_dir/client/$relative"
+  mkdir -p "$(dirname "$destination")"
+  cp "$asset" "$destination"
+done < <(find "$source_dir/assets" -type f ! -path "$source_dir/assets/voix/*.mp3" -print0)
 cp "$hosting_file" "$output_dir/.openai/hosting.json"
 
 test -f "$output_dir/server/index.js"

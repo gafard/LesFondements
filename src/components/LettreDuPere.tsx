@@ -14,6 +14,7 @@ import {
   Music,
 } from 'lucide-react';
 import { lectureDisponible, lireAVoixHaute, arreterLecture } from '@/lib/ambiance';
+import { urlVoixPubliee } from '@/lib/voix';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
 
 export interface ParagrapheLettre {
@@ -131,7 +132,7 @@ export default function LettreDuPere() {
 
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.src = `/voix/eleven/lettre.p${index}.mp3`;
+      audioRef.current.src = urlVoixPubliee(`/voix/eleven/lettre.p${index}.mp3`);
       audioRef.current.onended = () => {
         timerLectureRef.current = window.setTimeout(() => {
           lireLigneRef.current(index + 1);
