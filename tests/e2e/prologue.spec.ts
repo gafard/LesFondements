@@ -26,6 +26,32 @@ test('prologue : la vidéo tient l’écran après la création du groupe', asyn
   await page.getByRole('button', { name: /Entrer dans le parcours/i }).click({ force: true });
   await expect(page.getByText(/Votre voyage/i)).toBeVisible();
 
+  const lecteur = page.getByTestId('lecteur-video-onboarding');
+  await expect(lecteur).toHaveAttribute('aria-label', 'Vidéo d’introduction en plein écran');
+  await expect(page.getByRole('button', { name: 'Réduire la vidéo' })).toBeVisible();
+  await expect(lecteur.getByRole('button', { name: 'Passer', exact: true })).toBeVisible();
+  const cadre = await lecteur.evaluate((element) => {
+    const rectangle = element.getBoundingClientRect();
+    return {
+      position: getComputedStyle(element).position,
+      top: Math.round(rectangle.top),
+      left: Math.round(rectangle.left),
+      width: Math.round(rectangle.width),
+      height: Math.round(rectangle.height),
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+    };
+  });
+  expect(cadre).toEqual({
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: cadre.viewportWidth,
+    height: cadre.viewportHeight,
+    viewportWidth: cadre.viewportWidth,
+    viewportHeight: cadre.viewportHeight,
+  });
+
   await expect
     .poll(() => page.evaluate(() => document.querySelector('video')?.paused ?? true), { timeout: 5000 })
     .toBe(false);

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Play, RotateCcw, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Loader2, Maximize2, Minimize2, Play, RotateCcw, SkipForward } from 'lucide-react';
 
 interface LecteurVideoOnboardingProps {
   src?: string;
@@ -9,6 +9,8 @@ interface LecteurVideoOnboardingProps {
   titre?: string;
   sousTitre?: string;
   autoPlay?: boolean;
+  pleinEcran?: boolean;
+  onPasser?: () => void;
   onVideoEnded?: () => void;
 }
 
@@ -18,14 +20,17 @@ export default function LecteurVideoOnboarding({
   titre = 'Comprendre l’esprit du parcours en 50 secondes',
   sousTitre = '« Poser des piliers solides »',
   autoPlay = false,
+  pleinEcran = false,
+  onPasser,
   onVideoEnded,
 }: LecteurVideoOnboardingProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [enLecture, setEnLecture] = useState(false);
   const [enChargement, setEnChargement] = useState(false);
   const [termine, setTermine] = useState(false);
+  const [pleinEcranActif, setPleinEcranActif] = useState(pleinEcran);
 
-  const lancerLecture = () => {
+  const lancerLecture = useCallback(() => {
     if (!videoRef.current) return;
     setEnChargement(true);
     videoRef.current
@@ -38,17 +43,25 @@ export default function LecteurVideoOnboarding({
       .catch(() => {
         setEnChargement(false);
       });
-  };
+  }, []);
 
   useEffect(() => {
     if (autoPlay && videoRef.current) {
-      // Petite temporisation pour que l'animation de transition soit terminée
-      const timer = setTimeout(() => {
-        lancerLecture();
-      }, 400);
-      return () => clearTimeout(timer);
+      // Le lecteur est monté par une action explicite de l'utilisateur. On
+      // tente donc la lecture immédiatement ; si le navigateur la refuse, le
+      // grand bouton de lecture reste disponible au centre de l'écran.
+      lancerLecture();
     }
-  }, [autoPlay]);
+  }, [autoPlay, lancerLecture]);
+
+  useEffect(() => {
+    if (!pleinEcranActif) return;
+    const quitterAvecEchap = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPleinEcranActif(false);
+    };
+    window.addEventListener('keydown', quitterAvecEchap);
+    return () => window.removeEventListener('keydown', quitterAvecEchap);
+  }, [pleinEcranActif]);
 
   const relancer = () => {
     if (!videoRef.current) return;
@@ -57,15 +70,26 @@ export default function LecteurVideoOnboarding({
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-3xl border-2 border-or-400/50 bg-[#07162b] shadow-2xl shadow-or-500/10">
+    <div
+      data-testid="lecteur-video-onboarding"
+      role="region"
+      aria-label={pleinEcranActif ? 'Vidéo d’introduction en plein écran' : 'Vidéo d’introduction'}
+      className={pleinEcranActif
+        ? 'fixed inset-0 z-[100] flex h-[100dvh] w-screen flex-col overflow-hidden bg-black'
+        : 'mx-auto w-full max-w-2xl overflow-hidden rounded-3xl border-2 border-or-400/50 bg-[#07162b] shadow-2xl shadow-or-500/10'}
+    >
       {/* Zone Vidéo 16:9 */}
-      <div className="group relative aspect-video w-full bg-black overflow-hidden flex items-center justify-center select-none">
+      <div className={pleinEcranActif
+        ? 'group relative flex min-h-0 flex-1 select-none items-center justify-center overflow-hidden bg-black'
+        : 'group relative flex aspect-video w-full select-none items-center justify-center overflow-hidden bg-black'}
+      >
         <video
           ref={videoRef}
           src={src}
           poster={poster}
           playsInline
-          preload="metadata"
+          autoPlay={autoPlay}
+          preload={autoPlay ? 'auto' : 'metadata'}
           controls={enLecture}
           onPlay={() => {
             setEnLecture(true);
@@ -85,6 +109,29 @@ export default function LecteurVideoOnboarding({
           }}
           className="h-full w-full object-contain bg-black"
         />
+
+        <div className="absolute right-3 top-3 z-30 flex items-center gap-2 sm:right-5 sm:top-5">
+          {pleinEcranActif && onPasser && (
+            <button
+              type="button"
+              onClick={onPasser}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-black/65 px-4 text-xs font-bold text-white backdrop-blur transition-colors hover:bg-black/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-300"
+            >
+              Passer
+              <SkipForward className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setPleinEcranActif((actif) => !actif)}
+            aria-label={pleinEcranActif ? 'Réduire la vidéo' : 'Afficher la vidéo en plein écran'}
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-black/65 text-white backdrop-blur transition-colors hover:bg-black/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-or-300"
+          >
+            {pleinEcranActif
+              ? <Minimize2 className="h-4 w-4" aria-hidden="true" />
+              : <Maximize2 className="h-4 w-4" aria-hidden="true" />}
+          </button>
+        </div>
 
         {/* Voile sombre d'ambiance si en pause */}
         {!enLecture && (
@@ -127,7 +174,10 @@ export default function LecteurVideoOnboarding({
       </div>
 
       {/* Barre inférieure sobre */}
-      <div className="flex items-center justify-between border-t border-white/10 bg-white/[0.04] px-4 py-2.5 text-3xs text-parchemin-100/70">
+      <div className={pleinEcranActif
+        ? 'flex shrink-0 items-center justify-between gap-4 border-t border-white/10 bg-[#07162b] px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 text-3xs text-parchemin-100/70 sm:px-6'
+        : 'flex items-center justify-between border-t border-white/10 bg-white/[0.04] px-4 py-2.5 text-3xs text-parchemin-100/70'}
+      >
         <span className="flex items-center gap-1.5 font-bold text-or-300">
           <Play className="h-3 w-3 fill-or-300" />
           {titre}

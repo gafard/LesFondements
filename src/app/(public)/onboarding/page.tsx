@@ -818,7 +818,7 @@ export default function OnboardingPage() {
 
         {/* ═══════════ PROLOGUE (LANCEMENT VIDÉO EN FIN D'ONBOARDING) ═══════════ */}
         {etape === 'prologue' && (
-          <section className="animate-reveal text-center">
+          <section className="text-center">
             <span className="mx-auto grid h-16 w-16 animate-halo place-items-center rounded-full bg-or-400/15 text-or-300">
               <Compass className="h-8 w-8" strokeWidth={1.75} />
             </span>
@@ -837,8 +837,10 @@ export default function OnboardingPage() {
                 src="/video/onboarding.mp4"
                 poster="/video/onboarding_poster.jpg"
                 autoPlay={true}
+                pleinEcran={true}
                 titre="Prologue officiel (50s)"
                 sousTitre="« Poser des piliers solides »"
+                onPasser={() => router.push('/dashboard')}
                 onVideoEnded={() => {
                   router.push('/dashboard');
                 }}
