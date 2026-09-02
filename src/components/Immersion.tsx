@@ -2328,6 +2328,7 @@ function SceneAncrageVerset({
   onEnregistrer: (valeur: string) => void;
 }) {
   const [niveau, setNiveau] = useState<NiveauMemoire>(1);
+  const [sensNiveau, setSensNiveau] = useState<1 | -1 | 0>(0);
   const [etapePassage, setEtapePassage] = useState(0);
   const [copiee, setCopiee] = useState(false);
   const [microActif, setMicroActif] = useState(false);
@@ -2338,6 +2339,7 @@ function SceneAncrageVerset({
     return indexSelectionne >= 0 ? indexSelectionne : 0;
   });
   const debutGlissementCarte = useRef<number | null>(null);
+  const debutGlissementNiveau = useRef<number | null>(null);
   const reconnaissance = useRef<ReconnaissanceVocale | null>(null);
   const selectionValide = options.length === 1
     || options.some((option) => option.reference === selection);
@@ -2366,6 +2368,21 @@ function SceneAncrageVerset({
     debutGlissementCarte.current = null;
     if (Math.abs(distance) < 42) return;
     feuilleter(distance > 0 ? 1 : -1);
+  };
+
+  const changerNiveau = (prochain: NiveauMemoire) => {
+    if (prochain === niveau) return;
+    setSensNiveau(prochain > niveau ? 1 : -1);
+    setNiveau(prochain);
+  };
+
+  const terminerGlissementNiveau = (positionX: number) => {
+    if (debutGlissementNiveau.current === null) return;
+    const distance = debutGlissementNiveau.current - positionX;
+    debutGlissementNiveau.current = null;
+    if (Math.abs(distance) < 42) return;
+    const prochain = distance > 0 ? Math.min(4, niveau + 1) : Math.max(1, niveau - 1);
+    changerNiveau(prochain as NiveauMemoire);
   };
 
   useEffect(
@@ -2468,12 +2485,29 @@ function SceneAncrageVerset({
     lien.click();
   };
 
-  const niveaux: Array<{ niveau: NiveauMemoire; titre: string }> = [
-    { niveau: 1, titre: 'Lire' },
-    { niveau: 2, titre: 'Retrouver' },
-    { niveau: 3, titre: 'Initiales' },
-    { niveau: 4, titre: 'Réciter' },
+  const niveaux: Array<{ niveau: NiveauMemoire; titre: string; invitation: string }> = [
+    {
+      niveau: 1,
+      titre: 'Lire lentement',
+      invitation: 'Prends d’abord le temps de voir et d’entendre toute la Parole.',
+    },
+    {
+      niveau: 2,
+      titre: 'Retrouver les mots',
+      invitation: 'Quelques mots s’effacent. Laisse ta mémoire les retrouver sans te presser.',
+    },
+    {
+      niveau: 3,
+      titre: 'Suivre les initiales',
+      invitation: 'Les premières lettres deviennent un fil discret pour redire le passage.',
+    },
+    {
+      niveau: 4,
+      titre: 'Réciter librement',
+      invitation: 'Le texte se retire. Redis maintenant la Parole avec ce que tu as gardé.',
+    },
   ];
+  const niveauActif = niveaux.find((element) => element.niveau === niveau) ?? niveaux[0];
 
   return (
     <div className="py-6 sm:py-9">
@@ -2498,7 +2532,7 @@ function SceneAncrageVerset({
           </div>
 
           <div
-            className="relative mt-4 h-80 touch-pan-y overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_35%,rgba(216,170,85,0.12),transparent_58%)] [perspective:1400px] sm:h-72"
+            className="relative mt-4 h-80 touch-pan-y overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_35%,rgba(216,170,85,0.12),transparent_58%)] sm:h-72"
             onTouchStart={(event) => {
               event.stopPropagation();
               debutGlissementCarte.current = event.touches[0]?.clientX ?? null;
@@ -2518,10 +2552,10 @@ function SceneAncrageVerset({
               const choisi = option.reference === selection;
               const visible = Math.abs(distance) <= 1;
               const transformation = active
-                ? 'translate3d(-50%, 0, 40px) rotateY(0deg) rotateZ(0deg) scale(1)'
+                ? 'translate3d(-50%, 0, 0)'
                 : distance < 0
-                  ? 'translate3d(-91%, 26px, -100px) rotateY(20deg) rotateZ(-3deg) scale(0.82)'
-                  : 'translate3d(-9%, 26px, -100px) rotateY(-20deg) rotateZ(3deg) scale(0.82)';
+                  ? 'translate3d(-132%, 0, 0)'
+                  : 'translate3d(32%, 0, 0)';
               return (
                 <button
                   key={option.reference}
@@ -2535,15 +2569,14 @@ function SceneAncrageVerset({
                   aria-label={`${option.reference} — ${
                     choisi ? 'Parole choisie' : active ? 'Choisir cette Parole' : 'Afficher et choisir cette Parole'
                   }`}
-                  className={`absolute left-1/2 top-5 flex h-64 w-[min(36rem,calc(100%-3.5rem))] flex-col overflow-hidden rounded-[1.75rem] border p-5 text-left shadow-2xl transition-[transform,opacity,filter,border-color] duration-500 ease-out focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-60 sm:p-7 ${
+                  className={`absolute left-1/2 top-5 flex h-64 w-[min(36rem,calc(100%-3.5rem))] flex-col overflow-hidden rounded-[1.75rem] border p-5 text-left shadow-2xl transition-[transform,opacity,border-color] duration-300 ease-out focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-60 sm:p-7 ${
                     choisi
                       ? 'border-or-300 bg-[linear-gradient(145deg,rgba(216,170,85,0.22),rgba(11,29,56,0.98)_58%)]'
                       : 'border-white/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.09),rgba(11,29,56,0.98)_58%)]'
                   }`}
                   style={{
-                    transform: visible ? transformation : 'translate3d(-50%, 42px, -180px) scale(0.68)',
-                    opacity: visible ? (active ? 1 : 0.38) : 0,
-                    filter: active ? 'saturate(1)' : 'saturate(0.6)',
+                    transform: visible ? transformation : 'translate3d(-50%, 0, 0)',
+                    opacity: visible ? (active ? 1 : 0.18) : 0,
                     zIndex: active ? 30 : visible ? 15 : 0,
                     pointerEvents: visible ? 'auto' : 'none',
                   }}
@@ -2659,6 +2692,7 @@ function SceneAncrageVerset({
                     onClick={() => {
                       setEtapePassage(indexEtape);
                       setNiveau(1);
+                      setSensNiveau(0);
                     }}
                     aria-pressed={etapePassage === indexEtape}
                     className={`min-h-11 rounded-2xl border px-2 py-2 text-2xs font-bold transition-colors ${
@@ -2674,72 +2708,165 @@ function SceneAncrageVerset({
             </div>
           )}
 
-          <div className="mt-7 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {niveaux.map((element) => (
-              <button
-                key={element.niveau}
-                type="button"
-                onClick={() => setNiveau(element.niveau)}
-                className={`min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors ${
-                  niveau === element.niveau
-                    ? 'border-or-300 bg-or-400 text-encre-950'
-                    : 'border-white/10 bg-white/5 text-parchemin-100/65 hover:bg-white/10'
-                }`}
-              >
-                {element.niveau} · {element.titre}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-7 flex min-h-52 items-center justify-center rounded-3xl border border-or-400/16 bg-encre-950/35 p-6 text-center sm:p-8">
-            {niveau === 1 && (
-              <p className="font-serif text-xl italic leading-relaxed text-parchemin-100 sm:text-2xl">« {passageMemoire.texte} »</p>
-            )}
-            {niveau === 2 && (
-              <p className="font-serif text-lg leading-loose text-parchemin-100 sm:text-xl">
-                {motsATrous.map((element, indexMot) => (
-                  <span key={`${element.mot}-${indexMot}`} className="mx-1">
-                    {element.masque ? (
-                      <span className="rounded border-b border-or-300 bg-or-400/12 px-2 py-0.5 text-or-200">…</span>
-                    ) : element.mot}
+          <div
+            className="mt-7 touch-pan-y overflow-hidden px-1 py-3"
+            onTouchStart={(event) => {
+              debutGlissementNiveau.current = event.touches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(event) => {
+              terminerGlissementNiveau(event.changedTouches[0]?.clientX ?? 0);
+            }}
+            onTouchCancel={() => {
+              debutGlissementNiveau.current = null;
+            }}
+          >
+            <article
+              key={`${passageMemoire.reference}-${niveau}`}
+              className={`fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
+                sensNiveau === 1
+                  ? 'carte-etape-suivante'
+                  : sensNiveau === -1
+                    ? 'carte-etape-precedente'
+                    : 'note-posee'
+              } ${
+                niveau === 1
+                  ? 'border-t-or-400'
+                  : niveau === 2
+                    ? 'border-t-sky-400'
+                    : niveau === 3
+                      ? 'border-t-violet-400'
+                      : 'border-t-rose-400'
+              }`}
+              aria-live="polite"
+            >
+              <div className="flex items-start justify-between gap-4 border-b border-dashed border-encre-950/15 pb-5">
+                <div>
+                  <span className="text-xs font-black uppercase tracking-[0.14em] text-encre-600">
+                    Étape {niveau} sur {niveaux.length}
                   </span>
-                ))}
-              </p>
-            )}
-            {niveau === 3 && (
-              <p className="font-serif text-lg leading-loose tracking-wider text-or-200 sm:text-xl">{initiales}</p>
-            )}
-            {niveau === 4 && (
-              <div className="w-full max-w-xl">
-                <p className="text-sm leading-relaxed text-parchemin-100/60">
-                  Le texte disparaît. Récite-le sans prompteur, puis écoute ce que tu as réellement retenu.
-                </p>
-                <button
-                  type="button"
-                  onClick={basculerMicro}
-                  className={`mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full transition-colors ${
-                    microActif ? 'animate-pulse bg-rose-600 text-white' : 'bg-or-400 text-encre-950'
-                  }`}
-                  aria-label={microActif ? 'Arrêter la récitation' : 'Commencer la récitation'}
-                >
-                  {microActif ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-                </button>
-                {valeur && <p className="mt-5 rounded-2xl bg-white/6 p-4 font-serif italic text-parchemin-100/75">« {valeur} »</p>}
-                {scoreRecitation !== null && (
-                  <p
-                    className={`mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-2xs font-bold ${
-                      scoreRecitation >= 75
-                        ? 'bg-emerald-400/15 text-emerald-200'
-                        : scoreRecitation >= 50
-                          ? 'bg-or-400/15 text-or-200'
-                          : 'bg-rose-400/15 text-rose-200'
-                    }`}
-                  >
-                    {scoreRecitation}% · gardé dans vos révisions
+                  <h3 className="mt-1.5 font-serif text-2xl font-bold leading-tight text-encre-950 sm:text-3xl">
+                    {niveauActif.titre}
+                  </h3>
+                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-encre-700">
+                    {niveauActif.invitation}
+                  </p>
+                </div>
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-encre-950 text-or-300 shadow-lg" aria-hidden="true">
+                  {niveau === 1
+                    ? <BookOpen className="h-5 w-5" />
+                    : niveau === 2
+                      ? <Sparkles className="h-5 w-5" />
+                      : niveau === 3
+                        ? <PenLine className="h-5 w-5" />
+                        : <Mic className="h-5 w-5" />}
+                </span>
+              </div>
+
+              <div className="flex flex-1 items-center justify-center py-8 text-center sm:py-10">
+                {niveau === 1 && (
+                  <p className="font-serif text-xl italic leading-relaxed text-encre-900 sm:text-2xl">
+                    « {passageMemoire.texte} »
                   </p>
                 )}
+                {niveau === 2 && (
+                  <p className="font-serif text-lg leading-loose text-encre-900 sm:text-xl">
+                    {motsATrous.map((element, indexMot) => (
+                      <span key={`${element.mot}-${indexMot}`} className="mx-1">
+                        {element.masque ? (
+                          <span className="rounded border-b border-or-700 bg-or-200/75 px-2 py-0.5 text-encre-800">…</span>
+                        ) : element.mot}
+                      </span>
+                    ))}
+                  </p>
+                )}
+                {niveau === 3 && (
+                  <p className="font-serif text-lg leading-loose tracking-wider text-encre-800 sm:text-xl">
+                    {initiales}
+                  </p>
+                )}
+                {niveau === 4 && (
+                  <div className="w-full max-w-xl">
+                    <p className="text-sm leading-relaxed text-encre-700">
+                      À voix haute ou dans ton cœur. Le microphone peut ensuite t’aider à mesurer ce que tu as retenu.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={basculerMicro}
+                      className={`mx-auto mt-5 grid h-16 w-16 place-items-center rounded-full transition-colors ${
+                        microActif ? 'animate-pulse bg-rose-600 text-white' : 'bg-encre-950 text-or-300'
+                      }`}
+                      aria-label={microActif ? 'Arrêter la récitation' : 'Commencer la récitation'}
+                    >
+                      {microActif ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+                    </button>
+                    {valeur && (
+                      <p className="mt-5 rounded-2xl bg-encre-950/6 p-4 font-serif italic text-encre-800">
+                        « {valeur} »
+                      </p>
+                    )}
+                    {scoreRecitation !== null && (
+                      <p
+                        className={`mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-2xs font-bold ${
+                          scoreRecitation >= 75
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : scoreRecitation >= 50
+                              ? 'bg-or-100 text-or-900'
+                              : 'bg-rose-100 text-rose-800'
+                        }`}
+                      >
+                        {scoreRecitation}% · gardé dans vos révisions
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
+
+              <div className="flex items-center justify-between gap-2 border-t border-dashed border-encre-950/15 pt-4">
+                <button
+                  type="button"
+                  onClick={() => changerNiveau(Math.max(1, niveau - 1) as NiveauMemoire)}
+                  disabled={niveau === 1}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-encre-950/15 px-3 text-xs font-bold text-encre-800 transition-colors hover:bg-encre-950/6 disabled:opacity-25 sm:px-4"
+                  aria-label="Étape de mémorisation précédente"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="hidden sm:inline">Précédente</span>
+                </button>
+
+                <div className="flex items-center" aria-label="Choisir une étape de mémorisation">
+                  {niveaux.map((element) => (
+                    <button
+                      key={`niveau-${element.niveau}`}
+                      type="button"
+                      onClick={() => changerNiveau(element.niveau)}
+                      aria-label={`Étape ${element.niveau} : ${element.titre}`}
+                      aria-current={niveau === element.niveau ? 'step' : undefined}
+                      className="group grid h-11 w-11 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-encre-950"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`block h-2 rounded-full transition-all duration-200 ${
+                          niveau === element.niveau
+                            ? 'w-6 bg-encre-950'
+                            : 'w-2 bg-encre-950/20 group-hover:bg-encre-950/40'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => changerNiveau(Math.min(4, niveau + 1) as NiveauMemoire)}
+                  disabled={niveau === 4}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-encre-950 px-3 text-xs font-bold text-parchemin-50 transition-colors hover:bg-encre-800 disabled:opacity-25 sm:px-4"
+                  aria-label="Étape de mémorisation suivante"
+                >
+                  <span className="hidden sm:inline">Suivante</span>
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </article>
           </div>
 
           <button type="button" onClick={telechargerFond} className="mx-auto mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-or-400/22 bg-or-400/8 px-5 text-xs font-bold text-or-200 hover:bg-or-400/14">

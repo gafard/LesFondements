@@ -61,3 +61,24 @@ test('prière : elle reprend uniquement les mots réellement déposés', async (
   await expect(page.getByText('Il se donne à connaître.')).toBeVisible();
   await expect(page.getByText('Reprends tes propres mots.', { exact: false })).toBeVisible();
 });
+
+test('mémorisation : les quatre exercices se découvrent comme des cartes glissantes', async ({ page }) => {
+  await semerSession(page);
+  await page.goto('/aujourdhui?fiche=1&section=0&moment=ancrage-verset');
+
+  await page.getByRole('button', { name: /Ap 1:8 — Choisir cette Parole/ }).click();
+  await expect(page.getByRole('heading', { name: 'Lire lentement' })).toBeVisible();
+  await expect(page.getByText('Étape 1 sur 4', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '1 · Lire' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Étape de mémorisation suivante' }).click();
+  await expect(page.getByRole('heading', { name: 'Retrouver les mots' })).toBeVisible();
+  await expect(page.getByText('Étape 2 sur 4', { exact: true })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Étape 3 : Suivre les initiales' }).click();
+  await expect(page.getByRole('heading', { name: 'Suivre les initiales' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Étape de mémorisation suivante' }).click();
+  await expect(page.getByRole('heading', { name: 'Réciter librement' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Commencer la récitation' })).toBeVisible();
+});

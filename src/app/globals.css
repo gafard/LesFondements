@@ -851,31 +851,41 @@
   backdrop-filter: blur(1px);
 }
 
-/* ─── La feuille qu'on pose ────────────────────────────────── */
-/* La note suivante ne surgit pas : elle remonte de la pile et se pose. Le
-   mouvement porte sur l'enveloppe, jamais sur la feuille elle-même, dont la
-   transformation appartient déjà à son inclinaison. */
+/* ─── Changements de cartes ────────────────────────────────── */
+/* Les cartes restent posées sur la table. Le changement se limite à un léger
+   glissement horizontal et un fondu : aucune bascule, aucune rotation 3D. */
 @keyframes note-posee {
-  from { opacity: 0; transform: translate3d(0, 18px, -70px) scale(0.965); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-/* Vers l'avant : la feuille suivante vient de la pile, par la droite, et se
-   redresse en se posant. Vers l'arrière, le même geste inversé. La rotation
-   se fait sur l'axe vertical — c'est ce qui donne la profondeur, plutôt
-   qu'un simple glissement à plat. */
 @keyframes note-avant {
-  from { opacity: 0; transform: translate3d(38px, 14px, -140px) rotateY(-16deg) scale(0.94); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0deg) scale(1); }
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes note-arriere {
-  from { opacity: 0; transform: translate3d(-38px, 14px, -140px) rotateY(16deg) scale(0.94); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0deg) scale(1); }
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
-.note-posee { animation: note-posee 0.42s var(--ease-doux) both; }
-.note-avant { animation: note-avant 0.46s var(--ease-doux) both; }
-.note-arriere { animation: note-arriere 0.46s var(--ease-doux) both; }
+.note-posee { animation: note-posee 0.2s ease-out both; }
+.note-avant { animation: note-avant 0.24s ease-out both; }
+.note-arriere { animation: note-arriere 0.24s ease-out both; }
+
+@keyframes carte-etape-suivante {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes carte-etape-precedente {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.carte-etape-suivante { animation: carte-etape-suivante 0.28s ease-out both; }
+.carte-etape-precedente { animation: carte-etape-precedente 0.28s ease-out both; }
 @media (prefers-reduced-motion: reduce) {
-  .note-posee, .note-avant, .note-arriere { animation: none; }
+  .note-posee,
+  .note-avant,
+  .note-arriere,
+  .carte-etape-suivante,
+  .carte-etape-precedente { animation: none; }
 }
 
 /* ─── Les inclinaisons ─────────────────────────────────────── */
