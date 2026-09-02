@@ -37,6 +37,7 @@ const entetesSecurite = [
 ];
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   poweredByHeader: false,
   turbopack: {
