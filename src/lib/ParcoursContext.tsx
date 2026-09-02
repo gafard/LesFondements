@@ -15,6 +15,7 @@ import {
   getMembership,
   getMembers,
   getPublicGroup,
+  corrigerLeCompteDeMembres,
   hasRemoteBackend,
   republierAnnuaireSiAbsent,
   saveProfile,
@@ -177,7 +178,12 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
     if (membership?.status !== 'actif') return;
     if (membership.role !== 'animateur' && membership.role !== 'co_animateur') return;
     void republierAnnuaireSiAbsent(group);
-  }, [group, membership?.status, membership?.role]);
+    // Le nombre de membres est recopié dans l'annuaire, et c'est lui que lit
+    // une personne qui demande à entrer. S'il a dérivé, le groupe se déclare
+    // complet à tout le monde. L'animateur est le seul à voir la liste et le
+    // compte : il remet les deux d'accord en ouvrant l'application.
+    void corrigerLeCompteDeMembres(group, members);
+  }, [group, members, membership?.status, membership?.role]);
 
   /**
    * Groupes d'exemple (mode local, sans backend) : leur animateur n'existe

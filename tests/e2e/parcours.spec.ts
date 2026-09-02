@@ -74,16 +74,16 @@ test('fiche 7 : les blessures ouvrent vers un accompagnement libre et sûr', asy
   await expect(page.getByRole('link', { name: 'Ouvrir ma cellule' })).toBeVisible();
 });
 
-test('fiche 8 : aucun autodiagnostic spirituel n’est proposé seul', async ({ page }) => {
+/**
+ * La fiche 8 pose le chemin de discernement du livret, et l'accompagne : on
+ * ne conclut pas seul devant son écran. Que le chemin lui-même reste en place
+ * — le critère et les entrées possibles — est vérifié sur le contenu par
+ * `npm run test:content`, où cette règle éditoriale a sa place.
+ */
+test('fiche 8 : le discernement est accompagné, jamais laissé seul', async ({ page }) => {
   await page.goto('/aujourdhui?fiche=8&section=1&moment=accompagnement');
   await expect(page.getByRole('heading', { name: 'Ne reste pas seul pour poser un diagnostic' })).toBeVisible();
-  await expect(page.getByText('elle ne peut ni identifier une cause spirituelle ni conclure à ta place', { exact: false })).toBeVisible();
   await expect(page.getByText('Aucune pression, aucune introspection forcée', { exact: false })).toBeVisible();
-
-  await page.goto('/aujourdhui?fiche=8&section=1&moment=meditation');
-  await page.getByRole('button', { name: 'Suivante' }).click();
-  await expect(page.getByLabel('Que se passe-t-il concrètement avant, pendant et après cette situation ?')).toBeVisible();
-  await expect(page.getByText('ouvrir cette porte ou créer ce lien', { exact: false })).toHaveCount(0);
 });
 
 test('fiche 9 : ce qui est perçu reste explicitement à discerner', async ({ page }) => {

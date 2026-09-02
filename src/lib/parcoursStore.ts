@@ -909,10 +909,61 @@ export async function getMembership(groupId: string, uid: string): Promise<Group
   return getCachedMembers(groupId).find((m) => m.uid === uid) ?? null;
 }
 
+/**
+ * Accueillir quelqu'un — en recomptant plutôt qu'en faisant confiance.
+ *
+ * Le nombre de membres était un compteur tenu à la main, incrémenté ici,
+ * décrémenté ailleurs. Un compteur tenu à la main finit toujours par dériver :
+ * une suppression de compte qui oubliait de le baisser, une admission refusée
+ * qui l'augmentait quand même. Un groupe d'une seule personne se déclarait
+ * ainsi complet, et n'acceptait plus personne — sans que rien ne permette de
+ * le corriger.
+ *
+ * La vérité est la liste des membres. On la compte, on décide, et on remet le
+ * compteur d'accord avec elle : chaque admission répare ce qui a pu dériver.
+ */
+/** Groupes dont le compte a déjà été vérifié dans cette session. */
+const compteVerifie = new Set<string>();
+
+/**
+ * Remettre le nombre de membres d'accord avec la liste des membres.
+ *
+ * Ce nombre est recopié dans l'annuaire, et c'est lui — non la liste — que
+ * lit une personne qui demande à entrer : elle n'a pas le droit de voir les
+ * membres. S'il a dérivé vers le haut, le groupe se déclare complet à tout
+ * le monde et plus personne ne peut le rejoindre, sans que le demandeur
+ * puisse rien y faire.
+ *
+ * Seul l'animateur voit les deux. Il corrige donc en ouvrant l'application.
+ */
+export async function corrigerLeCompteDeMembres(
+  group: ParcoursGroup,
+  membres: GroupMember[]
+): Promise<void> {
+  if (compteVerifie.has(group.id)) return;
+  const actifs = membres.filter((m) => m.status === 'actif').length;
+  if (actifs === group.membersCount) {
+    compteVerifie.add(group.id);
+    return;
+  }
+  compteVerifie.add(group.id);
+  await writeGroup({ ...group, membersCount: actifs });
+}
+
 export async function approveMember(groupId: string, uid: string): Promise<void> {
-  const [group, member] = await Promise.all([getGroup(groupId), getMembership(groupId, uid)]);
+  const [group, member, membres] = await Promise.all([
+    getGroup(groupId),
+    getMembership(groupId, uid),
+    getMembers(groupId),
+  ]);
   if (!group || !member || member.status === 'actif') return;
-  if (group.membersCount >= group.capacity) throw new Error('Le groupe est complet.');
+
+  const actifs = membres.filter((m) => m.status === 'actif').length;
+  if (actifs >= group.capacity) {
+    throw new Error(
+      `Le groupe est complet : ${actifs} membres sur ${group.capacity}. Augmentez la capacité dans les paramètres du groupe.`
+    );
+  }
 
   const accepte = await writeMember({ ...member, status: 'actif', joinedAt: Date.now() });
   if (!accepte) {
@@ -920,7 +971,7 @@ export async function approveMember(groupId: string, uid: string): Promise<void>
       'Le serveur a refusé cette admission. Vérifiez que les règles de sécurité sont à jour, puis réessayez.'
     );
   }
-  await writeGroup({ ...group, membersCount: group.membersCount + 1 });
+  await writeGroup({ ...group, membersCount: actifs + 1 });
 
 }
 

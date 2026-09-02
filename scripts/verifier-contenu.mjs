@@ -38,4 +38,44 @@ const questions = livret.fiches.reduce(
 );
 assert.ok(questions >= 150, 'Le corpus de questions paraît incomplet.');
 
-console.log(`Contenu vérifié : 20 fiches, ${questions} questions, ${references.length} versets et 66 livres.`);
+// ── La règle éditoriale de la fiche 8 ────────────────────────
+//
+// « On ne retire pas le diagnostic du livret. On reproduit son chemin de
+// discernement. » Le critère de Damien Pradel — pouvoir choisir autrement, ou
+// être irrésistiblement dominé — est posé au lecteur, et les entrées qu'il
+// énumère sont nommées. Ce qui vient du livret est marqué comme tel.
+//
+// Ce contrôle existe parce que ces trois questions ont déjà été remplacées
+// une fois par des formulations qui écartaient le discernement.
+const meditations = JSON.parse(
+  await readFile(new URL('../src/data/meditation-questions.json', import.meta.url), 'utf8')
+);
+const fiche8 = meditations.find((f) => f.ficheId === 8);
+assert.ok(fiche8, 'La fiche 8 doit avoir son parcours de méditation.');
+const texteFiche8 = fiche8.sections
+  .flatMap((section) => section.questions)
+  .map((q) => `${q.consigne ?? ''} ${q.question ?? ''}`)
+  .join(' ');
+
+for (const attendu of [
+  'irrésistiblement dominé',
+  'ouvrir cette porte ou créer ce lien',
+  'sous l’influence d’un démon',
+]) {
+  assert.ok(
+    texteFiche8.includes(attendu),
+    `La fiche 8 doit conserver le chemin de discernement du livret : « ${attendu} » manque.`
+  );
+}
+
+const marquees = fiche8.sections
+  .flatMap((section) => section.questions)
+  .filter((q) => q.source === 'livret').length;
+assert.ok(marquees >= 8, 'Ce qui vient du livret doit rester marqué comme tel dans la fiche 8.');
+
+console.log(
+  `Contenu vérifié : 20 fiches, ${questions} questions, ${references.length} versets et 66 livres.`
+);
+console.log(
+  `Fiche 8 : le chemin de discernement du livret est en place, ${marquees} questions marquées « livret ».`
+);
