@@ -1830,7 +1830,7 @@ function useFeuilleAnimee(total: number, indexInitial = 0) {
       minuterie.current = window.setTimeout(() => {
         setPrecedent(null);
         minuterie.current = null;
-      }, 260);
+      }, 360);
     },
     [annulerMinuterie, index, total]
   );
@@ -2007,7 +2007,9 @@ function PileDeNotes({
             L'enveloppe porte le mouvement, la feuille garde son inclinaison. */}
         <div
           key={`active-${questionsAffichees[courant]?.id ?? courant}`}
-          className={`feuille-document relative z-10 ${
+          className={`feuille-document relative ${
+            sens === 'arriere' && precedent !== null ? 'z-20' : 'z-10'
+          } ${
             precedent !== null ? (sens === 'avant' ? 'note-avant' : 'note-arriere') : 'note-posee'
           }`}
         >
@@ -2026,12 +2028,14 @@ function PileDeNotes({
           </article>
         </div>
 
-        {/* La feuille sortante qui se soulève et quitte le bloc */}
+        {/* La feuille qui se décroche et tombe vers le bas */}
         {precedent !== null && questionsAffichees[precedent] && (
           <div
             key={`quitte-${questionsAffichees[precedent].id}`}
             aria-hidden="true"
-            className={`feuille-document pointer-events-none absolute inset-0 z-20 ${
+            className={`feuille-document pointer-events-none absolute inset-0 ${
+              sens === 'arriere' ? 'z-10' : 'z-20'
+            } ${
               sens === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
             }`}
           >
@@ -2271,7 +2275,9 @@ function ScenePriereImmersive({
         {/* Feuille active */}
         <div
           key={`priere-active-${elementActif.id}`}
-          className={`feuille-document relative z-10 ${
+          className={`feuille-document relative ${
+            sensPriere === 'arriere' && precedentPriere !== null ? 'z-20' : 'z-10'
+          } ${
             precedentPriere !== null
               ? sensPriere === 'avant'
                 ? 'note-avant'
@@ -2326,7 +2332,9 @@ function ScenePriereImmersive({
           <div
             key={`priere-quitte-${elements[precedentPriere].id}`}
             aria-hidden="true"
-            className={`feuille-document pointer-events-none absolute inset-0 z-20 ${
+            className={`feuille-document pointer-events-none absolute inset-0 ${
+              sensPriere === 'arriere' ? 'z-10' : 'z-20'
+            } ${
               sensPriere === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
             }`}
           >
@@ -2882,7 +2890,9 @@ function SceneAncrageVerset({
             />
             <article
               key={`${passageMemoire.reference}-${niveau}`}
-              className={`feuille-document relative z-10 fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
+              className={`feuille-document relative ${
+                sensNiveau === 'arriere' && precedentNiveau !== null ? 'z-20' : 'z-10'
+              } fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
                 precedentNiveau !== null
                   ? sensNiveau === 'avant'
                     ? 'note-avant'
@@ -3032,7 +3042,9 @@ function SceneAncrageVerset({
               <article
                 key={`memo-quitte-${precedentNiveau}`}
                 aria-hidden="true"
-                className={`feuille-document pointer-events-none absolute inset-x-3 top-3 z-20 fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
+                className={`feuille-document pointer-events-none absolute inset-x-3 top-3 ${
+                  sensNiveau === 'arriere' ? 'z-10' : 'z-20'
+                } fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
                   sensNiveau === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
                 } ${
                   precedentNiveau + 1 === 1
