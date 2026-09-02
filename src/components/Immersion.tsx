@@ -1780,6 +1780,75 @@ function FeuillesEnAttente({
   );
 }
 
+type AnimationFeuille =
+  | 'note-posee'
+  | 'note-avant'
+  | 'note-arriere'
+  | 'note-quitte-avant'
+  | 'note-quitte-arriere';
+
+/**
+ * Un changement de feuille en deux gestes : celle du dessus se soulève et
+ * quitte le bloc (en surimpression), tandis que la suivante est déjà là,
+ * remonte de la pile et devient immédiatement interactive.
+ */
+function useFeuilleAnimee(total: number, indexInitial = 0) {
+  const [courant, setCourant] = useState(indexInitial);
+  const [precedent, setPrecedent] = useState<number | null>(null);
+  const [sens, setSens] = useState<'avant' | 'arriere'>('avant');
+  const minuterie = useRef<number | null>(null);
+
+  const annulerMinuterie = useCallback(() => {
+    if (minuterie.current !== null) {
+      window.clearTimeout(minuterie.current);
+      minuterie.current = null;
+    }
+  }, []);
+
+  useEffect(() => annulerMinuterie, [annulerMinuterie]);
+
+  const index = Math.max(0, Math.min(courant, Math.max(0, total - 1)));
+
+  const changer = useCallback(
+    (prochain: number) => {
+      const cible = Math.max(0, Math.min(Math.max(0, total - 1), prochain));
+      if (cible === index) return;
+      const versAvant = cible > index;
+
+      if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        annulerMinuterie();
+        setPrecedent(null);
+        setCourant(cible);
+        return;
+      }
+
+      annulerMinuterie();
+      setPrecedent(index);
+      setCourant(cible);
+      setSens(versAvant ? 'avant' : 'arriere');
+
+      minuterie.current = window.setTimeout(() => {
+        setPrecedent(null);
+        minuterie.current = null;
+      }, 260);
+    },
+    [annulerMinuterie, index, total]
+  );
+
+  const aller = useCallback((delta: number) => changer(index + delta), [changer, index]);
+
+  const reinitialiser = useCallback(
+    (prochain = 0) => {
+      annulerMinuterie();
+      setPrecedent(null);
+      setCourant(prochain);
+    },
+    [annulerMinuterie]
+  );
+
+  return { index, precedent, sens, aller, changer, reinitialiser };
+}
+
 /**
  * La pile de notes.
  *
@@ -1807,24 +1876,20 @@ function PileDeNotes({
   reponses: Record<string, string>;
   onEnregistrer: (cle: string, valeur: string) => void;
 }) {
-  const [rang, setRang] = useState(0);
-  const [sens, setSens] = useState<1 | -1 | 0>(0);
   const [mode, setMode] = useState<'essentiel' | 'approfondir'>('essentiel');
   const departGlissement = useRef<number | null>(null);
   const questionsAffichees = mode === 'essentiel' ? questions : approfondissement;
   const total = questionsAffichees.length;
-  const courant = Math.min(rang, total - 1);
+  const {
+    index: courant,
+    precedent,
+    sens,
+    aller,
+    reinitialiser,
+  } = useFeuilleAnimee(total, 0);
 
   const papiers = ['post-it-jaune', 'post-it-bleu', 'post-it-rose'];
   const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
-
-  const aller = useCallback(
-    (delta: number) => {
-      setSens(delta > 0 ? 1 : -1);
-      setRang((valeur) => Math.max(0, Math.min(total - 1, valeur + delta)));
-    },
-    [total]
-  );
 
   const toutesLesQuestions = [...questions, ...approfondissement];
   const repondues = toutesLesQuestions.filter((q) => (reponses[`q:${q.id}`] ?? '').trim()).length;
@@ -1888,10 +1953,6 @@ function PileDeNotes({
 
   return (
     <div className="py-4 sm:py-6">
-      {/* L'en-tête tenait sur trois cent pixels — un intitulé, un grand titre
-          et un paragraphe d'explication — avant même la première note. Sur un
-          téléphone, la note commençait à mi-écran et finissait derrière la
-          barre du bas. Il ne reste ici que ce qu'on relit vraiment. */}
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
           {mode === 'essentiel'
@@ -1921,16 +1982,19 @@ function PileDeNotes({
       <div
         className="relative mt-5 [perspective:1400px]"
         onTouchStart={(event) => {
+          event.stopPropagation();
           departGlissement.current = event.touches[0]?.clientX ?? null;
         }}
         onTouchEnd={(event) => {
+          event.stopPropagation();
           if (departGlissement.current === null) return;
           const distance = departGlissement.current - (event.changedTouches[0]?.clientX ?? 0);
           departGlissement.current = null;
           if (Math.abs(distance) < 48) return;
           aller(distance > 0 ? 1 : -1);
         }}
-        onTouchCancel={() => {
+        onTouchCancel={(event) => {
+          event.stopPropagation();
           departGlissement.current = null;
         }}
       >
@@ -1942,9 +2006,9 @@ function PileDeNotes({
         {/* La note posée devant : c'est elle qui donne sa hauteur à la pile.
             L'enveloppe porte le mouvement, la feuille garde son inclinaison. */}
         <div
-          key={questionsAffichees[courant].id}
-          className={`relative z-10 ${
-            sens === 1 ? 'note-avant' : sens === -1 ? 'note-arriere' : 'note-posee'
+          key={`active-${questionsAffichees[courant]?.id ?? courant}`}
+          className={`feuille-document relative z-10 ${
+            precedent !== null ? (sens === 'avant' ? 'note-avant' : 'note-arriere') : 'note-posee'
           }`}
         >
           <article
@@ -1956,14 +2020,36 @@ function PileDeNotes({
               className={`punaise -top-2.5 ${courant % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
               aria-hidden="true"
             />
-            {/* Le défilement vit à l'intérieur de la feuille. Sans ce plafond,
-                une note longue repoussait « Précédente » et « Suivante » sous
-                la barre du bas, et l'on ne pouvait plus avancer. */}
             <div className="max-h-[46svh] overflow-y-auto p-5 sm:max-h-[56svh] sm:p-6">
               {carte(questionsAffichees[courant], courant, true)}
             </div>
           </article>
         </div>
+
+        {/* La feuille sortante qui se soulève et quitte le bloc */}
+        {precedent !== null && questionsAffichees[precedent] && (
+          <div
+            key={`quitte-${questionsAffichees[precedent].id}`}
+            aria-hidden="true"
+            className={`feuille-document pointer-events-none absolute inset-0 z-20 ${
+              sens === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
+            }`}
+          >
+            <article
+              className={`${papiers[precedent % papiers.length]} ${
+                poses[precedent % poses.length]
+              } rounded-[4px] text-encre-950 shadow-2xl`}
+            >
+              <span
+                className={`punaise -top-2.5 ${precedent % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
+                aria-hidden="true"
+              />
+              <div className="max-h-[46svh] overflow-y-auto p-5 sm:max-h-[56svh] sm:p-6">
+                {carte(questionsAffichees[precedent], precedent, false)}
+              </div>
+            </article>
+          </div>
+        )}
       </div>
 
       {/* Les feuilles en attente dépassent d'une cinquantaine de pixels sous
@@ -1978,9 +2064,6 @@ function PileDeNotes({
           <ChevronLeft className="h-4 w-4" /> Précédente
         </button>
 
-        {/* Des repères, pas des commandes : la règle de cible tactile impose
-            44 px à tout bouton, ce qui ferait neuf disques là où il ne faut
-            qu'un fil. On avance par les flèches ou d'un glissement. */}
         <span className="flex items-center gap-1.5" aria-hidden="true">
           {questionsAffichees.map((question, index) => {
             const ecrite = (reponses[`q:${question.id}`] ?? '').trim().length > 0;
@@ -2018,8 +2101,7 @@ function PileDeNotes({
           type="button"
           onClick={() => {
             setMode((valeur) => valeur === 'essentiel' ? 'approfondir' : 'essentiel');
-            setRang(0);
-            setSens(0);
+            reinitialiser();
           }}
           className="mx-auto mt-4 flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/5 px-5 text-xs font-bold text-parchemin-100/70 transition-colors hover:bg-white/10 hover:text-parchemin-100"
         >
@@ -2120,7 +2202,13 @@ function ScenePriereImmersive({
         reponse: '',
       }));
 
-  const [indexActif, setIndexActif] = useState(0);
+  const {
+    index: indexActif,
+    precedent: precedentPriere,
+    sens: sensPriere,
+    aller,
+  } = useFeuilleAnimee(elements.length, 0);
+  const departGlissement = useRef<number | null>(null);
   const elementActif = elements[indexActif] || elements[0];
 
   return (
@@ -2160,10 +2248,37 @@ function ScenePriereImmersive({
       {/* Les découvertes reprises une à une, sur des fiches posées en pile.
           La carte de verre sombre d'avant ne tenait pas sur cette table : on
           prie sur du papier, comme on a médité. */}
-      <div className="relative text-left [perspective:1400px]">
+      <div
+        className="relative touch-pan-y text-left [perspective:1400px]"
+        onTouchStart={(event) => {
+          event.stopPropagation();
+          departGlissement.current = event.touches[0]?.clientX ?? null;
+        }}
+        onTouchEnd={(event) => {
+          event.stopPropagation();
+          if (departGlissement.current === null) return;
+          const distance = departGlissement.current - (event.changedTouches[0]?.clientX ?? 0);
+          departGlissement.current = null;
+          if (Math.abs(distance) >= 48) aller(distance > 0 ? 1 : -1);
+        }}
+        onTouchCancel={(event) => {
+          event.stopPropagation();
+          departGlissement.current = null;
+        }}
+      >
         <FeuillesEnAttente restantes={elements.length - indexActif - 1} papier={() => 'fiche-bristol'} />
 
-        <div key={elementActif.id} className="note-posee relative z-10">
+        {/* Feuille active */}
+        <div
+          key={`priere-active-${elementActif.id}`}
+          className={`feuille-document relative z-10 ${
+            precedentPriere !== null
+              ? sensPriere === 'avant'
+                ? 'note-avant'
+                : 'note-arriere'
+              : 'note-posee'
+          }`}
+        >
           <article className="fiche-bristol pose-2 space-y-5 rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
             <span className="attache-pince -top-3 left-10" aria-hidden="true" />
             <div>
@@ -2205,13 +2320,46 @@ function ScenePriereImmersive({
             </div>
           </article>
         </div>
+
+        {/* Feuille sortante */}
+        {precedentPriere !== null && elements[precedentPriere] && (
+          <div
+            key={`priere-quitte-${elements[precedentPriere].id}`}
+            aria-hidden="true"
+            className={`feuille-document pointer-events-none absolute inset-0 z-20 ${
+              sensPriere === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
+            }`}
+          >
+            <article className="fiche-bristol pose-2 space-y-5 rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
+              <span className="attache-pince -top-3 left-10" aria-hidden="true" />
+              <div>
+                <span className="block text-3xs font-black uppercase tracking-[0.18em] text-encre-700/60">
+                  La vérité que tu as contemplée
+                </span>
+                <h3 className="mt-1.5 font-serif text-lg font-bold leading-relaxed text-encre-950 sm:text-xl">
+                  {elements[precedentPriere].titre}
+                </h3>
+              </div>
+              {elements[precedentPriere].reponse ? (
+                <div className="space-y-1.5 border-l-2 border-or-500/50 pl-4">
+                  <span className="block text-3xs font-black uppercase tracking-[0.14em] text-or-800/80">
+                    Ce que tu as écrit
+                  </span>
+                  <p className="manuscrit text-lg leading-relaxed text-encre-800 sm:text-xl">
+                    {elements[precedentPriere].reponse}
+                  </p>
+                </div>
+              ) : null}
+            </article>
+          </div>
+        )}
       </div>
 
       {elements.length > 1 && (
         <div className="mt-16 flex items-center justify-between gap-3">
           <button
             type="button"
-            onClick={() => setIndexActif((valeur) => Math.max(0, valeur - 1))}
+            onClick={() => aller(-1)}
             disabled={indexActif === 0}
             className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-bold text-parchemin-100/80 transition-colors hover:bg-white/12 disabled:opacity-25"
           >
@@ -2229,9 +2377,7 @@ function ScenePriereImmersive({
           </span>
           <button
             type="button"
-            onClick={() =>
-              setIndexActif((valeur) => Math.min(elements.length - 1, valeur + 1))
-            }
+            onClick={() => aller(1)}
             disabled={indexActif === elements.length - 1}
             className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-bold text-parchemin-100/80 transition-colors hover:bg-white/12 disabled:opacity-25"
           >
@@ -2330,8 +2476,14 @@ function SceneAncrageVerset({
   valeur: string;
   onEnregistrer: (valeur: string) => void;
 }) {
-  const [niveau, setNiveau] = useState<NiveauMemoire>(1);
-  const [sensNiveau, setSensNiveau] = useState<1 | -1 | 0>(0);
+  const {
+    index: indexNiveau,
+    precedent: precedentNiveau,
+    sens: sensNiveau,
+    changer: changerIndexNiveau,
+    reinitialiser: reinitialiserNiveau,
+  } = useFeuilleAnimee(4, 0);
+  const niveau = (indexNiveau + 1) as NiveauMemoire;
   const [etapePassage, setEtapePassage] = useState(0);
   const [copiee, setCopiee] = useState(false);
   const [microActif, setMicroActif] = useState(false);
@@ -2374,9 +2526,7 @@ function SceneAncrageVerset({
   };
 
   const changerNiveau = (prochain: NiveauMemoire) => {
-    if (prochain === niveau) return;
-    setSensNiveau(prochain > niveau ? 1 : -1);
-    setNiveau(prochain);
+    changerIndexNiveau(prochain - 1);
   };
 
   const terminerGlissementNiveau = (positionX: number) => {
@@ -2535,7 +2685,7 @@ function SceneAncrageVerset({
           </div>
 
           <div
-            className="relative mt-4 h-80 touch-pan-y overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_35%,rgba(216,170,85,0.12),transparent_58%)] sm:h-72"
+            className="relative mt-4 h-80 touch-pan-y overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_35%,rgba(216,170,85,0.12),transparent_58%)] [perspective:1400px] sm:h-72"
             onTouchStart={(event) => {
               event.stopPropagation();
               debutGlissementCarte.current = event.touches[0]?.clientX ?? null;
@@ -2555,10 +2705,10 @@ function SceneAncrageVerset({
               const choisi = option.reference === selection;
               const visible = Math.abs(distance) <= 1;
               const transformation = active
-                ? 'translate3d(-50%, 0, 0)'
+                ? 'translate3d(-50%, 0, 42px) rotateY(0deg) rotateZ(0deg) scale(1)'
                 : distance < 0
-                  ? 'translate3d(-132%, 0, 0)'
-                  : 'translate3d(32%, 0, 0)';
+                  ? 'translate3d(-91%, 24px, -100px) rotateY(18deg) rotateZ(-2.5deg) scale(0.84)'
+                  : 'translate3d(-9%, 24px, -100px) rotateY(-18deg) rotateZ(2.5deg) scale(0.84)';
               return (
                 <button
                   key={option.reference}
@@ -2572,14 +2722,15 @@ function SceneAncrageVerset({
                   aria-label={`${option.reference} — ${
                     choisi ? 'Parole choisie' : active ? 'Choisir cette Parole' : 'Afficher et choisir cette Parole'
                   }`}
-                  className={`absolute left-1/2 top-5 flex h-64 w-[min(36rem,calc(100%-3.5rem))] flex-col overflow-hidden rounded-[1.75rem] border p-5 text-left shadow-2xl transition-[transform,opacity,border-color] duration-300 ease-out focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-60 sm:p-7 ${
+                  className={`absolute left-1/2 top-5 flex h-64 w-[min(36rem,calc(100%-3.5rem))] flex-col overflow-hidden rounded-[1.75rem] border p-5 text-left shadow-2xl transition-[transform,opacity,filter,border-color] duration-500 ease-out [backface-visibility:hidden] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-60 sm:p-7 ${
                     choisi
                       ? 'border-or-300 bg-[linear-gradient(145deg,rgba(216,170,85,0.22),rgba(11,29,56,0.98)_58%)]'
                       : 'border-white/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.09),rgba(11,29,56,0.98)_58%)]'
                   }`}
                   style={{
-                    transform: visible ? transformation : 'translate3d(-50%, 0, 0)',
-                    opacity: visible ? (active ? 1 : 0.18) : 0,
+                    transform: visible ? transformation : 'translate3d(-50%, 40px, -180px) scale(0.7)',
+                    opacity: visible ? (active ? 1 : 0.34) : 0,
+                    filter: active ? 'saturate(1)' : 'saturate(0.68)',
                     zIndex: active ? 30 : visible ? 15 : 0,
                     pointerEvents: visible ? 'auto' : 'none',
                   }}
@@ -2694,8 +2845,7 @@ function SceneAncrageVerset({
                     type="button"
                     onClick={() => {
                       setEtapePassage(indexEtape);
-                      setNiveau(1);
-                      setSensNiveau(0);
+                      reinitialiserNiveau();
                     }}
                     aria-pressed={etapePassage === indexEtape}
                     className={`min-h-11 rounded-2xl border px-2 py-2 text-2xs font-bold transition-colors ${
@@ -2712,25 +2862,32 @@ function SceneAncrageVerset({
           )}
 
           <div
-            className="mt-7 touch-pan-y overflow-hidden px-1 py-3"
+            className="relative mt-7 touch-pan-y px-3 pb-10 pt-3 [perspective:1400px]"
             onTouchStart={(event) => {
+              event.stopPropagation();
               debutGlissementNiveau.current = event.touches[0]?.clientX ?? null;
             }}
             onTouchEnd={(event) => {
+              event.stopPropagation();
               terminerGlissementNiveau(event.changedTouches[0]?.clientX ?? 0);
             }}
-            onTouchCancel={() => {
+            onTouchCancel={(event) => {
+              event.stopPropagation();
               debutGlissementNiveau.current = null;
             }}
           >
+            <FeuillesEnAttente
+              restantes={4 - niveau}
+              papier={() => 'fiche-bristol rounded-[1.75rem] border-t-[7px] border-t-or-300/45'}
+            />
             <article
               key={`${passageMemoire.reference}-${niveau}`}
-              className={`fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
-                sensNiveau === 1
-                  ? 'carte-etape-suivante'
-                  : sensNiveau === -1
-                    ? 'carte-etape-precedente'
-                    : 'note-posee'
+              className={`feuille-document relative z-10 fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
+                precedentNiveau !== null
+                  ? sensNiveau === 'avant'
+                    ? 'note-avant'
+                    : 'note-arriere'
+                  : 'note-posee'
               } ${
                 niveau === 1
                   ? 'border-t-or-400'
@@ -2870,6 +3027,35 @@ function SceneAncrageVerset({
                 </button>
               </div>
             </article>
+
+            {precedentNiveau !== null && (
+              <article
+                key={`memo-quitte-${precedentNiveau}`}
+                aria-hidden="true"
+                className={`feuille-document pointer-events-none absolute inset-x-3 top-3 z-20 fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
+                  sensNiveau === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
+                } ${
+                  precedentNiveau + 1 === 1
+                    ? 'border-t-or-400'
+                    : precedentNiveau + 1 === 2
+                      ? 'border-t-sky-400'
+                      : precedentNiveau + 1 === 3
+                        ? 'border-t-violet-400'
+                        : 'border-t-rose-400'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4 border-b border-dashed border-encre-950/15 pb-5">
+                  <div>
+                    <span className="text-xs font-black uppercase tracking-[0.14em] text-encre-600">
+                      Étape {precedentNiveau + 1} sur {niveaux.length}
+                    </span>
+                    <h3 className="mt-1.5 font-serif text-2xl font-bold leading-tight text-encre-950 sm:text-3xl">
+                      {niveaux[precedentNiveau]?.titre}
+                    </h3>
+                  </div>
+                </div>
+              </article>
+            )}
           </div>
 
           <button type="button" onClick={telechargerFond} className="mx-auto mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-or-400/22 bg-or-400/8 px-5 text-xs font-bold text-or-200 hover:bg-or-400/14">

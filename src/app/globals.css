@@ -851,41 +851,47 @@
   backdrop-filter: blur(1px);
 }
 
-/* ─── Changements de cartes ────────────────────────────────── */
-/* Les cartes restent posées sur la table. Le changement se limite à un léger
-   glissement horizontal et un fondu : aucune bascule, aucune rotation 3D. */
+/* ─── Feuilles d'un même bloc-document ─────────────────────── */
+/* La feuille visible se soulève et quitte réellement le bloc avant que la
+   suivante ne remonte de la pile. Le mouvement porte sur l'enveloppe : le
+   papier conserve ainsi sa petite inclinaison naturelle. */
 @keyframes note-posee {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { opacity: 0; transform: translate3d(0, 16px, -90px) scale(0.97); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 @keyframes note-avant {
-  from { opacity: 0; transform: translateX(16px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translate3d(42px, 18px, -130px) rotateY(-14deg) rotateZ(1.2deg) scale(0.96); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0) rotateZ(0) scale(1); }
 }
 @keyframes note-arriere {
-  from { opacity: 0; transform: translateX(-16px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translate3d(-42px, 18px, -130px) rotateY(14deg) rotateZ(-1.2deg) scale(0.96); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0) rotateZ(0) scale(1); }
 }
-.note-posee { animation: note-posee 0.2s ease-out both; }
-.note-avant { animation: note-avant 0.24s ease-out both; }
-.note-arriere { animation: note-arriere 0.24s ease-out both; }
-
-@keyframes carte-etape-suivante {
-  from { opacity: 0; transform: translateX(24px); }
-  to   { opacity: 1; transform: translateX(0); }
+@keyframes note-quitte-avant {
+  from { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0) rotateZ(0) scale(1); }
+  to   { opacity: 0; transform: translate3d(-58px, -8px, 90px) rotateY(22deg) rotateZ(-2deg) scale(0.985); }
 }
-@keyframes carte-etape-precedente {
-  from { opacity: 0; transform: translateX(-24px); }
-  to   { opacity: 1; transform: translateX(0); }
+@keyframes note-quitte-arriere {
+  from { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0) rotateZ(0) scale(1); }
+  to   { opacity: 0; transform: translate3d(58px, -8px, 90px) rotateY(-22deg) rotateZ(2deg) scale(0.985); }
 }
-.carte-etape-suivante { animation: carte-etape-suivante 0.28s ease-out both; }
-.carte-etape-precedente { animation: carte-etape-precedente 0.28s ease-out both; }
+.feuille-document {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+.note-posee { animation: note-posee 0.32s var(--ease-doux) both; }
+.note-avant { animation: note-avant 0.4s var(--ease-doux) both; }
+.note-arriere { animation: note-arriere 0.4s var(--ease-doux) both; }
+.note-quitte-avant { animation: note-quitte-avant 0.22s ease-in both; pointer-events: none; }
+.note-quitte-arriere { animation: note-quitte-arriere 0.22s ease-in both; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .note-posee,
   .note-avant,
   .note-arriere,
-  .carte-etape-suivante,
-  .carte-etape-precedente { animation: none; }
+  .note-quitte-avant,
+  .note-quitte-arriere { animation: none; }
+  .feuille-document { will-change: auto; }
 }
 
 /* ─── Les inclinaisons ─────────────────────────────────────── */

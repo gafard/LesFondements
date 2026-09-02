@@ -45,6 +45,11 @@ test('accessibilité applicative : méditation, prière et mémorisation de Dieu
   expect(resultat.violations).toEqual([]);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Reste encore un instant.' })).toBeVisible();
+  resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
+  expect(resultat.violations).toEqual([]);
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('Mémorisation progressive')).toBeVisible();
   resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
   expect(resultat.violations).toEqual([]);
