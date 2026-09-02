@@ -139,7 +139,7 @@ type Scene = { piste?: string } & (
   | { type: 'seuil' }
   | { type: 'ouverture-section'; titre: string; rang: number; total: number }
   | { type: 'bloc'; bloc: Bloc; sousTitre: string | null; section: string | null }
-  | { type: 'silence' }
+  | { type: 'silence'; apres: 'lecture' | 'priere' }
   | {
       type: 'meditation';
       sectionTitre: string;
@@ -256,7 +256,6 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
     });
 
     scenes.push(
-      { type: 'silence' },
       {
         type: 'meditation',
         sectionTitre: section.titre || fiche.titre,
@@ -267,6 +266,7 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
     if (accompagnement) scenes.push({ type: 'accompagnement', contenu: accompagnement });
     scenes.push(
       { type: 'priere', id: idSection, questions: [...questions, ...approfondissement] },
+      { type: 'silence', apres: 'priere' },
       { type: 'ancrage-verset', id: idSection, reference, texte, options },
       { type: 'pas', id: idSection, reference, options, pratique: meditation?.pratique },
     );
@@ -313,7 +313,7 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
     });
   });
 
-  scenes.push({ type: 'silence' });
+  scenes.push({ type: 'silence', apres: 'lecture' });
 
   fiche.resume.forEach((section, indexSection) => {
     scenes.push({
@@ -493,7 +493,10 @@ export default function Immersion({
   // en temps nommés — entrer, écouter, méditer, mémoriser, écrire, conclure
   // — dont chacun se tient d'une traite.
   const moments = useMemo(
-    () => decouperEnMoments(scenario.map((s) => ({ type: s.type, texte: texteDeLaScene(s) }))),
+    () => decouperEnMoments(scenario.map((s) => ({
+      type: s.type === 'silence' && s.apres === 'priere' ? 'silence-priere' : s.type,
+      texte: texteDeLaScene(s),
+    }))),
     [scenario, texteDeLaScene]
   );
   const rangMoment = momentDe(moments, index);
@@ -1366,7 +1369,7 @@ function RenduScene({
       return <SceneBloc scene={scene} />;
 
     case 'silence':
-      return <SceneSilence />;
+      return <SceneSilence apres={scene.apres} />;
 
     case 'meditation': {
       return (
@@ -3011,9 +3014,10 @@ function SceneBloc({
   );
 }
 
-function SceneSilence() {
+function SceneSilence({ apres }: { apres: 'lecture' | 'priere' }) {
   const [secondes, setSecondes] = useState(45);
   const [encours, setEncours] = useState(false);
+  const apresPriere = apres === 'priere';
 
   useEffect(() => {
     if (!encours || secondes === 0) return;
@@ -3024,14 +3028,15 @@ function SceneSilence() {
   return (
     <div className="py-14 text-center sm:py-24">
       <span className="text-2xs font-bold uppercase tracking-[0.28em] text-or-300/55">
-        L&apos;exposé est lu
+        {apresPriere ? 'Ta prière est déposée' : 'L’exposé est lu'}
       </span>
       <h2 className="mt-5 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-        Restez là un instant.
+        {apresPriere ? 'Reste encore un instant.' : 'Reste là un instant.'}
       </h2>
       <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-parchemin-100/60">
-        Avant de répondre à quoi que ce soit. Ce que vous venez de lire a besoin d&apos;un peu de
-        place.
+        {apresPriere
+          ? 'Ne passe pas tout de suite à la suite. Demeure simplement devant Dieu avec ce que tu viens de lui confier.'
+          : 'Avant de répondre à quoi que ce soit. Ce que tu viens de lire a besoin d’un peu de place.'}
       </p>
 
       <button
@@ -3055,10 +3060,10 @@ function SceneSilence() {
 
       <p className="mt-8 text-2xs text-parchemin-100/55">
         {secondes === 0
-          ? 'Vous pouvez continuer.'
-          : encours
-            ? 'Inspirez lentement. Le compte descend tout seul.'
-            : 'Touchez le cercle pour commencer.'}
+          ? 'Tu peux continuer.'
+            : encours
+            ? 'Respire lentement. Le compte descend tout seul.'
+            : 'Touche le cercle pour commencer.'}
       </p>
     </div>
   );

@@ -5,7 +5,7 @@
  * vérité et décourage : on annonce une épreuve d'endurance à quelqu'un qui
  * venait méditer. Or ces scènes ne sont pas une file uniforme — elles ont
  * déjà une forme, celle du livret : on entre, on écoute l'enseignement, on
- * se tait, on recopie les versets, on écrit ses réponses, on conclut.
+ * médite, on prie, on demeure un instant, puis on garde la Parole et on conclut.
  *
  * On rend cette forme visible. « Moment 3 sur 6 · environ 7 minutes » est
  * une promesse tenable, et un endroit où l'on peut s'arrêter sans avoir le
@@ -31,16 +31,16 @@ export interface Moment {
 }
 
 /**
- * Les six temps du livret, dans son ordre — enseignement d'abord, silence,
- * versets à recopier, puis écriture personnelle. L'ordre n'est pas décoratif :
- * c'est celui que le livret suppose.
+ * Les temps du livret, dans leur ordre. Dans « l'immersion du jour », le silence
+ * qui suit la prière appartient au même mouvement qu'elle ; le silence de
+ * l'ancien parcours complet reste attaché à la méditation.
  */
 const TEMPS: { cle: string; titre: string; types: string[] }[] = [
   { cle: 'entrer', titre: 'Entrer', types: ['seuil'] },
   { cle: 'lire', titre: 'Lire & écouter', types: ['ouverture-section', 'bloc'] },
   { cle: 'mediter', titre: 'Méditer', types: ['silence', 'meditation'] },
   { cle: 'accompagner', titre: 'Être accompagné', types: ['accompagnement'] },
-  { cle: 'prier', titre: 'Prier', types: ['priere'] },
+  { cle: 'prier', titre: 'Prier', types: ['priere', 'silence-priere'] },
   { cle: 'memoriser', titre: 'Mémoriser', types: ['ancrage-verset', 'resume', 'verset', 'lecture'] },
   { cle: 'ecrire', titre: 'Écrire', types: ['question'] },
   { cle: 'vivre', titre: 'Vivre', types: ['pas', 'synthese-fiche'] },
@@ -58,6 +58,7 @@ const MOTS_PAR_MINUTE = 180;
 const MINUTES_FIXES: Record<string, number> = {
   seuil: 1,
   silence: 3,
+  'silence-priere': 3,
   meditation: 7,
   accompagnement: 2,
   priere: 5,

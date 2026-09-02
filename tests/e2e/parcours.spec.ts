@@ -23,6 +23,10 @@ test('fiche 1 : Parole, réponse, prière, mémorisation et vie restent un seul 
   await expect(page.getByText('Dieu règne même lorsque je ne maîtrise pas la situation.')).toBeVisible();
 
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Reste encore un instant.' })).toBeVisible();
+  await expect(page.getByText('Ta prière est déposée', { exact: true })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByText('La Parole que je garde', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Parole suivante' }).click();
   await page.getByRole('button', { name: /^Ps 46:11/ }).click();
