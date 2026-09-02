@@ -9,6 +9,8 @@ import {
   BellRing,
   RotateCcw,
   Sunrise,
+  Mail,
+  Users,
 } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
 import { useAuth } from '@/lib/AuthContext';
@@ -17,10 +19,10 @@ import { getAnswers } from '@/lib/firestore';
 import { chargerFiche, type FicheLivret } from '@/lib/livret';
 import NotificationCenter from '@/components/NotificationCenter';
 import Illumination from '@/components/Illumination';
-import { VERSETS_CONNUS, normaliserReference } from '@/data/versets';
+import { VERSETS_CONNUS, normaliserReference, texteDuVerset } from '@/data/versets';
 import { etapesTempsApart } from '@/lib/tempsApart';
 
-
+const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
 export default function DashboardPage() {
   return (
@@ -73,8 +75,14 @@ function DashboardContent() {
   let premierIndexNonFait = sections.findIndex((_, idx) => !reponsesFiche[`temps-apart:${idx}`]);
   if (premierIndexNonFait === -1) premierIndexNonFait = 0;
 
-  const versetRef = fiche?.resume?.[0]?.versets?.[0] || 'Ap 1:8';
-  const versetTexte = VERSETS_CONNUS[normaliserReference(versetRef)] || VERSETS_CONNUS[versetRef] || "« Je suis l’alpha et l’oméga, dit le Seigneur Dieu, celui qui est, qui était, et qui vient, le Tout-Puissant. »";
+  const parolesChoisies = sections
+    .map((_, index) => reponsesFiche[`verset-choisi:f${ficheCouranteId}-s${index + 1}`])
+    .filter((reference): reference is string => Boolean(reference));
+  const versetRef = parolesChoisies.at(-1) || fiche?.resume?.[0]?.versets?.[0] || 'Ap 1:8';
+  const versetTexte = VERSETS_CONNUS[normaliserReference(versetRef)]
+    || VERSETS_CONNUS[versetRef]
+    || texteDuVerset(versetRef)
+    || 'Relis cette Parole dans ta Bible.';
 
   return (
     <div className="table-travail min-h-screen text-encre-950 px-3 pb-24 pt-6 sm:px-6 lg:px-8">
@@ -215,33 +223,51 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Post-it Jaune : Verset à méditer */}
-          <div className="postit postit-jaune relative rounded-sm p-6 shadow-md border border-encre-900/15 rotate-1 space-y-4">
-            <span className="punaise punaise-rouge -top-2.5 right-6" />
-            
-            <div className="flex items-center justify-between border-b border-encre-900/10 pb-2">
-              <span className="text-xs font-bold uppercase tracking-[0.14em] text-encre-700 flex items-center gap-1.5">
-                <Bookmark className="h-3.5 w-3.5 text-or-800" /> Verset à méditer
-              </span>
-              <span className="text-[10px] font-bold text-encre-600">
-                Fiche {ficheCouranteId}
-              </span>
+          <div className="space-y-6">
+            {/* Le post-it garde la Parole choisie à portée de regard. */}
+            <div className="postit postit-jaune relative rotate-1 space-y-4 rounded-sm border border-encre-900/15 p-6 shadow-md">
+              <span className="punaise punaise-rouge -top-2.5 right-6" />
+              <div className="flex items-center justify-between border-b border-encre-900/10 pb-2">
+                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-encre-700">
+                  <Bookmark className="h-3.5 w-3.5 text-or-800" /> La Parole que je garde
+                </span>
+                <span className="text-[10px] font-bold text-encre-600">Fiche {ficheCouranteId}</span>
+              </div>
+              <p className="font-serif text-base italic leading-relaxed text-encre-950">« {versetTexte} »</p>
+              <div className="flex items-center justify-between border-t border-encre-900/10 pt-2">
+                <span className="text-xs font-bold text-or-900">{versetRef}</span>
+                <Link href="/memorisation" className="text-2xs font-bold text-encre-800 underline hover:text-encre-950">
+                  Le revoir →
+                </Link>
+              </div>
             </div>
 
-            <p className="font-serif text-base italic leading-relaxed text-encre-950">
-              « {versetTexte} »
-            </p>
-
-            <div className="flex items-center justify-between pt-2 border-t border-encre-900/10">
-              <span className="text-xs font-bold text-or-900">
-                {versetRef}
-              </span>
-              <Link
-                href="/memorisation"
-                className="text-2xs font-bold text-encre-800 underline hover:text-encre-950"
-              >
-                Flashcards & Micro →
-              </Link>
+            {/* L'enveloppe relie le travail personnel à la cellule. */}
+            <div className="feuille relative -rotate-1 overflow-hidden rounded-2xl border border-encre-900/12 p-5 shadow-sm">
+              <span className="absolute inset-x-0 top-0 h-2 bg-bordeaux-800" aria-hidden="true" />
+              <div className="flex items-start gap-3 pt-2">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-bordeaux-50 text-bordeaux-800">
+                  <Mail className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-3xs font-black uppercase tracking-[0.16em] text-encre-600">L’enveloppe de ma cellule</p>
+                  <h3 className="mt-1 truncate font-serif text-lg font-bold text-encre-950">
+                    {group?.name ?? 'Le parcours se vit aussi ensemble'}
+                  </h3>
+                  <p className="mt-2 text-xs leading-relaxed text-encre-700">
+                    {group
+                      ? `${JOURS[group.meeting.weekday] ?? 'Prochaine rencontre'} à ${group.meeting.time} · ${group.meeting.timezone}`
+                      : 'Rejoins une cellule pour partager la fiche et être accompagné.'}
+                  </p>
+                  <Link
+                    href="/groupes"
+                    className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-encre-950 px-4 text-xs font-bold text-parchemin-50 transition-colors hover:bg-encre-800"
+                  >
+                    <Users className="h-4 w-4 text-or-300" aria-hidden="true" />
+                    {group ? 'Ouvrir ma cellule' : 'Trouver une cellule'}
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
 

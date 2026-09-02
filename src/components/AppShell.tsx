@@ -296,7 +296,7 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
             height={26}
             className="h-6.5 w-6.5 shrink-0 object-contain"
           />
-          <h1 className="truncate font-serif text-lg font-bold text-encre-950">{titre}</h1>
+          <span className="truncate font-serif text-lg font-bold text-encre-950">{titre}</span>
         </Link>
         <div className="flex items-center gap-2">
           <div className="mobile-sync">

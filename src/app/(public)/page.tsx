@@ -32,7 +32,7 @@ const chapters = [
   { 
     range: '11—15', 
     title: 'Devenir disciple', 
-    detail: 'Dons de l’Esprit, caractère forger, communauté relationnelle et mission du Royaume.',
+    detail: 'Dons de l’Esprit, caractère forgé, communauté relationnelle et mission du Royaume.',
     badge: 'Maturité'
   },
   { 
@@ -64,7 +64,7 @@ const rhythms = [
     icon: CheckCircle2,
     eyebrow: 'Dans la vraie vie',
     title: 'Je pratique et transmets',
-    text: 'Chaque fiche débouche sur un pas d’amour concret : une réconciliation, un service rendu, une bénédiction partagée.',
+    text: 'Chaque fiche invite à choisir librement une manière concrète de vivre la Parole reçue.',
     badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-200',
     image: '/group-communion-hero.jpg'
   },
@@ -524,8 +524,8 @@ export default function Home() {
               <div className="bg-[#f8f3e9] p-4 rounded-2xl border border-amber-200 flex items-center gap-3">
                 <Award className="w-8 h-8 text-amber-600 flex-shrink-0" />
                 <div className="text-xs">
-                  <strong className="text-slate-900 block font-serif">Reconnaissance de Maturité</strong>
-                  <span className="text-slate-600">Prêt à transmettre et accompagner d&apos;autres disciples.</span>
+                  <strong className="text-slate-900 block font-serif">Mémoire du chemin parcouru</strong>
+                  <span className="text-slate-600">Relire ce qui a grandi, ce qui reste à travailler et ce que Dieu a fait.</span>
                 </div>
               </div>
             </div>

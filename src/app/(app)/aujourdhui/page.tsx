@@ -22,6 +22,7 @@ function AujourdhuiContent() {
   const ficheId = entierBorne(searchParams.get('fiche'), 1, 20, 1);
   const sectionDemandee = searchParams.get('section');
   const sceneInitiale = entierBorne(searchParams.get('scene'), 0, 500, 0);
+  const momentInitial = searchParams.get('moment');
   const retour = searchParams.get('retour') === 'fiche' ? `/fiches/${ficheId}` : '/dashboard';
 
   const [fiche, setFiche] = useState<FicheLivret | null | undefined>(undefined);
@@ -101,6 +102,7 @@ function AujourdhuiContent() {
       onQuitter={() => router.push(retour)}
       dejaPreparee={Boolean(reponses[`temps-apart:${sectionIndex}`])}
       indexInitial={sceneInitiale}
+      momentInitial={momentInitial}
     />
   );
 }

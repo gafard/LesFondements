@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "principe": "Le livret parle. L’application met en scène. Le disciple observe et répond. La cellule accompagne.",
+  "couches": {
+    "canonique": {
+      "source": "src/data/livret.json",
+      "modifiable": false,
+      "description": "Texte et questions issus du livret d’origine."
+    },
+    "facilitation": {
+      "source": "src/data/meditation-questions.json",
+      "modifiable": true,
+      "description": "Invitations numériques qui ne remplacent jamais le texte du livret."
+    },
+    "personnelle": {
+      "source": "réponses privées de l’utilisateur",
+      "modifiable": true,
+      "description": "Notes, prières et pas choisis librement par le disciple."
+    }
+  },
+  "regles": {
+    "questionsEssentiellesMaximum": 2,
+    "texteCanoniqueToujoursVisible": true,
+    "approfondissementFacultatif": true,
+    "reponsesPriveesParDefaut": true,
+    "autodiagnosticSpirituelInterdit": true,
+    "accompagnementHumainFichesSensibles": [7, 8]
+  }
+}

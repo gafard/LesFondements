@@ -2059,8 +2059,8 @@
             "id": "f7-s1-q4",
             "fonction": "identifier",
             "source": "vie",
-            "consigne": "Cela peut être une personne, une relation, l’argent, le travail, la réussite, l’apparence, le regard des autres, une activité — ou tout autre chose. Ne cherche pas plusieurs réponses.",
-            "question": "Y a-t-il quelque chose dont tu as particulièrement besoin pour te sentir en sécurité, reconnu, important, ou simplement « bien » ?"
+            "consigne": "Ne cherche pas plusieurs réponses et ne te juge pas. Laisse venir ce que tu reconnais déjà.",
+            "question": "Y a-t-il quelque chose dont tu attends qu’il te donne une sécurité, une valeur ou une raison d’être ?"
           },
           {
             "id": "f7-s1-q5",
@@ -2343,7 +2343,7 @@
         "pratique": {
           "questionMoment": "Reviens à la situation que tu as identifiée.",
           "placeholderMoment": "Je veux me souvenir de cette Parole lorsque…",
-          "questionAction": "À partir de cette Parole, quel pas concret peux-tu poser ? Une décision intérieure, une conversation, demander pardon pour ta part, abandonner une revanche, demander de l’aide, poser une limite.",
+          "questionAction": "À partir de cette Parole, quel pas veux-tu choisir librement ?",
           "placeholderAction": "À partir de cette Parole, je voudrais…"
         }
       }
@@ -2470,22 +2470,22 @@
             "id": "f8-s2-q6",
             "fonction": "examiner",
             "source": "vie",
-            "consigne": "Le livret distingue précisément ces deux cas, et c’est sur cette distinction que repose la suite.",
-            "question": "Lorsque cela arrive, as-tu le sentiment de pouvoir choisir autrement — même difficilement — ou d’être irrésistiblement dominé ?"
+            "consigne": "Reste sur ce que tu peux observer sans chercher à établir une cause spirituelle.",
+            "question": "Que se passe-t-il concrètement avant, pendant et après cette situation ?"
           },
           {
             "id": "f8-s2-q7",
             "fonction": "comprendre",
             "source": "livret",
             "consigne": "Le livret écrit : « Il peut arriver que malgré cette discipline et notre bonne volonté de marcher par l’Esprit et ne pas laisser la chair dominer, on soit toujours irrésistiblement dominé, et ce, de manière régulière. On est poussé à faire ou à subir quelque chose qu’on ne veut pas : péché particulier, crainte, angoisse, rejet, honte, culpabilité, violence, colère, pitié de soi, envie de mort. Il est alors fort possible que l’on soit sous l’influence d’un démon. »",
-            "question": "À la lumière de ce que tu viens de décrire, est-ce que cette situation te semble correspondre à ce que le livret décrit ici ?"
+            "question": "Pourquoi ce passage rappelle-t-il l’importance de ne pas conclure seul et de chercher un discernement accompagné ?"
           },
           {
             "id": "f8-s2-q8",
             "fonction": "identifier",
             "source": "livret",
             "consigne": "Le livret nomme les entrées possibles : péchés héréditaires, occultisme, un péché habituel dont on ne se repent pas, l’idolâtrie, les fausses religions ou croyances, les malédictions, l’affliction mentale, le non-pardon, mais aussi un choc émotif ou un abus subi.",
-            "question": "Y a-t-il quelque chose que tu identifies comme ayant pu ouvrir cette porte ou créer ce lien ?"
+            "question": "Quelles questions voudrais-tu apporter à des responsables mûrs, sans chercher à établir toi-même une cause ?"
           },
           {
             "id": "f8-s2-q9",
@@ -2904,8 +2904,8 @@
             "id": "f9-s4-q1",
             "fonction": "observer",
             "source": "parole",
-            "consigne": "Lis Jean 10:27.",
-            "question": "Qui fait quoi, dans ce verset ? Note l’ordre des trois verbes."
+            "consigne": "Lis lentement Jean 10:27. Observe simplement l’ordre des verbes.",
+            "question": "Qu’est-ce qui retient ton attention dans ce verset ?"
           },
           {
             "id": "f9-s4-q2",
@@ -2968,7 +2968,7 @@
             "fonction": "repondre",
             "source": "vie",
             "consigne": "Le livret conclut : « Plus on écoute Dieu, plus on l’entend, et plus on l’entend, plus notre oreille s’affine. »",
-            "question": "Demande-lui de te parler, puis reste en silence un moment avant d’écrire ce qui vient."
+            "question": "Reste un moment en silence. Note ensuite ce que tu as perçu comme une pensée à discerner — jamais comme une parole de Dieu déjà certaine."
           }
         ],
         "pratique": {

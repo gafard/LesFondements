@@ -28,6 +28,8 @@ import {
   Flame,
   Mic,
   MicOff,
+  ShieldCheck,
+  Users,
 } from 'lucide-react';
 import ShareableVerseCard from '@/components/ShareableVerseCard';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
@@ -67,6 +69,11 @@ import { comparer } from '@/lib/recitation';
 import { enregistrerRevision, qualiteDepuisScore } from '@/lib/memorisation';
 import { useAuth } from '@/lib/AuthContext';
 import { decouperEnMoments, momentDe, type Moment } from '@/lib/moments';
+import {
+  accompagnementDuJour,
+  repartirQuestions,
+  type AccompagnementEditorial,
+} from '@/lib/parcoursEditorial';
 import {
   annoncerAuSysteme,
   etatDeLecture,
@@ -109,7 +116,7 @@ interface SectionMeditation {
 interface FicheMeditation {
   ficheId: number;
   sections: SectionMeditation[];
-  /** La Parole et les questions précèdent les formulations du livret. */
+  /** Indicateur historique, conservé pour lire les données existantes. */
   parcoursGuide?: boolean;
   synthese?: {
     question: string;
@@ -129,8 +136,14 @@ type Scene = { piste?: string } & (
   | { type: 'ouverture-section'; titre: string; rang: number; total: number }
   | { type: 'bloc'; bloc: Bloc; sousTitre: string | null; section: string | null }
   | { type: 'silence' }
-  | { type: 'meditation'; sectionTitre: string; questions: QuestionMeditation[] }
+  | {
+      type: 'meditation';
+      sectionTitre: string;
+      questions: QuestionMeditation[];
+      approfondissement: QuestionMeditation[];
+    }
   | { type: 'priere'; id: string; questions: QuestionMeditation[] }
+  | { type: 'accompagnement'; contenu: AccompagnementEditorial }
   | { type: 'ancrage-verset'; id: string; reference: string; texte: string; options: PassageAncrage[] }
   | { type: 'resume'; section: ResumeSection }
   | { type: 'verset'; reference: string; texte: string | null }
@@ -160,25 +173,29 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
     const parcoursMeditation = MEDITATIONS.find((element) => element.ficheId === fiche.id);
     const meditation = parcoursMeditation?.sections[sectionCibleIndex];
     const idSection = `f${fiche.id}-s${sectionCibleIndex + 1}`;
-    const questions = meditation?.questions.length
-      ? meditation.questions
-      : [
-          {
-            id: `${idSection}-q1`,
-            fonction: 'decouvrir-dieu',
-            question: 'Qu’est-ce que ce texte te révèle sur Dieu, son caractère ou sa manière d’agir ?',
-          },
-          {
-            id: `${idSection}-q2`,
-            fonction: 'recevoir',
-            question: 'Quelle vérité es-tu invité à accueillir personnellement aujourd’hui ?',
-          },
-          {
-            id: `${idSection}-q3`,
-            fonction: 'repondre',
-            question: 'Quelle réponse simple et concrète peux-tu donner à Dieu ?',
-          },
-        ];
+    const questionsOuvertes: QuestionMeditation[] = [
+      {
+        id: `${idSection}-regarder`,
+        fonction: 'observer',
+        consigne: 'Relis le passage du livret et les textes bibliques associés, sans chercher à répondre trop vite.',
+        question: 'Qu’est-ce qui retient ton attention ?',
+      },
+      {
+        id: `${idSection}-repondre`,
+        fonction: 'repondre',
+        question: 'Qu’est-ce que tu veux continuer à méditer, questionner ou apporter à Dieu ?',
+      },
+    ];
+    const questionsAjoutees = meditation?.questions.length ? meditation.questions : questionsOuvertes;
+    // Les séries anciennes des fiches 11, 12 et 16–20 avaient été générées
+    // comme des examens très directifs. Tant qu'elles ne sont pas relues une
+    // à une, le parcours utilise deux invitations ouvertes et laisse le texte
+    // original porter la journée.
+    const questionsSource = fiche.id >= 11 && questionsAjoutees.every((question) => !question.source)
+      ? questionsOuvertes
+      : questionsAjoutees;
+    const { principales: questions, approfondissement } = repartirQuestions(questionsSource);
+    const accompagnement = accompagnementDuJour(fiche.id, sectionCibleIndex);
     const versetsDuResume = fiche.resume.find((resume) => resume.titre === section.titre)?.versets;
     const referencesProposees = meditation?.versets.length
       ? meditation.versets
@@ -211,32 +228,41 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
       });
     }
 
-    if (!parcoursMeditation?.parcoursGuide) {
-      let sousTitre: string | null = null;
-      section.blocs.forEach((bloc, indexBloc) => {
-        if (bloc.type === 'sous-titre') {
-          sousTitre = bloc.texte;
-          return;
-        }
-        scenes.push({
-          type: 'bloc',
-          bloc,
-          sousTitre,
-          section: section.titre,
-          piste: pisteId.bloc(
-            fiche.id,
-            etape.sourceSectionIndex,
-            etape.sourceBlocOffset + indexBloc
-          ),
-        });
-        sousTitre = null;
+    // Le livret est la source du parcours, même lorsqu'une facilitation
+    // numérique a été écrite pour ce jour. Elle vient après le texte et ne le
+    // remplace jamais.
+    let sousTitre: string | null = null;
+    section.blocs.forEach((bloc, indexBloc) => {
+      if (bloc.type === 'sous-titre') {
+        sousTitre = bloc.texte;
+        return;
+      }
+      scenes.push({
+        type: 'bloc',
+        bloc,
+        sousTitre,
+        section: section.titre,
+        piste: pisteId.bloc(
+          fiche.id,
+          etape.sourceSectionIndex,
+          etape.sourceBlocOffset + indexBloc
+        ),
       });
-    }
+      sousTitre = null;
+    });
 
     scenes.push(
       { type: 'silence' },
-      { type: 'meditation', sectionTitre: section.titre || fiche.titre, questions },
-      { type: 'priere', id: idSection, questions },
+      {
+        type: 'meditation',
+        sectionTitre: section.titre || fiche.titre,
+        questions,
+        approfondissement,
+      },
+    );
+    if (accompagnement) scenes.push({ type: 'accompagnement', contenu: accompagnement });
+    scenes.push(
+      { type: 'priere', id: idSection, questions: [...questions, ...approfondissement] },
       { type: 'ancrage-verset', id: idSection, reference, texte, options },
       { type: 'pas', id: idSection, reference, options, pratique: meditation?.pratique },
     );
@@ -342,6 +368,8 @@ interface ImmersionProps {
   onQuitter: () => void;
   dejaPreparee?: boolean;
   indexInitial?: number;
+  /** Repère stable préféré à l'ancien index numérique de scène. */
+  momentInitial?: string | null;
   /** Limite le temps du jour à une section, tout en gardant une immersion continue. */
   sectionIndex?: number | null;
 }
@@ -354,15 +382,20 @@ export default function Immersion({
   onQuitter,
   dejaPreparee,
   indexInitial = 0,
+  momentInitial = null,
   sectionIndex = null,
 }: ImmersionProps) {
   const scenario = useMemo(
     () => construireScenario(fiche, sectionIndex),
     [fiche, sectionIndex]
   );
-  const [index, setIndex] = useState(() =>
-    Math.max(0, Math.min(scenario.length - 1, indexInitial))
-  );
+  const [index, setIndex] = useState(() => {
+    const indexDuMoment = momentInitial
+      ? scenario.findIndex((candidate) => candidate.type === momentInitial)
+      : -1;
+    const depart = indexDuMoment >= 0 ? indexDuMoment : indexInitial;
+    return Math.max(0, Math.min(scenario.length - 1, depart));
+  });
   const [ambiance, setAmbiance] = useState<Ambiance>('emotional-piano');
   const [lecture, setLecture] = useState(false);
   const [genreVoixLocal, setGenreVoixLocal] = useState<GenreVoix>(() => getGenreVoix());
@@ -371,7 +404,6 @@ export default function Immersion({
   const [enchainer, setEnchainer] = useState(false);
   const [cloture, setCloture] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
-  const [audioAvancement, setAudioAvancement] = useState(0);
   const [erreurVoix, setErreurVoix] = useState<string | null>(null);
   const [noteOuverte, setNoteOuverte] = useState(false);
   // Le chrome s'efface pour laisser la scène seule ; un toucher le rappelle.
@@ -405,6 +437,7 @@ export default function Immersion({
       case 'bloc': return scene.sousTitre ?? scene.section ?? 'Lecture guidée';
       case 'silence': return 'Temps de silence';
       case 'meditation': return 'Méditer';
+      case 'accompagnement': return 'Être accompagné';
       case 'priere': return 'Prier';
       case 'ancrage-verset': return 'Mémoriser';
       case 'resume': return `L’essentiel — ${scene.section.titre}`;
@@ -433,6 +466,8 @@ export default function Immersion({
         return courante.questions
           .map((question) => `${question.consigne ? `${question.consigne} ` : ''}${question.question}`)
           .join(' ');
+      case 'accompagnement':
+        return `${courante.contenu.titre}. ${courante.contenu.texte}`;
       case 'priere':
         return 'Relis ce que tu viens d’écrire. Puis parle simplement à Dieu à partir de ce que tu as découvert. Tu peux aussi rester un instant en silence.';
       case 'ancrage-verset': {
@@ -519,7 +554,6 @@ export default function Immersion({
         },
         onFin: () => {
           setAudioEnCours(false);
-          setAudioAvancement(1);
           if (enchainerRef.current) aller(1);
         },
         onErreur: () => {
@@ -567,7 +601,7 @@ export default function Immersion({
     memoriserPassage({
       url: sectionIndex === null
         ? `/fiches/${fiche.id}`
-        : `/aujourdhui?fiche=${fiche.id}&section=${sectionIndex}&scene=${index}`,
+        : `/aujourdhui?fiche=${fiche.id}&section=${sectionIndex}&moment=${scene.type}`,
       titre: scene.type === 'verset' || scene.type === 'ancrage-verset'
         ? referenceAncrage ?? `Fiche ${fiche.id}`
         : `Fiche ${fiche.id}`,
@@ -844,9 +878,9 @@ export default function Immersion({
         className="absolute inset-0 z-10 overflow-y-auto px-3 pb-32 pt-28 sm:px-8 sm:pt-36"
       >
         <div className="immersion-page-nuit mx-auto min-h-[calc(100svh-12rem)] max-w-4xl rounded-[1.75rem] border border-white/10 px-5 py-5 shadow-2xl sm:px-10 sm:py-8">
-          <div className="mb-2 flex items-center justify-between border-b border-white/8 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-parchemin-100/55">
-            <span>Atelier intérieur</span>
-            <span>{Math.round(progression * 100)} % parcouru</span>
+          <div className="mb-2 flex items-center justify-between gap-3 border-b border-white/8 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-parchemin-100/55">
+            <span>Table de travail</span>
+            <span className="truncate text-right text-or-300/65">{libelleScene}</span>
           </div>
           {cloture ? (
             <SceneCloture fiche={fiche} onQuitter={onQuitter} tempsDuJour={sectionIndex !== null} />
@@ -859,14 +893,15 @@ export default function Immersion({
                 onEnregistrer={onEnregistrer}
                 dejaPreparee={dejaPreparee}
                 tempsDuJour={sectionIndex !== null}
-                onAvancer={() => aller(1)}
               />
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Barre basse unifiée (Navigation + Lecteur Audio) ── */}
+      {/* ── Barre basse légère ─────────────────────────────────
+          La progression vit déjà en haut. Ici, on garde seulement les trois
+          gestes utiles : revenir, écouter si besoin, poursuivre. */}
       {!cloture && (
         <footer
           className={`absolute inset-x-0 bottom-0 z-20 px-3 pb-4 transition-all duration-500 sm:px-8 sm:pb-7 ${
@@ -874,7 +909,7 @@ export default function Immersion({
           }`}
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="immersion-console mx-auto flex max-w-4xl items-center justify-between gap-2.5 rounded-full border border-white/12 px-3.5 py-2.5 shadow-2xl">
+          <div className="immersion-console mx-auto flex max-w-xl items-center justify-between gap-2.5 rounded-full border border-white/12 px-3 py-2 shadow-2xl">
             {/* Précédent */}
             <button
               onClick={() => aller(-1)}
@@ -887,11 +922,14 @@ export default function Immersion({
               <ArrowLeft className="h-4 w-4" />
             </button>
 
-            {/* Centre : Audio ou indicateur de scène */}
-            <div className="flex flex-1 items-center gap-2.5 min-w-0 px-1 sm:px-3">
+            <div className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1">
               <button
                 onClick={basculerLectureOuPause}
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-or-400 text-encre-950 transition-transform active:scale-95 shadow-xs"
+                className={`grid h-10 w-10 shrink-0 place-items-center rounded-full transition-transform active:scale-95 ${
+                  audioEnCours
+                    ? 'bg-or-400 text-encre-950 shadow-xs'
+                    : 'border border-white/12 bg-white/7 text-parchemin-100/70'
+                }`}
                 aria-label={audioEnCours ? 'Mettre en pause' : 'Écouter'}
                 title={audioEnCours ? 'Mettre en pause' : 'Écouter'}
               >
@@ -902,40 +940,9 @@ export default function Immersion({
                 )}
               </button>
 
-              <div className="flex-1 flex flex-col justify-center min-w-0">
-                <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
-                  <span
-                    className="block h-full rounded-full bg-or-400 transition-[width] duration-200"
-                    style={{
-                      width: `${
-                        lecture && pisteCourante
-                          ? Math.round(audioAvancement * 100)
-                          : Math.round(progression * 100)
-                      }%`,
-                    }}
-                  />
-                </div>
-                <div className="flex items-center justify-between mt-1 text-3xs text-parchemin-100/50">
-                  <span className="truncate">
-                    {erreurVoix ?? (lecture ? 'Voix studio' : 'Mode lecture')}
-                  </span>
-                  <span className="shrink-0 ml-2">
-                    {index + 1} / {scenario.length}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setEnchainer(!enchainer)}
-                title="Passer automatiquement à la scène suivante après la voix"
-                className={`shrink-0 rounded-full px-2.5 py-1 text-3xs font-bold transition-colors ${
-                  enchainer
-                    ? 'bg-or-400 text-encre-950'
-                    : 'bg-white/10 text-parchemin-100/60 hover:bg-white/18'
-                }`}
-              >
-                Auto
-              </button>
+              <span className="hidden truncate text-xs font-bold text-parchemin-100/60 sm:block">
+                {erreurVoix ?? (audioEnCours ? 'Lecture en cours' : libelleScene)}
+              </span>
             </div>
 
             {/* Bouton Suivant / Action */}
@@ -976,6 +983,8 @@ export default function Immersion({
         setAmbiance={setAmbiance}
         lecture={lecture}
         setLecture={setLecture}
+        enchainer={enchainer}
+        setEnchainer={setEnchainer}
         genreVoix={genreVoixLocal}
         setGenreVoix={(g) => {
           setGenreVoix(g);
@@ -1010,14 +1019,9 @@ export default function Immersion({
           activerDuckingVoix(false, sourceDuckingAudio.current);
           setAudioEnCours(false);
         }}
-        onTimeUpdate={(event) => {
-          const el = event.currentTarget;
-          if (el.duration) setAudioAvancement(el.currentTime / el.duration);
-        }}
         onEnded={() => {
           activerDuckingVoix(false, sourceDuckingAudio.current);
           setAudioEnCours(false);
-          setAudioAvancement(1);
           if (enchainer) aller(1);
         }}
         onError={() => {
@@ -1045,6 +1049,8 @@ function FeuilleOptions({
   setAmbiance,
   lecture,
   setLecture,
+  enchainer,
+  setEnchainer,
   genreVoix,
   setGenreVoix,
   vivienneDisponible,
@@ -1063,6 +1069,8 @@ function FeuilleOptions({
   setAmbiance: (valeur: Ambiance) => void;
   lecture: boolean;
   setLecture: (valeur: boolean) => void;
+  enchainer: boolean;
+  setEnchainer: (valeur: boolean) => void;
   genreVoix: GenreVoix;
   setGenreVoix: (valeur: GenreVoix) => void;
   vivienneDisponible: boolean;
@@ -1139,22 +1147,37 @@ function FeuilleOptions({
         {/* ── Voix et confort ── */}
         <div className="mt-6 space-y-2.5">
           {voixDisponible && (
-            <button
-              onClick={() => setLecture(!lecture)}
-              className="flex w-full items-center justify-between rounded-2xl bg-white/8 px-4 py-3.5 text-left transition-colors hover:bg-white/14"
-            >
-              <span className="flex items-center gap-2.5 text-sm text-parchemin-100">
-                {lecture ? (
-                  <Volume2 className="h-4 w-4 text-or-300" />
-                ) : (
-                  <VolumeX className="h-4 w-4 text-parchemin-100/50" />
-                )}
-                Lecture Vocale
-              </span>
-              <span className="text-2xs font-bold text-parchemin-100/45">
-                {lecture ? 'Active' : 'Coupée'}
-              </span>
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={() => setLecture(!lecture)}
+                className="flex w-full items-center justify-between rounded-2xl bg-white/8 px-4 py-3.5 text-left transition-colors hover:bg-white/14"
+              >
+                <span className="flex items-center gap-2.5 text-sm text-parchemin-100">
+                  {lecture ? (
+                    <Volume2 className="h-4 w-4 text-or-300" />
+                  ) : (
+                    <VolumeX className="h-4 w-4 text-parchemin-100/50" />
+                  )}
+                  Lecture vocale
+                </span>
+                <span className="text-2xs font-bold text-parchemin-100/45">
+                  {lecture ? 'Active' : 'Coupée'}
+                </span>
+              </button>
+              <button
+                onClick={() => setEnchainer(!enchainer)}
+                aria-pressed={enchainer}
+                className="flex w-full items-center justify-between rounded-2xl bg-white/8 px-4 py-3.5 text-left transition-colors hover:bg-white/14"
+              >
+                <span className="flex items-center gap-2.5 text-sm text-parchemin-100">
+                  <Play className="h-4 w-4 text-parchemin-100/50" />
+                  Enchaîner les lectures
+                </span>
+                <span className="text-2xs font-bold text-parchemin-100/45">
+                  {enchainer ? 'Oui' : 'Non'}
+                </span>
+              </button>
+            </div>
           )}
 
           {/* Le sélecteur n'existe que lorsque toutes les pistes Vivienne ont
@@ -1292,7 +1315,6 @@ function RenduScene({
   onEnregistrer,
   dejaPreparee,
   tempsDuJour,
-  onAvancer,
 }: {
   scene: Scene;
   fiche: FicheLivret;
@@ -1300,7 +1322,6 @@ function RenduScene({
   onEnregistrer: (cle: string, valeur: string) => void;
   dejaPreparee?: boolean;
   tempsDuJour: boolean;
-  onAvancer?: () => void;
 }) {
   switch (scene.type) {
     case 'seuil':
@@ -1349,11 +1370,15 @@ function RenduScene({
           key={scene.sectionTitre}
           titre={scene.sectionTitre}
           questions={scene.questions}
+          approfondissement={scene.approfondissement}
           reponses={reponses}
           onEnregistrer={onEnregistrer}
         />
       );
     }
+
+    case 'accompagnement':
+      return <SceneAccompagnement contenu={scene.contenu} />;
 
     case 'priere': {
       const reprises = scene.questions.map((question) => {
@@ -1369,7 +1394,6 @@ function RenduScene({
         <ScenePriereImmersive
           reprises={reprises}
           questions={scene.questions}
-          onAvancer={onAvancer}
         />
       );
     }
@@ -1686,7 +1710,7 @@ interface ReprisePriere {
 /** 📖 la Parole, 📘 le livret, 🪞 ma vie, 🌿 le temps qu'on prend. */
 function etiquetteDeSource(source: QuestionMeditation['source']): string | null {
   if (source === 'parole') return '📖 La Parole';
-  if (source === 'livret') return '📘 Le livret · interprétation proposée';
+  if (source === 'livret') return '📘 Repère du livret';
   if (source === 'vie') return '🪞 Ma vie aujourd’hui';
   if (source === 'contemplation') return '🌿 Prends le temps';
   return null;
@@ -1757,18 +1781,22 @@ function FeuillesEnAttente({
 function PileDeNotes({
   titre,
   questions,
+  approfondissement,
   reponses,
   onEnregistrer,
 }: {
   titre: string;
   questions: QuestionMeditation[];
+  approfondissement: QuestionMeditation[];
   reponses: Record<string, string>;
   onEnregistrer: (cle: string, valeur: string) => void;
 }) {
   const [rang, setRang] = useState(0);
   const [sens, setSens] = useState<1 | -1 | 0>(0);
+  const [mode, setMode] = useState<'essentiel' | 'approfondir'>('essentiel');
   const departGlissement = useRef<number | null>(null);
-  const total = questions.length;
+  const questionsAffichees = mode === 'essentiel' ? questions : approfondissement;
+  const total = questionsAffichees.length;
   const courant = Math.min(rang, total - 1);
 
   const papiers = ['post-it-jaune', 'post-it-bleu', 'post-it-rose'];
@@ -1782,7 +1810,8 @@ function PileDeNotes({
     [total]
   );
 
-  const repondues = questions.filter((q) => (reponses[`q:${q.id}`] ?? '').trim()).length;
+  const toutesLesQuestions = [...questions, ...approfondissement];
+  const repondues = toutesLesQuestions.filter((q) => (reponses[`q:${q.id}`] ?? '').trim()).length;
 
   const carte = (question: QuestionMeditation, index: number, devant: boolean) => {
     const reponse = reponses[`q:${question.id}`] ?? '';
@@ -1842,7 +1871,7 @@ function PileDeNotes({
           barre du bas. Il ne reste ici que ce qu'on relit vraiment. */}
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-          Méditer la Parole
+          {mode === 'essentiel' ? 'Regarder puis répondre' : 'Approfondir librement'}
         </span>
         <span
           aria-live="polite"
@@ -1852,7 +1881,9 @@ function PileDeNotes({
         </span>
       </div>
       <h2 className="mt-1.5 font-serif text-xl font-bold leading-snug text-parchemin-100 sm:text-3xl">
-        Laisser « {titre} » descendre dans le cœur
+        {mode === 'essentiel'
+          ? `Laisser « ${titre} » descendre dans le cœur`
+          : 'Continuer seulement si tu en as le désir'}
       </h2>
       {repondues === 0 && (
         <p className="mt-2 text-2xs leading-relaxed text-parchemin-100/50">
@@ -1884,7 +1915,7 @@ function PileDeNotes({
         {/* La note posée devant : c'est elle qui donne sa hauteur à la pile.
             L'enveloppe porte le mouvement, la feuille garde son inclinaison. */}
         <div
-          key={questions[courant].id}
+          key={questionsAffichees[courant].id}
           className={`relative z-10 ${
             sens === 1 ? 'note-avant' : sens === -1 ? 'note-arriere' : 'note-posee'
           }`}
@@ -1902,7 +1933,7 @@ function PileDeNotes({
                 une note longue repoussait « Précédente » et « Suivante » sous
                 la barre du bas, et l'on ne pouvait plus avancer. */}
             <div className="max-h-[46svh] overflow-y-auto p-5 sm:max-h-[56svh] sm:p-6">
-              {carte(questions[courant], courant, true)}
+              {carte(questionsAffichees[courant], courant, true)}
             </div>
           </article>
         </div>
@@ -1924,7 +1955,7 @@ function PileDeNotes({
             44 px à tout bouton, ce qui ferait neuf disques là où il ne faut
             qu'un fil. On avance par les flèches ou d'un glissement. */}
         <span className="flex items-center gap-1.5" aria-hidden="true">
-          {questions.map((question, index) => {
+          {questionsAffichees.map((question, index) => {
             const ecrite = (reponses[`q:${question.id}`] ?? '').trim().length > 0;
             return (
               <span
@@ -1952,8 +1983,32 @@ function PileDeNotes({
       </div>
 
       <p className="mt-3 text-center text-2xs text-parchemin-100/40">
-        {repondues} note{repondues > 1 ? 's' : ''} déposée{repondues > 1 ? 's' : ''} sur {total}
+        {repondues} note{repondues > 1 ? 's' : ''} déposée{repondues > 1 ? 's' : ''}
       </p>
+
+      {approfondissement.length > 0 && (
+        <button
+          type="button"
+          onClick={() => {
+            setMode((valeur) => valeur === 'essentiel' ? 'approfondir' : 'essentiel');
+            setRang(0);
+            setSens(0);
+          }}
+          className="mx-auto mt-4 flex min-h-11 items-center gap-2 rounded-full border border-white/12 bg-white/5 px-5 text-xs font-bold text-parchemin-100/70 transition-colors hover:bg-white/10 hover:text-parchemin-100"
+        >
+          {mode === 'essentiel' ? (
+            <>
+              <Plus className="h-4 w-4" />
+              Approfondir librement · {approfondissement.length} piste{approfondissement.length > 1 ? 's' : ''}
+            </>
+          ) : (
+            <>
+              <ArrowLeft className="h-4 w-4" />
+              Revenir aux deux questions essentielles
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 }
@@ -1966,19 +2021,72 @@ function distanceCirculaire(index: number, actif: number, total: number): number
   return distance;
 }
 
+function SceneAccompagnement({ contenu }: { contenu: AccompagnementEditorial }) {
+  const important = contenu.niveau === 'important';
+
+  return (
+    <div className="mx-auto max-w-2xl py-8 sm:py-12">
+      <article className="fiche-bristol pose-1 relative rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-9">
+        <span className="attache-pince -top-3 left-10" aria-hidden="true" />
+        <div className="flex items-start gap-4">
+          <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-full ${
+            important ? 'bg-rose-100 text-rose-800' : 'bg-or-100 text-or-900'
+          }`}>
+            {important
+              ? <ShieldCheck className="h-6 w-6" aria-hidden="true" />
+              : <Users className="h-6 w-6" aria-hidden="true" />}
+          </span>
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-encre-600">
+              À vivre accompagné
+            </p>
+            <h2 className="mt-2 font-serif text-2xl font-bold leading-tight text-encre-950 sm:text-3xl">
+              {contenu.titre}
+            </h2>
+          </div>
+        </div>
+
+        <p className="mt-6 text-base leading-relaxed text-encre-800 sm:text-lg">
+          {contenu.texte}
+        </p>
+        <ul className="mt-6 space-y-3 border-y border-dashed border-encre-950/15 py-5">
+          {contenu.reperes.map((repere) => (
+            <li key={repere} className="flex gap-3 text-sm leading-relaxed text-encre-800">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+              {repere}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="max-w-md text-xs leading-relaxed text-encre-600">
+            En cas de violence, d’abus, d’emprise ou de danger, cherche aussi l’aide d’un
+            professionnel compétent ou des services d’urgence de ton pays.
+          </p>
+          <a
+            href="/groupes"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-encre-950 px-5 text-xs font-bold text-parchemin-50 transition-colors hover:bg-encre-800"
+          >
+            <Users className="h-4 w-4 text-or-300" aria-hidden="true" />
+            Ouvrir ma cellule
+          </a>
+        </div>
+      </article>
+    </div>
+  );
+}
+
 function ScenePriereImmersive({
   reprises,
   questions,
-  onAvancer,
 }: {
   reprises: ReprisePriere[];
   questions: QuestionMeditation[];
-  onAvancer?: () => void;
 }) {
   const notesRemplies = reprises.filter((r) => r.reponse && r.reponse.trim().length > 0);
   const elements = notesRemplies.length > 0
     ? notesRemplies
-    : questions.map((q) => ({
+    : questions.slice(0, 2).map((q) => ({
         id: q.id,
         titre: q.question,
         consigne: q.consigne,
@@ -2061,8 +2169,8 @@ function ScenePriereImmersive({
                 Parle à Dieu maintenant
               </p>
               <p className="font-serif text-base italic leading-relaxed text-encre-800 sm:text-lg">
-                « Seigneur, à partir de cette vérité que tu m&apos;as montrée, je te prie et je te
-                dis… »
+                Reprends tes propres mots. Tu peux remercier, demander, déposer ce qui pèse ou
+                simplement rester en silence devant Dieu.
               </p>
               <p className="pt-1 text-xs text-encre-600">
                 À voix haute ou dans ton cœur. Rien à écrire ici.
@@ -2105,17 +2213,6 @@ function ScenePriereImmersive({
         </div>
       )}
 
-      {/* ── Sortie vers la suite ── */}
-      <div className="pt-2">
-        <button
-          type="button"
-          onClick={() => onAvancer?.()}
-          className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-xs font-bold shadow-xl transition-transform hover:scale-105"
-        >
-          <Check className="h-4 w-4" strokeWidth={2.5} />
-          <span>J&apos;ai prié · Poursuivre vers la Parole</span>
-        </button>
-      </div>
     </div>
   );
 }
@@ -2689,8 +2786,9 @@ function SceneBloc({
   if (bloc.type === 'encadre') {
     return (
       <div className="py-12 text-center sm:py-20">
+        <RepereTexteOriginal />
         {section && (
-          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/45">
+          <span className="mt-3 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/45">
             {section}
           </span>
         )}
@@ -2706,6 +2804,7 @@ function SceneBloc({
   if (bloc.type === 'citation') {
     return (
       <div className="py-10 sm:py-16">
+        <RepereTexteOriginal />
         <Quote className="mx-auto h-7 w-7 text-or-400/50" strokeWidth={1.5} />
         <blockquote className="mx-auto mt-6 max-w-2xl text-center font-serif text-2xl italic leading-relaxed text-parchemin-100 sm:text-3xl">
           <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
@@ -2721,6 +2820,7 @@ function SceneBloc({
       .filter(Boolean);
     return (
       <div className="py-8">
+        <RepereTexteOriginal />
         {sousTitre && (
           <h3 className="mb-5 font-serif text-2xl font-bold text-or-300">{sousTitre}</h3>
         )}
@@ -2739,6 +2839,7 @@ function SceneBloc({
   if (bloc.type === 'aparte') {
     return (
       <div className="py-10 sm:py-14">
+        <RepereTexteOriginal />
         <p className="mx-auto max-w-xl rounded-2xl border border-or-300/25 bg-or-400/8 px-5 py-4 text-center text-sm leading-relaxed text-or-100/85">
           {bloc.texte.replace(/^>\s*/, '')}
         </p>
@@ -2748,6 +2849,7 @@ function SceneBloc({
 
   return (
     <div className="py-8 sm:py-12">
+      <RepereTexteOriginal />
       {sousTitre && (
         <h3 className="mb-5 font-serif text-2xl font-bold text-or-300 sm:text-3xl">{sousTitre}</h3>
       )}
@@ -2760,6 +2862,15 @@ function SceneBloc({
         <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
       </p>
     </div>
+  );
+}
+
+function RepereTexteOriginal() {
+  return (
+    <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-or-300/18 bg-or-400/7 px-3 py-1.5 text-3xs font-black uppercase tracking-[0.16em] text-or-200/75">
+      <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
+      Texte original du livret
+    </span>
   );
 }
 

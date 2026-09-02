@@ -94,12 +94,12 @@ for (const fiche of fiches) {
       echecs += 1;
       continue;
     }
-    // Fiches pas encore réécrites : les derniers jours retombent sur les trois
-    // questions génériques. Ce n'est pas un accident de découpage, c'est du
-    // contenu qui reste à écrire — on le dit sans bloquer le reste.
-    console.warn(
-      `· fiche ${fiche.id} : ${orphelins} jour(s) sur ${temps.length} sans questions propres — ` +
-        `à écrire (${temps.slice(meditation.sections.length).map((e) => e.section.titre ?? '?').join(', ')})`
+    // Ces jours utilisent volontairement la facilitation ouverte commune :
+    // le texte du livret reste premier et aucune question générée ne vient
+    // lui imposer une conclusion.
+    console.log(
+      `· fiche ${fiche.id} : ${orphelins} jour(s) utilisent les deux invitations ouvertes — ` +
+        `${temps.slice(meditation.sections.length).map((e) => e.section.titre ?? '?').join(', ')}`
     );
     continue;
   }

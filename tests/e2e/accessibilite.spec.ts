@@ -33,7 +33,7 @@ test('accessibilité applicative : menu des outils mobile', async ({ page }) => 
 test('accessibilité applicative : méditation, prière et mémorisation de Dieu est un', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await semerSession(page);
-  await page.goto('/aujourdhui?fiche=1&section=2&scene=17');
+  await page.goto('/aujourdhui?fiche=1&section=2&moment=meditation');
   await expect(page.getByText('Lis lentement Marc 12:29', { exact: false })).toBeVisible();
 
   let resultat = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();

@@ -7,7 +7,6 @@ export type EvenementProduit =
   | 'fiche_1'
   | 'groupe'
   | 'preparation'
-  | 'rituel'
   | 'rencontre'
   | 'retention_j1'
   | 'retention_j7'

@@ -40,6 +40,9 @@
   --color-or-600: #d18410;
   --color-or-700: #a75f0f;
 
+  --color-bordeaux-50: #f9eef1;
+  --color-bordeaux-800: #6f2138;
+
   /* Aucun texte fonctionnel sous 12 px. Les deux niveaux restent distincts
      par la graisse, la casse et l'espacement plutôt que par l'illisibilité. */
   --text-2xs: 0.75rem;

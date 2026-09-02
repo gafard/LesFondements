@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:content": "node scripts/verifier-contenu.mjs",
+    "test:editorial": "esbuild scripts/test-parcours-editorial.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-editorial.mjs --log-level=warning && node /tmp/lesfondements-test-editorial.mjs",
     "test:rappels": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-rappels.mjs",
     "test:prononciation": "node scripts/test-prononciation.mjs",
     "temps:titres": "esbuild scripts/generer-temps-titres.ts --bundle --platform=node --format=esm --outfile=/tmp/lf-temps-titres.mjs --log-level=warning && node /tmp/lf-temps-titres.mjs",
