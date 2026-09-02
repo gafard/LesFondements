@@ -52,9 +52,9 @@ test('fiche 1 : Parole, réponse, prière, mémorisation et vie restent un seul 
     .toEqual({ termine: '1', verset: 'Ps 46:11' });
 });
 
-test('une fiche guidée montre toujours le texte original avant la facilitation', async ({ page }) => {
+test('une fiche guidée conserve le texte du livret sans étiquette superflue', async ({ page }) => {
   await page.goto('/aujourdhui?fiche=2&section=0&moment=bloc');
-  await expect(page.getByText('Texte original du livret', { exact: true })).toBeVisible();
+  await expect(page.getByText('Texte original du livret', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Le péché', { exact: true }).first()).toBeVisible();
 
   await page.goto('/aujourdhui?fiche=2&section=0&moment=meditation');

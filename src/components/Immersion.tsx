@@ -2937,7 +2937,6 @@ function SceneBloc({
   if (bloc.type === 'encadre') {
     return (
       <div className="py-12 text-center sm:py-20">
-        <RepereTexteOriginal />
         {section && (
           <span className="mt-3 block text-2xs font-bold uppercase tracking-[0.22em] text-or-300/45">
             {section}
@@ -2955,7 +2954,6 @@ function SceneBloc({
   if (bloc.type === 'citation') {
     return (
       <div className="py-10 sm:py-16">
-        <RepereTexteOriginal />
         <Quote className="mx-auto h-7 w-7 text-or-400/50" strokeWidth={1.5} />
         <blockquote className="mx-auto mt-6 max-w-2xl text-center font-serif text-2xl italic leading-relaxed text-parchemin-100 sm:text-3xl">
           <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
@@ -2971,7 +2969,6 @@ function SceneBloc({
       .filter(Boolean);
     return (
       <div className="py-8">
-        <RepereTexteOriginal />
         {sousTitre && (
           <h3 className="mb-5 font-serif text-2xl font-bold text-or-300">{sousTitre}</h3>
         )}
@@ -2990,7 +2987,6 @@ function SceneBloc({
   if (bloc.type === 'aparte') {
     return (
       <div className="py-10 sm:py-14">
-        <RepereTexteOriginal />
         <p className="mx-auto max-w-xl rounded-2xl border border-or-300/25 bg-or-400/8 px-5 py-4 text-center text-sm leading-relaxed text-or-100/85">
           {bloc.texte.replace(/^>\s*/, '')}
         </p>
@@ -3000,7 +2996,6 @@ function SceneBloc({
 
   return (
     <div className="py-8 sm:py-12">
-      <RepereTexteOriginal />
       {sousTitre && (
         <h3 className="mb-5 font-serif text-2xl font-bold text-or-300 sm:text-3xl">{sousTitre}</h3>
       )}
@@ -3013,15 +3008,6 @@ function SceneBloc({
         <TexteAvecReferences tone="nuit">{bloc.texte}</TexteAvecReferences>
       </p>
     </div>
-  );
-}
-
-function RepereTexteOriginal() {
-  return (
-    <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-or-300/18 bg-or-400/7 px-3 py-1.5 text-3xs font-black uppercase tracking-[0.16em] text-or-200/75">
-      <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
-      Texte original du livret
-    </span>
   );
 }
 
