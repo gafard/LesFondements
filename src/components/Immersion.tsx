@@ -1780,12 +1780,29 @@ function FeuillesEnAttente({
   );
 }
 
+/**
+ * Le vocabulaire du feuilletage, en cinq gestes. Les noms doivent
+ * correspondre aux animations déclarées dans la feuille de styles : les
+ * fonctions ci-dessous les rendent, ce qui met le compilateur en travers
+ * d'une faute de frappe silencieuse.
+ */
 type AnimationFeuille =
   | 'note-posee'
   | 'note-avant'
   | 'note-arriere'
   | 'note-quitte-avant'
   | 'note-quitte-arriere';
+
+/** La feuille qui arrive : elle se pose, ou remonte de la pile. */
+function feuilleQuiArrive(enMouvement: boolean, sens: 'avant' | 'arriere'): AnimationFeuille {
+  if (!enMouvement) return 'note-posee';
+  return sens === 'avant' ? 'note-avant' : 'note-arriere';
+}
+
+/** La feuille qui s'en va, en surimpression, le temps du geste. */
+function feuilleQuiPart(sens: 'avant' | 'arriere'): AnimationFeuille {
+  return sens === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere';
+}
 
 /**
  * Un changement de feuille en deux gestes : celle du dessus se soulève et
@@ -2010,7 +2027,7 @@ function PileDeNotes({
           className={`feuille-document relative ${
             sens === 'arriere' && precedent !== null ? 'z-20' : 'z-10'
           } ${
-            precedent !== null ? (sens === 'avant' ? 'note-avant' : 'note-arriere') : 'note-posee'
+            feuilleQuiArrive(precedent !== null, sens)
           }`}
         >
           <article
@@ -2036,7 +2053,7 @@ function PileDeNotes({
             className={`feuille-document pointer-events-none absolute inset-0 ${
               sens === 'arriere' ? 'z-10' : 'z-20'
             } ${
-              sens === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
+              feuilleQuiPart(sens)
             }`}
           >
             <article
@@ -2335,7 +2352,7 @@ function ScenePriereImmersive({
             className={`feuille-document pointer-events-none absolute inset-0 ${
               sensPriere === 'arriere' ? 'z-10' : 'z-20'
             } ${
-              sensPriere === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
+              feuilleQuiPart(sensPriere)
             }`}
           >
             <article className="fiche-bristol pose-2 space-y-5 rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
