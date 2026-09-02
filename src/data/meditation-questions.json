@@ -13,26 +13,51 @@
           {
             "id": "f1-s1-q1",
             "fonction": "observer+decouvrir-dieu",
+            "source": "parole",
+            "phase": "regarder",
+            "priorite": "essentielle",
             "consigne": "Lis Apocalypse 1:8 lentement une première fois. Puis relis-le, sans chercher immédiatement à répondre.",
-            "question": "Qu’est-ce qui retient ton attention dans la manière dont Dieu parle de lui-même ?"
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Dieu parle de lui-même ?",
+            "priereTitre": "Ce que j’ai contemplé de Dieu"
           },
           {
             "id": "f1-s1-q2",
             "fonction": "se-laisser-eclairer",
+            "source": "parole",
+            "phase": "relier",
+            "priorite": "approfondissement",
             "consigne": "Lis maintenant Psaume 46:11. Relis-le lentement, puis garde Apocalypse 1:8 et Psaume 46:11 ensemble.",
             "question": "Qu’est-ce que ces deux passages te font découvrir de Dieu ?"
           },
           {
             "id": "f1-s1-q3",
             "fonction": "recevoir",
+            "source": "livret",
+            "phase": "comprendre",
+            "priorite": "essentielle",
             "consigne": "Relis Psaume 104:27-30 une seconde fois. Puis rapproche ce passage de cette phrase du livret : « Si nous sommes en vie et le demeurons, mais aussi si nous le connaissons, c’est uniquement par sa grâce. »",
-            "question": "Qu’est-ce qui te frappe lorsque tu gardes ce passage et cette phrase ensemble ?"
+            "question": "Avec tes propres mots, comment expliquerais-tu le lien que le livret établit entre ce passage et la grâce ?",
+            "priereTitre": "Ce que je comprends de sa grâce"
+          },
+          {
+            "id": "f1-s1-q5",
+            "fonction": "comprendre",
+            "source": "livret",
+            "phase": "comprendre",
+            "priorite": "essentielle",
+            "consigne": "Relis Proverbes 1:7 et 2:5, puis cette précision du livret : « Pas une crainte du châtiment, qui nous paralyserait, mais une profonde révérence, un saint respect pour qui il est. »",
+            "question": "Quelle différence comprends-tu entre la crainte qui paralyse et la sainte crainte dont parle le livret ?",
+            "priereTitre": "Ce que je comprends de la sainte crainte"
           },
           {
             "id": "f1-s1-q4",
             "fonction": "repondre",
-            "consigne": "Prends quelques instants avant de répondre. Reviens librement aux passages et aux phrases qui ont retenu ton attention.",
-            "question": "Si tu devais maintenant exprimer avec tes propres mots ce que tu as découvert de Dieu, qu’écrirais-tu ?"
+            "source": "contemplation",
+            "phase": "mettre-en-mots",
+            "priorite": "essentielle",
+            "consigne": "Prends quelques instants avant de répondre. Reviens librement aux passages et aux phrases qui ont retenu ton attention. Le livret te pose maintenant sa propre question.",
+            "question": "Qu’évoque pour toi le fait que Dieu règne ?",
+            "priereTitre": "Ce que le règne de Dieu éveille en moi"
           }
         ]
       },
@@ -46,32 +71,60 @@
           {
             "id": "f1-s2-q1",
             "fonction": "observer",
+            "source": "parole",
+            "phase": "regarder",
+            "priorite": "essentielle",
             "consigne": "Lis lentement Jean 17:3 puis Éphésiens 1:17. Relis-les une seconde fois.",
-            "question": "Qu’est-ce qui retient ton attention dans ces deux passages ?"
+            "question": "Qu’est-ce qui retient ton attention dans ces deux passages ?",
+            "priereTitre": "Ce qui m’a rejoint dans ces passages"
           },
           {
             "id": "f1-s2-q2",
             "fonction": "decouvrir-dieu",
-            "consigne": "Lis 1 Jean 4:16 puis Romains 8:38-39. Ne cherche pas à les résumer trop vite : reste un instant avec les mots du texte.",
-            "question": "Qu’est-ce que ces passages te font découvrir de Dieu ?"
+            "source": "parole",
+            "phase": "comprendre",
+            "priorite": "essentielle",
+            "consigne": "Lis 1 Jean 4:16, Jérémie 31:3 puis Romains 8:38-39. Ne cherche pas à les résumer trop vite : relève simplement les mots ou les expressions qui t’arrêtent.",
+            "question": "À partir de ce que tu as relevé, comment expliquerais-tu avec tes propres mots ce que ces passages disent de l’amour de Dieu ?",
+            "priereTitre": "Ce que je comprends de l’amour de Dieu"
           },
           {
             "id": "f1-s2-q3",
             "fonction": "se-laisser-eclairer",
-            "consigne": "Lis lentement Luc 15:11-32. Laisse le récit se dérouler sans chercher d’abord une leçon à en tirer.",
-            "question": "Où ton attention s’arrête-t-elle dans ce récit, et pourquoi ?"
+            "source": "parole",
+            "phase": "comprendre",
+            "priorite": "essentielle",
+            "consigne": "Lis lentement Luc 15:11-32. Observe ce que le père fait, ce qu’il dit et la manière dont il accueille chacun de ses fils.",
+            "question": "À partir de ce que tu as observé, comment comprends-tu l’attitude du père dans ce récit ?",
+            "priereTitre": "Ce que l’attitude du père me révèle"
           },
           {
             "id": "f1-s2-q4",
             "fonction": "recevoir",
+            "source": "parole",
+            "phase": "relier",
+            "priorite": "approfondissement",
             "consigne": "Reviens à Psaume 16:2 et Jacques 4:8. Garde-les un moment à côté de ce que tu viens de lire.",
             "question": "Qu’est-ce que leur rapprochement fait naître dans ta réflexion ?"
           },
           {
+            "id": "f1-s2-q6",
+            "fonction": "comprendre",
+            "source": "parole",
+            "phase": "comprendre",
+            "priorite": "approfondissement",
+            "consigne": "Relis 1 Jean 4:18-19 et observe l’ordre des idées avant de répondre.",
+            "question": "Comment expliquerais-tu avec tes propres mots le lien que tu vois entre l’amour, la crainte et notre réponse à Dieu ?"
+          },
+          {
             "id": "f1-s2-q5",
             "fonction": "repondre",
-            "consigne": "Reprends seulement les mots, les versets ou l’image qui sont restés avec toi.",
-            "question": "Avec tes propres mots, qu’as-tu découvert ou redécouvert de Dieu ?"
+            "source": "livret",
+            "phase": "mettre-en-mots",
+            "priorite": "essentielle",
+            "consigne": "Le livret te demande : « As-tu saisi la grandeur de son amour inconditionnel et son désir d’être en communion avec toi ? » Ne réponds pas seulement oui ou non : reprends les mots, les versets ou l’image qui sont restés avec toi.",
+            "question": "Qu’est-ce qui est devenu plus clair pour toi — et qu’aimerais-tu encore mieux comprendre ?",
+            "priereTitre": "Ce que je reçois de son amour aujourd’hui"
           }
         ]
       },
@@ -84,31 +137,49 @@
           {
             "id": "f1-s3-un",
             "fonction": "observer",
+            "source": "parole",
+            "phase": "regarder",
+            "priorite": "essentielle",
             "consigne": "Lis lentement Marc 12:29, puis relis-le une deuxième fois. Garde près de toi cette phrase du livret : « Le Seigneur est notre Dieu, il est le seul Dieu. Il n’y a pas d’autre Dieu que lui. »",
-            "question": "Qu’est-ce qui retient ton attention dans ce que Jésus affirme ici sur Dieu ?"
+            "question": "Qu’est-ce qui retient ton attention dans ce que Jésus affirme ici sur Dieu ?",
+            "priereTitre": "Ce que Jésus m’a fait regarder de Dieu"
           },
           {
             "id": "f1-s3-pere-fils-esprit",
             "fonction": "decouvrir-dieu",
+            "source": "parole",
+            "phase": "relier",
+            "priorite": "essentielle",
             "consigne": "Lis Matthieu 28:19 puis 2 Corinthiens 13:13. Ne cherche pas encore à expliquer ce que tu lis. Relis simplement les deux passages, puis garde-les un instant à côté de Marc 12:29.",
-            "question": "Qu’est-ce qui retient ton attention lorsque tu gardes ces passages ensemble ?"
+            "question": "Qu’est-ce qui retient ton attention lorsque tu gardes ces passages ensemble ?",
+            "priereTitre": "Ce que ces passages me laissent contempler"
           },
           {
             "id": "f1-s3-pere",
             "fonction": "decouvrir-dieu",
-            "consigne": "Lis lentement Galates 4:5-6, puis relis-le sans chercher à isoler trop vite une formule.",
-            "question": "Qu’est-ce que ce passage te fait découvrir de Dieu ?",
+            "source": "livret",
+            "phase": "comprendre",
+            "priorite": "essentielle",
+            "consigne": "Lis lentement Galates 4:5-6, puis reviens à ce que le livret dit de Dieu comme Père.",
+            "question": "À partir de ce passage, comment expliquerais-tu avec tes propres mots ce que signifie connaître Dieu comme Père ?",
             "priereTitre": "Ce que j’ai découvert de Dieu comme Père"
           },
           {
             "id": "f1-s3-fils-parole",
             "fonction": "observer",
-            "consigne": "Lis Jean 1:1-3 lentement. Puis relis-le une seconde fois.",
-            "question": "Qu’est-ce qui te frappe dans ce que ce passage dit de la Parole ?"
+            "source": "parole",
+            "phase": "comprendre",
+            "priorite": "essentielle",
+            "consigne": "Lis Jean 1:1-3, Hébreux 4:15 puis Matthieu 11:28. Garde-les auprès de cette phrase du livret : « Il est venu nous rejoindre dans notre humanité. »",
+            "question": "Que comprends-tu de Jésus lorsque tu gardes ces passages ensemble ?",
+            "priereTitre": "Ce que je comprends de Jésus"
           },
           {
             "id": "f1-s3-fils-humanite",
             "fonction": "decouvrir-dieu",
+            "source": "parole",
+            "phase": "relier",
+            "priorite": "approfondissement",
             "consigne": "Lis maintenant Hébreux 4:15 puis Matthieu 11:28. Prends quelques instants avec ces textes et rapproche-les de cette phrase du livret : « Il est venu nous rejoindre dans notre humanité. »",
             "question": "Qu’est-ce que cela te fait découvrir de Dieu en regardant Jésus ?",
             "priereTitre": "Ce que j’ai découvert en regardant Jésus"
@@ -116,12 +187,19 @@
           {
             "id": "f1-s3-esprit-observer",
             "fonction": "observer",
-            "consigne": "Lis lentement Jean 14:15-18 puis Jean 14:25-26. Relis ces deux passages une seconde fois.",
-            "question": "Qu’est-ce qui retient ton attention dans ce que Jésus dit du Saint-Esprit ?"
+            "source": "parole",
+            "phase": "comprendre",
+            "priorite": "essentielle",
+            "consigne": "Lis lentement Jean 14:15-18 puis Jean 14:25-26. Relis-les auprès de cette phrase du livret : « Le Saint-Esprit n’est pas une force impersonnelle. »",
+            "question": "Qu’est-ce que les paroles de Jésus te permettent de comprendre du Saint-Esprit ?",
+            "priereTitre": "Ce que je comprends du Saint-Esprit"
           },
           {
             "id": "f1-s3-esprit-comprendre",
             "fonction": "se-laisser-eclairer",
+            "source": "livret",
+            "phase": "comprendre",
+            "priorite": "approfondissement",
             "consigne": "Reviens à cette phrase du livret : « Le Saint-Esprit n’est pas une force impersonnelle. » Garde-la à côté des passages que tu viens de lire.",
             "question": "À la lumière de ces textes, qu’est-ce que tu comprends de cette affirmation ?",
             "priereTitre": "Ce que j’ai découvert du Saint-Esprit"
@@ -129,6 +207,9 @@
           {
             "id": "f1-s3-ensemble",
             "fonction": "recevoir+repondre",
+            "source": "contemplation",
+            "phase": "mettre-en-mots",
+            "priorite": "essentielle",
             "consigne": "Ne passe pas encore à la suite. Reviens brièvement à ce qui t’a marqué dans Marc 12:29, Matthieu 28:19, 2 Corinthiens 13:13, Galates 4:5-6, Jean 1:1-3 et Jean 14:15-18. Tu n’as pas besoin de tout relire entièrement.",
             "question": "Lorsque tu mets ensemble ce que tu viens de découvrir, qu’est-ce que tu comprends maintenant de Dieu ?",
             "priereTitre": "Ce que l’ensemble m’a fait comprendre de Dieu"
@@ -136,6 +217,9 @@
           {
             "id": "f1-s3-ouvert",
             "fonction": "repondre",
+            "source": "vie",
+            "phase": "mettre-en-mots",
+            "priorite": "approfondissement",
             "consigne": "Tu n’as pas besoin d’avoir tout résolu ni de savoir expliquer la Trinité. Reste simplement avec ce que les textes ont ouvert.",
             "question": "Y a-t-il quelque chose dans ta compréhension de Dieu qui est devenu plus clair ou qui t’interroge encore ?"
           }

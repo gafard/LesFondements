@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "principe": "Le livret parle. L’application met en scène. Le disciple observe et répond. La cellule accompagne.",
   "couches": {
     "canonique": {
@@ -19,7 +19,8 @@
     }
   },
   "regles": {
-    "questionsEssentiellesMaximum": 2,
+    "questionsEssentiellesMaximumParDefaut": 2,
+    "parcoursReluPeutEtreCompose": true,
     "texteCanoniqueToujoursVisible": true,
     "approfondissementFacultatif": true,
     "reponsesPriveesParDefaut": true,

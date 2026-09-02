@@ -8,8 +8,13 @@ test.beforeEach(async ({ page }) => {
 test('fiche 1 : Parole, réponse, prière, mémorisation et vie restent un seul chemin', async ({ page }) => {
   await page.goto('/aujourdhui?fiche=1&section=0&moment=meditation');
 
-  await expect(page.getByText('1 / 2')).toBeVisible();
+  await expect(page.getByText('1 / 4')).toBeVisible();
+  await expect(page.getByText('Chemin de compréhension', { exact: true })).toBeVisible();
   await page.locator('textarea').first().fill('Dieu règne même lorsque je ne maîtrise pas la situation.');
+  await page.getByRole('button', { name: 'Suivante' }).click();
+  await page.locator('textarea').first().fill('Ma vie dépend de sa grâce.');
+  await page.getByRole('button', { name: 'Suivante' }).click();
+  await page.locator('textarea').first().fill('La révérence me tourne vers Dieu sans me paralyser.');
   await page.getByRole('button', { name: 'Suivante' }).click();
   await page.locator('textarea').first().fill('Je veux lui confier ce que je ne contrôle pas.');
 

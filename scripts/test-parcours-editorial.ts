@@ -19,17 +19,34 @@ interface FicheMeditation {
 }
 
 let jours = 0;
-assert.equal(constitution.regles.questionsEssentiellesMaximum, MAX_QUESTIONS_ESSENTIELLES);
+assert.equal(constitution.regles.questionsEssentiellesMaximumParDefaut, MAX_QUESTIONS_ESSENTIELLES);
+assert.equal(constitution.regles.parcoursReluPeutEtreCompose, true);
 assert.equal(constitution.regles.texteCanoniqueToujoursVisible, true);
 for (const fiche of meditations as FicheMeditation[]) {
   for (const section of fiche.sections) {
     const repartition = repartirQuestions(section.questions);
     jours += 1;
     assert.ok(repartition.principales.length > 0, `Fiche ${fiche.ficheId} · ${section.sectionTitre} sans question essentielle`);
-    assert.ok(
-      repartition.principales.length <= MAX_QUESTIONS_ESSENTIELLES,
-      `Fiche ${fiche.ficheId} · ${section.sectionTitre} dépasse ${MAX_QUESTIONS_ESSENTIELLES} questions essentielles`
-    );
+    if (fiche.ficheId === 1) {
+      const phases = new Set(repartition.principales.map((question) => question.phase));
+      assert.ok(
+        phases.has('regarder') && phases.has('comprendre') && phases.has('mettre-en-mots'),
+        `Fiche 1 · ${section.sectionTitre} doit faire regarder, comprendre et mettre en mots`
+      );
+      assert.ok(
+        repartition.principales.length >= 4,
+        `Fiche 1 · ${section.sectionTitre} doit conserver un vrai chemin de compréhension`
+      );
+      assert.ok(
+        section.questions.every((question) => question.priorite && question.phase),
+        `Fiche 1 · ${section.sectionTitre} doit être entièrement composée par l’éditeur`
+      );
+    } else {
+      assert.ok(
+        repartition.principales.length <= MAX_QUESTIONS_ESSENTIELLES,
+        `Fiche ${fiche.ficheId} · ${section.sectionTitre} dépasse la limite par défaut`
+      );
+    }
     assert.equal(
       repartition.principales.length + repartition.approfondissement.length,
       section.questions.length,
@@ -60,6 +77,12 @@ assert.ok(!texteFiche8.includes('ouvrir cette porte ou créer ce lien'), 'La fic
 const fiche9 = (meditations as FicheMeditation[]).find((fiche) => fiche.ficheId === 9);
 assert.ok(JSON.stringify(fiche9).includes('pensée à discerner'), 'La fiche 9 doit nommer les perceptions comme étant à discerner.');
 
+const fiche1 = (meditations as FicheMeditation[]).find((fiche) => fiche.ficheId === 1);
+const texteFiche1 = JSON.stringify(fiche1);
+assert.ok(texteFiche1.includes('Qu’évoque pour toi le fait que Dieu règne ?'), 'La question originale du premier temps doit rester visible.');
+assert.ok(texteFiche1.includes('As-tu saisi la grandeur de son amour inconditionnel'), 'La question originale du deuxième temps doit rester visible.');
+assert.ok(texteFiche1.includes('comment expliquerais-tu'), 'La fiche 1 doit comporter de vraies questions de compréhension.');
+
 const immersion = await readFile(resolve(process.cwd(), 'src/components/Immersion.tsx'), 'utf8');
 assert.ok(
   !immersion.includes('if (!parcoursMeditation?.parcoursGuide)'),
@@ -70,4 +93,4 @@ assert.ok(
   'Le scénario quotidien doit parcourir les blocs canoniques du livret.'
 );
 
-console.log(`Constitution éditoriale vérifiée : ${tempsCanoniques.length} temps canoniques, ${jours} facilitations relues, 2 questions essentielles maximum.`);
+console.log(`Constitution éditoriale vérifiée : ${tempsCanoniques.length} temps canoniques, ${jours} facilitations relues, fiche 1 composée et limite de 2 conservée par défaut.`);

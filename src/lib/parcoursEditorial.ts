@@ -2,14 +2,21 @@
  * Constitution éditoriale du temps quotidien.
  *
  * Le livret reste la source. Les questions numériques n'ont qu'un rôle de
- * facilitation : une observation, puis une réponse personnelle. Tout le reste
- * demeure disponible, mais facultatif, dans « Approfondir ».
+ * facilitation. Deux invitations ouvertes restent la règle par défaut tant
+ * qu'une fiche n'a pas fait l'objet d'une relecture éditoriale complète.
+ * Lorsqu'un chemin a été composé explicitement, ses étapes peuvent être plus
+ * nombreuses : observer, comprendre, relier et mettre en mots.
  */
+
+export type PhaseQuestion = 'regarder' | 'comprendre' | 'relier' | 'mettre-en-mots';
+export type PrioriteQuestion = 'essentielle' | 'approfondissement';
 
 export interface QuestionEditoriale {
   id: string;
   fonction?: string;
   source?: 'parole' | 'livret' | 'contemplation' | 'vie';
+  phase?: PhaseQuestion;
+  priorite?: PrioriteQuestion;
   consigne?: string;
   question: string;
 }
@@ -37,11 +44,20 @@ function estReponsePersonnelle(question: QuestionEditoriale): boolean {
 }
 
 /**
- * Une journée ne présente jamais plus de deux questions comme nécessaires.
- * On privilégie un regard posé sur le texte, puis une réponse qui appartient
- * au disciple. L'ordre du corpus est toujours conservé.
+ * Une journée non relue présente au plus deux questions comme nécessaires.
+ * Une journée composée explicitement porte sa propre répartition : cela évite
+ * qu'un algorithme décide à la place de l'éditeur quelles étapes de
+ * compréhension sont utiles. L'ordre du corpus est toujours conservé.
  */
 export function repartirQuestions<T extends QuestionEditoriale>(questions: T[]): RepartitionQuestions<T> {
+  const repartitionExplicite = questions.some((question) => question.priorite !== undefined);
+  if (repartitionExplicite) {
+    return {
+      principales: questions.filter((question) => question.priorite !== 'approfondissement'),
+      approfondissement: questions.filter((question) => question.priorite === 'approfondissement'),
+    };
+  }
+
   if (questions.length <= MAX_QUESTIONS_ESSENTIELLES) {
     return { principales: questions, approfondissement: [] };
   }

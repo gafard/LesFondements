@@ -1,31 +1,32 @@
 import { expect, test } from '@playwright/test';
 import { UTILISATEUR, semerSession } from './fixtures';
 
-test('méditation : deux questions essentielles, les autres librement', async ({ page }) => {
+test('fiche 1 : un vrai chemin de compréhension, les prolongements restent libres', async ({ page }) => {
   await semerSession(page);
   await page.goto('/aujourdhui?fiche=1&section=2&moment=meditation');
 
-  await expect(page.getByText('1 / 2')).toBeVisible();
+  await expect(page.getByText('Chemin de compréhension', { exact: true })).toBeVisible();
+  await expect(page.getByText('1 / 6')).toBeVisible();
+  await expect(page.getByText('Regarder', { exact: true })).toBeVisible();
   const premiere = page.getByLabel(
     'Qu’est-ce qui retient ton attention dans ce que Jésus affirme ici sur Dieu ?'
   );
   await premiere.fill('Je découvre un Dieu qui se fait connaître.');
 
   await page.getByRole('button', { name: 'Suivante' }).click();
-  const seconde = page.getByLabel(
-    'Y a-t-il quelque chose dans ta compréhension de Dieu qui est devenu plus clair ou qui t’interroge encore ?'
-  );
+  await expect(page.getByText('Relier', { exact: true })).toBeVisible();
+  const seconde = page.getByLabel('Qu’est-ce qui retient ton attention lorsque tu gardes ces passages ensemble ?');
   await seconde.fill('Je veux continuer à contempler son unité.');
 
-  await expect(page.getByRole('button', { name: /Approfondir librement · 7 pistes/ })).toBeVisible();
-  await page.getByRole('button', { name: /Approfondir librement · 7 pistes/ }).click();
+  await expect(page.getByRole('button', { name: /Approfondir librement · 3 pistes/ })).toBeVisible();
+  await page.getByRole('button', { name: /Approfondir librement · 3 pistes/ }).click();
   await expect(page.getByText('Approfondir librement', { exact: true })).toBeVisible();
-  await expect(page.getByText('1 / 7')).toBeVisible();
+  await expect(page.getByText('1 / 3')).toBeVisible();
   await expect(
-    page.getByLabel('Qu’est-ce qui retient ton attention lorsque tu gardes ces passages ensemble ?')
+    page.getByLabel('Qu’est-ce que cela te fait découvrir de Dieu en regardant Jésus ?')
   ).toBeVisible();
 
-  await page.getByRole('button', { name: 'Revenir aux deux questions essentielles' }).click();
+  await page.getByRole('button', { name: 'Revenir au chemin principal' }).click();
   await page.getByRole('button', { name: 'Suivante' }).click();
   await expect(seconde).toHaveValue('Je veux continuer à contempler son unité.');
 

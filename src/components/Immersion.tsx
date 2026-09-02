@@ -73,6 +73,8 @@ import {
   accompagnementDuJour,
   repartirQuestions,
   type AccompagnementEditorial,
+  type PhaseQuestion,
+  type PrioriteQuestion,
 } from '@/lib/parcoursEditorial';
 import {
   annoncerAuSysteme,
@@ -93,6 +95,8 @@ interface QuestionMeditation {
   id: string;
   fonction?: string;
   source?: 'parole' | 'livret' | 'contemplation' | 'vie';
+  phase?: PhaseQuestion;
+  priorite?: PrioriteQuestion;
   consigne?: string;
   question: string;
   priereTitre?: string;
@@ -1385,7 +1389,7 @@ function RenduScene({
         const reponse = reponses[`q:${question.id}`]?.trim();
         return {
           id: question.id,
-          titre: question.question,
+          titre: question.priereTitre ?? question.question,
           consigne: question.consigne,
           reponse: reponse || '',
         };
@@ -1704,6 +1708,7 @@ function RenduScene({
 interface ReprisePriere {
   id: string;
   titre: string;
+  consigne?: string;
   reponse: string;
 }
 
@@ -1713,6 +1718,14 @@ function etiquetteDeSource(source: QuestionMeditation['source']): string | null 
   if (source === 'livret') return '📘 Repère du livret';
   if (source === 'vie') return '🪞 Ma vie aujourd’hui';
   if (source === 'contemplation') return '🌿 Prends le temps';
+  return null;
+}
+
+function etiquetteDePhase(phase: QuestionMeditation['phase']): string | null {
+  if (phase === 'regarder') return 'Regarder';
+  if (phase === 'comprendre') return 'Comprendre';
+  if (phase === 'relier') return 'Relier';
+  if (phase === 'mettre-en-mots') return 'Mettre en mots';
   return null;
 }
 
@@ -1812,10 +1825,12 @@ function PileDeNotes({
 
   const toutesLesQuestions = [...questions, ...approfondissement];
   const repondues = toutesLesQuestions.filter((q) => (reponses[`q:${q.id}`] ?? '').trim()).length;
+  const cheminCompose = questions.some((question) => question.phase !== undefined);
 
   const carte = (question: QuestionMeditation, index: number, devant: boolean) => {
     const reponse = reponses[`q:${question.id}`] ?? '';
     const etiquette = etiquetteDeSource(question.source);
+    const phase = etiquetteDePhase(question.phase);
     return (
       <>
         <div className="flex items-center justify-between gap-3">
@@ -1826,6 +1841,11 @@ function PileDeNotes({
             {etiquette && (
               <span className="truncate rounded-full border border-encre-700/12 bg-white/35 px-2.5 py-1 text-xs font-black uppercase tracking-[0.06em] text-encre-800/70">
                 {etiquette}
+              </span>
+            )}
+            {phase && (
+              <span className="truncate rounded-full bg-encre-950/8 px-2.5 py-1 text-xs font-black uppercase tracking-[0.06em] text-encre-900/75">
+                {phase}
               </span>
             )}
           </span>
@@ -1871,7 +1891,9 @@ function PileDeNotes({
           barre du bas. Il ne reste ici que ce qu'on relit vraiment. */}
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-          {mode === 'essentiel' ? 'Regarder puis répondre' : 'Approfondir librement'}
+          {mode === 'essentiel'
+            ? cheminCompose ? 'Chemin de compréhension' : 'Regarder puis répondre'
+            : 'Approfondir librement'}
         </span>
         <span
           aria-live="polite"
@@ -1882,7 +1904,9 @@ function PileDeNotes({
       </div>
       <h2 className="mt-1.5 font-serif text-xl font-bold leading-snug text-parchemin-100 sm:text-3xl">
         {mode === 'essentiel'
-          ? `Laisser « ${titre} » descendre dans le cœur`
+          ? cheminCompose
+            ? `Regarder, comprendre et mettre en mots « ${titre} »`
+            : `Laisser « ${titre} » descendre dans le cœur`
           : 'Continuer seulement si tu en as le désir'}
       </h2>
       {repondues === 0 && (
@@ -2004,7 +2028,7 @@ function PileDeNotes({
           ) : (
             <>
               <ArrowLeft className="h-4 w-4" />
-              Revenir aux deux questions essentielles
+              Revenir au chemin principal
             </>
           )}
         </button>
