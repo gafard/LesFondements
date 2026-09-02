@@ -4,11 +4,13 @@ set -euo pipefail
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source_dir="$project_dir/.open-next"
 output_dir="$project_dir/dist"
+hosting_file="$project_dir/.openai/hosting.json"
 
 test -f "$source_dir/worker.js"
+test -f "$hosting_file"
 mkdir -p "$output_dir/server" "$output_dir/client"
 find "$output_dir" -mindepth 1 -delete
-mkdir -p "$output_dir/server" "$output_dir/client"
+mkdir -p "$output_dir/server" "$output_dir/client" "$output_dir/.openai"
 # Static assets are uploaded from dist/client. Keeping a second copy under the
 # Worker bundle pushes larger offline-first builds over Cloudflare's Worker
 # size limit without adding any runtime value. Use only POSIX-style utilities:
@@ -20,5 +22,7 @@ if [ -d "$output_dir/server/assets" ]; then
 fi
 cp "$project_dir/scripts/sites-worker-entry.mjs" "$output_dir/server/index.js"
 cp -R "$source_dir/assets"/. "$output_dir/client"/
+cp "$hosting_file" "$output_dir/.openai/hosting.json"
 
 test -f "$output_dir/server/index.js"
+test -f "$output_dir/.openai/hosting.json"
