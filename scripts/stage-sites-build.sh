@@ -27,7 +27,7 @@ while IFS= read -r -d '' asset; do
   destination="$output_dir/client/$relative"
   mkdir -p "$(dirname "$destination")"
   cp "$asset" "$destination"
-done < <(find "$source_dir/assets" -type f ! -path "$source_dir/assets/voix/*.mp3" -print0)
+done < <(find "$source_dir/assets" -type f ! -path "$source_dir/assets/voix/*.mp3" ! -path "$source_dir/assets/demo-audio/*" ! -name .DS_Store -print0)
 cp "$hosting_file" "$output_dir/.openai/hosting.json"
 
 test -f "$output_dir/server/index.js"
