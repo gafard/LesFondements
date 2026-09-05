@@ -36,6 +36,8 @@ import {
   HeartHandshake,
   Printer,
   Settings,
+  Share2,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -100,6 +102,7 @@ function CelluleContent() {
   const [sessions, setSessions] = useState<GroupSession[]>([]);
   const [codeCopie, setCodeCopie] = useState(false);
   const [inviteOuvert, setInviteOuvert] = useState(false);
+  const [modalInviteOuverte, setModalInviteOuverte] = useState(false);
   const [reglagesOuvert, setReglagesOuvert] = useState(false);
 
   const chargerPosts = useCallback(() => {
@@ -137,7 +140,11 @@ function CelluleContent() {
 
   const copierCode = async () => {
     try {
-      await navigator.clipboard.writeText(group.inviteCode);
+      const joinUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/rejoindre/${group.inviteCode}`
+        : `https://parcours.lesfondements.workers.dev/rejoindre/${group.inviteCode}`;
+      const message = `Rejoins-moi sur le parcours « Les Fondements » dans notre groupe « ${group.name} » !\n\nLien direct pour nous rejoindre :\n${joinUrl}\n\n(Code : ${group.inviteCode})`;
+      await navigator.clipboard.writeText(message);
       setCodeCopie(true);
       setTimeout(() => setCodeCopie(false), 2000);
     } catch {
@@ -201,18 +208,15 @@ function CelluleContent() {
 
             <div className="flex shrink-0 flex-wrap items-center gap-2.5">
               <button
-                onClick={copierCode}
+                onClick={() => setModalInviteOuverte(true)}
+                title="Partager le lien d'invitation (WhatsApp, SMS, e-mail)"
                 className="verre flex items-center gap-2 rounded-2xl px-4 py-2.5 text-2xs transition-colors hover:bg-white/14"
               >
-                <span className="text-parchemin-100/55">Code</span>
-                <strong className="font-mono tracking-[0.18em] text-or-300">
+                <Share2 className="h-3.5 w-3.5 text-or-300" />
+                <span className="text-parchemin-100/75">Inviter</span>
+                <strong className="font-mono tracking-[0.15em] text-or-300">
                   {group.inviteCode}
                 </strong>
-                {codeCopie ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-400" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5 text-parchemin-100/50" />
-                )}
               </button>
 
               {group.meeting.callLink && (
@@ -260,12 +264,12 @@ function CelluleContent() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => void copierCode()}
+                    onClick={() => setModalInviteOuverte(true)}
                     title="Une cellule fraternelle a besoin d'au moins 2 membres pour ouvrir une rencontre"
-                    className="verre inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold text-amber-200 border border-amber-300/30 hover:bg-white/10 transition-colors"
+                    className="bouton-or inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold shadow-md animate-pulse"
                   >
-                    <Users className="h-4 w-4 text-or-400" />
-                    {codeCopie ? 'Code d’invitation copié !' : 'Inviter un membre pour ouvrir (1/2)'}
+                    <UserPlus className="h-4 w-4" />
+                    Inviter un membre pour ouvrir (1/2)
                   </button>
                 )
               ) : null}
@@ -423,7 +427,7 @@ function CelluleContent() {
 
         {onglet === 'membres' && (
           <OngletMembres
-            onInviter={() => setInviteOuvert((open) => !open)}
+            onInviter={() => setModalInviteOuverte(true)}
             inviteOuvert={inviteOuvert}
           />
         )}
@@ -447,6 +451,14 @@ function CelluleContent() {
             setReglagesOuvert(false);
             void refresh();
           }}
+        />
+      )}
+
+      {modalInviteOuverte && group && (
+        <ModalInvitation
+          group={group}
+          inviter={{ uid: user.uid, displayName: user.displayName || 'Un compagnon' }}
+          onFermer={() => setModalInviteOuverte(false)}
         />
       )}
     </div>
@@ -1795,6 +1807,209 @@ function ModalReglagesCellule({
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function ModalInvitation({
+  group,
+  inviter,
+  onFermer,
+}: {
+  group: ParcoursGroup;
+  inviter: { uid: string; displayName: string };
+  onFermer: () => void;
+}) {
+  const [lienCopie, setLienCopie] = useState(false);
+  const [messageCopie, setMessageCopie] = useState(false);
+  const [codeCopie, setCodeCopie] = useState(false);
+  const [modeEmail, setModeEmail] = useState(false);
+
+  const joinUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/rejoindre/${group.inviteCode}`
+      : `https://parcours.lesfondements.workers.dev/rejoindre/${group.inviteCode}`;
+
+  const messageInvitation = `Bonjour ! Je t'invite à rejoindre notre cellule « ${group.name} » sur le parcours chrétien « Les Fondements ».\n\nClique sur ce lien direct pour voir le groupe et nous rejoindre :\n${joinUrl}\n\n(Code : ${group.inviteCode})`;
+
+  const copierLien = async () => {
+    try {
+      await navigator.clipboard.writeText(joinUrl);
+      setLienCopie(true);
+      setTimeout(() => setLienCopie(false), 2000);
+    } catch {
+      /* clipboard indisponible */
+    }
+  };
+
+  const copierMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(messageInvitation);
+      setMessageCopie(true);
+      setTimeout(() => setMessageCopie(false), 2000);
+    } catch {
+      /* clipboard indisponible */
+    }
+  };
+
+  const copierCode = async () => {
+    try {
+      await navigator.clipboard.writeText(group.inviteCode);
+      setCodeCopie(true);
+      setTimeout(() => setCodeCopie(false), 2000);
+    } catch {
+      /* clipboard indisponible */
+    }
+  };
+
+  const partagerNatif = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Rejoins « ${group.name} » sur Les Fondements`,
+          text: messageInvitation,
+          url: joinUrl,
+        });
+      } catch {
+        /* annulé */
+      }
+    } else {
+      await copierMessage();
+    }
+  };
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(messageInvitation)}`;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+      <div className="feuille relative max-w-lg w-full rounded-3xl border-2 border-or-400 bg-[#fffdfa] p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[92vh] text-encre-950">
+        <span className="punaise-bois absolute -top-2.5 left-10" />
+
+        <div className="flex items-start justify-between border-b border-parchemin-300 pb-4 mb-5">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-or-100 flex items-center justify-center text-or-800 font-bold shrink-0">
+              <UserPlus className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-serif text-xl font-bold text-encre-950">Inviter un compagnon</h3>
+              <p className="text-xs text-encre-600">Cellule « {group.name} »</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onFermer}
+            aria-label="Fermer"
+            className="rounded-full p-1.5 text-encre-400 hover:bg-parchemin-200 hover:text-encre-800 transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <p className="text-xs leading-relaxed text-encre-700 mb-5">
+          Pour inviter un proche qui <strong>ne connaît pas encore l&apos;application</strong>, envoyez-lui le <strong>lien direct</strong> ci-dessous. En cliquant dessus, il découvrira votre groupe et pourra vous rejoindre en créant son profil en 30 secondes.
+        </p>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2.5 w-full rounded-2xl bg-[#25D366] text-white py-3.5 px-4 font-bold text-sm shadow-sm hover:bg-[#20bd5a] transition-colors"
+            >
+              <MessageCircle className="h-5 w-5" />
+              Envoyer l&apos;invitation sur WhatsApp
+            </a>
+
+            {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+              <button
+                type="button"
+                onClick={partagerNatif}
+                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-encre-900 text-parchemin-100 py-3 px-4 font-bold text-xs hover:bg-encre-800 transition-colors"
+              >
+                <Share2 className="h-4 w-4 text-or-300" />
+                Partager via une autre application (SMS, Telegram…)
+              </button>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-parchemin-300 bg-parchemin-50/80 p-4 space-y-2">
+            <span className="text-3xs uppercase tracking-wider font-bold text-encre-500 block">
+              Lien direct d&apos;invitation
+            </span>
+            <div className="flex items-center gap-2">
+              <input
+                readOnly
+                value={joinUrl}
+                className="w-full rounded-xl border border-parchemin-300 bg-white px-3 py-2 text-xs text-encre-800 select-all font-mono"
+              />
+              <button
+                type="button"
+                onClick={copierLien}
+                className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-or-500 text-encre-950 px-3.5 py-2 text-xs font-bold hover:bg-or-400 transition-colors"
+              >
+                {lienCopie ? <Check className="h-4 w-4 text-emerald-800" /> : <Copy className="h-4 w-4" />}
+                {lienCopie ? 'Copié !' : 'Copier'}
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-parchemin-300 bg-parchemin-50/80 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-3xs uppercase tracking-wider font-bold text-encre-500">
+                Message complet pré-rédigé
+              </span>
+              <button
+                type="button"
+                onClick={copierMessage}
+                className="inline-flex items-center gap-1 text-2xs font-bold text-or-800 hover:text-or-900 hover:underline"
+              >
+                {messageCopie ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+                {messageCopie ? 'Message copié !' : 'Copier le texte'}
+              </button>
+            </div>
+            <p className="text-2xs text-encre-700 bg-white p-3 rounded-xl border border-parchemin-200 font-sans whitespace-pre-line leading-relaxed">
+              {messageInvitation}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-dashed border-parchemin-300 px-3.5 py-2.5 text-2xs text-encre-500">
+            <span>Code seul (à donner de vive voix) : <strong className="font-mono text-encre-900">{group.inviteCode}</strong></span>
+            <button
+              type="button"
+              onClick={copierCode}
+              className="text-or-800 font-bold hover:underline"
+            >
+              {codeCopie ? 'Copié' : 'Copier'}
+            </button>
+          </div>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setModeEmail((v) => !v)}
+              className="text-2xs font-bold text-encre-600 hover:text-encre-950 flex items-center gap-1"
+            >
+              {modeEmail ? '− Masquer l’envoi par e-mail' : '+ Envoyer une invitation par e-mail'}
+            </button>
+            {modeEmail && (
+              <div className="mt-3">
+                <InvitePanel group={group} inviter={inviter} tone="clair" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-parchemin-200 text-right">
+          <button
+            type="button"
+            onClick={onFermer}
+            className="rounded-full bg-parchemin-200 px-5 py-2 text-xs font-bold text-encre-800 hover:bg-parchemin-300 transition-colors"
+          >
+            Fermer
+          </button>
+        </div>
       </div>
     </div>
   );
