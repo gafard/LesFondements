@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import configurationPublique from "./config/client-public.json";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const autoriserEvaluationDev = process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'";
@@ -37,6 +38,9 @@ const entetesSecurite = [
 ];
 
 const nextConfig: NextConfig = {
+  // Valeurs déjà publiques dans le navigateur. Les secrets restent chez l’hébergeur.
+  // La construction distante ne doit pas dépendre du fichier privé .env.local.
+  env: Object.fromEntries(Object.entries(configurationPublique).map(([cle, valeur]) => [cle, process.env[cle] ?? valeur])),
   output: 'standalone',
   reactStrictMode: true,
   poweredByHeader: false,

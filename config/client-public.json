@@ -1,0 +1,10 @@
+{
+  "NEXT_PUBLIC_FIREBASE_API_KEY": "AIzaSyChx1w2dYoMlpdyorCl2-GxDtHKdjFFd1M",
+  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": "les-fondements.firebaseapp.com",
+  "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "les-fondements",
+  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET": "les-fondements.firebasestorage.app",
+  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "752600214949",
+  "NEXT_PUBLIC_FIREBASE_APP_ID": "1:752600214949:web:185c907304cc211d9c0c4c",
+  "NEXT_PUBLIC_SITE_URL": "https://parcours.lesfondements.workers.dev",
+  "NEXT_PUBLIC_VAPID_PUBLIC_KEY": "BI2vidPne5PO-i0-5OVddnDmF1vytgrDIk1KrZbk3rSCx5qxvuGXUWn1PSlr9zBnX0i6gsqfcbiEOviMuPPOmys"
+}
