@@ -40,6 +40,7 @@ import {
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
+import InvitePanel from '@/components/InvitePanel';
 import {
   addPost,
   addReply,
@@ -776,6 +777,16 @@ function OngletMembres({
             </button>
           )}
         </div>
+
+        {inviteOuvert && (
+          <div className="mt-4 border-t border-parchemin-300 pt-4">
+            <InvitePanel
+              group={group}
+              inviter={{ uid: user.uid, displayName: user.displayName || 'Un compagnon' }}
+              tone="clair"
+            />
+          </div>
+        )}
 
         <ul className="mt-4 divide-y divide-parchemin-300">
           {actifs.map((membre) => (
