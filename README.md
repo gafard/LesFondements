@@ -51,7 +51,7 @@ npm run dev
 
 # 3. Compiler pour Cloudflare Workers
 npm run build:cloud
-npx wrangler deploy
+npx wrangler deploy --keep-vars
 ```
 
 ---
@@ -96,5 +96,7 @@ src/
 ---
 
 ## 🌐 Déploiement
+
+La production existante est le Worker Cloudflare `parcours`. Toute demande de déploiement concerne ce site, avec ses domaines et services existants. Sites/ChatGPT est un aperçu séparé et ne doit pas être utilisé comme destination de production sans demande explicite.
 
 - **URL de production** : [https://parcours.lesfondements.workers.dev](https://parcours.lesfondements.workers.dev)
