@@ -113,7 +113,7 @@ function FicheContent() {
   const meta = FICHES_META.find((m) => m.id === ficheId);
   const preparee = membership?.preparedSteps.includes(ficheId) ?? false;
   // Les prérequis personnels et l’avancée du groupe limitent toutes les entrées.
-  const maxFicheAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
+  const maxFicheAccessible = Math.min(20, Math.max(1, preparationStep));
   const fermee = ficheId > maxFicheAccessible;
   // Conservé pour les écrans de partage ; aucune fiche future n’est lisible.
   const enPreparation = !!group && ficheId > unlockedStep;

@@ -4,7 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Les sessions antérieures à la remise à zéro ne peuvent recréer les données supprimées.
     function connecte() {
-      return request.auth != null && request.auth.token.auth_time >= 1788626251;
+      return request.auth != null && request.auth.token.auth_time >= 1788630500;
     }
     function moi() { return request.auth.uid; }
 

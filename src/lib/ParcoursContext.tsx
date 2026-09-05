@@ -237,8 +237,9 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
         membership?.role === 'co_animateur'),
     unlockedStep: gate.state === 'ouvert' ? gate.unlockedStep : gate.state === 'termine' ? 20 : 0,
     preparationStep:
-      user && progression?.uid === user.uid && ((!group && profile?.studyMode === 'personnel') || gate.state === 'ouvert' || gate.state === 'termine')
-        ? limiteLecture(group, progression.fiches) : 1,
+      user && progression?.uid === user.uid
+        ? limiteLecture(group, progression.fiches)
+        : 1,
     refresh: load,
     updateProfile,
     isLocalMode: !hasRemoteBackend(),

@@ -78,14 +78,14 @@ function SentierContent() {
   }, [user]);
 
   // La progression personnelle respecte aussi l’avancée de la cellule.
-  const maxAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
+  const maxAccessible = Math.min(20, Math.max(1, preparationStep));
   const etatDe = (id: number): Etat => {
+    if (id > maxAccessible) return 'close';
     if (!group) {
-      if (profile?.studyMode === 'personnel') return id > maxAccessible ? 'close' : validees.includes(id) ? 'terminee' : 'ouverte';
+      if (profile?.studyMode === 'personnel') return validees.includes(id) ? 'terminee' : 'ouverte';
       if (id === 1) return 'ouverte';
       return 'close';
     }
-    if (id > maxAccessible) return 'close';
     if (group.closedSteps.includes(id)) return 'terminee';
     if (membership?.preparedSteps.includes(id) || validees.includes(id)) return 'preparee';
     return 'ouverte';

@@ -776,7 +776,7 @@ export async function requestToJoin(input: JoinRequestInput): Promise<GroupMembe
     requestMessage: input.message?.trim() || undefined,
     distanceKm: input.place ? Math.round(distanceKm(input.place, group.place)) : undefined,
     preparedSteps: [],
-    personalStep: group.currentStep,
+    personalStep: 1,
     nextAttendance: input.attendance,
   };
 
@@ -1734,14 +1734,14 @@ const DEMO_BLUEPRINTS: {
   {
     name: 'Les Enracinés',
     description:
-      'Groupe hybride : la moitié se réunit au local, les autres se connectent. Beaucoup de jeunes actifs.',
+      'Groupe hybride : la moitié se réunit au local, les autres se connectent. Beaucoup de jeunes actifs. Nous commençons la fiche 1.',
     leader: 'David K.',
     compagnons: ['Nadia S.', 'Thomas G.', 'Ruth A.'],
     km: 6.8,
     bearing: 160,
     members: 4,
     capacity: 6,
-    step: 2,
+    step: 1,
     mode: 'hybride',
     weekday: 2,
     time: '19:30',
@@ -1765,14 +1765,14 @@ const DEMO_BLUEPRINTS: {
   },
   {
     name: 'Cellule Antioche',
-    description: 'Groupe complet cette saison — nous ouvrirons un second groupe au prochain cycle.',
+    description: 'Groupe complet cette saison — nous débutons ensemble la fiche 1.',
     leader: 'Marc L.',
     compagnons: ['Anne-Claire V.', 'Josué B.', 'Myriam K.', 'Daniel O.', 'Rebecca F.'],
     km: 21.5,
     bearing: 95,
     members: 6,
     capacity: 6,
-    step: 3,
+    step: 1,
     mode: 'presentiel',
     weekday: 3,
     time: '20:30',
@@ -1781,14 +1781,14 @@ const DEMO_BLUEPRINTS: {
   {
     name: 'Le Cénacle',
     description:
-      'Nous en sommes à la fiche 7 : le groupe est lancé, mais nous accueillons volontiers pour le cycle suivant.',
+      'Groupe lancé sur les fondements : nous démarrons la fiche 1 avec joie.',
     leader: 'Joëlle T.',
     compagnons: ['Étienne L.', 'Aïcha D.', 'Pierre-Yves C.', 'Salomé H.'],
     km: 38,
     bearing: 310,
     members: 5,
     capacity: 6,
-    step: 7,
+    step: 1,
     mode: 'hybride',
     weekday: 1,
     time: '20:00',
@@ -1812,14 +1812,14 @@ const DEMO_BLUEPRINTS: {
   },
   {
     name: 'Cellule Béthanie',
-    description: 'Groupe de femmes, rencontre en journée, un mercredi sur deux.',
+    description: 'Groupe de femmes, rencontre en journée, un mercredi sur deux. Fiche 1 en cours.',
     leader: 'Miriam A.',
     compagnons: ['Judith A.', 'Claire-Marie P.', 'Naomi B.'],
     km: 9.1,
     bearing: 210,
     members: 4,
     capacity: 6,
-    step: 2,
+    step: 1,
     mode: 'presentiel',
     weekday: 3,
     time: '14:00',
@@ -1909,8 +1909,8 @@ async function seedDemoGroups(place: PlaceRef): Promise<void> {
         role: 'animateur',
         status: 'actif',
         joinedAt: group.createdAt,
-        preparedSteps: Array.from({ length: group.currentStep }, (_, i) => i + 1),
-        personalStep: group.currentStep,
+        preparedSteps: [],
+        personalStep: 1,
         nextAttendance: group.meeting.mode === 'ligne' ? 'ligne' : 'presentiel',
       },
       ...blueprint.compagnons.map((nom, i) => ({
@@ -1921,11 +1921,8 @@ async function seedDemoGroups(place: PlaceRef): Promise<void> {
         role: 'membre' as const,
         status: 'actif' as const,
         joinedAt: group.createdAt + (i + 1) * 3600000,
-        preparedSteps: Array.from(
-          { length: Math.max(0, group.currentStep - (i % 2)) },
-          (_, k) => k + 1
-        ),
-        personalStep: group.currentStep,
+        preparedSteps: [],
+        personalStep: 1,
         nextAttendance: (group.meeting.mode === 'ligne'
           ? 'ligne'
           : group.meeting.mode === 'hybride' && i % 2 === 1

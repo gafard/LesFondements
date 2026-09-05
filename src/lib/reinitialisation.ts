@@ -1,5 +1,5 @@
 /** Remise à zéro demandée le 5 septembre 2026. Valeur partagée avec firestore.rules. */
-export const CONNEXION_MINIMALE_SECONDES = 1788626251;
+export const CONNEXION_MINIMALE_SECONDES = 1788630500;
 const CLE = 'lesfondements_reset_epoch';
 const PREFIXES = ['lf.', 'lesfondements_', 'temoignages_'];
 
