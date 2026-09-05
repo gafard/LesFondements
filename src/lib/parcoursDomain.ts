@@ -23,7 +23,7 @@ export const MEETING_FLOW = [
   {
     key: 'partage',
     title: 'Tour de partage sur la fiche',
-    hint: "Chacun dit ce qui l’a marqué. Pas de cours magistral : chacun a déjà travaillé la fiche chez lui.",
+    hint: "Chacun peut partager ce qui l’a marqué, poser une question ou passer son tour sans se justifier.",
     minutes: 25,
   },
   {
@@ -34,19 +34,36 @@ export const MEETING_FLOW = [
   },
   {
     key: 'application',
-    title: 'Un pas concret pour la semaine',
-    hint: 'Chacun formule à voix haute une application précise, que le groupe portera dans la prière.',
+    title: 'Une réponse libre à la Parole',
+    hint: 'Une compréhension, une question, une prière ou un pas choisi. On peut garder sa réponse privée.',
     minutes: 10,
   },
   {
     key: 'priere',
     title: 'Temps de prière',
-    hint: 'Prière les uns pour les autres. Aux fiches 7, 8 et 10, prévoir un temps personnel plus long.',
+    hint: 'Prière les uns pour les autres, avec l’accord de chacun. Les durées sont des repères que l’animateur peut adapter.',
     minutes: 15,
   },
 ] as const;
 
 export const MEETING_FLOW_LENGTH = MEETING_FLOW.length;
+
+/** Six repères stables pour les sessions existantes, avec le rythme propre au livret p. 4. */
+export function derouleRencontre(ficheId: number): Array<{ key: typeof MEETING_FLOW[number]['key']; title: string; hint: string; minutes: number }> {
+  const etapes: Array<{ key: typeof MEETING_FLOW[number]['key']; title: string; hint: string; minutes: number }> = MEETING_FLOW.map(e => ({ ...e }));
+  if (ficheId === 7 || ficheId === 8) {
+    etapes[4] = { ...etapes[4], title: 'Proposer un accompagnement personnel',
+      hint: 'Proposer, séparément de la rencontre collective, un rendez-vous avec des responsables préparés. Chacun choisit s’il le souhaite, avec qui et ce qu’il veut dire. Aucune confidence n’est demandée en public.' };
+    etapes[5] = { ...etapes[5], hint: 'Prière commune avec l’accord de chacun. Le temps personnel prévu par le livret se prépare à part ; aucune note intime ne rejoint le compte rendu.' };
+  }
+  if (ficheId === 10) {
+    const durees = [5, 5, 15, 15, 5, 45];
+    etapes.forEach((e, i) => { e.minutes = durees[i]; });
+    etapes[4] = { ...etapes[4], title: 'Se préparer à la prière', hint: 'Expliquer le temps personnel à venir et recueillir l’accord des personnes. Chacun peut participer ou rester simplement présent.' };
+    etapes[5] = { ...etapes[5], title: 'Prière personnelle · seconde moitié', hint: 'Le livret réserve la seconde partie de cette rencontre à la prière personnelle. L’animateur organise un accompagnement choisi et veille à la discrétion.' };
+  }
+  return etapes;
+}
 
 /** Prochaine occurrence du créneau hebdomadaire (ou bimensuel) du groupe. */
 export function nextMeetingDate(meeting: GroupMeetingPlan, from: number = Date.now()): Date {

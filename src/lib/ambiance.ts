@@ -1,21 +1,11 @@
+import ambiancesImportees from '@/data/ambiances-importees.json';
 import { preparerPourLaVoix } from './prononciation.mjs';
 import { decouperTextePourStudio } from './decoupageVoix';
 import { urlVoixStudio, voixStudioPossible } from './voixStudio';
 import { chargerManifesteVoix } from './voix';
 import { chargerManifesteVivienne, pisteVivienne } from './voixVivienne';
 
-/**
- * Ambiance sonore de l'immersion, entièrement synthétisée.
- *
- * Aucun fichier audio n'est embarqué : tout est produit par la Web Audio API.
- * L'application reste légère, fonctionne hors-ligne, et aucune question de
- * licence ne se pose sur un fond sonore.
- *
- * Trois ambiances :
- *  · souffle — un pad chaud et respirant, très en retrait ;
- *  · pluie   — un bruit filtré, régulier, qui masque les bruits alentour ;
- *  · silence — rien du tout, c'est aussi une option.
- */
+/** Ambiances synthétiques et musicales, chargées à la demande. */
 
 export type Ambiance =
   | 'silence'
@@ -23,7 +13,13 @@ export type Ambiance =
   | 'pluie'
   | 'emotional-piano'
   | 'a-beautiful-story'
-  | 'fly-like-a-bird';
+  | 'fly-like-a-bird'
+  | 'lieu-saint-presence'
+  | 'lieu-saint-intimite'
+  | 'lieu-saint-contemplation'
+  | 'selah-recueillement'
+  | 'selah-priere'
+  | 'selah-repos';
 
 export const AMBIANCES: {
   valeur: Ambiance;
@@ -52,9 +48,14 @@ export const AMBIANCES: {
     description: 'Mélodie aérienne, lumineuse et chaleureuse',
     type: 'musique',
   },
+  ...ambiancesImportees.map((piste) => ({
+    valeur: piste.valeur as Ambiance, label: piste.label,
+    description: piste.description, type: 'musique' as const,
+  })),
 ];
 
 const FICHIERS_MUSIQUE: Record<string, string> = {
+  ...Object.fromEntries(ambiancesImportees.map((piste) => [piste.valeur, piste.fichier])),
   'emotional-piano': '/audio/ambiances/emotional-piano.mp3',
   'a-beautiful-story': '/audio/ambiances/a-beautiful-story.mp3',
   'fly-like-a-bird': '/audio/ambiances/fly-like-a-bird.mp3',
@@ -70,6 +71,7 @@ type Contexte = {
 let actif: Contexte | null = null;
 let audioMusiqueActif: HTMLAudioElement | null = null;
 let ambianceActuelle: Ambiance = 'silence';
+let revisionAmbiance = 0;
 
 /** Un tampon de bruit rose : plus doux à l'oreille qu'un bruit blanc. */
 function tamponBruitRose(ctx: AudioContext, secondes = 4): AudioBuffer {
@@ -274,7 +276,10 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
     return;
   }
 
-  await arreterAmbiance();
+  const arret = arreterAmbiance();
+  const revision = revisionAmbiance;
+  await arret;
+  if (revision !== revisionAmbiance) return;
   ambianceActuelle = ambiance;
   if (ambiance === 'silence') return;
 
@@ -283,9 +288,11 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
     try {
       const audio = new Audio(FICHIERS_MUSIQUE[ambiance]);
       audio.loop = true;
-      audio.volume = calculerVolumeMusique();
-      void audio.play().catch(() => {});
+      audio.volume = 0;
       audioMusiqueActif = audio;
+      void audio.play().then(() => {
+        if (audioMusiqueActif === audio) animerVolumeMusique(1_200);
+      }).catch(() => {});
     } catch {
       /* impossible de lire l'audio */
     }
@@ -300,6 +307,7 @@ export async function jouerAmbiance(ambiance: Ambiance, volume = 0.5): Promise<v
 
   const ctx = new Constructeur();
   if (ctx.state === 'suspended') await ctx.resume();
+  if (revision !== revisionAmbiance) { await ctx.close(); return; }
 
   const master = ctx.createGain();
   master.gain.value = 0;
@@ -327,6 +335,7 @@ export function reglerVolume(volume: number): void {
 }
 
 export async function arreterAmbiance(): Promise<void> {
+  revisionAmbiance += 1;
   // Arrêt de la musique MP3
   if (audioMusiqueActif) {
     const el = audioMusiqueActif;

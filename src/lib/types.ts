@@ -204,6 +204,8 @@ export interface GroupSession {
 // ─────────────────────────────────────────────────────────────
 
 export interface UserProfile {
+  /** L’étude individuelle est proposée par le livret, p. 3. */
+  studyMode?: 'personnel' | 'cellule';
   uid: string;
   displayName: string;
   email: string | null;

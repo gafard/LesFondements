@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/lib/AuthContext';
 import { usePathname } from 'next/navigation';
 
 import { useEffect, useState } from 'react';
@@ -13,23 +14,22 @@ import {
 
 export default function MarquePageFlottant() {
   const pathname = usePathname();
-  const [passage, setPassage] = useState<DernierPassage | null>(lireDernierPassage);
+  const { user } = useAuth();
+  const [passage, setPassage] = useState<DernierPassage | null>(null);
 
   useEffect(() => {
-    const actualiser = () => setPassage(lireDernierPassage());
-    const actualiserDepuisEvenement = (event: Event) => {
-      const detail = (event as CustomEvent<DernierPassage>).detail;
-      setPassage(detail ?? lireDernierPassage());
-    };
+    const actualiser = () => setPassage(lireDernierPassage(user?.uid));
+    const actualiserDepuisEvenement = actualiser;
+    void Promise.resolve().then(actualiser);
     window.addEventListener('storage', actualiser);
     window.addEventListener(EVENEMENT_PASSAGE, actualiserDepuisEvenement);
     return () => {
       window.removeEventListener('storage', actualiser);
       window.removeEventListener(EVENEMENT_PASSAGE, actualiserDepuisEvenement);
     };
-  }, []);
+  }, [user?.uid]);
 
-  if (!passage) return null;
+  if (!passage || passage.uid !== user?.uid) return null;
 
   const Icone = passage.type === 'verset' || passage.type === 'ecriture' ? PenLine : BookOpen;
 

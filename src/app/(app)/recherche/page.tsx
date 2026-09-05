@@ -5,10 +5,9 @@ import Link from 'next/link';
 import { BookOpen, FileText, PenLine, Search, X } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
 import { useAuth } from '@/lib/AuthContext';
-import { useParcours } from '@/lib/ParcoursContext';
 import { getAnswers, getJournalEntries, timestampToDate } from '@/lib/firestore';
 import { chargerLivret, questionsDe } from '@/lib/livret';
-import { lireAnnotations } from '@/lib/annotations';
+import { ecritsDuCarnet } from '@/lib/habiter';
 
 interface EcritIndexe {
   id: string;
@@ -29,7 +28,6 @@ function normaliser(texte: string): string {
 
 function RechercheContent() {
   const { user } = useAuth();
-  const { preparationStep } = useParcours();
   const [requete, setRequete] = useState('');
   const [ecrits, setEcrits] = useState<EcritIndexe[] | null>(null);
 
@@ -38,7 +36,7 @@ function RechercheContent() {
     let annule = false;
     void (async () => {
       const livret = await chargerLivret();
-      const fiches = livret.fiches.filter((fiche) => fiche.id <= Math.max(1, preparationStep));
+      const fiches = livret.fiches;
       const reponsesParFiche = await Promise.all(
         fiches.map(async (fiche) => ({ fiche, answers: await getAnswers(user.uid, fiche.id) }))
       );
@@ -46,39 +44,13 @@ function RechercheContent() {
 
       const contenus: EcritIndexe[] = reponsesParFiche.flatMap(({ fiche, answers }) => {
         const questions = new Map(questionsDe(fiche).map((question) => [question.id, question.texte]));
-        const reponses = Object.entries(answers)
-          .filter(([cle, contenu]) =>
-            !cle.startsWith('annotations:') &&
-            typeof contenu === 'string' &&
-            contenu.trim().length > 0
-          )
-          .map(([questionId, contenu]) => ({
-            id: `f${fiche.id}-${questionId}`,
-            type: 'fiche' as const,
-            titre: `Fiche ${fiche.id} · ${fiche.titre}`,
-            contexte:
-              questions.get(questionId) ??
-              (questionId.startsWith('v:')
-                ? `Verset recopié · ${questionId.slice(2)}`
-                : questionId.startsWith('immersion:note:')
-                  ? 'Carnet de bord de l’immersion'
-                  : 'Note personnelle'),
-            contenu: String(contenu),
-            href: `/fiches/${fiche.id}`,
-          }));
-
-        const annotations = lireAnnotations(answers[`annotations:${fiche.id}`]);
-        return [
-          ...reponses,
-          ...annotations.notes.map((note) => ({
-            id: `f${fiche.id}-postit-${note.id}`,
-            type: 'fiche' as const,
-            titre: `Fiche ${fiche.id} · ${fiche.titre}`,
-            contexte: 'Post-it personnel',
-            contenu: note.texte,
-            href: `/fiches/${fiche.id}`,
-          })),
-        ];
+        return ecritsDuCarnet(fiche.id, answers).map(ecrit => ({
+          id: `f${fiche.id}-${ecrit.id}`, type: 'fiche' as const,
+          titre: `Fiche ${fiche.id} · ${fiche.titre}`,
+          contexte: questions.get(ecrit.id.replace(/^q:/, '')) || ecrit.titre,
+          contenu: ecrit.contenu, href: ecrit.href,
+          date: ecrit.date ? new Date(ecrit.date) : undefined,
+        }));
       });
 
       contenus.push(
@@ -102,7 +74,7 @@ function RechercheContent() {
     return () => {
       annule = true;
     };
-  }, [preparationStep, user]);
+  }, [user]);
 
   const resultats = useMemo(() => {
     const termes = normaliser(requete).split(/\s+/).filter(Boolean);

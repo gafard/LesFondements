@@ -33,7 +33,7 @@ import EcouteContinueFiche from '@/components/EcouteContinueFiche';
 import GuidePastoralCellule from '@/components/GuidePastoralCellule';
 import ChampDictée from '@/components/ChampDictée';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
-import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswers } from '@/lib/firestore';
+import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswer, flushPendingWrites } from '@/lib/firestore';
 import {
   chargerFiche,
   type Bloc,
@@ -137,7 +137,7 @@ function FicheContent() {
         );
         if (!chargees[cleAnnotations] && annotationsChargees.notes.length > 0) {
           chargees[cleAnnotations] = encoderAnnotations(annotationsChargees);
-          void saveAnswers(user.uid, ficheId, chargees);
+          void saveAnswer(user.uid, ficheId, cleAnnotations, chargees[cleAnnotations]).catch(() => undefined);
         }
         reponsesRef.current = chargees;
         setReponses(chargees);
@@ -152,19 +152,20 @@ function FicheContent() {
 
   useEffect(() => {
     if (!fiche) return;
-    const dernier = lireDernierPassage();
+    const dernier = lireDernierPassage(user?.uid);
     if (
       dernier &&
       dernier.type !== 'fiche' &&
       dernier.url.startsWith(`/fiches/${ficheId}?`)
     ) return;
     memoriserPassage({
+      uid: user?.uid,
       url: `/fiches/${ficheId}`,
       titre: `Fiche ${ficheId} — ${fiche.titre}`,
       sousTitre: 'Dernière fiche ouverte',
       type: 'fiche',
     });
-  }, [fiche, ficheId]);
+  }, [fiche, ficheId, user?.uid]);
 
   useEffect(() => {
     if (!fiche || !cleReprise) return;
@@ -188,6 +189,7 @@ function FicheContent() {
       const estVerset = cle.startsWith('v:');
       const reference = estVerset ? cle.slice(2) : null;
       memoriserPassage({
+      uid: user?.uid,
         url: `/fiches/${ficheId}?onglet=partage&reprendre=${encodeURIComponent(cle)}#passage-${ancrePourCle(cle)}`,
         titre: reference ?? `Fiche ${ficheId}`,
         sousTitre: reference ? 'Verset en cours d’écriture' : 'Réponse en cours d’écriture',
@@ -196,11 +198,10 @@ function FicheContent() {
     }
 
     if (minuteur.current) window.clearTimeout(minuteur.current);
-    minuteur.current = window.setTimeout(() => {
-      if (uid) void saveAnswers(uid, ficheId, suivantes);
+    if (uid) void saveAnswer(uid, ficheId, cle, valeur, { differer: true }).then(() => {
       setEnregistre(true);
-      window.setTimeout(() => setEnregistre(false), 1800);
-    }, 800);
+      minuteur.current = window.setTimeout(() => setEnregistre(false), 1800);
+    }).catch(() => setEnregistre(false));
   }, [cleAnnotations, ficheId, user?.uid]);
 
   const changerAnnotations = useCallback((prochain: DocumentAnnotations) => {
@@ -210,11 +211,11 @@ function FicheContent() {
 
   const marquerPreparee = useCallback(async () => {
     if (!user) return;
-    await saveAnswers(user.uid, ficheId, reponses);
+    await flushPendingWrites(user.uid);
     await markFicheCompleted(user.uid, ficheId);
     if (group) await markStepPrepared(group.id, user.uid, ficheId);
     await refresh();
-  }, [user, ficheId, reponses, group, refresh]);
+  }, [user, ficheId, group, refresh]);
 
   // ── États d'attente ─────────────────────────────────────────
   if (!meta) {
@@ -711,7 +712,7 @@ function FicheContent() {
 
           {enregistre && (
             <p className="mt-3 inline-flex items-center gap-1 text-2xs font-bold text-emerald-600">
-              <Check className="h-3 w-3" /> Vos réponses sont enregistrées
+              <Check className="h-3 w-3" /> Conservé sur cet appareil
             </p>
           )}
         </div>
@@ -1235,7 +1236,7 @@ export default function Page() {
   const rawId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const parsedId = rawId ? Number.parseInt(rawId, 10) : 1;
   const ficheId = Number.isFinite(parsedId) ? parsedId : 1;
-  const acces = ficheId === 1 ? 'decouverte' : 'groupe';
+  const acces = ficheId === 1 ? 'decouverte' : 'lecture';
 
   return (
     <ParcoursGate acces={acces}>

@@ -31,6 +31,7 @@ import {
 } from '@/lib/memorisation';
 
 import RecitationVocale from '@/components/RecitationVocale';
+import { TraceParole } from '@/components/TraceParole';
 import EpreuveMemoire from '@/components/EpreuveMemoire';
 import { Mic } from 'lucide-react';
 
@@ -47,7 +48,7 @@ interface Carte {
 
 function MemorisationContent() {
   const { user } = useAuth();
-  const { unlockedStep } = useParcours();
+  const { preparationStep } = useParcours();
 
   const [cartes, setCartes] = useState<Carte[] | null>(null);
   const [index, setIndex] = useState(0);
@@ -74,7 +75,7 @@ function MemorisationContent() {
 
     void (async () => {
       const livret = await chargerLivret();
-      const ouvertes = livret.fiches.filter((fiche) => fiche.id <= Math.max(1, unlockedStep));
+      const ouvertes = livret.fiches.filter((fiche) => fiche.id <= Math.max(1, preparationStep));
 
       // Ce que la personne a recopié de sa main, fiche par fiche.
       const copies = await Promise.all(
@@ -105,7 +106,7 @@ function MemorisationContent() {
     return () => {
       annule = true;
     };
-  }, [user, unlockedStep]);
+  }, [user, preparationStep]);
 
   const paquet = useMemo(() => {
     if (!cartes) return [];
@@ -124,7 +125,7 @@ function MemorisationContent() {
     setIndex((valeur) => (valeur + delta + paquet.length) % Math.max(1, paquet.length));
   };
 
-  const fichesDisponibles = FICHES_META.filter((meta) => meta.id <= Math.max(1, unlockedStep));
+  const fichesDisponibles = FICHES_META.filter((meta) => meta.id <= Math.max(1, preparationStep));
   const acquis = (cartes ?? []).filter((c) => memoire[cleMemoire(c.reference)]?.masteredAt).length;
   const dues = revisionsDues(memoire).length;
 
@@ -295,9 +296,7 @@ function MemorisationContent() {
                     </span>
 
                     {carte.texte ? (
-                      <p className="mt-4 font-serif text-lg leading-relaxed text-encre-900">
-                        « {carte.texte} »
-                      </p>
+                      <div><p className="mt-4 font-serif text-lg leading-relaxed text-encre-900">« {carte.texte} »</p><p className="mt-2 text-xs text-encre-500">Texte affiché : Louis Segond 1910</p></div>
                     ) : carte.copie ? (
                       <>
                         <p className="manuscrit mt-4 text-2xl leading-relaxed text-encre-950">
@@ -476,11 +475,16 @@ function MemorisationContent() {
                   ))}
                 </div>
                 <p className="mt-3 text-center text-2xs text-encre-500">
-                  Score vocal actuel : {scoreVocal}% · la prochaine date s’adapte à votre rappel.
+                  Correspondance de la transcription : {scoreVocal}% · ce repère sert uniquement à organiser les révisions.
                 </p>
               </div>
             )}
 
+            <div className="mt-6 space-y-4">
+              <p className="text-sm leading-relaxed text-encre-700">Vous pouvez relire le texte puis le redire intérieurement, à voix haute ou par écrit, sans microphone. La mémoire du texte et sa compréhension se travaillent ensemble.</p>
+              <Link href={`/fiches/${carte.ficheId}`} className="inline-flex min-h-11 items-center text-sm font-semibold underline">Revenir au contexte dans la fiche {carte.ficheId}</Link>
+              <details className="rounded-2xl border border-parchemin-300 p-4"><summary className="min-h-11 cursor-pointer font-semibold">Ce que je comprends de ce passage</summary><TraceParole key={carte.cle} ficheId={carte.ficheId} cle={`trace:memoire:${carte.reference}`} reference={carte.reference} natureInitiale="comprehension" invitation="Que dit ce passage dans son contexte, et que souhaites-tu en garder ?" /></details>
+            </div>
             <div className="mt-6 rounded-3xl border border-parchemin-400 bg-white p-5">
               <div className="mb-2 flex items-center justify-between text-2xs font-bold">
                 <span className="text-encre-500">Versets retenus</span>

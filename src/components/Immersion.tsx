@@ -1,5 +1,9 @@
 'use client';
 
+import { TraceParole, FilDeLaParole } from '@/components/TraceParole';
+import { creerNavigationFeuilles, directionGlissement, type EtatFeuille, type PointGlissement } from '@/lib/carrousel';
+import { PROFILS_FICHES } from '@/lib/habiter';
+
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
@@ -255,6 +259,7 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
       sousTitre = null;
     });
 
+    if (accompagnement) scenes.push({ type: 'accompagnement', contenu: accompagnement });
     scenes.push(
       {
         type: 'meditation',
@@ -263,7 +268,6 @@ function construireScenario(fiche: FicheLivret, sectionCibleIndex?: number | nul
         approfondissement,
       },
     );
-    if (accompagnement) scenes.push({ type: 'accompagnement', contenu: accompagnement });
     scenes.push(
       { type: 'priere', id: idSection, questions: [...questions, ...approfondissement] },
       { type: 'silence', apres: 'priere' },
@@ -389,6 +393,7 @@ export default function Immersion({
   momentInitial = null,
   sectionIndex = null,
 }: ImmersionProps) {
+  const { user } = useAuth();
   const scenario = useMemo(
     () => construireScenario(fiche, sectionIndex),
     [fiche, sectionIndex]
@@ -400,7 +405,10 @@ export default function Immersion({
     const depart = indexDuMoment >= 0 ? indexDuMoment : indexInitial;
     return Math.max(0, Math.min(scenario.length - 1, depart));
   });
-  const [ambiance, setAmbiance] = useState<Ambiance>('emotional-piano');
+  const [ambiance, setAmbiance] = useState<Ambiance>(() => {
+    try { return typeof window !== 'undefined' && localStorage.getItem('lf.lecture-paisible') === '1' ? 'silence' : 'emotional-piano'; }
+    catch { return 'silence'; }
+  });
   const [lecture, setLecture] = useState(false);
   const [genreVoixLocal, setGenreVoixLocal] = useState<GenreVoix>(() => getGenreVoix());
   const [manifeste, setManifeste] = useState<Manifeste | null>(null);
@@ -419,7 +427,7 @@ export default function Immersion({
   const sourceDuckingAudio = useRef(Symbol('immersion-piste-enregistree'));
   const enchainerRef = useRef(enchainer);
   const zone = useRef<HTMLDivElement>(null);
-  const depart = useRef<number | null>(null);
+  const depart = useRef<PointGlissement | null>(null);
 
   const scene = scenario[index];
   const progression = (index + 1) / scenario.length;
@@ -606,16 +614,17 @@ export default function Immersion({
     const estVerset = scene.type === 'verset'
       || (scene.type === 'ancrage-verset' && referenceAncrage !== null);
     memoriserPassage({
+      uid: user?.uid,
       url: sectionIndex === null
         ? `/fiches/${fiche.id}`
-        : `/aujourdhui?fiche=${fiche.id}&section=${sectionIndex}&moment=${scene.type}`,
+        : `/aujourdhui?fiche=${fiche.id}&section=${sectionIndex}&scene=${index}`,
       titre: scene.type === 'verset' || scene.type === 'ancrage-verset'
         ? referenceAncrage ?? `Fiche ${fiche.id}`
         : `Fiche ${fiche.id}`,
       sousTitre: libelleScene,
       type: estVerset ? 'verset' : 'immersion',
     });
-  }, [choixVersetAncrage, fiche.id, index, libelleScene, scene, sectionIndex]);
+  }, [choixVersetAncrage, fiche.id, index, libelleScene, scene, sectionIndex, user?.uid]);
 
   useEffect(() => {
     const auClavier = (event: KeyboardEvent) => {
@@ -748,18 +757,17 @@ export default function Immersion({
 
   // ── Gestes tactiles ─────────────────────────────────────────
   const debutTouche = (event: React.TouchEvent) => {
-    depart.current = event.touches[0]?.clientX ?? null;
+    depart.current = event.target instanceof Element && event.target.closest('input, textarea, select, button, a, [contenteditable]') ? null : { x: event.touches[0]?.clientX ?? 0, y: event.touches[0]?.clientY ?? 0 };
   };
   const finTouche = (event: React.TouchEvent) => {
-    if (depart.current === null) return;
-    const delta = (event.changedTouches[0]?.clientX ?? 0) - depart.current;
-    if (Math.abs(delta) > 60) aller(delta < 0 ? 1 : -1);
+    const direction = directionGlissement(depart.current, { x: event.changedTouches[0]?.clientX ?? 0, y: event.changedTouches[0]?.clientY ?? 0 });
     depart.current = null;
+    if (direction) aller(direction);
   };
 
   const terminer = async () => {
-    setCloture(true);
-    await onTerminer();
+    try { await onTerminer(); setCloture(true); }
+    catch { setErreurVoix('La fin de ce temps n’a pas pu être conservée. Vos champs restent ouverts ; réessayez avant de quitter.'); }
   };
 
   // ── Repères du sommaire ─────────────────────────────────────
@@ -892,7 +900,7 @@ export default function Immersion({
           {cloture ? (
             <SceneCloture fiche={fiche} onQuitter={onQuitter} tempsDuJour={sectionIndex !== null} />
           ) : (
-            <div key={index} className="animate-reveal">
+            <div key={index} className="immersion-transition">
               <RenduScene
                 scene={scene}
                 fiche={fiche}
@@ -1498,12 +1506,17 @@ function RenduScene({
       const modeTransformation = scene.pratique?.mode === 'transformation';
       return (
         <div className="py-8">
+          <TraceParole key={scene.id || fiche.id} ficheId={fiche.id} cle={`trace:${scene.id || `f${fiche.id}`}`} reference={referenceChoisie || ''} sombre />
+          <div className="mt-6"><FilDeLaParole ficheId={fiche.id} /></div>
+          <details className="mt-6 rounded-2xl border border-white/15 p-5" open={Boolean(reponses[clePas])}>
+          <summary className="min-h-11 cursor-pointer text-sm font-bold text-or-300">Si je souhaite préparer un pas concret</summary>
+          <p className="my-3 text-sm text-parchemin-100/75">{PROFILS_FICHES[fiche.id]?.invitation}</p>
           <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
             {tempsDuJour ? 'Vivre cette Parole' : 'Vivre cette vérité'}
           </span>
           <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
             {tempsDuJour && passageChoisi
-              ? 'Relis une dernière fois le verset que tu as choisi.'
+              ? 'Une Parole reçue. Un petit pas à vivre.'
               : 'Quelle vérité veux-tu garder présente cette semaine ?'}
           </h2>
           {tempsDuJour && passageChoisi ? (
@@ -1568,6 +1581,17 @@ function RenduScene({
               />
             </>
           )}
+          <div className="mt-7 rounded-2xl border border-or-300/25 bg-or-300/10 p-5">
+            <p className="text-base leading-relaxed text-parchemin-100">
+              Choisis un geste assez petit pour l’essayer dans une situation réelle. Tu peux aussi
+              prendre le temps d’y réfléchir : rien à promettre pour avancer.
+            </p>
+            {reponses[clePas]?.trim() && <p className="mt-3 text-base leading-relaxed text-or-200">
+              Retrouve ce pas dans « Mon chemin intérieur ». Après l’avoir essayé, tu pourras
+              raconter ce qui s’est passé, puis choisir de le poursuivre ou de l’ajuster.
+            </p>}
+          </div>
+          </details>
         </div>
       );
     }
@@ -1793,12 +1817,6 @@ type AnimationFeuille =
   | 'note-quitte-avant'
   | 'note-quitte-arriere';
 
-/** La feuille qui arrive : elle se pose, ou remonte de la pile. */
-function feuilleQuiArrive(enMouvement: boolean, sens: 'avant' | 'arriere'): AnimationFeuille {
-  if (!enMouvement) return 'note-posee';
-  return sens === 'avant' ? 'note-avant' : 'note-arriere';
-}
-
 /** La feuille qui s'en va, en surimpression, le temps du geste. */
 function feuilleQuiPart(sens: 'avant' | 'arriere'): AnimationFeuille {
   return sens === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere';
@@ -1810,60 +1828,13 @@ function feuilleQuiPart(sens: 'avant' | 'arriere'): AnimationFeuille {
  * remonte de la pile et devient immédiatement interactive.
  */
 function useFeuilleAnimee(total: number, indexInitial = 0) {
-  const [courant, setCourant] = useState(indexInitial);
-  const [precedent, setPrecedent] = useState<number | null>(null);
-  const [sens, setSens] = useState<'avant' | 'arriere'>('avant');
-  const minuterie = useRef<number | null>(null);
-
-  const annulerMinuterie = useCallback(() => {
-    if (minuterie.current !== null) {
-      window.clearTimeout(minuterie.current);
-      minuterie.current = null;
-    }
-  }, []);
-
-  useEffect(() => annulerMinuterie, [annulerMinuterie]);
-
-  const index = Math.max(0, Math.min(courant, Math.max(0, total - 1)));
-
-  const changer = useCallback(
-    (prochain: number) => {
-      const cible = Math.max(0, Math.min(Math.max(0, total - 1), prochain));
-      if (cible === index) return;
-      const versAvant = cible > index;
-
-      if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        annulerMinuterie();
-        setPrecedent(null);
-        setCourant(cible);
-        return;
-      }
-
-      annulerMinuterie();
-      setPrecedent(index);
-      setCourant(cible);
-      setSens(versAvant ? 'avant' : 'arriere');
-
-      minuterie.current = window.setTimeout(() => {
-        setPrecedent(null);
-        minuterie.current = null;
-      }, 360);
-    },
-    [annulerMinuterie, index, total]
-  );
-
-  const aller = useCallback((delta: number) => changer(index + delta), [changer, index]);
-
-  const reinitialiser = useCallback(
-    (prochain = 0) => {
-      annulerMinuterie();
-      setPrecedent(null);
-      setCourant(prochain);
-    },
-    [annulerMinuterie]
-  );
-
-  return { index, precedent, sens, aller, changer, reinitialiser };
+  const [etat, setEtat] = useState<EtatFeuille>({ index: indexInitial, precedent: null, sens: 'avant', animation: 'note-posee' });
+  const controle = useMemo(() => creerNavigationFeuilles(total, indexInitial, setEtat, {
+    reduire: () => window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('lecture-paisible'),
+    programmer: (suite, duree) => { const id = window.setTimeout(suite, duree); return () => window.clearTimeout(id); },
+  }), [total, indexInitial]);
+  useEffect(() => { controle.activer(); return () => controle.detruire(); }, [controle]);
+  return { ...etat, index: Math.max(0, Math.min(etat.index, total - 1)), aller: controle.aller, changer: controle.changer, reinitialiser: controle.reinitialiser };
 }
 
 /**
@@ -1894,13 +1865,14 @@ function PileDeNotes({
   onEnregistrer: (cle: string, valeur: string) => void;
 }) {
   const [mode, setMode] = useState<'essentiel' | 'approfondir'>('essentiel');
-  const departGlissement = useRef<number | null>(null);
+  const departGlissement = useRef<PointGlissement | null>(null);
   const questionsAffichees = mode === 'essentiel' ? questions : approfondissement;
   const total = questionsAffichees.length;
   const {
     index: courant,
     precedent,
     sens,
+    animation,
     aller,
     reinitialiser,
   } = useFeuilleAnimee(total, 0);
@@ -1997,18 +1969,16 @@ function PileDeNotes({
       )}
 
       <div
-        className="relative mt-5 [perspective:1400px]"
+        className="relative mt-5 touch-pan-y"
         onTouchStart={(event) => {
           event.stopPropagation();
-          departGlissement.current = event.touches[0]?.clientX ?? null;
+          departGlissement.current = event.target instanceof Element && event.target.closest('input, textarea, select, button, a, [contenteditable]') ? null : { x: event.touches[0]?.clientX ?? 0, y: event.touches[0]?.clientY ?? 0 };
         }}
         onTouchEnd={(event) => {
           event.stopPropagation();
-          if (departGlissement.current === null) return;
-          const distance = departGlissement.current - (event.changedTouches[0]?.clientX ?? 0);
+          const direction = directionGlissement(departGlissement.current, { x: event.changedTouches[0]?.clientX ?? 0, y: event.changedTouches[0]?.clientY ?? 0 });
           departGlissement.current = null;
-          if (Math.abs(distance) < 48) return;
-          aller(distance > 0 ? 1 : -1);
+          if (direction) aller(direction);
         }}
         onTouchCancel={(event) => {
           event.stopPropagation();
@@ -2027,7 +1997,7 @@ function PileDeNotes({
           className={`feuille-document relative ${
             sens === 'arriere' && precedent !== null ? 'z-20' : 'z-10'
           } ${
-            feuilleQuiArrive(precedent !== null, sens)
+            animation
           }`}
         >
           <article
@@ -2039,7 +2009,7 @@ function PileDeNotes({
               className={`punaise -top-2.5 ${courant % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
               aria-hidden="true"
             />
-            <div className="max-h-[46svh] overflow-y-auto p-5 sm:max-h-[56svh] sm:p-6">
+            <div className="h-[46svh] overflow-y-auto overscroll-contain p-5 sm:h-[56svh] sm:p-6">
               {carte(questionsAffichees[courant], courant, true)}
             </div>
           </article>
@@ -2050,6 +2020,7 @@ function PileDeNotes({
           <div
             key={`quitte-${questionsAffichees[precedent].id}`}
             aria-hidden="true"
+            inert
             className={`feuille-document pointer-events-none absolute inset-0 ${
               sens === 'arriere' ? 'z-10' : 'z-20'
             } ${
@@ -2065,7 +2036,7 @@ function PileDeNotes({
                 className={`punaise -top-2.5 ${precedent % 2 === 0 ? 'left-8' : 'right-8 punaise-bleue'}`}
                 aria-hidden="true"
               />
-              <div className="max-h-[46svh] overflow-y-auto p-5 sm:max-h-[56svh] sm:p-6">
+              <div className="h-[46svh] overflow-y-auto overscroll-contain p-5 sm:h-[56svh] sm:p-6">
                 {carte(questionsAffichees[precedent], precedent, false)}
               </div>
             </article>
@@ -2227,9 +2198,10 @@ function ScenePriereImmersive({
     index: indexActif,
     precedent: precedentPriere,
     sens: sensPriere,
+    animation: animationPriere,
     aller,
   } = useFeuilleAnimee(elements.length, 0);
-  const departGlissement = useRef<number | null>(null);
+  const departGlissement = useRef<PointGlissement | null>(null);
   const elementActif = elements[indexActif] || elements[0];
 
   return (
@@ -2270,17 +2242,16 @@ function ScenePriereImmersive({
           La carte de verre sombre d'avant ne tenait pas sur cette table : on
           prie sur du papier, comme on a médité. */}
       <div
-        className="relative touch-pan-y text-left [perspective:1400px]"
+        className="relative touch-pan-y text-left"
         onTouchStart={(event) => {
           event.stopPropagation();
-          departGlissement.current = event.touches[0]?.clientX ?? null;
+          departGlissement.current = event.target instanceof Element && event.target.closest('input, textarea, select, button, a, [contenteditable]') ? null : { x: event.touches[0]?.clientX ?? 0, y: event.touches[0]?.clientY ?? 0 };
         }}
         onTouchEnd={(event) => {
           event.stopPropagation();
-          if (departGlissement.current === null) return;
-          const distance = departGlissement.current - (event.changedTouches[0]?.clientX ?? 0);
+          const direction = directionGlissement(departGlissement.current, { x: event.changedTouches[0]?.clientX ?? 0, y: event.changedTouches[0]?.clientY ?? 0 });
           departGlissement.current = null;
-          if (Math.abs(distance) >= 48) aller(distance > 0 ? 1 : -1);
+          if (direction) aller(direction);
         }}
         onTouchCancel={(event) => {
           event.stopPropagation();
@@ -2295,14 +2266,10 @@ function ScenePriereImmersive({
           className={`feuille-document relative ${
             sensPriere === 'arriere' && precedentPriere !== null ? 'z-20' : 'z-10'
           } ${
-            precedentPriere !== null
-              ? sensPriere === 'avant'
-                ? 'note-avant'
-                : 'note-arriere'
-              : 'note-posee'
+            animationPriere
           }`}
         >
-          <article className="fiche-bristol pose-2 space-y-5 rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
+          <article className="fiche-bristol pose-2 h-[min(30rem,54svh)] space-y-5 overflow-y-auto overscroll-contain rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
             <span className="attache-pince -top-3 left-10" aria-hidden="true" />
             <div>
               <span className="block text-3xs font-black uppercase tracking-[0.18em] text-encre-700/60">
@@ -2349,13 +2316,14 @@ function ScenePriereImmersive({
           <div
             key={`priere-quitte-${elements[precedentPriere].id}`}
             aria-hidden="true"
+            inert
             className={`feuille-document pointer-events-none absolute inset-0 ${
               sensPriere === 'arriere' ? 'z-10' : 'z-20'
             } ${
               feuilleQuiPart(sensPriere)
             }`}
           >
-            <article className="fiche-bristol pose-2 space-y-5 rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
+            <article className="fiche-bristol pose-2 h-[min(30rem,54svh)] space-y-5 overflow-y-auto overscroll-contain rounded-[4px] p-6 text-encre-950 shadow-2xl sm:p-8">
               <span className="attache-pince -top-3 left-10" aria-hidden="true" />
               <div>
                 <span className="block text-3xs font-black uppercase tracking-[0.18em] text-encre-700/60">
@@ -2505,6 +2473,7 @@ function SceneAncrageVerset({
     index: indexNiveau,
     precedent: precedentNiveau,
     sens: sensNiveau,
+    animation: animationNiveau,
     changer: changerIndexNiveau,
     reinitialiser: reinitialiserNiveau,
   } = useFeuilleAnimee(4, 0);
@@ -2518,8 +2487,8 @@ function SceneAncrageVerset({
     const indexSelectionne = options.findIndex((option) => option.reference === selection);
     return indexSelectionne >= 0 ? indexSelectionne : 0;
   });
-  const debutGlissementCarte = useRef<number | null>(null);
-  const debutGlissementNiveau = useRef<number | null>(null);
+  const debutGlissementCarte = useRef<PointGlissement | null>(null);
+  const debutGlissementNiveau = useRef<PointGlissement | null>(null);
   const reconnaissance = useRef<ReconnaissanceVocale | null>(null);
   const selectionValide = options.length === 1
     || options.some((option) => option.reference === selection);
@@ -2542,24 +2511,23 @@ function SceneAncrageVerset({
     setIndexCarte((index) => (index + direction + options.length) % options.length);
   }, [options.length]);
 
-  const terminerGlissementCarte = (positionX: number) => {
+  const terminerGlissementCarte = (fin: PointGlissement) => {
     if (debutGlissementCarte.current === null) return;
-    const distance = debutGlissementCarte.current - positionX;
+    const direction = directionGlissement(debutGlissementCarte.current, fin);
     debutGlissementCarte.current = null;
-    if (Math.abs(distance) < 42) return;
-    feuilleter(distance > 0 ? 1 : -1);
+    if (direction) feuilleter(direction);
   };
 
   const changerNiveau = (prochain: NiveauMemoire) => {
     changerIndexNiveau(prochain - 1);
   };
 
-  const terminerGlissementNiveau = (positionX: number) => {
+  const terminerGlissementNiveau = (fin: PointGlissement) => {
     if (debutGlissementNiveau.current === null) return;
-    const distance = debutGlissementNiveau.current - positionX;
+    const direction = directionGlissement(debutGlissementNiveau.current, fin);
     debutGlissementNiveau.current = null;
-    if (Math.abs(distance) < 42) return;
-    const prochain = distance > 0 ? Math.min(4, niveau + 1) : Math.max(1, niveau - 1);
+    if (!direction) return;
+    const prochain = direction > 0 ? Math.min(4, niveau + 1) : Math.max(1, niveau - 1);
     changerNiveau(prochain as NiveauMemoire);
   };
 
@@ -2713,11 +2681,11 @@ function SceneAncrageVerset({
             className="relative mt-4 h-80 touch-pan-y overflow-hidden rounded-[2rem] border border-white/8 bg-[radial-gradient(circle_at_50%_35%,rgba(216,170,85,0.12),transparent_58%)] [perspective:1400px] sm:h-72"
             onTouchStart={(event) => {
               event.stopPropagation();
-              debutGlissementCarte.current = event.touches[0]?.clientX ?? null;
+              debutGlissementCarte.current = event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]') ? null : { x: event.touches[0]?.clientX ?? 0, y: event.touches[0]?.clientY ?? 0 };
             }}
             onTouchEnd={(event) => {
               event.stopPropagation();
-              terminerGlissementCarte(event.changedTouches[0]?.clientX ?? 0);
+              terminerGlissementCarte({ x: event.changedTouches[0]?.clientX ?? 0, y: event.changedTouches[0]?.clientY ?? 0 });
             }}
             onTouchCancel={(event) => {
               event.stopPropagation();
@@ -2743,11 +2711,13 @@ function SceneAncrageVerset({
                     onChoisir(option.reference);
                   }}
                   aria-pressed={choisi}
+                  tabIndex={visible ? 0 : -1}
+                  aria-hidden={!visible}
                   aria-current={active ? 'true' : undefined}
                   aria-label={`${option.reference} — ${
                     choisi ? 'Parole choisie' : active ? 'Choisir cette Parole' : 'Afficher et choisir cette Parole'
                   }`}
-                  className={`absolute left-1/2 top-5 flex h-64 w-[min(36rem,calc(100%-3.5rem))] flex-col overflow-hidden rounded-[1.75rem] border p-5 text-left shadow-2xl transition-[transform,opacity,filter,border-color] duration-500 ease-out [backface-visibility:hidden] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-60 sm:p-7 ${
+                  className={`absolute left-1/2 top-5 flex h-64 w-[min(36rem,calc(100%-3.5rem))] flex-col overflow-hidden rounded-[1.75rem] border p-5 text-left shadow-2xl transition-[transform,opacity] duration-300 ease-out [backface-visibility:hidden] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-or-300 motion-reduce:transition-none sm:h-60 sm:p-7 ${
                     choisi
                       ? 'border-or-300 bg-[linear-gradient(145deg,rgba(216,170,85,0.22),rgba(11,29,56,0.98)_58%)]'
                       : 'border-white/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.09),rgba(11,29,56,0.98)_58%)]'
@@ -2755,9 +2725,9 @@ function SceneAncrageVerset({
                   style={{
                     transform: visible ? transformation : 'translate3d(-50%, 40px, -180px) scale(0.7)',
                     opacity: visible ? (active ? 1 : 0.34) : 0,
-                    filter: active ? 'saturate(1)' : 'saturate(0.68)',
                     zIndex: active ? 30 : visible ? 15 : 0,
                     pointerEvents: visible ? 'auto' : 'none',
+                    willChange: visible ? 'transform, opacity' : 'auto',
                   }}
                 >
                   <span className="flex items-center justify-between gap-4">
@@ -2890,11 +2860,11 @@ function SceneAncrageVerset({
             className="relative mt-7 touch-pan-y px-3 pb-10 pt-3 [perspective:1400px]"
             onTouchStart={(event) => {
               event.stopPropagation();
-              debutGlissementNiveau.current = event.touches[0]?.clientX ?? null;
+              debutGlissementNiveau.current = event.target instanceof Element && event.target.closest('input, textarea, select, button, a, [contenteditable]') ? null : { x: event.touches[0]?.clientX ?? 0, y: event.touches[0]?.clientY ?? 0 };
             }}
             onTouchEnd={(event) => {
               event.stopPropagation();
-              terminerGlissementNiveau(event.changedTouches[0]?.clientX ?? 0);
+              terminerGlissementNiveau({ x: event.changedTouches[0]?.clientX ?? 0, y: event.changedTouches[0]?.clientY ?? 0 });
             }}
             onTouchCancel={(event) => {
               event.stopPropagation();
@@ -2909,12 +2879,8 @@ function SceneAncrageVerset({
               key={`${passageMemoire.reference}-${niveau}`}
               className={`feuille-document relative ${
                 sensNiveau === 'arriere' && precedentNiveau !== null ? 'z-20' : 'z-10'
-              } fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
-                precedentNiveau !== null
-                  ? sensNiveau === 'avant'
-                    ? 'note-avant'
-                    : 'note-arriere'
-                  : 'note-posee'
+              } fiche-bristol flex h-[min(34rem,65svh)] min-h-[22rem] flex-col overflow-y-auto overscroll-contain rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
+                animationNiveau
               } ${
                 niveau === 1
                   ? 'border-t-or-400'
@@ -3061,7 +3027,7 @@ function SceneAncrageVerset({
                 aria-hidden="true"
                 className={`feuille-document pointer-events-none absolute inset-x-3 top-3 ${
                   sensNiveau === 'arriere' ? 'z-10' : 'z-20'
-                } fiche-bristol flex min-h-[26rem] flex-col overflow-hidden rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
+                } fiche-bristol flex h-[min(34rem,65svh)] min-h-[22rem] flex-col overflow-y-auto overscroll-contain rounded-[1.75rem] border-t-[7px] p-5 text-encre-950 shadow-2xl sm:p-8 ${
                   sensNiveau === 'avant' ? 'note-quitte-avant' : 'note-quitte-arriere'
                 } ${
                   precedentNiveau + 1 === 1
@@ -3128,9 +3094,9 @@ function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
 
       <div className="mx-auto mt-10 max-w-md space-y-2.5 text-left">
         {[
-          'Mettez votre téléphone en silencieux. Ce moment ne dure qu’une fois.',
+          PROFILS_FICHES[fiche.id]?.invitation || 'Prendre le temps de lire et de recevoir.',
           'Gardez une Bible à portée de main : plusieurs passages sont à lire dedans.',
-          'Vous pouvez vous arrêter et revenir : tout est enregistré au fur et à mesure.',
+          'Vous pouvez vous arrêter et revenir. Le marque-page garde votre place ; le carnet indique ce qui est conservé.',
         ].map((ligne) => (
           <p
             key={ligne}
@@ -3439,8 +3405,8 @@ function SceneCloture({
       </h2>
       <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-parchemin-100/65">
         {tempsDuJour
-          ? 'Ta lecture, ta méditation, ta prière et ton pas sont enregistrés. Tu pourras les retrouver dans ton carnet.'
-          : 'Votre groupe le voit. Le reste — vos réponses, ce que vous avez écrit — ne regarde que vous, jusqu’à ce que vous décidiez d’en parler.'}
+          ? 'Ce temps peut se poursuivre dans ta journée. Retrouve dans ton carnet les mots que tu as choisi d’enregistrer.'
+          : 'Tes écrits restent dans ton espace personnel. Si tu vis le parcours en cellule, seule la préparation de la fiche est signalée au groupe.'}
       </p>
       <button
         onClick={onQuitter}

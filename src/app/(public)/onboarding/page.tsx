@@ -19,6 +19,7 @@ import {
   Bookmark,
   Users,
 } from 'lucide-react';
+import { TraceParole } from '@/components/TraceParole';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import {
@@ -104,15 +105,15 @@ export default function OnboardingPage() {
   // L'accueil a été vu : on le note, pour ne pas y ramener la personne à
   // chaque page. Elle le retrouve depuis la fiche 1 ou son espace.
   const remettreAPlusTard = async () => {
-    await updateProfile({ onboardingSeenAt: Date.now() });
-    router.push('/fiches/1');
+    await updateProfile({ onboardingSeenAt: Date.now(), studyMode: 'personnel' });
+    router.push('/dashboard');
   };
 
   const validerPosition = async () => {
     if (!place) return;
     await updateProfile({ place });
     setMatches(null);
-    setEtape('chemin');
+    setEtape('rejoindre');
   };
 
   const soumettreDemande = async () => {
@@ -254,9 +255,9 @@ export default function OnboardingPage() {
             </p>
 
             <h1 className="mt-5 font-serif text-4xl leading-[1.1] font-bold text-parchemin-100 sm:text-5xl">
-              Ce parcours ne
+              Un chemin à vivre
               <br />
-              <span className="titre-or">se marche pas seul.</span>
+              <span className="titre-or">avec Dieu et les autres.</span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-parchemin-100/70 sm:text-base">
@@ -276,21 +277,21 @@ export default function OnboardingPage() {
               {[
                 {
                   icon: Users,
-                  titre: 'Un groupe, d’abord',
+                  titre: 'Un temps avec Dieu',
                   texte:
-                    'Vous rejoignez un groupe près de chez vous, ou vous créez le vôtre et vous invitez.',
+                    'Vous ouvrez le livret, écoutez la Parole et prenez le temps de la comprendre.',
                 },
                 {
                   icon: Lock,
-                  titre: 'Puis le parcours s’ouvre',
+                  titre: 'Un chemin personnel',
                   texte:
-                    'Tant qu’il n’y a pas de groupe, les fiches restent fermées. C’est voulu.',
+                    'Les vingt fiches sont accessibles en étude individuelle. Votre carnet reste privé.',
                 },
                 {
                   icon: Compass,
-                  titre: 'Une fiche à la fois',
+                  titre: 'La richesse d’une cellule',
                   texte:
-                    'Vous la préparez seul, le groupe la partage, puis la suivante s’ouvre. Jamais avant.',
+                    'Le livret recommande un petit groupe : chacun prépare la fiche, puis la partage avec les autres.',
                 },
               ].map((item) => (
                 <div
@@ -310,13 +311,14 @@ export default function OnboardingPage() {
               ))}
             </div>
 
+            <div className="mt-8"><TraceParole ficheId={1} cle="trace:depart" titre="Au début de mon chemin" invitation="Qu’est-ce qui vous a donné envie d’ouvrir ce parcours ?" natureInitiale="question" sombre /></div>
             <div className="mt-10 flex flex-col items-center gap-4">
               <button
                 type="button"
-                onClick={() => setEtape(place ? 'chemin' : 'situer')}
+                onClick={() => setEtape('chemin')}
                 className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
               >
-                Commencer
+                Avec une cellule
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </button>
 
@@ -327,7 +329,7 @@ export default function OnboardingPage() {
                 onClick={remettreAPlusTard}
                 className="text-2xs font-bold text-parchemin-100/40 transition-colors hover:text-parchemin-100/70"
               >
-                Plus tard — lire d&apos;abord la fiche 1
+                Commencer mon étude personnelle
               </button>
             </div>
           </section>
@@ -420,7 +422,7 @@ export default function OnboardingPage() {
                 type="button"
                 onClick={() => {
                   setMatches(null);
-                  setEtape('rejoindre');
+                  setEtape(place ? 'rejoindre' : 'situer');
                 }}
                 className="group relative overflow-hidden rounded-3xl border border-white/12 bg-white/[0.05] p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-or-300/40 hover:bg-white/[0.09]"
               >

@@ -21,7 +21,7 @@ import { useDeclarerFondSombre } from '@/lib/fondSombre';
  *                 attend son groupe, c'était appliquer la règle du parcours
  *                 à ce qui n'en relève pas.
  */
-export type NiveauAcces = 'groupe' | 'attente' | 'personnel' | 'decouverte';
+export type NiveauAcces = 'groupe' | 'attente' | 'personnel' | 'decouverte' | 'lecture';
 
 interface ParcoursGateProps {
   children: React.ReactNode;
@@ -83,6 +83,8 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
   if (!user) return null;
 
   // Une pratique personnelle n'attend personne : être connecté suffit.
+  if (acces === 'lecture' && profile?.studyMode === 'personnel' && !group) return <>{children}</>;
+
   if (acces === 'personnel') return <>{children}</>;
 
   if (gate.state === 'sans_groupe' || gate.state === 'refuse') {
@@ -92,14 +94,14 @@ export default function ParcoursGate({ children, acces = 'groupe' }: ParcoursGat
         titre={
           gate.state === 'refuse'
             ? 'Vous n’êtes plus rattaché à un groupe'
-            : 'Rejoignez une cellule pour les étapes suivantes'
+            : 'Choisissez comment poursuivre le parcours'
         }
         texte={
           gate.state === 'refuse'
             ? "Votre place dans ce groupe s'est libérée. Rejoignez-en un autre, ou créez le vôtre — le parcours reprendra là où vous l'aviez laissé."
-            : "La Fiche 1 est en accès libre. Pour vivre les 19 fiches suivantes en profondeur, rejoignez une cellule de 5 ou 6 personnes près de chez vous, ou rassemblez la vôtre."
+            : "Le livret propose une étude personnelle, idéalement accompagnée d’un partage en cellule de 5 ou 6 personnes. Vous pouvez choisir votre chemin dans l’accueil."
         }
-        action={{ href: '/onboarding', label: 'Trouver ou créer mon groupe' }}
+        action={{ href: '/onboarding', label: 'Choisir mon chemin' }}
       />
     );
   }
@@ -155,7 +157,7 @@ function EcranFerme({
         <div className="mx-auto mt-7 max-w-sm rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3">
           <p className="flex items-center justify-center gap-2 text-2xs leading-relaxed text-parchemin-100/55">
             <Lock className="h-3 w-3 shrink-0" />
-            Les fiches restent fermées tant qu&apos;un groupe ne les porte pas.
+            Vos écrits personnels restent privés, quel que soit votre chemin.
           </p>
         </div>
 

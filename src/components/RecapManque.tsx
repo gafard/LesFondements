@@ -22,10 +22,10 @@ import type { GroupSession } from '@/lib/types';
 /** Une fois lu, on ne le remontre pas : la clé retient lesquels. */
 const CLE = 'lf.recapsLus';
 
-function dejaLus(): number[] {
+function dejaLus(cle: string): number[] {
   if (typeof window === 'undefined') return [];
   try {
-    return JSON.parse(window.localStorage.getItem(CLE) ?? '[]') as number[];
+    return JSON.parse(window.localStorage.getItem(cle) ?? '[]') as number[];
   } catch {
     return [];
   }
@@ -34,6 +34,7 @@ function dejaLus(): number[] {
 export default function RecapManque() {
   const { user } = useAuth();
   const { group } = useParcours();
+  const cle = `${CLE}:${user?.uid}:${group?.id}`;
   const [manques, setManques] = useState<GroupSession[]>([]);
 
   useEffect(() => {
@@ -41,13 +42,13 @@ export default function RecapManque() {
     let vivant = true;
     void recapsManques(group.id, user.uid).then((sessions) => {
       if (!vivant) return;
-      const lus = dejaLus();
+      const lus = dejaLus(cle);
       setManques(sessions.filter((s) => !lus.includes(s.step)));
     });
     return () => {
       vivant = false;
     };
-  }, [group, user]);
+  }, [group, user, cle]);
 
   if (!manques.length) return null;
 
@@ -56,7 +57,7 @@ export default function RecapManque() {
 
   const ranger = () => {
     try {
-      window.localStorage.setItem(CLE, JSON.stringify([...dejaLus(), session.step]));
+      window.localStorage.setItem(cle, JSON.stringify([...dejaLus(cle), session.step]));
     } catch {
       /* stockage indisponible : il reparaîtra, ce n'est pas grave */
     }

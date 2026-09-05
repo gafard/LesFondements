@@ -64,7 +64,7 @@ const rhythms = [
     icon: CheckCircle2,
     eyebrow: 'Dans la vraie vie',
     title: 'Je pratique et transmets',
-    text: 'Chaque fiche invite à choisir librement une manière concrète de vivre la Parole reçue.',
+    text: 'Une Parole reçue, un petit geste dans ma journée, puis une relecture : ce que j’ai vécu, ce qui m’a freiné et ce que je veux faire grandir.',
     badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-200',
     image: '/group-communion-hero.jpg'
   },

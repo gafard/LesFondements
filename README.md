@@ -1,6 +1,12 @@
 # 📖 Les Fondements — Parcours de Discipulat
 
-Application web et mobile progressive (PWA) du parcours **« Le parcours des fondements »** : vingt fiches préparées seul, vingt rencontres vécues en petit groupe (5 à 6 disciples).
+Application web et mobile progressive (PWA) du parcours **« Le parcours des fondements »** : vingt fiches étudiées personnellement, avec un partage en petit groupe (5 à 6 disciples) recommandé par le livret.
+
+## Habiter la Parole
+
+Le temps avec Dieu est le point d’entrée. Chaque fiche propose une invitation adaptée et la liberté de garder une compréhension, une prière, une question ou un pas. Le carnet réunit les anciens écrits, les nouvelles traces et les relectures ; le fil entre fiches retrouve les mots choisis par la personne. Les modes personnel et cellule, les rencontres 7/8/10, l’export choisi et le mode de lecture paisible prolongent cette expérience.
+
+Voir [la vision d’ensemble](docs/REFONTE-ENSEMBLE-EXPERIENCE.md) et [le bilan de mise en œuvre](docs/HABITER-LA-PAROLE-IMPLEMENTATION.md). Les contrôles spécifiques sont `npm run test:habiter`, `npm run test:carnet` et `npm run test:pas`.
 
 ---
 
@@ -14,7 +20,7 @@ Le parcours quotidien découpe chaque fiche en étapes contemplatives au fil des
 - **Méditation Théocentrique** : Questions profondes axées sur la grandeur et l'amour de Dieu.
 - **Sanctuaire de Prière** : Miroir sacré des pensées notées avec verbes d'adoration (*Adorer · Remercier · Confesser · Demander · Écouter · Remettre*).
 - **Ancrage du Verset (4 niveaux)** : Lecture intégrale, mots à trous interactifs, initiales mémorielles, et récitation vocale avec génération 1-clic de fond d'écran pour mobile.
-- **Pose de pas de vie & Archivage automatique** : Enregistrement transparent dans le Carnet Spirituel (`/journal`).
+- **Trace libre & Carnet privé** : Compréhension, prière, question ou pas, conservés dans le carnet (`/journal`) ; aucune entrée automatique ne prétend que toutes les pratiques ont été vécues.
 
 ### 2. 🎙️ Transcription Vocale Intelligente (Whisper Large v3) & Écoute Audio
 - **Écoute de la question (🔊)** : Bouton pour entendre chaque question lue à voix haute posément.

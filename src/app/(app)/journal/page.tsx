@@ -8,6 +8,7 @@ import type { JournalEntry } from '@/lib/firestore';
 import Image from 'next/image';
 import { PenLine, Plus, Trash2, Calendar } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
+import CarnetUnifie from '@/components/CarnetUnifie';
 import ChampDictée from '@/components/ChampDictée';
 
 function Journal() {
@@ -16,6 +17,8 @@ function Journal() {
   const [entries, setEntries] = useState<JournalEntry[]>(() => (user ? getCachedJournalEntries(user.uid) : []));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [newContent, setNewContent] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [erreur, setErreur] = useState('');
   
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -40,19 +43,20 @@ function Journal() {
   }, [user]);
 
   const handleSave = async () => {
-    if (user && newContent.trim()) {
+    if (!user || !newContent.trim() || busy) return;
+    setBusy(true); setErreur('');
+    try {
       await addJournalEntry(user.uid, newContent);
-      setNewContent('');
-      setIsFormOpen(false);
-      refreshEntries();
-    }
+      setNewContent(''); setIsFormOpen(false); await refreshEntries();
+    } catch { setErreur('Cette note n’a pas été conservée. Votre texte reste ouvert : réessayez ou copiez-le.'); }
+    finally { setBusy(false); }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Voulez-vous supprimer cette entrée ?')) {
       if (!user) return;
-      await deleteJournalEntry(user.uid, id);
-      refreshEntries();
+      try { await deleteJournalEntry(user.uid, id); await refreshEntries(); }
+      catch { setErreur('La suppression n’a pas été conservée. Réessayez.'); }
     }
   };
 
@@ -82,10 +86,10 @@ function Journal() {
                 Sanctuaire de réflexion intime
               </p>
               <h1 className="text-3xl font-bold font-serif text-[#fff8e8] flex items-center gap-2 sm:text-4xl">
-                Journal Spirituel
+                Mon carnet
               </h1>
               <p className="text-parchemin-100/75 text-xs sm:text-sm mt-1.5 max-w-md">
-                Consignez vos réflexions secrètes, vos prières et ce que le Seigneur vous révèle de votre main.
+                Gardez vos découvertes, vos prières et vos questions. Ces pages vous appartiennent.
               </p>
             </div>
             
@@ -98,6 +102,9 @@ function Journal() {
           </div>
         </div>
 
+        <CarnetUnifie key={user.uid} />
+        <h2 className="mb-5 font-serif text-2xl font-bold text-encre-950">Mes notes libres</h2>
+        {erreur && <p role="alert" className="mb-4 text-sm text-encre-800">{erreur}</p>}
         {isFormOpen && (
           <div className="feuille feuille-dechiree p-6 sm:p-8 rounded-3xl shadow-lg border border-parchemin-300 mb-8 animate-fade-in relative">
             <span className="ruban -top-3 left-8 -rotate-2 rounded-[2px]" />
@@ -120,6 +127,7 @@ function Journal() {
               </button>
               <button
                 onClick={handleSave}
+                disabled={busy || !newContent.trim()}
                 className="bouton-or px-6 py-2.5 rounded-full text-xs font-bold shadow-sm"
               >
                 Épingler au journal
@@ -171,9 +179,10 @@ function Journal() {
 }
 
 export default function Page() {
+  const { user } = useAuth();
   return (
     <ParcoursGate acces="personnel">
-      <Journal />
+      <Journal key={user?.uid} />
     </ParcoursGate>
   );
 }

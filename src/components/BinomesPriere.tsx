@@ -24,6 +24,7 @@ export default function BinomesPriere() {
   const [binomes, setBinomes] = useState<Binome[]>([]);
   const [choisis, setChoisis] = useState<string[]>([]);
   const [ouvert, setOuvert] = useState(false);
+  const [accord, setAccord] = useState(false);
 
   const actifs = members.filter((m) => m.status === 'actif');
 
@@ -53,7 +54,8 @@ export default function BinomesPriere() {
   const nomDe = (uid: string) =>
     actifs.find((m) => m.uid === uid)?.displayName ?? 'Un membre';
 
-  const basculer = (uid: string) =>
+  const basculer = (uid: string) => {
+    setAccord(false);
     setChoisis((actuels) =>
       actuels.includes(uid)
         ? actuels.filter((x) => x !== uid)
@@ -61,11 +63,13 @@ export default function BinomesPriere() {
           ? actuels
           : [...actuels, uid]
     );
+  };
 
   const attacher = async () => {
-    if (choisis.length < 2) return;
+    if (choisis.length < 2 || !accord) return;
     await creerBinome(group.id, choisis, user.uid);
     setChoisis([]);
+    setAccord(false);
     setOuvert(false);
     await relire();
   };
@@ -113,12 +117,13 @@ export default function BinomesPriere() {
               </button>
             ))}
           </div>
+          <label className="mt-4 flex items-start gap-3 text-sm text-encre-700"><input type="checkbox" checked={accord} onChange={e => setAccord(e.target.checked)} className="mt-1" />J’ai demandé leur accord à chacune des personnes choisies ; elles souhaitent prier ensemble.</label>
           <button
             onClick={attacher}
-            disabled={choisis.length < 2}
+            disabled={choisis.length < 2 || !accord}
             className="bouton-or mt-3 rounded-full px-5 py-2 text-2xs font-bold disabled:opacity-30"
           >
-            Les attacher
+            Enregistrer leur accord
           </button>
         </div>
       )}

@@ -1,0 +1,68 @@
+[
+  {
+    "valeur": "lieu-saint-presence",
+    "label": "Présence",
+    "description": "Heaven Sounds · boucle douce de 3 min 56",
+    "type": "musique",
+    "fichier": "/audio/ambiances/lieu-saint-presence.mp3",
+    "artiste": "Heaven Sounds",
+    "source": "Dans le lieu très saint",
+    "debutSourceSecondes": 120,
+    "dureeSecondes": 236
+  },
+  {
+    "valeur": "lieu-saint-intimite",
+    "label": "Intimité",
+    "description": "Heaven Sounds · boucle douce de 3 min 56",
+    "type": "musique",
+    "fichier": "/audio/ambiances/lieu-saint-intimite.mp3",
+    "artiste": "Heaven Sounds",
+    "source": "Dans le lieu très saint",
+    "debutSourceSecondes": 1320,
+    "dureeSecondes": 236
+  },
+  {
+    "valeur": "lieu-saint-contemplation",
+    "label": "Contemplation",
+    "description": "Heaven Sounds · boucle douce de 3 min 56",
+    "type": "musique",
+    "fichier": "/audio/ambiances/lieu-saint-contemplation.mp3",
+    "artiste": "Heaven Sounds",
+    "source": "Dans le lieu très saint",
+    "debutSourceSecondes": 3000,
+    "dureeSecondes": 236
+  },
+  {
+    "valeur": "selah-recueillement",
+    "label": "Selah · Recueillement",
+    "description": "Josue Grace · boucle douce de 3 min 56",
+    "type": "musique",
+    "fichier": "/audio/ambiances/selah-recueillement.mp3",
+    "artiste": "Josue Grace",
+    "source": "Selah — Prayer Instrumental",
+    "debutSourceSecondes": 90,
+    "dureeSecondes": 236
+  },
+  {
+    "valeur": "selah-priere",
+    "label": "Selah · Prière",
+    "description": "Josue Grace · boucle douce de 3 min 56",
+    "type": "musique",
+    "fichier": "/audio/ambiances/selah-priere.mp3",
+    "artiste": "Josue Grace",
+    "source": "Selah — Prayer Instrumental",
+    "debutSourceSecondes": 780,
+    "dureeSecondes": 236
+  },
+  {
+    "valeur": "selah-repos",
+    "label": "Selah · Repos",
+    "description": "Josue Grace · boucle douce de 3 min 56",
+    "type": "musique",
+    "fichier": "/audio/ambiances/selah-repos.mp3",
+    "artiste": "Josue Grace",
+    "source": "Selah — Prayer Instrumental",
+    "debutSourceSecondes": 1560,
+    "dureeSecondes": 236
+  }
+]

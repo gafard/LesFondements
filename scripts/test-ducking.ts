@@ -45,6 +45,10 @@ const { activerDuckingVoix, arreterAmbiance, jouerAmbiance } = await import('../
 await jouerAmbiance('emotional-piano', 1);
 const audio = FauxAudio.dernier;
 assert.ok(audio);
+assert.equal(audio.volume, 0, 'entrée musicale silencieuse');
+avancer(600);
+assert.ok(audio.volume > 0 && audio.volume < 0.14, 'entrée progressive');
+avancer(600);
 assert.equal(audio.volume, 0.14, 'volume musical nominal');
 
 const voixA = Symbol('voix-a');
@@ -62,6 +66,9 @@ activerDuckingVoix(false, voixB);
 avancer(1_200);
 assert.ok(Math.abs(audio.volume - 0.14) < 0.0001, 'la musique remonte après la dernière voix');
 
+await arreterAmbiance();
+await Promise.all([jouerAmbiance('lieu-saint-presence'), jouerAmbiance('selah-repos')]);
+assert.equal(FauxAudio.dernier?.src, '/audio/ambiances/selah-repos.mp3', 'la dernière sélection musicale gagne');
 await arreterAmbiance();
 console.log('Ducking vérifié : fondu, chevauchement des voix et restauration du volume.');
 

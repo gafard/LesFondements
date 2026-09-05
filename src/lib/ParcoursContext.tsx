@@ -232,7 +232,7 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
         membership?.role === 'co_animateur'),
     unlockedStep: gate.state === 'ouvert' ? gate.unlockedStep : gate.state === 'termine' ? 20 : 0,
     preparationStep:
-      gate.state === 'ouvert' ? gate.preparationStep : gate.state === 'termine' ? 20 : 0,
+      !group && profile?.studyMode === 'personnel' ? 20 : gate.state === 'ouvert' ? gate.preparationStep : gate.state === 'termine' ? 20 : 0,
     refresh: load,
     updateProfile,
     isLocalMode: !hasRemoteBackend(),

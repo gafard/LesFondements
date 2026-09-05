@@ -61,6 +61,7 @@ import {
   updateGroupSettings,
 } from '@/lib/parcoursStore';
 import { FICHES_META } from '@/data/fichesMeta';
+import PreparationRencontre from '@/components/PreparationRencontre';
 import BinomesPriere from '@/components/BinomesPriere';
 import {
   LONGUEUR_REPONSE,
@@ -156,6 +157,7 @@ function CelluleContent() {
   return (
     <div className="table-travail min-h-screen pb-16 pt-6">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <PreparationRencontre key={`${user.uid}:${group.currentStep}`} ficheId={group.currentStep} />
         {/* ══ En-tête du groupe ══ */}
         <header className="nuit nuit-grain relative mb-8 overflow-hidden rounded-4xl p-6 text-parchemin-100 shadow-lg sm:p-8">
           <div className="absolute inset-0 z-0">

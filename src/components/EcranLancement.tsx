@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/lib/AuthContext';
 import { useCallback, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Download, Wifi, WifiOff } from 'lucide-react';
@@ -65,23 +66,24 @@ function estInstallee(): boolean {
  */
 const RIEN = () => () => {};
 
-function useDernierPassage(): DernierPassage | null {
+function useDernierPassage(uid?: string): DernierPassage | null {
   const abonner = useCallback((rappel: () => void) => {
     window.addEventListener(EVENEMENT_PASSAGE, rappel);
     return () => window.removeEventListener(EVENEMENT_PASSAGE, rappel);
   }, []);
-  return useSyncExternalStore(abonner, passageStable, () => null);
+  const lire = useCallback(() => passageStable(uid), [uid]);
+  return useSyncExternalStore(abonner, lire, () => null);
 }
 
-function passageStable(): DernierPassage | null {
+function passageStable(uid?: string): DernierPassage | null {
   const brut = (() => {
     try {
-      return window.localStorage.getItem(CLE_DERNIER_PASSAGE);
+      return window.localStorage.getItem(uid ? `${CLE_DERNIER_PASSAGE}:${uid}` : CLE_DERNIER_PASSAGE);
     } catch {
       return null;
     }
   })();
-  if (brut !== passageCache.brut) passageCache = { brut, valeur: lireDernierPassage() };
+  if (brut !== passageCache.brut) passageCache = { brut, valeur: lireDernierPassage(uid) };
   return passageCache.valeur;
 }
 
@@ -98,7 +100,8 @@ function useEnLigne(): boolean {
 }
 
 export default function EcranLancement() {
-  const passage = useDernierPassage();
+  const { user } = useAuth();
+  const passage = useDernierPassage(user?.uid);
   const enLigne = useEnLigne();
   const installee = useSyncExternalStore(RIEN, estInstallee, () => true);
   const verset = useSyncExternalStore(RIEN, versetDuJour, () => null);

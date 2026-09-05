@@ -24,13 +24,13 @@ import {
   Search,
   Shield,
   ShieldCheck,
-  Sunrise,
   TrendingUp,
   Users,
   X,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
+import ConfortLecture from '@/components/ConfortLecture';
 import NotificationCenter from '@/components/NotificationCenter';
 import SyncStatusBadge from '@/components/SyncStatusBadge';
 import { flushPendingWrites } from '@/lib/firestore';
@@ -64,28 +64,27 @@ interface Destination {
 }
 
 const PRINCIPALES: Destination[] = [
-  { href: '/dashboard', label: 'Tableau de bord', court: 'Accueil', icon: Home },
-  { href: '/aujourdhui', label: 'Aujourd’hui', court: 'Aujourd’hui', icon: Sunrise },
+  { href: '/dashboard', label: 'Aujourd’hui', court: 'Aujourd’hui', icon: Home },
   { href: '/fiches', label: 'Le parcours', court: 'Parcours', icon: Compass },
+  { href: '/journal', label: 'Mon carnet', court: 'Carnet', icon: PenLine },
   { href: '/groupes', label: 'Ma cellule', court: 'Cellule', icon: Users },
-  { href: '/memorisation', label: 'Mémorisation', court: 'Versets', icon: Brain },
 ];
 
 const SECONDAIRES: Destination[] = [
-  { href: '/journal', label: 'Journal', court: 'Journal', icon: PenLine },
+  { href: '/memorisation', label: 'La Parole en mémoire', court: 'Versets', icon: Brain },
   { href: '/recherche', label: 'Retrouver mes écrits', court: 'Recherche', icon: Search },
-  { href: '/transformation', label: 'Mon chemin parcouru', court: 'Chemin', icon: TrendingUp },
+  { href: '/transformation', label: 'Mon chemin intérieur', court: 'Chemin', icon: TrendingUp },
   { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
   { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
   { href: '/ressources', label: 'Bibliothèque & Contact', court: 'Ressources', icon: BookMarked },
   { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Bookmark },
   { href: '/guide-pastoral', label: 'Guide pastoral', court: 'Guide', icon: Shield },
-  { href: '/certificat', label: 'Mon attestation', court: 'Attestation', icon: Award },
+  { href: '/certificat', label: 'Relire mon parcours', court: 'Relecture', icon: Award },
   { href: '/parametres', label: 'Mes réglages', court: 'Réglages', icon: ShieldCheck },
 ];
 
 const ONGLETS_MOBILES = PRINCIPALES.slice(0, 4);
-const MENU_MOBILE = [PRINCIPALES[4], ...SECONDAIRES];
+const MENU_MOBILE = SECONDAIRES;
 
 function estActive(pathname: string, href: string): boolean {
   return href === '/dashboard' ? pathname === href : pathname.startsWith(href);
@@ -199,6 +198,7 @@ function ColonneLaterale({
         ))}
       </nav>
 
+      <ConfortLecture />
       <p className="mb-1 mt-6 px-3 text-2xs font-bold uppercase tracking-[0.16em] text-parchemin-100/55">
         Aller plus loin
       </p>
@@ -433,7 +433,7 @@ function BarreOnglets({
             <div className="max-h-[calc(min(72vh,42rem)-8rem)] overflow-y-auto px-4 pb-5 pt-4">
               <Link
                 ref={premierLien}
-                href={PRINCIPALES[4].href}
+                href={SECONDAIRES[0].href}
                 onClick={() => setPlusOuvert(false)}
                 className="mb-4 flex min-h-14 items-center gap-3 rounded-2xl border border-or-300 bg-or-50 px-4 py-3 text-encre-950"
               >
@@ -450,7 +450,7 @@ function BarreOnglets({
                 Aller plus loin
               </p>
               <div className="grid grid-cols-2 gap-2.5">
-                {SECONDAIRES.map((lien) => {
+                {SECONDAIRES.slice(1).map((lien) => {
                   const Icone = lien.icon;
                   const actif = estActive(pathname, lien.href);
                   return (
@@ -472,6 +472,7 @@ function BarreOnglets({
                 })}
               </div>
 
+              <ConfortLecture />
               <div className="mt-4 grid grid-cols-2 gap-2.5 border-t border-dashed border-encre-950/15 pt-4">
                 <button
                   type="button"

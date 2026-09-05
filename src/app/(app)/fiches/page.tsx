@@ -65,7 +65,7 @@ type Etat = 'close' | 'ouverte' | 'preparee' | 'terminee';
 
 function SentierContent() {
   const { user } = useAuth();
-  const { group, membership, unlockedStep, preparationStep, isLeader } = useParcours();
+  const { group, profile, membership, unlockedStep, preparationStep, isLeader } = useParcours();
   const [validees, setValidees] = useState<number[]>(() =>
     user ? getCachedUserProgress(user.uid).completedFiches ?? [] : []
   );
@@ -81,6 +81,7 @@ function SentierContent() {
   const maxAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
   const etatDe = (id: number): Etat => {
     if (!group) {
+      if (profile?.studyMode === 'personnel') return validees.includes(id) ? 'terminee' : 'ouverte';
       if (id === 1) return 'ouverte';
       return 'close';
     }
@@ -101,7 +102,7 @@ function SentierContent() {
     );
   }, [recherche]);
 
-  const terminees = group?.closedSteps.length ?? 0;
+  const terminees = group?.closedSteps.length ?? validees.length;
   const pourcentage = Math.round((terminees / 20) * 100);
   const prochaine = group ? nextMeetingDate(group.meeting, group.stepOpenedAt) : null;
 

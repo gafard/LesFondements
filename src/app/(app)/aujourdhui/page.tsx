@@ -6,8 +6,10 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import Immersion, { ChargementImmersion } from '@/components/Immersion';
 import ParcoursGate from '@/components/ParcoursGate';
 import { useAuth } from '@/lib/AuthContext';
-import { addJournalEntry, getAnswers, saveAnswer } from '@/lib/firestore';
+import { getAnswers, saveAnswer, markFicheCompleted } from '@/lib/firestore';
 import { chargerFiche, type FicheLivret } from '@/lib/livret';
+import { useParcours } from '@/lib/ParcoursContext';
+import { memoriserPassage } from '@/lib/marquePage';
 import { etapesTempsApart } from '@/lib/tempsApart';
 
 function entierBorne(valeur: string | null, minimum: number, maximum: number, repli: number): number {
@@ -18,8 +20,10 @@ function entierBorne(valeur: string | null, minimum: number, maximum: number, re
 function AujourdhuiContent() {
   const { user } = useAuth();
   const router = useRouter();
+  const { group, preparationStep } = useParcours();
+  const [erreur, setErreur] = useState('');
   const searchParams = useSearchParams();
-  const ficheId = entierBorne(searchParams.get('fiche'), 1, 20, 1);
+  const ficheId = entierBorne(searchParams.get('fiche'), 1, 20, group?.currentStep || 1);
   const sectionDemandee = searchParams.get('section');
   const sceneInitiale = entierBorne(searchParams.get('scene'), 0, 500, 0);
   const momentInitial = searchParams.get('moment');
@@ -55,24 +59,27 @@ function AujourdhuiContent() {
 
   const enregistrer = (cle: string, valeur: string) => {
     setReponses((actuelles) => ({ ...(actuelles ?? {}), [cle]: valeur }));
-    if (user) void saveAnswer(user.uid, ficheId, cle, valeur);
+    if (user) void saveAnswer(user.uid, ficheId, cle, valeur).catch(() => setErreur('Votre réponse n’a pas été conservée. Copiez-la avant de quitter et libérez de la place sur cet appareil.'));
   };
 
   const terminer = async () => {
     if (!fiche || !reponses) return;
     const cle = `temps-apart:${sectionIndex}`;
-    const dejaTerminee = Boolean(reponses[cle]);
-    setReponses((actuelles) => ({ ...(actuelles ?? {}), [cle]: '1' }));
     if (!user) return;
-
     await saveAnswer(user.uid, ficheId, cle, '1');
-    if (!dejaTerminee) {
-      const sectionTitre = etapes[sectionIndex]?.section.titre || `Étape ${sectionIndex + 1}`;
-      await addJournalEntry(
-        user.uid,
-        `📖 **Fiche ${fiche.id} : ${fiche.titre}** — ${sectionTitre}\n✨ Lecture, méditation, prière et mémorisation vécues aujourd’hui.`
-      );
+    setReponses((actuelles) => ({ ...(actuelles ?? {}), [cle]: '1' }));
+    if (etapes.every((_, i) => i === sectionIndex || Boolean(reponses[`temps-apart:${i}`]))) {
+      await markFicheCompleted(user.uid, ficheId);
     }
+    const suivante = etapes.findIndex((_, i) => i !== sectionIndex && !reponses[`temps-apart:${i}`]);
+    const continuer = suivante >= 0 || (!group && ficheId < 20);
+    const prochaineFiche = suivante >= 0 || group || ficheId === 20 ? ficheId : ficheId + 1;
+    memoriserPassage({ uid: user.uid,
+      url: continuer ? `/aujourdhui?fiche=${prochaineFiche}&section=${suivante >= 0 ? suivante : 0}&scene=0` : ficheId === 20 ? '/certificat' : `/fiches/${ficheId}`,
+      titre: continuer ? `Fiche ${prochaineFiche}` : 'Relire mon parcours',
+      sousTitre: continuer ? 'Prochain temps, quand tu le souhaites' : 'Les mots que tu gardes',
+      type: continuer ? 'immersion' : 'fiche',
+    });
   };
 
   if (fiche === undefined || reponses === null) return <ChargementImmersion />;
@@ -92,8 +99,13 @@ function AujourdhuiContent() {
     );
   }
 
+  if (group && ficheId > Math.max(1, preparationStep)) return <div className="p-8 text-encre-950"><p>Cette fiche s’ouvrira avec l’avancée de votre cellule.</p><button onClick={() => router.push('/dashboard')} className="mt-4 min-h-11 rounded-full border px-5">Revenir à mon temps</button></div>;
+
   return (
+    <ParcoursGate acces={ficheId === 1 ? 'decouverte' : 'lecture'}>
+    {erreur && <div role="alert" className="fixed inset-x-4 top-4 z-[100] rounded-xl bg-white p-4 text-encre-950">{erreur}</div>}
     <Immersion
+      key={`${user?.uid}:${ficheId}:${sectionIndex}`}
       fiche={fiche}
       sectionIndex={sectionIndex}
       reponses={reponses}
@@ -104,12 +116,13 @@ function AujourdhuiContent() {
       indexInitial={sceneInitiale}
       momentInitial={momentInitial}
     />
+    </ParcoursGate>
   );
 }
 
 export default function AujourdhuiPage() {
   return (
-    <ParcoursGate acces="personnel">
+    <ParcoursGate acces="decouverte">
       <Suspense
         fallback={
           <div className="nuit fixed inset-0 z-[60] flex items-center justify-center">

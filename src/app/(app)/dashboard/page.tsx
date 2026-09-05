@@ -15,12 +15,15 @@ import {
 import ParcoursGate from '@/components/ParcoursGate';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
-import { getAnswers } from '@/lib/firestore';
+import { getAnswers, getUserProgress } from '@/lib/firestore';
 import { chargerFiche, type FicheLivret } from '@/lib/livret';
 import NotificationCenter from '@/components/NotificationCenter';
 import Illumination from '@/components/Illumination';
 import { VERSETS_CONNUS, normaliserReference, texteDuVerset } from '@/data/versets';
 import { etapesTempsApart } from '@/lib/tempsApart';
+import ReprendreParole from '@/components/ReprendreParole';
+import RecapManque from '@/components/RecapManque';
+import { PasDuJour } from '@/components/PasDeVie';
 
 const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
@@ -52,7 +55,14 @@ function DashboardContent() {
   const [reponsesFiche, setReponsesFiche] = useState<Record<string, string>>({});
   const [notifOuvert, setNotifOuvert] = useState(false);
 
-  const ficheCouranteId = group?.currentStep ?? 1;
+  const [fichePersonnelle, setFichePersonnelle] = useState(1);
+  useEffect(() => {
+    if (!user || group) return;
+    let actif = true;
+    void getUserProgress(user.uid).then(p => { if (actif) setFichePersonnelle(p.currentFicheId); });
+    return () => { actif = false; };
+  }, [user, group]);
+  const ficheCouranteId = group?.currentStep ?? fichePersonnelle;
 
   useEffect(() => {
     let actif = true;
@@ -100,7 +110,7 @@ function DashboardContent() {
                 Bonjour, {user?.displayName?.split(' ')[0] || 'Cher Disciple'}
               </h1>
               <p className="mt-1 text-sm text-encre-700 font-serif italic">
-                « Chaque jour, la Parole s&apos;enracine un peu plus dans votre cœur. »
+                Un passage à recevoir. Du temps pour demeurer. La liberté de répondre.
               </p>
             </div>
 
@@ -113,6 +123,10 @@ function DashboardContent() {
           </div>
         </div>
 
+
+        <ReprendreParole ficheId={ficheCouranteId} section={premierIndexNonFait} />
+        <RecapManque key={`${user?.uid}:${group?.id}`} />
+
         {/* ══ La Feuille de la Semaine & Post-it Verset (Le Cœur du Tableau de Bord) ══ */}
         <div className="grid gap-6 md:grid-cols-3 items-start">
           
@@ -123,7 +137,7 @@ function DashboardContent() {
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-dashed border-encre-900/15 pb-4">
               <div>
                 <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] bg-or-100 text-or-950 border border-or-300">
-                  <Sunrise className="w-3.5 h-3.5" /> Cahier d&apos;étude de la semaine
+                  <Sunrise className="w-3.5 h-3.5" /> Un temps avec Dieu
                 </span>
                 <h2 className="mt-2 font-serif text-2xl sm:text-3xl font-bold text-encre-950">
                   Fiche {ficheCouranteId} • {fiche?.titre || 'Connaître Dieu'}
@@ -211,7 +225,7 @@ function DashboardContent() {
                 className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-encre-950 px-6 text-xs font-bold text-parchemin-50 shadow-md transition hover:-translate-y-0.5 hover:bg-encre-800"
               >
                 <Sunrise className="h-4 w-4 text-or-400" />
-                Vivre mon temps du jour
+                Ouvrir mon temps avec Dieu
               </Link>
               <Link
                 href={`/fiches/${ficheCouranteId}`}
@@ -297,6 +311,8 @@ function DashboardContent() {
             Régler mes rappels
           </button>
         </div>
+
+        <PasDuJour ficheId={ficheCouranteId} />
 
         {/* Les dix outils vivaient ici en cartes, et à l'identique sous
             « Plus » dans la barre du bas : le même menu à deux endroits, sans

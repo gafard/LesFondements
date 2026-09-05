@@ -29,7 +29,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
 import {
-  MEETING_FLOW,
   MEETING_FLOW_LENGTH,
   addPost,
   baisserLesEcrans,
@@ -40,6 +39,7 @@ import {
   setSessionAttendance,
   subscribe,
 } from '@/lib/parcoursStore';
+import { derouleRencontre } from '@/lib/parcoursDomain';
 import { FICHES_META } from '@/data/fichesMeta';
 import { chargerFiche, questionsDe } from '@/lib/livret';
 import type { AttendanceMode, GroupPost } from '@/lib/types';
@@ -86,7 +86,8 @@ function RencontreContent() {
 
   const fiche = FICHES_META.find((f) => f.id === group.currentStep);
   const stage = session?.liveStage ?? 0;
-  const etape = MEETING_FLOW[Math.min(stage, MEETING_FLOW_LENGTH - 1)];
+  const deroule = derouleRencontre(group.currentStep);
+  const etape = deroule[Math.min(stage, MEETING_FLOW_LENGTH - 1)];
   const ouverte = session?.status === 'ouverte';
 
   // Ce qu'une personne a déclaré pour la rencontre, sinon son intention
@@ -343,7 +344,7 @@ function RencontreContent() {
 
         {/* ── Fil du déroulé ── */}
         <div className="mt-6 flex gap-1.5 overflow-x-auto pb-1">
-          {MEETING_FLOW.map((item, index) => (
+          {deroule.map((item, index) => (
             <button
               key={item.key}
               onClick={() => isLeader && void setMeetingStage(group.id, index).then(refresh)}

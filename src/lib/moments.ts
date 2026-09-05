@@ -38,12 +38,12 @@ export interface Moment {
 const TEMPS: { cle: string; titre: string; types: string[] }[] = [
   { cle: 'entrer', titre: 'Entrer', types: ['seuil'] },
   { cle: 'lire', titre: 'Lire & écouter', types: ['ouverture-section', 'bloc'] },
-  { cle: 'mediter', titre: 'Méditer', types: ['silence', 'meditation'] },
   { cle: 'accompagner', titre: 'Être accompagné', types: ['accompagnement'] },
+  { cle: 'mediter', titre: 'Méditer', types: ['silence', 'meditation'] },
   { cle: 'prier', titre: 'Prier', types: ['priere', 'silence-priere'] },
   { cle: 'memoriser', titre: 'Mémoriser', types: ['ancrage-verset', 'resume', 'verset', 'lecture'] },
   { cle: 'ecrire', titre: 'Écrire', types: ['question'] },
-  { cle: 'vivre', titre: 'Vivre', types: ['pas', 'synthese-fiche'] },
+  { cle: 'vivre', titre: 'Garder une trace', types: ['pas', 'synthese-fiche'] },
   { cle: 'conclure', titre: 'Conclure', types: ['cloture'] },
 ];
 

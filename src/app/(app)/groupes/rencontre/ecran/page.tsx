@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Loader2, MonitorPlay, Users, Wifi } from 'lucide-react';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
-import { MEETING_FLOW, MEETING_FLOW_LENGTH } from '@/lib/parcoursStore';
+import { MEETING_FLOW_LENGTH } from '@/lib/parcoursStore';
+import { derouleRencontre } from '@/lib/parcoursDomain';
 import { FICHES_META } from '@/data/fichesMeta';
 import { useDeclarerFondSombre } from '@/lib/fondSombre';
 import { garderLEcranEveille, laisserLEcranSEteindre, suivreLaVisibilite } from '@/lib/seance';
@@ -59,7 +60,8 @@ function EcranContent() {
 
   const meta = FICHES_META.find((f) => f.id === group.currentStep);
   const stage = Math.min(session?.liveStage ?? 0, MEETING_FLOW_LENGTH - 1);
-  const etape = MEETING_FLOW[stage];
+  const deroule = derouleRencontre(group.currentStep);
+  const etape = deroule[stage];
 
   // ── Les écrans baissés : la pièce entière s'éteint ──────────
   if (session?.ecransBaisses) {

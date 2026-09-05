@@ -7,10 +7,11 @@ import { Printer, ArrowLeft, Award, CheckCircle, PenLine } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import { FICHES_META } from '@/data/fichesMeta';
-import { getCachedJournalEntries, getCachedAnswers, timestampToDate } from '@/lib/firestore';
+import { getJournalEntries, getAnswers, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
 import { etatMemoireLocal } from '@/lib/memorisation';
-import { lireAnnotations } from '@/lib/annotations';
+import ParcoursGate from '@/components/ParcoursGate';
+import { ecritsDuCarnet } from '@/lib/habiter';
 
 interface EcritExportable {
   id: string;
@@ -20,43 +21,37 @@ interface EcritExportable {
 
 function ecritsExportables(
   reponses: Record<string, string>,
-  ficheId: number
+  ficheId: number,
+  favorisSeulement = false
 ): EcritExportable[] {
-  const classiques = Object.entries(reponses)
-    .filter(([cle, contenu]) =>
-      !cle.startsWith('annotations:') && typeof contenu === 'string' && contenu.trim()
-    )
-    .map(([cle, contenu]) => ({ id: cle, contenu }));
-  const annotations = lireAnnotations(reponses[`annotations:${ficheId}`]);
-  return [
-    ...classiques,
-    ...annotations.notes
-      .filter((note) => note.texte.trim())
-      .map((note) => ({ id: `postit-${note.id}`, contenu: note.texte, postIt: true })),
-  ];
+  return ecritsDuCarnet(ficheId, reponses).filter(e => !favorisSeulement || e.favori).map(ecrit => ({
+    id: ecrit.id, contenu: `${ecrit.titre}${ecrit.reference ? ` · ${ecrit.reference}` : ''}${ecrit.date ? ` · ${new Date(ecrit.date).toLocaleDateString('fr-FR')}` : ''}\n${ecrit.contenu}`,
+    postIt: ecrit.id.startsWith('postit-'),
+  }));
 }
 
-export default function CarnetExportPage() {
+function CarnetExportContent() {
   const { user } = useAuth();
   const { group } = useParcours();
   const [reponsesParFiche, setReponsesParFiche] = useState<Record<number, Record<string, string>>>({});
+  const [chargement, setChargement] = useState(true);
+  const [selection, setSelection] = useState<number[]>(Array.from({ length: 20 }, (_, i) => i + 1));
+  const [inclureJournal, setInclureJournal] = useState(true);
+  const [favorisSeulement, setFavorisSeulement] = useState(false);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
   const [maitrisees, setMaitrisees] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
-    const timer = window.setTimeout(() => {
-      setJournal(getCachedJournalEntries(user.uid));
-      const reponses: Record<number, Record<string, string>> = {};
-      for (let i = 1; i <= 20; i++) reponses[i] = getCachedAnswers(user.uid, i);
-      setReponsesParFiche(reponses);
-      setMaitrisees(
-        Object.values(etatMemoireLocal(user.uid))
-          .filter((record) => record.masteredAt)
-          .map((record) => record.reference)
-      );
-    }, 0);
-    return () => window.clearTimeout(timer);
+    let actif = true;
+    void Promise.all([getJournalEntries(user.uid), Promise.all(Array.from({ length: 20 }, (_, i) => getAnswers(user.uid, i + 1)))]).then(([notes, fiches]) => {
+      if (!actif) return;
+      setJournal(notes);
+      setReponsesParFiche(Object.fromEntries(fiches.map((answers, i) => [i + 1, answers])));
+      setMaitrisees(Object.values(etatMemoireLocal(user.uid)).filter(r => r.masteredAt).map(r => r.reference));
+      setChargement(false);
+    });
+    return () => { actif = false; };
   }, [user]);
 
   const imprimer = () => {
@@ -84,6 +79,7 @@ export default function CarnetExportPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={imprimer}
+            disabled={chargement}
             className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-5 py-2.5 text-xs font-bold text-parchemin-100 shadow-md transition-all hover:bg-encre-900 hover:scale-105"
           >
             <Printer className="h-4 w-4 text-or-300" />
@@ -92,6 +88,14 @@ export default function CarnetExportPage() {
         </div>
       </div>
 
+      {chargement && <p role="status" className="mx-auto mb-5 max-w-4xl text-sm">Chargement des écrits avant de composer l’export…</p>}
+      <fieldset className="mx-auto mb-8 max-w-4xl rounded-2xl border border-parchemin-300 bg-white p-5 print:hidden">
+        <legend className="px-2 font-serif text-xl font-bold">Ce que je souhaite emporter</legend>
+        <p className="mb-4 text-sm text-encre-600">L’aperçu ci-dessous contient uniquement votre sélection. Vérifiez-le avant de partager votre PDF.</p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{FICHES_META.map(f => <label key={f.id} className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={selection.includes(f.id)} onChange={e => setSelection(s => e.target.checked ? [...s, f.id] : s.filter(id => id !== f.id))} />Fiche {f.id}</label>)}</div>
+        <label className="mt-4 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={favorisSeulement} onChange={e => setFavorisSeulement(e.target.checked)} />Seulement mes pages étoilées du parcours</label>
+        <label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={inclureJournal} onChange={e => setInclureJournal(e.target.checked)} />Inclure mes notes libres</label>
+      </fieldset>
       {/* ══ MANUSCRIT DU CARNET (Format Livre Relié) ══ */}
       <div className="mx-auto max-w-4xl space-y-12 bg-white p-8 sm:p-14 shadow-xl border border-parchemin-300 rounded-3xl print:border-none print:shadow-none print:p-6 print:rounded-none">
         
@@ -136,9 +140,9 @@ export default function CarnetExportPage() {
             1. Table des Fondements
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            {FICHES_META.map((meta) => {
+            {FICHES_META.filter(meta => selection.includes(meta.id)).map((meta) => {
               const estCloturee = group?.closedSteps.includes(meta.id);
-              const repCount = ecritsExportables(reponsesParFiche[meta.id] || {}, meta.id).length;
+              const repCount = ecritsExportables(reponsesParFiche[meta.id] || {}, meta.id, favorisSeulement).length;
 
               return (
                 <div
@@ -167,11 +171,12 @@ export default function CarnetExportPage() {
           </h2>
 
           {Object.entries(reponsesParFiche).some(([ficheId, rep]) =>
-            ecritsExportables(rep, Number(ficheId)).length > 0
+            selection.includes(Number(ficheId)) && ecritsExportables(rep, Number(ficheId), favorisSeulement).length > 0
           ) ? (
             Object.entries(reponsesParFiche).map(([ficheIdStr, reponses]) => {
               const ficheId = Number(ficheIdStr);
-              const ecrits = ecritsExportables(reponses, ficheId);
+              if (!selection.includes(ficheId)) return null;
+              const ecrits = ecritsExportables(reponses, ficheId, favorisSeulement);
               if (ecrits.length === 0) return null;
               const meta = FICHES_META.find((f) => f.id === ficheId);
 
@@ -213,9 +218,9 @@ export default function CarnetExportPage() {
             3. Feuillets du Journal Spirituel
           </h2>
 
-          {journal.length > 0 ? (
+          {inclureJournal && journal.length > 0 ? (
             <div className="space-y-4">
-              {journal.map((entree) => (
+              {(inclureJournal ? journal : []).map((entree) => (
                 <div key={entree.id} className="rounded-2xl border border-parchemin-200 p-4 bg-white">
                   <div className="flex items-center justify-between border-b border-parchemin-100 pb-1 mb-2">
                     <h4 className="manuscrit text-base font-bold text-encre-900">
@@ -233,7 +238,7 @@ export default function CarnetExportPage() {
             </div>
           ) : (
             <p className="text-xs italic text-encre-500 font-serif">
-              Aucun feuillet de journal écrit pour l’instant.
+              Aucune note libre incluse dans cet export.
             </p>
           )}
         </div>
@@ -279,4 +284,9 @@ export default function CarnetExportPage() {
       </div>
     </div>
   );
+}
+
+export default function CarnetExportPage() {
+  const { user } = useAuth();
+  return <ParcoursGate acces="personnel"><CarnetExportContent key={user?.uid} /></ParcoursGate>;
 }

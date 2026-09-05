@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import { saveAnswer, saveAnswers, getAnswers, getCachedAnswers, flushPendingWrites, markFicheCompleted, getCachedUserProgress } from '../src/lib/firestore';
+import { bloquer, liberer, documents, reseau, ecritures } from './fixtures/carnet-backend';
+const donnees = new Map<string, string>();
+let quota = false;
+Object.assign(globalThis, { window: Object.assign(new EventTarget(), { localStorage: {
+  getItem: (k: string) => donnees.get(k) || null,
+  setItem: (k: string, v: string) => { if (quota) throw new Error('Quota dépassé'); donnees.set(k, v); },
+} }) });
+reseau(false);
+await saveAnswer('alice', 4, 'q:grace', 'Un don reçu');
+assert.equal(getCachedAnswers('alice', 4)['q:grace'], 'Un don reçu');
+assert.deepEqual(getCachedAnswers('bob', 4), {});
+await saveAnswer('alice', 4, 'trace:f4-s1', 'Ma prière');
+await saveAnswers('alice', 4, { 'q:grace': 'Un don que je reçois' });
+assert.equal(getCachedAnswers('alice', 4)['trace:f4-s1'], 'Ma prière', 'Une ancienne fiche ouverte ne supprime pas une nouvelle trace.');
+reseau(true);
+assert.equal((await getAnswers('alice', 4))['q:grace'], 'Un don que je reçois', 'Un document distant absent ne doit pas effacer la réponse locale.');
+await flushPendingWrites('alice');
+assert.equal((documents.get('users/alice/progress/4')?.answers as Record<string, string>)['trace:f4-s1'], 'Ma prière');
+bloquer();
+const avant = ecritures;
+const premiere = saveAnswer('alice', 4, 'q:grace', 'Première version');
+while (ecritures === avant) await new Promise(r => setTimeout(r, 1));
+const seconde = saveAnswer('alice', 4, 'q:grace', 'Version plus récente');
+const troisieme = saveAnswer('alice', 4, 'q:repos', 'Du repos');
+liberer();
+await Promise.all([premiere, seconde, troisieme]);
+const distant = documents.get('users/alice/progress/4')?.answers as Record<string, string>;
+assert.equal(distant['q:grace'], 'Version plus récente', 'Une écriture pendant l’envoi doit être rejouée.');
+assert.equal(distant['q:repos'], 'Du repos');
+assert.equal(JSON.parse(donnees.get('lesfondements_pending_alice') || '[]').length, 0);
+quota = true;
+await assert.rejects(saveAnswer('alice', 4, 'q:perdu', 'À préserver'), /stockage/);
+assert.equal(getCachedAnswers('alice', 4)['q:perdu'], undefined);
+quota = false;
+reseau(false);
+for (let i = 1; i <= 20; i++) await markFicheCompleted('alice', i);
+assert.equal(getCachedUserProgress('alice').currentFicheId, 20, 'L’achèvement ne ramène pas à la fiche 1.');
+console.log('✓ Carnet : hors ligne, retour réseau, isolation, fusion, écritures pendant l’envoi, quota et fin du parcours.');

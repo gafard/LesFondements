@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Printer, ArrowLeft, Lock } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
+import BilanParcours from '@/components/BilanParcours';
 import { useParcours } from '@/lib/ParcoursContext';
 
 function CertificatPage() {
@@ -26,6 +27,7 @@ function CertificatPage() {
   if (!acheve) {
     return (
       <div className="table-travail min-h-screen px-4 pb-16 pt-6">
+        <BilanParcours />
         <div className="feuille relative mx-auto max-w-lg rounded-3xl border border-parchemin-300 p-8 text-center shadow-lg sm:p-10">
           <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
           <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-parchemin-200 text-encre-400">
@@ -63,6 +65,7 @@ function CertificatPage() {
 
   return (
     <div className="table-travail min-h-screen pb-16 pt-6">
+      <BilanParcours />
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
 
         {/* Top Controls */}

@@ -1,184 +1,119 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, CalendarDays, MessageCircleHeart, PenLine, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Footprints, HeartHandshake, LockKeyhole, PenLine, Sprout } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
+import { CartePasDeVie } from '@/components/PasDeVie';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
+import { usePasDeVie } from '@/lib/usePasDeVie';
+import { ISSUES_PAS, pasARelire } from '@/lib/pasDeVie';
 import { FICHES_META } from '@/data/fichesMeta';
-import { getAnswers, getJournalEntries } from '@/lib/firestore';
-import { etatMemoireLocal } from '@/lib/memorisation';
-import { lireAnnotations } from '@/lib/annotations';
 
-interface TraceFiche {
-  id: number;
-  titre: string;
-  reponses: number;
-  mots: number;
-  terminee: boolean;
-}
-
-const MOTS_OUTILS = new Set(['avec', 'dans', 'pour', 'mais', 'plus', 'cette', 'comme', 'vous', 'nous', 'être', 'avoir', 'tout', 'cela', 'sans', 'mes', 'mon', 'une', 'des', 'les', 'que', 'qui', 'est', 'sur', 'pas']);
+const MOUVEMENTS = [
+  { icon: BookOpen, titre: 'Recevoir', texte: 'Une Parole qui m’éclaire.' },
+  { icon: Footprints, titre: 'Incarner', texte: 'Un geste dans ma journée.' },
+  { icon: PenLine, titre: 'Relire', texte: 'Ce que j’ai réellement vécu.' },
+  { icon: HeartHandshake, titre: 'Grandir ensemble', texte: 'Une présence qui m’accompagne.' },
+];
 
 function TransformationContent() {
   const { user } = useAuth();
-  const { preparationStep } = useParcours();
-  const [traces, setTraces] = useState<TraceFiche[] | null>(null);
-  const [motsJournal, setMotsJournal] = useState(0);
-  const [themes, setThemes] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!user) return;
-    let annule = false;
-    void (async () => {
-      const metas = FICHES_META.filter((fiche) => fiche.id <= Math.max(1, preparationStep));
-      const details = await Promise.all(
-        metas.map(async (fiche) => {
-          const answers = await getAnswers(user.uid, fiche.id);
-          const annotations = lireAnnotations(answers[`annotations:${fiche.id}`]);
-          const contenus = [
-            ...Object.entries(answers)
-              .filter(([cle, valeur]) =>
-                !cle.startsWith('annotations:') &&
-                typeof valeur === 'string' &&
-                valeur.trim().length > 0
-              )
-              .map(([, valeur]) => String(valeur)),
-            ...annotations.notes.map((note) => note.texte).filter(Boolean),
-          ];
-          return {
-            id: fiche.id,
-            titre: fiche.titre,
-            reponses: contenus.length,
-            mots: contenus.join(' ').split(/\s+/).filter(Boolean).length,
-            terminee: contenus.length >= Math.max(1, Math.floor(fiche.nbQuestions * 0.6)),
-            texte: contenus.join(' '),
-          };
-        })
-      );
-      const journal = await getJournalEntries(user.uid);
-      const texteGlobal = `${details.map((detail) => detail.texte).join(' ')} ${journal.map((entree) => entree.content).join(' ')}`;
-      const frequences = new Map<string, number>();
-      for (const motBrut of texteGlobal.toLocaleLowerCase('fr').match(/[a-zà-ÿ]{4,}/g) ?? []) {
-        if (MOTS_OUTILS.has(motBrut)) continue;
-        frequences.set(motBrut, (frequences.get(motBrut) ?? 0) + 1);
-      }
-      if (!annule) {
-        setTraces(details.map((detail) => ({
-          id: detail.id,
-          titre: detail.titre,
-          reponses: detail.reponses,
-          mots: detail.mots,
-          terminee: detail.terminee,
-        })));
-        setMotsJournal(journal.reduce((total, entree) => total + entree.content.split(/\s+/).filter(Boolean).length, 0));
-        setThemes([...frequences].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([mot]) => mot));
-      }
-    })();
-    return () => {
-      annule = true;
-    };
-  }, [preparationStep, user]);
-
-  const statistiques = useMemo(() => {
-    const state = user ? etatMemoireLocal(user.uid) : {};
-    return {
-      ecrits: traces?.reduce((total, trace) => total + trace.reponses, 0) ?? 0,
-      mots: (traces?.reduce((total, trace) => total + trace.mots, 0) ?? 0) + motsJournal,
-      verses: Object.values(state).filter((record) => record.masteredAt).length,
-    };
-  }, [motsJournal, traces, user]);
+  const { preparationStep, group } = useParcours();
+  const ficheId = Math.max(1, preparationStep, group?.currentStep ?? 1);
+  const { pas, chargement, erreur, enregistrer } = usePasDeVie(user?.uid, ficheId);
+  const [filtre, setFiltre] = useState<'tous' | 'a-relire' | 'relus'>('tous');
+  const visibles = pas.filter((p) => filtre === 'tous' || (filtre === 'a-relire' ? pasARelire(p) : p.relectures.length > 0));
+  const premiereRelecture = pas.flatMap((p) => p.relectures).sort((a, b) => a.date - b.date)[0];
+  const derniereRelecture = pas.flatMap((p) => p.relectures).sort((a, b) => b.date - a.date)[0];
 
   return (
-    <div className="table-travail min-h-screen px-4 py-8 sm:px-6">
+    <div className="table-travail min-h-screen px-4 pb-24 pt-8 sm:px-6">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8 grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-center">
+        <header className="chemin-entete">
           <div>
-            <span className="etiquette-classee -rotate-1">Dossier de route · personnel</span>
-            <h1 className="mt-5 font-serif text-4xl font-bold text-encre-950 sm:text-5xl">Votre chemin, visible sur la table</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-encre-600">
-              Ce tableau ne mesure pas votre foi. Il rend visibles vos gestes de fidélité : lire,
-              répondre, écrire, revenir et mémoriser.
-            </p>
+            <p className="flex items-center gap-2 text-sm font-semibold tracking-wide text-or-700"><Sprout className="h-4 w-4" aria-hidden="true" /> LE CARNET DE TRANSFORMATION</p>
+            <h1 className="mt-4 font-serif text-4xl font-bold leading-tight text-encre-950 sm:text-6xl">La Parole<br /><span className="italic text-or-700">prend corps.</span></h1>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-encre-700">Ce que vous recevez de Dieu trouve peu à peu sa place dans vos choix, vos relations et votre quotidien.</p>
           </div>
-          <div className="post-it-rose rotate-1 p-6 shadow-md">
-            <Sparkles className="h-5 w-5 text-rose-700" />
-            <p className="manuscrit mt-3 text-3xl font-bold text-encre-950">Les traces comptent</p>
-            <p className="mt-2 text-xs leading-relaxed text-encre-700">Relisez-les pour discerner, jamais pour vous comparer.</p>
-          </div>
+          <aside className="chemin-note">
+            <span className="ruban -top-3 left-12 -rotate-3" aria-hidden="true" />
+            <p className="font-serif text-2xl italic leading-relaxed text-encre-950">« Qu’est-ce qui devient différent dans ma manière de vivre ? »</p>
+            <p className="mt-4 text-sm leading-relaxed text-encre-600">Gardez une trace avec vos mots. Les changements discrets ont aussi leur place ici.</p>
+          </aside>
         </header>
 
-        <section className="grid gap-4 sm:grid-cols-3">
-          {[
-            { icon: PenLine, value: statistiques.ecrits, label: 'réponses déposées', tone: 'post-it-jaune -rotate-1' },
-            { icon: BookOpen, value: statistiques.mots, label: 'mots écrits', tone: 'post-it-bleu rotate-1' },
-            { icon: MessageCircleHeart, value: statistiques.verses, label: 'versets retenus', tone: 'post-it-rose -rotate-[0.5deg]' },
-          ].map(({ icon: Icon, value, label, tone }) => (
-            <div key={label} className={`${tone} p-6 shadow-sm`}>
-              <Icon className="h-5 w-5 text-encre-600" />
-              <p className="manuscrit mt-3 text-5xl font-bold text-encre-950">{value}</p>
-              <p className="mt-1 text-xs font-bold uppercase tracking-[0.12em] text-encre-600">{label}</p>
-            </div>
-          ))}
-        </section>
+        <ol className="chemin-mouvements" aria-label="Le mouvement du parcours">
+          {MOUVEMENTS.map(({ icon: Icon, titre, texte }, index) => <li key={titre}>
+            <div className="flex items-center gap-3"><span className="chemin-numero">0{index + 1}</span><Icon className="h-5 w-5 text-or-300" aria-hidden="true" /></div>
+            <h2 className="mt-4 font-serif text-xl font-bold">{titre}</h2>
+            <p className="mt-1 text-sm leading-relaxed text-parchemin-200">{texte}</p>
+          </li>)}
+        </ol>
 
-        <section className="feuille relative mt-8 rounded-[2rem] border border-parchemin-400 p-5 shadow-lg sm:p-8">
-          <span className="trombone" aria-hidden="true" />
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-2xs font-black uppercase tracking-[0.18em] text-or-700">Frise des fiches</p>
-              <h2 className="mt-1 font-serif text-2xl font-bold text-encre-950">Ce que vous avez déjà travaillé</h2>
+        <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <section aria-labelledby="mes-pas">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div><p className="text-sm font-semibold text-or-700">DE L’INTENTION À LA VIE</p><h2 id="mes-pas" className="mt-2 font-serif text-3xl font-bold text-encre-950">Mes pas, un à un</h2></div>
+              <p className="flex items-center gap-2 text-sm text-encre-600"><LockKeyhole className="h-4 w-4" aria-hidden="true" />Personnel</p>
             </div>
-            <CalendarDays className="h-6 w-6 text-encre-300" />
-          </div>
-
-          {!traces ? (
-            <p className="py-12 text-center text-sm text-encre-400">Rassemblement des pages…</p>
-          ) : (
-            <ol className="relative mt-8 space-y-4 before:absolute before:bottom-4 before:left-[1.15rem] before:top-4 before:w-px before:bg-or-300 sm:before:left-[1.4rem]">
-              {traces.map((trace) => (
-                <li key={trace.id} className="relative grid grid-cols-[2.4rem_1fr] gap-4 sm:grid-cols-[3rem_1fr]">
-                  <span className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border-4 border-parchemin-50 text-xs font-black sm:h-11 sm:w-11 ${trace.reponses ? 'bg-or-500 text-encre-950' : 'bg-parchemin-300 text-encre-500'}`}>{trace.id}</span>
-                  <Link href={`/fiches/${trace.id}`} className="fiche-bristol rounded-2xl border border-parchemin-300 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-md">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-serif text-base font-bold text-encre-950">{trace.titre}</p>
-                        <p className="mt-0.5 text-2xs text-encre-500">{trace.reponses} réponse{trace.reponses > 1 ? 's' : ''} · {trace.mots} mots</p>
-                      </div>
-                      <ArrowRight className="h-4 w-4 shrink-0 text-or-700" />
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ol>
-          )}
-        </section>
-
-        <section className="mt-8 grid gap-5 lg:grid-cols-[1fr_18rem]">
-          <div className="fiche-bristol rounded-3xl p-6 shadow-sm">
-            <p className="text-2xs font-black uppercase tracking-[0.16em] text-or-700">Mots qui reviennent</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {themes.length ? themes.map((theme, index) => (
-                <span key={theme} className={`rounded-full px-4 py-2 font-serif font-bold ${index % 3 === 0 ? 'bg-or-100 text-or-900' : index % 3 === 1 ? 'bg-indigo-100 text-indigo-900' : 'bg-rose-100 text-rose-900'}`}>{theme}</span>
-              )) : <p className="text-xs text-encre-500">Écrivez quelques réponses : vos thèmes apparaîtront ici.</p>}
+            <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Afficher les pas de vie">
+              {([['tous', 'Tout le chemin'], ['a-relire', 'À faire grandir'], ['relus', 'Déjà relus']] as const).map(([valeur, label]) =>
+                <button key={valeur} type="button" aria-pressed={filtre === valeur} onClick={() => setFiltre(valeur)} className={`chemin-filtre ${filtre === valeur ? 'chemin-filtre-actif' : ''}`}>{label}</button>
+              )}
             </div>
-          </div>
-          <Link href="/recherche" className="nuit nuit-grain rounded-3xl p-6 text-parchemin-100 shadow-md transition hover:-translate-y-1">
-            <p className="font-serif text-xl font-bold">Relire une trace précise</p>
-            <p className="mt-2 text-xs leading-relaxed text-parchemin-100/70">Chercher un mot dans toutes vos pages.</p>
-            <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-or-300">Ouvrir l’index <ArrowRight className="h-4 w-4" /></span>
-          </Link>
-        </section>
+            {erreur && <p role="status" className="mt-4 text-base text-bordeaux-800">Les notes disponibles sur cet appareil sont affichées. La connexion n’a pas permis de retrouver les autres.</p>}
+            {chargement ? <p role="status" className="py-12 text-base text-encre-600">Ouverture de votre carnet…</p> : visibles.length ? (
+              <div className="mt-6 space-y-6">{visibles.map((p) => <CartePasDeVie key={`${p.ficheId}-${p.id}`} pas={p} onEnregistrer={enregistrer} />)}</div>
+            ) : (
+              <div className="chemin-vide mt-6">
+                <Sprout className="h-9 w-9 text-or-700" aria-hidden="true" />
+                <h3 className="mt-5 font-serif text-2xl font-bold text-encre-950">{pas.length ? 'Le chemin reste ouvert.' : 'Tout commence par un petit pas.'}</h3>
+                <p className="mt-3 text-base leading-relaxed text-encre-600">{pas.length
+                  ? 'Aucun pas dans cette vue pour le moment. Retrouvez vos intentions ou laissez-vous le temps de vivre la suivante.'
+                  : 'Après votre lecture, choisissez une situation et un geste simple. Votre intention et vos relectures trouveront leur place sur ces pages.'}</p>
+                {pas.length ? <button className="pas-bouton mt-6" type="button" onClick={() => setFiltre('tous')}>Retrouver mes pas</button>
+                  : <Link href={`/aujourdhui?fiche=${ficheId}`} className="pas-bouton mt-6">Ouvrir mon temps à part <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
+              </div>
+            )}
+          </section>
+
+          <aside className="space-y-6">
+            <section className="chemin-marge">
+              <p className="text-sm font-semibold text-or-700">AVANT LA RENCONTRE</p>
+              <h2 className="mt-3 font-serif text-2xl font-bold text-encre-950">Venir avec du vécu</h2>
+              <p className="mt-3 text-base leading-relaxed text-encre-600">Un moment concret, ce que vous avez essayé, ce qui vous a aidé ou ce qui reste difficile.</p>
+              <p className="mt-4 text-base leading-relaxed text-encre-700">Vous pouvez simplement écouter. Vous choisissez ce que vous racontez.</p>
+              <Link href="/groupes" className="pas-lien mt-4">Retrouver ma cellule <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+            </section>
+            <section className="chemin-marge">
+              <p className="text-sm font-semibold text-or-700">PRENDRE DU RECUL</p>
+              <h2 className="mt-3 font-serif text-2xl font-bold text-encre-950">Reconnaître le chemin</h2>
+              {premiereRelecture && derniereRelecture && premiereRelecture !== derniereRelecture ? <>
+                <p className="mt-4 text-sm font-semibold text-encre-600">Ma première relecture · {new Date(premiereRelecture.date).toLocaleDateString('fr-FR')}</p>
+                <p className="mt-2 whitespace-pre-wrap break-words font-serif text-lg text-encre-950">{premiereRelecture.observation || ISSUES_PAS[premiereRelecture.issue]}</p>
+                <p className="mt-5 text-sm font-semibold text-encre-600">Plus récemment · {new Date(derniereRelecture.date).toLocaleDateString('fr-FR')}</p>
+                <p className="mt-2 whitespace-pre-wrap break-words font-serif text-lg text-encre-950">{derniereRelecture.observation || ISSUES_PAS[derniereRelecture.issue]}</p>
+              </> : <p className="mt-3 text-base leading-relaxed text-encre-600">Avec vos prochaines relectures, vous pourrez retrouver ici vos premiers mots et les plus récents.</p>}
+              <p className="mt-5 text-base leading-relaxed text-encre-700">Qu’est-ce qui vous surprend ? Qu’aimeriez-vous continuer à cultiver ?</p>
+              <Link href="/journal" className="pas-lien mt-3">Écrire dans mon journal <PenLine className="h-4 w-4" aria-hidden="true" /></Link>
+            </section>
+          </aside>
+        </div>
+
+        <details className="mt-12 border-t border-parchemin-400 pt-5">
+          <summary className="cursor-pointer py-3 font-serif text-xl font-bold text-encre-950">Retrouver les fiches de mon parcours</summary>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{FICHES_META.filter((f) => f.id <= ficheId).map((f) => (
+            <Link key={f.id} href={`/fiches/${f.id}`} className="flex min-h-16 items-center gap-3 rounded-xl border border-parchemin-300 bg-parchemin-50 p-4 text-base text-encre-800"><span className="font-serif text-xl text-or-700">{String(f.id).padStart(2, '0')}</span>{f.titre}<ArrowRight className="ml-auto h-4 w-4 shrink-0" aria-hidden="true" /></Link>
+          ))}</div>
+        </details>
+        <p className="mt-8 text-sm leading-relaxed text-encre-600">Ce carnet garde la mémoire de votre expérience. Il ne mesure ni votre foi ni votre valeur.</p>
       </div>
     </div>
   );
 }
 
-export default function Page() {
-  return (
-    <ParcoursGate acces="personnel">
-      <TransformationContent />
-    </ParcoursGate>
-  );
+export default function TransformationPage() {
+  return <ParcoursGate acces="personnel"><TransformationContent /></ParcoursGate>;
 }

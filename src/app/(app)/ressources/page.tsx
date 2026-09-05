@@ -235,6 +235,7 @@ export default function RessourcesPage() {
   const [message, setMessage] = useState('');
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const [messageEnvoye, setMessageEnvoye] = useState(false);
+  const [erreurEnvoi, setErreurEnvoi] = useState('');
 
   useEffect(() => {
     void chargerLivret().then(setLivret);
@@ -268,44 +269,28 @@ export default function RessourcesPage() {
   const envoyerRetour = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    if (message.trim().length > 5000) { setErreurEnvoi('Votre message dépasse 5 000 caractères. Raccourcissez-le avant l’envoi.'); return; }
 
-    setEnvoiEnCours(true);
+    if (envoiEnCours) return;
+    setEnvoiEnCours(true); setErreurEnvoi('');
     const retourData = {
-      id: 'ret_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
       uid: user?.uid || null,
-      nom: nom.trim() || 'Ami des Fondements',
-      email: email.trim() || 'Non renseigné',
-      categorie,
-      message: message.trim(),
-      date: Date.now(),
-      dateIso: new Date().toISOString(),
+      nom: nomAffiche.trim().slice(0, 120) || 'Ami des Fondements',
+      email: emailAffiche.trim().slice(0, 254) || 'Non renseigné',
+      categorie, message: message.trim().slice(0, 5000),
+      date: Date.now(), dateIso: new Date().toISOString(),
     };
-
-    // Sauvegarde locale
     try {
-      const brut = localStorage.getItem('lf.retoursUtilisateurs');
-      const existants = brut ? JSON.parse(brut) : [];
-      localStorage.setItem('lf.retoursUtilisateurs', JSON.stringify([retourData, ...existants]));
-    } catch {
-      /* ignorer */
-    }
-
-    // Sauvegarde Firestore Cloud si connecté
-    if (hasRemoteBackend()) {
-      try {
-        const [db, { collection, addDoc }] = await Promise.all([
-          getFirebaseDb(),
-          import('firebase/firestore'),
-        ]);
-        await addDoc(collection(db, 'retours'), retourData);
-      } catch (err) {
-        console.warn('Envoi retour sur Firestore :', err);
+      if (!hasRemoteBackend()) {
+        setErreurEnvoi('L’envoi à l’équipe est indisponible dans cette version locale. Votre texte reste dans le formulaire ; copiez-le avant de quitter.');
+        return;
       }
-    }
-
-    setEnvoiEnCours(false);
-    setMessageEnvoye(true);
-    setMessage('');
+      const [db, { collection, addDoc }] = await Promise.all([getFirebaseDb(), import('firebase/firestore')]);
+      await addDoc(collection(db, 'retours'), retourData);
+      setMessageEnvoye(true); setMessage('');
+    } catch {
+      setErreurEnvoi('L’envoi n’a pas été confirmé. Votre texte reste ici. Vérifiez votre connexion avant de réessayer.');
+    } finally { setEnvoiEnCours(false); }
   };
 
   return (
@@ -708,6 +693,7 @@ export default function RessourcesPage() {
               </div>
             ) : (
               <form onSubmit={envoyerRetour} className="space-y-6">
+                {erreurEnvoi && <p role="alert" className="rounded-xl border border-or-400 bg-or-50 p-4 text-sm text-encre-900">{erreurEnvoi}</p>}
                 {/* Choix du type de retour */}
                 <div>
                   <label className="block text-xs font-bold text-encre-900 mb-2">
@@ -800,6 +786,7 @@ export default function RessourcesPage() {
                     Votre message ou retour d&apos;expérience
                   </label>
                   <textarea
+                    maxLength={5000}
                     required
                     rows={5}
                     placeholder="Partagez vos impressions, vos questions ou vos besoins d'animation pour votre cellule..."

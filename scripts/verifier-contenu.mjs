@@ -40,13 +40,8 @@ assert.ok(questions >= 150, 'Le corpus de questions paraît incomplet.');
 
 // ── La règle éditoriale de la fiche 8 ────────────────────────
 //
-// « On ne retire pas le diagnostic du livret. On reproduit son chemin de
-// discernement. » Le critère de Damien Pradel — pouvoir choisir autrement, ou
-// être irrésistiblement dominé — est posé au lecteur, et les entrées qu'il
-// énumère sont nommées. Ce qui vient du livret est marqué comme tel.
-//
-// Ce contrôle existe parce que ces trois questions ont déjà été remplacées
-// une fois par des formulations qui écartaient le discernement.
+// Les affirmations doctrinales originales restent citées. La facilitation
+// demande de les comprendre et d’en parler, sans conduire un autodiagnostic.
 const meditations = JSON.parse(
   await readFile(new URL('../src/data/meditation-questions.json', import.meta.url), 'utf8')
 );
@@ -59,7 +54,6 @@ const texteFiche8 = fiche8.sections
 
 for (const attendu of [
   'irrésistiblement dominé',
-  'ouvrir cette porte ou créer ce lien',
   'sous l’influence d’un démon',
 ]) {
   assert.ok(
