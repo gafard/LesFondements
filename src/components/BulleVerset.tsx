@@ -358,11 +358,7 @@ export default function BulleVerset() {
             <p className="flex items-center gap-2 py-4 text-xs text-encre-500">
               <Loader2 className="h-4 w-4 animate-spin text-or-600" /> Chargement du passage…
             </p>
-          ) : texteAffiche ? (
-            <p className={`font-serif text-sm leading-relaxed text-encre-900 ${tropLong ? 'text-xs leading-relaxed' : ''}`}>
-              {texteAffiche}
-            </p>
-          ) : passage?.versets && passage.versets.length > 0 ? (
+          ) : versionEffective === 'lsg' && passage?.versets && passage.versets.length > 0 ? (
             <p className={`font-serif text-sm leading-relaxed text-encre-900 ${tropLong ? 'text-xs leading-relaxed' : ''}`}>
               {passage.versets.map((verset) => (
                 <span key={verset.v}>
@@ -374,6 +370,10 @@ export default function BulleVerset() {
                   {verset.t}{' '}
                 </span>
               ))}
+            </p>
+          ) : texteAffiche ? (
+            <p className={`font-serif text-sm leading-relaxed text-encre-900 ${tropLong ? 'text-xs leading-relaxed' : ''}`}>
+              {texteAffiche}
             </p>
           ) : (
             <p className="py-2 text-xs leading-relaxed text-encre-600">
@@ -438,7 +438,9 @@ export default function BulleVerset() {
             className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-encre-950 px-3.5 py-1.5 text-2xs font-bold text-parchemin-100 shadow-xs transition-colors hover:bg-or-600 hover:text-white"
           >
             <BookOpen className="h-3.5 w-3.5" />
-            Lire tout le chapitre {bulle.reference.chapitre}
+            {passage?.chapitreEntier
+              ? 'Étude complète'
+              : `Lire tout le chapitre ${bulle.reference.chapitre}`}
           </button>
         </div>
       </div>

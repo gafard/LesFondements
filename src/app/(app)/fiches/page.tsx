@@ -53,7 +53,7 @@ const CHAPITRES = [
     id: 4,
     roman: 'IV',
     mot: 'Demeurer',
-    titre: 'Demeurer et transmettre',
+    titre: 'Demeurer et espérer',
     sous: "L'intimité de la prière, la méditation des Écritures, les alliances et l'espérance éternelle.",
     fiches: [16, 17, 18, 19, 20],
   },
@@ -77,16 +77,16 @@ function SentierContent() {
     void getUserProgress(user.uid).then((prog) => setValidees(prog.completedFiches ?? []));
   }, [user]);
 
-  // La fiche du groupe, plus la suivante qu'on prépare seul.
+  // La progression personnelle respecte aussi l’avancée de la cellule.
   const maxAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
   const etatDe = (id: number): Etat => {
     if (!group) {
-      if (profile?.studyMode === 'personnel') return validees.includes(id) ? 'terminee' : 'ouverte';
+      if (profile?.studyMode === 'personnel') return id > maxAccessible ? 'close' : validees.includes(id) ? 'terminee' : 'ouverte';
       if (id === 1) return 'ouverte';
       return 'close';
     }
-    if (group.closedSteps.includes(id)) return 'terminee';
     if (id > maxAccessible) return 'close';
+    if (group.closedSteps.includes(id)) return 'terminee';
     if (membership?.preparedSteps.includes(id) || validees.includes(id)) return 'preparee';
     return 'ouverte';
   };
@@ -465,7 +465,7 @@ function EtapeSentier({
         ) : (
           <>
             <span className="inline-flex items-center gap-1 text-2xs font-bold text-encre-700">
-              {fiche.id === etapeGroupe + 1 ? 'Préparer en avance' : 'Ouvrir la fiche'}
+              Ouvrir la fiche
               <ArrowRight className="h-3.5 w-3.5" />
             </span>
             <span className="text-2xs text-encre-300">~45 min</span>

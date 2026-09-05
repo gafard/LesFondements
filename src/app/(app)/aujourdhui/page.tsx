@@ -20,10 +20,10 @@ function entierBorne(valeur: string | null, minimum: number, maximum: number, re
 function AujourdhuiContent() {
   const { user } = useAuth();
   const router = useRouter();
-  const { group, preparationStep } = useParcours();
+  const { group, preparationStep, refresh, loading: parcoursLoading } = useParcours();
   const [erreur, setErreur] = useState('');
   const searchParams = useSearchParams();
-  const ficheId = entierBorne(searchParams.get('fiche'), 1, 20, group?.currentStep || 1);
+  const ficheId = entierBorne(searchParams.get('fiche'), 1, 20, Math.max(1, preparationStep));
   const sectionDemandee = searchParams.get('section');
   const sceneInitiale = entierBorne(searchParams.get('scene'), 0, 500, 0);
   const momentInitial = searchParams.get('moment');
@@ -70,6 +70,7 @@ function AujourdhuiContent() {
     setReponses((actuelles) => ({ ...(actuelles ?? {}), [cle]: '1' }));
     if (etapes.every((_, i) => i === sectionIndex || Boolean(reponses[`temps-apart:${i}`]))) {
       await markFicheCompleted(user.uid, ficheId);
+      await refresh();
     }
     const suivante = etapes.findIndex((_, i) => i !== sectionIndex && !reponses[`temps-apart:${i}`]);
     const continuer = suivante >= 0 || (!group && ficheId < 20);
@@ -82,7 +83,7 @@ function AujourdhuiContent() {
     });
   };
 
-  if (fiche === undefined || reponses === null) return <ChargementImmersion />;
+  if ((ficheId > 1 && parcoursLoading) || fiche === undefined || (fiche !== null && fiche.id !== ficheId) || reponses === null) return <ChargementImmersion />;
 
   if (fiche === null) {
     return (
@@ -99,7 +100,7 @@ function AujourdhuiContent() {
     );
   }
 
-  if (group && ficheId > Math.max(1, preparationStep)) return <div className="p-8 text-encre-950"><p>Cette fiche s’ouvrira avec l’avancée de votre cellule.</p><button onClick={() => router.push('/dashboard')} className="mt-4 min-h-11 rounded-full border px-5">Revenir à mon temps</button></div>;
+  if (ficheId > Math.max(1, preparationStep)) return <div className="p-8 text-encre-950"><p>Terminez la fiche précédente pour poursuivre. En cellule, attendez aussi son ouverture par votre groupe.</p><button onClick={() => router.push('/dashboard')} className="mt-4 min-h-11 rounded-full border px-5">Revenir à mon temps</button></div>;
 
   return (
     <ParcoursGate acces={ficheId === 1 ? 'decouverte' : 'lecture'}>

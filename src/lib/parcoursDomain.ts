@@ -131,11 +131,22 @@ export function isStepUnlocked(group: ParcoursGroup, step: number): boolean {
   return step <= group.currentStep;
 }
 
-/** Une fiche d'avance peut être préparée seul, jamais davantage. */
+/** La préparation reste sur la fiche courante du groupe. */
 export function etapeDePreparation(group: ParcoursGroup): number {
-  return Math.min(group.currentStep + 1, PARCOURS_TOTAL_STEPS);
+  return Math.max(1, Math.min(group.currentStep, PARCOURS_TOTAL_STEPS));
 }
 
 export function estEtapeLisible(group: ParcoursGroup, step: number): boolean {
-  return step <= etapeDePreparation(group);
+  return Number.isInteger(step) && step >= 1 && step <= etapeDePreparation(group);
+}
+
+/** La première fiche non terminée ouvre le prochain temps, sans sauter de fiche. */
+export function etapePersonnelle(completedFiches: readonly number[]): number {
+  const terminees = new Set(completedFiches);
+  for (let i = 1; i <= PARCOURS_TOTAL_STEPS; i++) if (!terminees.has(i)) return i;
+  return PARCOURS_TOTAL_STEPS;
+}
+
+export function limiteLecture(group: ParcoursGroup | null, completedFiches: readonly number[]): number {
+  return Math.min(etapePersonnelle(completedFiches), group ? etapeDePreparation(group) : PARCOURS_TOTAL_STEPS);
 }

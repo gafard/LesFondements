@@ -34,7 +34,8 @@
     "test:pas": "esbuild scripts/test-pas-de-vie.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-pas.mjs --log-level=warning && node /tmp/lesfondements-test-pas.mjs",
     "test:habiter": "esbuild scripts/test-habiter.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-habiter.mjs --log-level=warning && node /tmp/lesfondements-test-habiter.mjs",
     "test:carnet": "node scripts/test-carnet-stockage.mjs",
-    "test:carrousels": "esbuild scripts/test-carrousels.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-carrousels.mjs --log-level=warning && node /tmp/lesfondements-test-carrousels.mjs"
+    "test:carrousels": "esbuild scripts/test-carrousels.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-carrousels.mjs --log-level=warning && node /tmp/lesfondements-test-carrousels.mjs",
+    "test:acces": "esbuild scripts/test-acces-fiches.ts --bundle --platform=node --format=esm --outfile=/tmp/lf-test-acces.mjs --log-level=warning && node /tmp/lf-test-acces.mjs"
   },
   "dependencies": {
     "@types/web-push": "^3.6.4",

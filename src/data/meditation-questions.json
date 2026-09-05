@@ -894,42 +894,54 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Éphésiens 2:8. Puis relis-le encore une fois.",
-            "question": "Qu’est-ce qui retient ton attention dans ce verset ?"
+            "question": "Qu’est-ce qui retient ton attention dans ce verset ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s1-q2",
             "fonction": "comprendre",
             "source": "contemplation",
             "consigne": "Reste encore un instant dans Éphésiens 2:8, sans ajouter d’autre explication.",
-            "question": "Qu’est-ce que ce passage te fait comprendre de la grâce ?"
+            "question": "Qu’est-ce que ce passage te fait comprendre de la grâce ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s1-q3",
             "fonction": "comparer",
             "source": "parole",
             "consigne": "Lis maintenant Jean 10:10. Prends quelques instants, puis garde ce passage à côté d’Éphésiens 2:8.",
-            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de méditer ?"
+            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de méditer ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s1-q4",
             "fonction": "relire-le-livret",
             "source": "livret",
             "consigne": "Le livret propose ces deux formulations : « La grâce est un don immérité de Dieu » et « La grâce ne dépend pas de ce que je suis mais de qui est Dieu. » Relis-les lentement, puis reviens aux passages bibliques.",
-            "question": "Qu’est-ce que tu comprends maintenant de ces affirmations ?"
+            "question": "Qu’est-ce que tu comprends maintenant de ces affirmations ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s1-q5",
             "fonction": "observer+decouvrir-dieu",
             "source": "parole",
             "consigne": "Lis 2 Corinthiens 3:5 lentement.",
-            "question": "Qu’est-ce qui te frappe dans ce que Paul dit ici de lui-même et de Dieu ?"
+            "question": "Qu’est-ce qui te frappe dans ce que Paul dit ici de lui-même et de Dieu ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s1-q6",
             "fonction": "comprendre",
             "source": "contemplation",
             "consigne": "Garde 2 Corinthiens 3:5 à côté des passages déjà parcourus.",
-            "question": "Qu’est-ce que ce passage ajoute à ta compréhension de la grâce ?"
+            "question": "Qu’est-ce que ce passage ajoute à ta compréhension de la grâce ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s1-q7",
@@ -937,7 +949,9 @@
             "source": "contemplation",
             "consigne": "Appuie-toi seulement sur le chemin que tu viens de parcourir.",
             "question": "Si tu devais maintenant expliquer la grâce avec tes propres mots, que dirais-tu ?",
-            "priereTitre": "Ce que j’ai compris de la grâce"
+            "priereTitre": "Ce que j’ai compris de la grâce",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s1-q8",
@@ -945,7 +959,9 @@
             "source": "contemplation",
             "consigne": "Reviens aux mots qui ont particulièrement retenu ton attention.",
             "question": "Qu’est-ce que cette partie t’a fait découvrir de Dieu ?",
-            "priereTitre": "Ce que j’ai découvert de Dieu"
+            "priereTitre": "Ce que j’ai découvert de Dieu",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s1-q9",
@@ -953,7 +969,9 @@
             "source": "contemplation",
             "consigne": "Tu n’as pas besoin de tout retenir.",
             "question": "Qu’est-ce qui t’a particulièrement marqué ?",
-            "priereTitre": "Ce qui m’a particulièrement marqué"
+            "priereTitre": "Ce qui m’a particulièrement marqué",
+            "phase": "repondre",
+            "priorite": "essentielle"
           }
         ],
         "pratique": {
@@ -975,35 +993,45 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis Jean 6:28-29. Relis particulièrement la réponse de Jésus.",
-            "question": "Qu’est-ce qui retient ton attention ?"
+            "question": "Qu’est-ce qui retient ton attention ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s2-q2",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis maintenant Romains 8:1. Relis-le encore une fois, lentement.",
-            "question": "Qu’est-ce qui te frappe dans cette affirmation ?"
+            "question": "Qu’est-ce qui te frappe dans cette affirmation ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s2-q3",
             "fonction": "comparer",
             "source": "parole",
             "consigne": "Lis Galates 1:10, puis garde-le avec les passages précédents.",
-            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de méditer ?"
+            "question": "Qu’est-ce que ce passage ajoute à ce que tu viens de méditer ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s2-q4",
             "fonction": "relire-le-livret",
             "source": "livret",
             "consigne": "Le livret explique qu’une personne qui fonde sa valeur sur ses performances et cherche continuellement à être « acceptable » peut entretenir une image d’elle-même et vivre dans l’échec ou la culpabilité. Il oppose cela à l’identité reçue en Christ.",
-            "question": "Qu’est-ce que cette interprétation vient éclairer ou questionner pour toi ?"
+            "question": "Qu’est-ce que cette interprétation vient éclairer ou questionner pour toi ?",
+            "phase": "me-situer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s2-q5",
             "fonction": "se-laisser-eclairer",
             "source": "parole",
             "consigne": "Relis maintenant 2 Corinthiens 5:17. Tu as déjà rencontré ce texte dans la fiche précédente.",
-            "question": "Quel sens prend-il ici, après les passages que tu viens de méditer ?"
+            "question": "Quel sens prend-il ici, après les passages que tu viens de méditer ?",
+            "phase": "reconsiderer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s2-q6",
@@ -1011,7 +1039,9 @@
             "source": "contemplation",
             "consigne": "Regarde l’ensemble du chemin parcouru dans cette partie.",
             "question": "Qu’est-ce que cette partie t’a fait comprendre de la grâce et de la manière dont tu te regardes devant Dieu ?",
-            "priereTitre": "Ce que j’ai découvert"
+            "priereTitre": "Ce que j’ai découvert",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s2-q7",
@@ -1019,7 +1049,9 @@
             "source": "contemplation",
             "consigne": "Reviens aux textes, sans chercher une réponse exemplaire.",
             "question": "Y a-t-il une Parole que tu voudrais garder particulièrement ?",
-            "priereTitre": "La Parole qui m’a particulièrement arrêté"
+            "priereTitre": "La Parole qui m’a particulièrement arrêté",
+            "phase": "repondre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s2-q8",
@@ -1027,7 +1059,9 @@
             "source": "contemplation",
             "consigne": "Tu peux aussi constater que rien de précis ne s’impose encore.",
             "question": "Qu’est-ce que tout cela vient éclairer pour toi ?",
-            "priereTitre": "Ce que cela vient éclairer pour moi"
+            "priereTitre": "Ce que cela vient éclairer pour moi",
+            "phase": "repondre",
+            "priorite": "approfondissement"
           }
         ],
         "pratique": {
@@ -1051,49 +1085,63 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Jean 7:37-38. Puis relis les paroles de Jésus une deuxième fois.",
-            "question": "Qu’est-ce qui retient ton attention ?"
+            "question": "Qu’est-ce qui retient ton attention ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s3-q2",
             "fonction": "decouvrir-dieu",
             "source": "contemplation",
             "consigne": "Reste encore un instant avec Jean 7:37-38.",
-            "question": "Qu’est-ce que ce passage te fait découvrir de Jésus et de ce qu’il propose à celui qui a soif ?"
+            "question": "Qu’est-ce que ce passage te fait découvrir de Jésus et de ce qu’il propose à celui qui a soif ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s3-q3",
             "fonction": "comparer",
             "source": "parole",
             "consigne": "Lis maintenant Matthieu 7:7 et rapproche-le de Jean 7:37-38.",
-            "question": "Qu’est-ce que ce texte ajoute à ce que tu viens de méditer ?"
+            "question": "Qu’est-ce que ce texte ajoute à ce que tu viens de méditer ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s3-q4",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Matthieu 4:4.",
-            "question": "Qu’est-ce qui te frappe dans la comparaison faite par Jésus ?"
+            "question": "Qu’est-ce qui te frappe dans la comparaison faite par Jésus ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s3-q5",
             "fonction": "relire-le-livret",
             "source": "livret",
             "consigne": "Le livret explique que la Parole révèle Dieu, son amour, notre identité et ses promesses. Il utilise l’image d’une graine qui grandit en nous.",
-            "question": "Qu’est-ce que cette interprétation ajoute à ce que tu viens de lire dans Matthieu 4:4 ?"
+            "question": "Qu’est-ce que cette interprétation ajoute à ce que tu viens de lire dans Matthieu 4:4 ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s3-q6",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis Jean 15:7, puis relis-le lentement.",
-            "question": "Qu’est-ce qui retient ton attention dans les paroles de Jésus ?"
+            "question": "Qu’est-ce qui retient ton attention dans les paroles de Jésus ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s3-q7",
             "fonction": "comparer",
             "source": "parole",
             "consigne": "Lis maintenant 1 Jean 4:19 et garde-le à côté de Jean 15:7.",
-            "question": "Qu’est-ce que ce verset ajoute à ce que tu viens de contempler ?"
+            "question": "Qu’est-ce que ce verset ajoute à ce que tu viens de contempler ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s3-q8",
@@ -1101,7 +1149,9 @@
             "source": "contemplation",
             "consigne": "Tu viens de rencontrer trois images : avoir soif, être nourri, demeurer. Prends un instant avant de répondre.",
             "question": "Qu’est-ce que tout cela te fait comprendre de la manière dont une relation avec Dieu grandit ?",
-            "priereTitre": "Ce que ces textes m’ont fait découvrir"
+            "priereTitre": "Ce que ces textes m’ont fait découvrir",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s3-q9",
@@ -1109,7 +1159,9 @@
             "source": "contemplation",
             "consigne": "Reviens au passage qui est resté avec toi.",
             "question": "Quelle Parole t’a particulièrement nourri ?",
-            "priereTitre": "La Parole qui m’a particulièrement nourri"
+            "priereTitre": "La Parole qui m’a particulièrement nourri",
+            "phase": "repondre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s3-q10",
@@ -1117,7 +1169,9 @@
             "source": "contemplation",
             "consigne": "Tu peux nommer une découverte, un désir, une question ou quelque chose d’encore indistinct.",
             "question": "Qu’est-ce qui s’est éveillé ou précisé en toi ?",
-            "priereTitre": "Ce qui s’est éveillé ou précisé en moi"
+            "priereTitre": "Ce qui s’est éveillé ou précisé en moi",
+            "phase": "repondre",
+            "priorite": "approfondissement"
           }
         ],
         "pratique": {
@@ -1141,56 +1195,72 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Jean 15:10. Relis encore une fois les paroles de Jésus.",
-            "question": "Qu’est-ce qui retient ton attention dans ce qu’il dit de l’obéissance et de l’amour ?"
+            "question": "Qu’est-ce qui retient ton attention dans ce qu’il dit de l’obéissance et de l’amour ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s4-q2",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis maintenant Romains 6:15-18. Prends ton temps.",
-            "question": "Qu’est-ce qui te frappe dans ce passage ?"
+            "question": "Qu’est-ce qui te frappe dans ce passage ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s4-q3",
             "fonction": "comparer",
             "source": "contemplation",
             "consigne": "Garde Romains 6:15-18 à côté de Jean 15:10.",
-            "question": "Qu’est-ce que ce passage ajoute à ce que Jésus vient de dire ?"
+            "question": "Qu’est-ce que ce passage ajoute à ce que Jésus vient de dire ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s4-q4",
             "fonction": "observer+decouvrir-dieu",
             "source": "parole",
             "consigne": "Lis Hébreux 13:21 lentement.",
-            "question": "Qu’est-ce qui retient ton attention dans ce passage ?"
+            "question": "Qu’est-ce qui retient ton attention dans ce passage ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s4-q5",
             "fonction": "comprendre",
             "source": "contemplation",
             "consigne": "Reviens maintenant à l’ensemble des textes que tu viens de lire.",
-            "question": "Qu’est-ce que tu comprends de l’obéissance dans une vie de grâce ?"
+            "question": "Qu’est-ce que tu comprends de l’obéissance dans une vie de grâce ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s4-q6",
             "fonction": "relire-le-livret",
             "source": "livret",
             "consigne": "Le livret propose que l’obéissance est motivée par l’amour et la confiance, et qu’elle devient la conséquence de la relation avec Dieu.",
-            "question": "Qu’est-ce que cette interprétation vient préciser dans ce que tu avais observé ?"
+            "question": "Qu’est-ce que cette interprétation vient préciser dans ce que tu avais observé ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s4-q7",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis maintenant 1 Samuel 15:23 dans son contexte. Reste d’abord avec les mots du passage.",
-            "question": "Qu’est-ce que tu observes dans le texte lui-même ?"
+            "question": "Qu’est-ce que tu observes dans le texte lui-même ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s4-q8",
             "fonction": "rester-ouvert",
             "source": "livret",
             "consigne": "Le livret rapproche ensuite la désobéissance de la sorcellerie, du contrôle et de « droits » donnés à l’ennemi. Il s’agit ici d’une interprétation proposée par le livret, et non d’une formulation directe du texte biblique.",
-            "question": "Après avoir lu 1 Samuel 15:23, qu’est-ce que tu retiens, qu’est-ce que tu questionnes ou qu’est-ce qui reste ouvert pour toi ?"
+            "question": "Après avoir lu 1 Samuel 15:23, qu’est-ce que tu retiens, qu’est-ce que tu questionnes ou qu’est-ce qui reste ouvert pour toi ?",
+            "phase": "me-situer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s4-q9",
@@ -1198,7 +1268,9 @@
             "source": "contemplation",
             "consigne": "Appuie-toi sur les passages parcourus, sans chercher une formule parfaite.",
             "question": "Comment comprends-tu maintenant l’obéissance ?",
-            "priereTitre": "Ce que j’ai compris de l’obéissance"
+            "priereTitre": "Ce que j’ai compris de l’obéissance",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s4-q10",
@@ -1206,7 +1278,9 @@
             "source": "contemplation",
             "consigne": "Reviens à ce qui t’a frappé dans les textes.",
             "question": "Qu’est-ce que tu as découvert de Dieu ?",
-            "priereTitre": "Ce que j’ai découvert de Dieu"
+            "priereTitre": "Ce que j’ai découvert de Dieu",
+            "phase": "repondre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s4-q11",
@@ -1214,7 +1288,9 @@
             "source": "contemplation",
             "consigne": "Tu peux nommer une invitation, une résistance ou une question.",
             "question": "Qu’est-ce qui t’interpelle ?",
-            "priereTitre": "Ce qui m’interpelle"
+            "priereTitre": "Ce qui m’interpelle",
+            "phase": "repondre",
+            "priorite": "approfondissement"
           }
         ],
         "pratique": {
@@ -1235,28 +1311,36 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement 2 Corinthiens 12:9. Puis relis-le encore une fois.",
-            "question": "Qu’est-ce qui retient ton attention ?"
+            "question": "Qu’est-ce qui retient ton attention ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s5-q2",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis maintenant Hébreux 5:8.",
-            "question": "Qu’est-ce qui t’interpelle dans ce qui est dit de Jésus ?"
+            "question": "Qu’est-ce qui t’interpelle dans ce qui est dit de Jésus ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s5-q3",
             "fonction": "comprendre",
             "source": "contemplation",
             "consigne": "Garde les deux textes ensemble, sans chercher une conclusion rapide.",
-            "question": "Qu’est-ce qu’ils te font comprendre ?"
+            "question": "Qu’est-ce qu’ils te font comprendre ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s5-q4",
             "fonction": "relire-le-livret",
             "source": "livret",
             "consigne": "Le livret voit dans les épreuves un lieu où l’être humain peut apprendre à moins dépendre de ses propres capacités et à davantage s’appuyer sur Dieu. C’est l’interprétation proposée par le livret, pas une citation biblique directe.",
-            "question": "Après les textes que tu viens de lire, qu’est-ce que tu retiens de cette affirmation ?"
+            "question": "Après les textes que tu viens de lire, qu’est-ce que tu retiens de cette affirmation ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s5-q5",
@@ -1264,7 +1348,9 @@
             "source": "contemplation",
             "consigne": "Tu peux répondre que quelque chose a changé, s’est précisé ou demeure entièrement ouvert.",
             "question": "Qu’est-ce que ces passages changent, précisent ou laissent encore ouvert dans ta compréhension de la faiblesse et de l’épreuve ?",
-            "priereTitre": "Ce que ces textes m’ont fait comprendre"
+            "priereTitre": "Ce que ces textes m’ont fait comprendre",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s5-q6",
@@ -1272,7 +1358,9 @@
             "source": "contemplation",
             "consigne": "Il n’est pas nécessaire de résoudre maintenant ce qui reste douloureux ou mystérieux.",
             "question": "Qu’est-ce que tu ne comprends pas encore ?",
-            "priereTitre": "Ce que je ne comprends pas encore"
+            "priereTitre": "Ce que je ne comprends pas encore",
+            "phase": "reconsiderer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s5-q7",
@@ -1280,7 +1368,9 @@
             "source": "contemplation",
             "consigne": "Reviens à la Parole que tu souhaites simplement garder devant Dieu.",
             "question": "Quelle Parole veux-tu apporter avec toi dans la prière ?",
-            "priereTitre": "La Parole que je veux apporter devant Dieu"
+            "priereTitre": "La Parole que je veux apporter devant Dieu",
+            "phase": "repondre",
+            "priorite": "essentielle"
           }
         ],
         "pratique": {
@@ -1303,42 +1393,54 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Hébreux 4:10-11.",
-            "question": "Qu’est-ce qui retient ton attention dans la manière dont ce passage parle du repos ?"
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont ce passage parle du repos ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s6-q2",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis maintenant Éphésiens 2:10. Tu as rencontré la grâce quelques versets plus tôt, dans Éphésiens 2:8-9.",
-            "question": "Qu’est-ce que ce verset ajoute ?"
+            "question": "Qu’est-ce que ce verset ajoute ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s6-q3",
             "fonction": "comparer",
             "source": "contemplation",
             "consigne": "Garde maintenant Éphésiens 2:8-10 ensemble, sans qu’on t’en fournisse le lien.",
-            "question": "Qu’est-ce que tu comprends lorsque tu relis l’ensemble ?"
+            "question": "Qu’est-ce que tu comprends lorsque tu relis l’ensemble ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s6-q4",
             "fonction": "relire-le-livret",
             "source": "livret",
             "consigne": "Le livret propose : « Se reposer, ce n’est pas être passif, c’est s’en remettre totalement à Jésus afin qu’il anime notre vie. » Relis cette phrase, puis reviens à Hébreux 4 et Éphésiens 2.",
-            "question": "Quelle différence comprends-tu maintenant entre le repos et la passivité ?"
+            "question": "Quelle différence comprends-tu maintenant entre le repos et la passivité ?",
+            "phase": "me-situer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s6-q5",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis simplement la prière de Jaebets dans 1 Chroniques 4:10, sans la transformer en promesse générale.",
-            "question": "Qu’est-ce qui retient ton attention dans ce qu’il demande à Dieu ?"
+            "question": "Qu’est-ce qui retient ton attention dans ce qu’il demande à Dieu ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s6-q6",
             "fonction": "recevoir",
             "source": "contemplation",
             "consigne": "Reste avec le texte tel qu’il est écrit.",
-            "question": "Y a-t-il quelque chose dans cette prière qui nourrit ta propre relation avec Dieu ?"
+            "question": "Y a-t-il quelque chose dans cette prière qui nourrit ta propre relation avec Dieu ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f4-s6-q7",
@@ -1346,7 +1448,9 @@
             "source": "contemplation",
             "consigne": "Regarde l’ensemble des passages de cette dernière traversée.",
             "question": "Comment comprends-tu maintenant le repos dans la grâce ?",
-            "priereTitre": "Ce que j’ai compris du repos"
+            "priereTitre": "Ce que j’ai compris du repos",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s6-q8",
@@ -1354,7 +1458,9 @@
             "source": "contemplation",
             "consigne": "Reviens aux mots qui ont retenu ton attention.",
             "question": "Qu’est-ce que cela t’a fait découvrir de Dieu ?",
-            "priereTitre": "Ce que j’ai découvert de Dieu"
+            "priereTitre": "Ce que j’ai découvert de Dieu",
+            "phase": "repondre",
+            "priorite": "essentielle"
           },
           {
             "id": "f4-s6-q9",
@@ -1362,7 +1468,9 @@
             "source": "contemplation",
             "consigne": "Tu n’as pas besoin de produire davantage. Choisis simplement ce que tu veux garder devant toi.",
             "question": "Quelle Parole veux-tu garder devant toi ?",
-            "priereTitre": "La Parole que je veux garder devant moi"
+            "priereTitre": "La Parole que je veux garder devant moi",
+            "phase": "repondre",
+            "priorite": "approfondissement"
           }
         ],
         "pratique": {
@@ -1813,7 +1921,9 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Éphésiens 4:20-24. Puis relis-le encore une fois.",
-            "question": "Qu’est-ce qui retient ton attention dans les images et les mouvements utilisés par Paul ?"
+            "question": "Qu’est-ce qui retient ton attention dans les images et les mouvements utilisés par Paul ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s1-q2",
@@ -1821,21 +1931,27 @@
             "source": "contemplation",
             "consigne": "Relis le passage en t’arrêtant sur les expressions qui t’ont particulièrement marqué.",
             "question": "Qu’est-ce que tu comprends de la transformation dont Paul parle ?",
-            "priereTitre": "Ce que j’ai compris du passage"
+            "priereTitre": "Ce que j’ai compris du passage",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s1-q3",
             "fonction": "relire-le-livret",
             "source": "livret",
             "consigne": "Le livret explique que le croyant est déjà un homme nouveau, mais qu’il peut encore porter dans sa vie nouvelle des habitudes acquises auparavant, « tel un vêtement » dont il doit se dépouiller. Il place aussi le renouvellement de la pensée au cœur de cette transformation.",
-            "question": "Après Éphésiens 4:20-24, qu’est-ce que cette explication t’aide à mieux comprendre ?"
+            "question": "Après Éphésiens 4:20-24, qu’est-ce que cette explication t’aide à mieux comprendre ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s1-q4",
             "fonction": "se-laisser-eclairer",
             "source": "vie",
             "consigne": "Pense à ta vie telle qu’elle est réellement aujourd’hui. Ne cherche pas à dresser une liste de tout ce qui devrait changer.",
-            "question": "Y a-t-il une manière de penser, de réagir ou d’agir que tu reconnais comme appartenant encore à ton ancienne manière de vivre ?"
+            "question": "Y a-t-il une manière de penser, de réagir ou d’agir que tu reconnais comme appartenant encore à ton ancienne manière de vivre ?",
+            "phase": "me-situer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s1-q5",
@@ -1843,7 +1959,9 @@
             "source": "vie",
             "consigne": "Ne choisis qu’une seule chose. Sors du général et pense à un moment réel.",
             "question": "Dans quelle situation concrète cela apparaît-il généralement ?",
-            "priereTitre": "La situation que j’ai identifiée"
+            "priereTitre": "La situation que j’ai identifiée",
+            "phase": "me-situer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s1-q6",
@@ -1851,21 +1969,27 @@
             "source": "vie",
             "consigne": "Regarde honnêtement cette situation, sans te condamner et sans chercher encore la solution.",
             "question": "Que fais-tu, ou que se passe-t-il habituellement en toi dans cette situation ?",
-            "priereTitre": "Ce que je reconnais dans ma manière actuelle de réagir"
+            "priereTitre": "Ce que je reconnais dans ma manière actuelle de réagir",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s1-q7",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis maintenant Colossiens 3:3-5.",
-            "question": "Qu’est-ce qui te frappe lorsque Paul place ensemble ce qui est déjà vrai du croyant et ce qu’il lui demande ensuite de faire ?"
+            "question": "Qu’est-ce qui te frappe lorsque Paul place ensemble ce qui est déjà vrai du croyant et ce qu’il lui demande ensuite de faire ?",
+            "phase": "reconsiderer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s1-q8",
             "fonction": "repondre",
             "source": "vie",
             "consigne": "Reviens à la situation que tu viens d’identifier et garde Colossiens 3:3-5 ouvert devant toi.",
-            "question": "À la lumière du texte, qu’est-ce qui aurait besoin d’être laissé derrière ?"
+            "question": "À la lumière du texte, qu’est-ce qui aurait besoin d’être laissé derrière ?",
+            "phase": "repondre",
+            "priorite": "essentielle"
           }
         ],
         "pratique": {
@@ -1888,28 +2012,36 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Galates 5:16-25. Ne cherche pas immédiatement à te classer quelque part.",
-            "question": "Qu’est-ce qui retient ton attention dans le contraste présenté par Paul ?"
+            "question": "Qu’est-ce qui retient ton attention dans le contraste présenté par Paul ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s2-q2",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Relis particulièrement Galates 5:22-25, sans résumer trop vite la liste.",
-            "question": "Qu’est-ce qui te frappe ?"
+            "question": "Qu’est-ce qui te frappe ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s2-q3",
             "fonction": "comparer",
             "source": "parole",
             "consigne": "Lis maintenant Jean 15:5 et garde-le à côté de Galates 5.",
-            "question": "Qu’est-ce que cette parole de Jésus ajoute à ce que tu viens de lire ?"
+            "question": "Qu’est-ce que cette parole de Jésus ajoute à ce que tu viens de lire ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s2-q4",
             "fonction": "se-laisser-eclairer",
             "source": "vie",
             "consigne": "Regarde ta vie à partir de Galates 5, et non l’inverse.",
-            "question": "Y a-t-il un domaine dans lequel tu reconnais un décalage entre ce que tu désires vivre et ta manière habituelle de réagir ?"
+            "question": "Y a-t-il un domaine dans lequel tu reconnais un décalage entre ce que tu désires vivre et ta manière habituelle de réagir ?",
+            "phase": "me-situer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s2-q5",
@@ -1917,7 +2049,9 @@
             "source": "vie",
             "consigne": "Pense à un exemple récent, pas à une idée générale.",
             "question": "Qu’est-il arrivé ?",
-            "priereTitre": "La situation que j’ai identifiée"
+            "priereTitre": "La situation que j’ai identifiée",
+            "phase": "me-situer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s2-q6",
@@ -1925,7 +2059,9 @@
             "source": "vie",
             "consigne": "Reste sur les faits et sur ce qui s’est réellement passé en toi.",
             "question": "Comment as-tu réagi ?",
-            "priereTitre": "Ma manière habituelle de réagir"
+            "priereTitre": "Ma manière habituelle de réagir",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s2-q7",
@@ -1933,7 +2069,9 @@
             "source": "vie",
             "consigne": "Relis Galates 5:22-25 et laisse le texte éclairer cette situation précise.",
             "question": "Qu’est-ce qui aurait pu être différent ?",
-            "priereTitre": "Ce que la Parole m’a montré"
+            "priereTitre": "Ce que la Parole m’a montré",
+            "phase": "repondre",
+            "priorite": "essentielle"
           }
         ],
         "pratique": {
@@ -1955,21 +2093,27 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Romains 12:2. Puis relis-le une deuxième fois.",
-            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul parle de transformation ?"
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul parle de transformation ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s3-q2",
             "fonction": "comprendre",
             "source": "contemplation",
             "consigne": "Reste encore un instant avec les mots du verset.",
-            "question": "Qu’est-ce que tu comprends du rôle de la pensée dans ce passage ?"
+            "question": "Qu’est-ce que tu comprends du rôle de la pensée dans ce passage ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s3-q3",
             "fonction": "identifier",
             "source": "vie",
             "consigne": "Reviens à une situation précise dans laquelle tu réagis souvent de la même manière.",
-            "question": "Quelle est cette situation ?"
+            "question": "Quelle est cette situation ?",
+            "phase": "me-situer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s3-q4",
@@ -1977,21 +2121,27 @@
             "source": "vie",
             "consigne": "Écoute ce qui se dit intérieurement en toi lorsque cette situation arrive.",
             "question": "Dans ce moment, qu’est-ce que tu te dis souvent ?",
-            "priereTitre": "La pensée que j’ai identifiée"
+            "priereTitre": "La pensée que j’ai identifiée",
+            "phase": "me-situer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s3-q5",
             "fonction": "comprendre",
             "source": "vie",
             "consigne": "Ne juge pas encore cette pensée. Cherche d’abord à comprendre sa logique.",
-            "question": "Pourquoi cette pensée te paraît-elle vraie ?"
+            "question": "Pourquoi cette pensée te paraît-elle vraie ?",
+            "phase": "me-situer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s3-q6",
             "fonction": "examiner",
             "source": "parole",
             "consigne": "Regarde maintenant cette pensée à la lumière de Romains 12:2 et des Paroles déjà rencontrées dans le parcours.",
-            "question": "Est-elle entièrement vraie, partiellement vraie, ou y a-t-il quelque chose qui a besoin d’être renouvelé ?"
+            "question": "Est-elle entièrement vraie, partiellement vraie, ou y a-t-il quelque chose qui a besoin d’être renouvelé ?",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s3-q7",
@@ -1999,7 +2149,9 @@
             "source": "parole",
             "consigne": "Tu peux revenir à un verset déjà étudié. L’application ne choisira pas la réponse à ta place.",
             "question": "Quelle Parole biblique éclaire, corrige, complète ou remet en perspective cette manière de penser ?",
-            "priereTitre": "Ce que la Parole vient éclairer"
+            "priereTitre": "Ce que la Parole vient éclairer",
+            "phase": "reconsiderer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s3-q8",
@@ -2007,7 +2159,9 @@
             "source": "vie",
             "consigne": "Reformule maintenant cette situation à la lumière de la Parole, sans nier ce qui est réellement difficile.",
             "question": "Qu’est-ce que tu comprends autrement aujourd’hui ?",
-            "priereTitre": "Ce que je comprends autrement maintenant"
+            "priereTitre": "Ce que je comprends autrement maintenant",
+            "phase": "repondre",
+            "priorite": "essentielle"
           }
         ],
         "pratique": {
@@ -2032,35 +2186,45 @@
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis lentement Galates 2:20. Ne cherche pas à le réciter trop vite parce que tu le connais peut-être déjà.",
-            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul décrit sa vie ?"
+            "question": "Qu’est-ce qui retient ton attention dans la manière dont Paul décrit sa vie ?",
+            "phase": "comprendre",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s4-q2",
             "fonction": "comparer",
             "source": "parole",
             "consigne": "Lis maintenant Philippiens 2:13 et garde-le à côté de Galates 2:20.",
-            "question": "Qu’est-ce que ce texte ajoute ?"
+            "question": "Qu’est-ce que ce texte ajoute ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s4-q3",
             "fonction": "observer",
             "source": "parole",
             "consigne": "Lis Colossiens 1:29.",
-            "question": "Qu’est-ce qui te frappe dans la manière dont Paul parle à la fois de son effort et de la puissance qui agit en lui ?"
+            "question": "Qu’est-ce qui te frappe dans la manière dont Paul parle à la fois de son effort et de la puissance qui agit en lui ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s4-q4",
             "fonction": "comprendre",
             "source": "contemplation",
             "consigne": "Mets maintenant Galates 2:20, Philippiens 2:13 et Colossiens 1:29 ensemble.",
-            "question": "Qu’est-ce que ces passages te font comprendre de ta part et de l’action de Dieu dans la transformation ?"
+            "question": "Qu’est-ce que ces passages te font comprendre de ta part et de l’action de Dieu dans la transformation ?",
+            "phase": "comprendre",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s4-q5",
             "fonction": "rester-ouvert",
             "source": "livret",
             "consigne": "Le livret emploie des formulations comme « Dieu attend que nous cessions de faire » ou « rejeter toute intervention de notre volonté ». Ce sont ses formulations interprétatives. Les passages que tu viens de lire montrent ensemble l’action de Dieu et une réponse humaine réelle ; le livret parle lui-même ensuite de « collaboration avec le Saint-Esprit ».",
-            "question": "Après avoir lu les textes, qu’est-ce que tu retiens, qu’est-ce que tu nuances ou qu’est-ce qui reste ouvert pour toi ?"
+            "question": "Après avoir lu les textes, qu’est-ce que tu retiens, qu’est-ce que tu nuances ou qu’est-ce qui reste ouvert pour toi ?",
+            "phase": "me-situer",
+            "priorite": "approfondissement"
           },
           {
             "id": "f6-s4-q6",
@@ -2068,7 +2232,9 @@
             "source": "vie",
             "consigne": "Pense à ta vie actuelle, sans chercher un exemple spectaculaire.",
             "question": "Y a-t-il quelque chose que tu sais juste, mais que tu as beaucoup de mal à vivre par tes propres forces ?",
-            "priereTitre": "La difficulté que j’ai identifiée"
+            "priereTitre": "La difficulté que j’ai identifiée",
+            "phase": "me-situer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s4-q7",
@@ -2076,7 +2242,9 @@
             "source": "vie",
             "consigne": "Reste sur ce que tu expérimentes réellement lorsque tu essaies.",
             "question": "Qu’est-ce qui se passe généralement ?",
-            "priereTitre": "Ce que je fais ou vis habituellement"
+            "priereTitre": "Ce que je fais ou vis habituellement",
+            "phase": "reconsiderer",
+            "priorite": "essentielle"
           },
           {
             "id": "f6-s4-q8",
@@ -2084,7 +2252,9 @@
             "source": "vie",
             "consigne": "Reviens aux trois passages et garde ensemble ta responsabilité et l’action de Dieu en toi.",
             "question": "Qu’est-ce qu’ils changent dans ta manière d’aborder cette difficulté ?",
-            "priereTitre": "Ce que les textes viennent changer dans ma compréhension"
+            "priereTitre": "Ce que les textes viennent changer dans ma compréhension",
+            "phase": "repondre",
+            "priorite": "essentielle"
           }
         ],
         "pratique": {

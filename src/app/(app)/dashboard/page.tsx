@@ -50,7 +50,7 @@ function DashboardSkeleton() {
 
 function DashboardContent() {
   const { user } = useAuth();
-  const { group } = useParcours();
+  const { group, preparationStep } = useParcours();
   const [fiche, setFiche] = useState<FicheLivret | null>(null);
   const [reponsesFiche, setReponsesFiche] = useState<Record<string, string>>({});
   const [notifOuvert, setNotifOuvert] = useState(false);
@@ -62,7 +62,7 @@ function DashboardContent() {
     void getUserProgress(user.uid).then(p => { if (actif) setFichePersonnelle(p.currentFicheId); });
     return () => { actif = false; };
   }, [user, group]);
-  const ficheCouranteId = group?.currentStep ?? fichePersonnelle;
+  const ficheCouranteId = Math.min(group?.currentStep ?? fichePersonnelle, Math.max(1, preparationStep));
 
   useEffect(() => {
     let actif = true;

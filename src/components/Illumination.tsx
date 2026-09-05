@@ -192,7 +192,7 @@ function FigureCentrale({ chapitre, fiche }: { chapitre: 1 | 2 | 3 | 4; fiche: n
     );
   }
 
-  // IV — Demeurer et transmettre : une croix élargie, aux branches ouvertes.
+  // IV — Demeurer et espérer : une croix élargie, aux branches ouvertes.
   return (
     <g opacity="0.75" strokeWidth="1.8">
       <line x1="100" y1="52" x2="100" y2="148" />

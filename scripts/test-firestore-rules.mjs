@@ -65,9 +65,12 @@ try {
     });
   });
 
-  const alice = environnement.authenticatedContext('alice', { email: 'alice@example.test' }).firestore();
-  const bob = environnement.authenticatedContext('bob', { email: 'bob@example.test' }).firestore();
+  const alice = environnement.authenticatedContext('alice', { email: 'alice@example.test', auth_time: 1788626251 }).firestore();
+  const bob = environnement.authenticatedContext('bob', { email: 'bob@example.test', auth_time: 1788626251 }).firestore();
   const anonyme = environnement.unauthenticatedContext().firestore();
+  const ancienneSession = environnement.authenticatedContext('alice', { email: 'alice@example.test', auth_time: 1788626250 }).firestore();
+  await assertFails(setDoc(doc(ancienneSession, 'users/alice/progress/1'), { completed: true, answers: {} }));
+  await assertFails(setDoc(doc(ancienneSession, 'profiles/alice'), { uid: 'alice' }));
 
   const annuaireValide = {
     ...groupe,

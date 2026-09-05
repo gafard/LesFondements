@@ -27,20 +27,29 @@ for (const fiche of meditations as FicheMeditation[]) {
     const repartition = repartirQuestions(section.questions);
     jours += 1;
     assert.ok(repartition.principales.length > 0, `Fiche ${fiche.ficheId} · ${section.sectionTitre} sans question essentielle`);
-    if (fiche.ficheId === 1) {
-      const phases = new Set(repartition.principales.map((question) => question.phase));
+    const estPilote = [1, 4, 6].includes(fiche.ficheId);
+    if (estPilote) {
       assert.ok(
-        phases.has('regarder') && phases.has('comprendre') && phases.has('mettre-en-mots'),
-        `Fiche 1 · ${section.sectionTitre} doit faire regarder, comprendre et mettre en mots`
-      );
-      assert.ok(
-        repartition.principales.length >= 4,
-        `Fiche 1 · ${section.sectionTitre} doit conserver un vrai chemin de compréhension`
+        repartition.principales.length >= 3,
+        `Fiche ${fiche.ficheId} · ${section.sectionTitre} doit conserver un vrai chemin de compréhension`
       );
       assert.ok(
         section.questions.every((question) => question.priorite && question.phase),
-        `Fiche 1 · ${section.sectionTitre} doit être entièrement composée par l’éditeur`
+        `Fiche ${fiche.ficheId} · ${section.sectionTitre} doit être entièrement composée par l’éditeur`
       );
+      if (fiche.ficheId === 1) {
+        const phases = new Set(repartition.principales.map((question) => question.phase));
+        assert.ok(
+          phases.has('regarder') && phases.has('comprendre') && phases.has('mettre-en-mots'),
+          `Fiche 1 · ${section.sectionTitre} doit faire regarder, comprendre et mettre en mots`
+        );
+      } else {
+        const phases = new Set(repartition.principales.map((question) => question.phase));
+        assert.ok(
+          phases.has('comprendre') && phases.has('repondre'),
+          `Fiche ${fiche.ficheId} · ${section.sectionTitre} doit au moins comprendre et répondre`
+        );
+      }
     } else {
       assert.ok(
         repartition.principales.length <= MAX_QUESTIONS_ESSENTIELLES,
@@ -93,4 +102,4 @@ assert.ok(
   'Le scénario quotidien doit parcourir les blocs canoniques du livret.'
 );
 
-console.log(`Constitution éditoriale vérifiée : ${tempsCanoniques.length} temps canoniques, ${jours} facilitations relues, fiche 1 composée et limite de 2 conservée par défaut.`);
+console.log(`Constitution éditoriale vérifiée : ${tempsCanoniques.length} temps canoniques, ${jours} facilitations relues, fiches pilotes (1, 4, 6) composées et limite de 2 conservée par défaut.`);

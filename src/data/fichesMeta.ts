@@ -228,5 +228,5 @@ export const CHAPITRES: ChapitreMeta[] = [
   { numero: 1, roman: 'I', titre: "Recevoir le Fondement", fiches: [1, 2, 3, 4, 5] },
   { numero: 2, roman: 'II', titre: "Être transformé", fiches: [6, 7, 8, 9, 10] },
   { numero: 3, roman: 'III', titre: "Devenir disciple", fiches: [11, 12, 13, 14, 15] },
-  { numero: 4, roman: 'IV', titre: "Demeurer et transmettre", fiches: [16, 17, 18, 19, 20] },
+  { numero: 4, roman: 'IV', titre: "Demeurer et espérer", fiches: [16, 17, 18, 19, 20] },
 ];

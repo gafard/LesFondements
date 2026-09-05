@@ -68,10 +68,10 @@ export const MEMBRES = [
   },
 ];
 
-export async function semerSession(page: Page, options?: { avecGroupe?: boolean }): Promise<void> {
+export async function semerSession(page: Page, options?: { avecGroupe?: boolean; personnel?: boolean; etape?: number; fichesTerminees?: number[] }): Promise<void> {
   const avecGroupe = options?.avecGroupe ?? true;
   await page.addInitScript(
-    ({ utilisateur, groupe, membres, groupeActif }) => {
+    ({ utilisateur, groupe, membres, groupeActif, personnel, fichesTerminees }) => {
       localStorage.clear();
       localStorage.setItem('lesfondements_local_user', JSON.stringify(utilisateur));
       localStorage.setItem(
@@ -79,6 +79,7 @@ export async function semerSession(page: Page, options?: { avecGroupe?: boolean 
         JSON.stringify({
           ...utilisateur,
           photoURL: null,
+          studyMode: personnel ? 'personnel' : 'cellule',
           groupId: groupeActif ? groupe.id : null,
           membershipStatus: groupeActif ? 'actif' : null,
           role: groupeActif ? 'animateur' : null,
@@ -92,10 +93,11 @@ export async function semerSession(page: Page, options?: { avecGroupe?: boolean 
         localStorage.setItem(`lf.members.${groupe.id}`, JSON.stringify(membres));
         localStorage.setItem(`lf.sessions.${groupe.id}`, JSON.stringify([]));
       }
+      localStorage.setItem(`lesfondements_prog_${utilisateur.uid}`, JSON.stringify(Object.fromEntries(fichesTerminees.map(id => [id, { completed: true, answers: {}, lastUpdated: Date.now() }]))));
       localStorage.setItem('lf.demoSeeded', 'true');
       localStorage.setItem('lf.mesure.consentement', 'refuse');
     },
-    { utilisateur: UTILISATEUR, groupe: GROUPE, membres: MEMBRES, groupeActif: avecGroupe }
+    { utilisateur: UTILISATEUR, groupe: { ...GROUPE, currentStep: options?.etape ?? 1 }, membres: MEMBRES, groupeActif: avecGroupe, personnel: options?.personnel ?? false, fichesTerminees: options?.fichesTerminees ?? [] }
   );
 }
 

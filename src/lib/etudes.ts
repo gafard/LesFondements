@@ -17,7 +17,7 @@
  *   · Commentaire de Matthew Henry (1710)
  */
 
-import { abreger, livreParCode, type Livre, type ReferenceBiblique } from './reference';
+import { abreger, formaterReference, livreParCode, type Livre, type ReferenceBiblique } from './reference';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -113,10 +113,15 @@ export interface Passage {
   chapitreEntier: boolean;
   /** Nombre total de chapitres du livre, pour la navigation. */
   nbChapitres: number;
+  /** Tous les versets du chapitre courant. */
+  tousLesVersets?: Verset[];
 }
 
 /** Lit le passage désigné. `null` si le livre ou le chapitre n'existe pas. */
-export async function lirePassage(reference: ReferenceBiblique): Promise<Passage | null> {
+export async function lirePassage(
+  reference: ReferenceBiblique,
+  options?: { chapitreComplet?: boolean }
+): Promise<Passage | null> {
   const livre = await chargerLivre(reference.livre.code);
   if (!livre) return null;
 
@@ -133,12 +138,30 @@ export async function lirePassage(reference: ReferenceBiblique): Promise<Passage
   const tous = livre.chapitres[String(numeroChapitre)];
   if (!tous) return null;
 
+  const aVersetPrecis = reference.versetDebut !== undefined;
+  const chapitreComplet = Boolean(options?.chapitreComplet || !aVersetPrecis);
+
+  let versets = tous;
+  if (!chapitreComplet && aVersetPrecis) {
+    const debut = reference.versetDebut!;
+    const fin = reference.versetFin ?? debut;
+    const filtres = tous.filter((v) => v.v >= debut && v.v <= fin);
+    if (filtres.length > 0) {
+      versets = filtres;
+    }
+  }
+
+  const titre = chapitreComplet
+    ? `${livre.nom} ${numeroChapitre}`
+    : formaterReference({ ...reference, chapitre: numeroChapitre }, true);
+
   return {
     reference: { ...reference, chapitre: numeroChapitre },
-    titre: `${livre.nom} ${numeroChapitre}`,
-    versets: tous,
-    chapitreEntier: true,
+    titre,
+    versets,
+    chapitreEntier: chapitreComplet,
     nbChapitres: chapitres.length,
+    tousLesVersets: tous,
   };
 }
 

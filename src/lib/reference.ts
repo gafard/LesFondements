@@ -152,11 +152,14 @@ export function livreParNom(valeur: string): Livre | null {
 const MOTIF = new RegExp(
   String.raw`(?:\b|\()([123])?\s?` + // numéro éventuel du livre
     String.raw`([a-zA-ZÀ-ÿ]{1,12})\.?\s*` + // nom du livre (insensible à la casse)
-    String.raw`(\d{1,3})` + // chapitre
+    String.raw`(\d{1,3})(?![a-zA-ZÀ-ÿ])` + // chapitre
     String.raw`(?:\s*[:.]\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?` + // versets
     String.raw`|\s*[-–]\s*(\d{1,3})(?![:.\d]))?`, // ou plage de chapitres
   'gi'
 );
+
+const MOTIF_ENCHAINEMENT =
+  /^(?:\s*(?:et|,)\s*)(\d{1,3})(?:\s*[:.]\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?|\s*[-–]\s*(\d{1,3}))?(?![a-zA-ZÀ-ÿ\d])/i;
 
 /** Analyse une référence isolée. Retourne `null` si ce n'en est pas une. */
 export function analyserReference(valeur: string): ReferenceBiblique | null {
@@ -168,14 +171,15 @@ export function analyserReference(valeur: string): ReferenceBiblique | null {
 }
 
 function construire(trouvee: RegExpExecArray): ReferenceBiblique | null {
-  const [brut, numero, nom, chapitre, verset, versetFin, chapitreFin] = trouvee;
+  const [brutEntier, numero, nom, chapitre, verset, versetFin, chapitreFin] = trouvee;
   const livre = livreParNom(`${numero ?? ''}${nom}`);
   if (!livre) return null;
 
+  const brut = brutEntier.trim().replace(/^\(/, '');
   const reference: ReferenceBiblique = {
     livre,
     chapitre: Number.parseInt(chapitre, 10),
-    brut: brut.trim(),
+    brut,
   };
   if (verset) {
     reference.versetDebut = Number.parseInt(verset, 10);
@@ -203,11 +207,68 @@ export function detecterReferences(texte: string): ReferenceTrouvee[] {
   let correspondance: RegExpExecArray | null;
   while ((correspondance = MOTIF.exec(texte)) !== null) {
     const reference = construire(correspondance);
-    if (!reference) continue;
-    // On recale le début sur le texte réellement conservé : la regex peut
-    // avoir avalé une espace avant le nom du livre.
-    const debut = correspondance.index + correspondance[0].indexOf(reference.brut[0]);
-    trouvees.push({ reference, debut, fin: debut + reference.brut.length });
+    if (!reference) {
+      MOTIF.lastIndex = correspondance.index + 1;
+      continue;
+    }
+
+    const brutSansParenth = reference.brut;
+    const decalageDansMatch = correspondance[0].indexOf(brutSansParenth);
+    const debut = correspondance.index + (decalageDansMatch >= 0 ? decalageDansMatch : 0);
+    const fin = debut + brutSansParenth.length;
+    trouvees.push({ reference, debut, fin });
+
+    // Repérage des enchaînements : « Gn 2 et 3 », « 1 Co 12 et 14 », « Jn 14:15-18 et 25-26 », « Rm 3:20, 28 »
+    let curseurFin = fin;
+    let derniereRef = reference;
+
+    while (curseurFin < texte.length) {
+      const suite = texte.slice(curseurFin);
+      const matchEnchainement = MOTIF_ENCHAINEMENT.exec(suite);
+      if (!matchEnchainement) break;
+
+      const [texteComplet, p1, p2, p3, p4] = matchEnchainement;
+      const refEnchainee: ReferenceBiblique = {
+        livre: derniereRef.livre,
+        chapitre: derniereRef.chapitre,
+        brut: '',
+      };
+
+      if (p2 !== undefined) {
+        // Ex: « Pr 1:7 et 2:5 » -> p1 est le chapitre (2), p2 est le verset (5)
+        refEnchainee.chapitre = Number.parseInt(p1, 10);
+        refEnchainee.versetDebut = Number.parseInt(p2, 10);
+        if (p3 !== undefined) refEnchainee.versetFin = Number.parseInt(p3, 10);
+      } else if (derniereRef.versetDebut !== undefined) {
+        // Ex: « Jn 14:15-18 et 25-26 » ou « Rm 3:20, 28 » -> même chapitre, verset p1
+        refEnchainee.chapitre = derniereRef.chapitre;
+        refEnchainee.versetDebut = Number.parseInt(p1, 10);
+        if (p4 !== undefined) refEnchainee.versetFin = Number.parseInt(p4, 10);
+      } else {
+        // Ex: « Gn 2 et 3 » ou « 1 Co 12 et 14 » -> même livre, nouveau chapitre p1
+        refEnchainee.chapitre = Number.parseInt(p1, 10);
+        if (p4 !== undefined) refEnchainee.chapitreFin = Number.parseInt(p4, 10);
+      }
+
+      const separateurMatch = texteComplet.match(/^\s*(?:et|,)\s*/i);
+      const longueurSep = separateurMatch ? separateurMatch[0].length : 0;
+      const brutPart = texteComplet.slice(longueurSep).trim();
+      refEnchainee.brut = brutPart;
+
+      const debutLien = curseurFin + longueurSep;
+      const finLien = debutLien + brutPart.length;
+
+      trouvees.push({
+        reference: refEnchainee,
+        debut: debutLien,
+        fin: finLien,
+      });
+
+      curseurFin = curseurFin + texteComplet.length;
+      derniereRef = refEnchainee;
+    }
+
+    MOTIF.lastIndex = curseurFin;
   }
   return trouvees;
 }

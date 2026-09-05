@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useSyncExternalStore } from 'react';
-import { firebaseConfigure } from './runtime';
+import { firebaseConfigure, MODE_E2E } from './runtime';
+import { doitReinitialiser, reinitialiserStockage, CONNEXION_MINIMALE_SECONDES } from './reinitialisation';
 
 export interface AppUser {
   uid: string;
@@ -33,6 +34,7 @@ const LOCAL_STORAGE_USER_KEY = 'lesfondements_local_user';
 function lireUtilisateurLocal(): AppUser | null {
   if (typeof window === 'undefined') return null;
   try {
+    if (!MODE_E2E && doitReinitialiser(window.localStorage)) return null;
     const brut = window.localStorage.getItem(LOCAL_STORAGE_USER_KEY);
     return brut ? (JSON.parse(brut) as AppUser) : null;
   } catch {
@@ -66,12 +68,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (isFirebaseConfigured) {
       void Promise.all([import('./firebase'), import('firebase/auth')])
-        .then(([{ getFirebaseAuth }, { onAuthStateChanged, getRedirectResult }]) => {
-          return getFirebaseAuth().then((auth) => {
+        .then(([{ getFirebaseAuth }, { onAuthStateChanged, getRedirectResult, signOut, reload }]) => {
+          return getFirebaseAuth().then(async (auth) => {
+            if (!active) return;
+            if (!MODE_E2E && doitReinitialiser(window.localStorage)) {
+              await signOut(auth);
+              reinitialiserStockage(window.localStorage);
+            }
             if (!active) return;
             getRedirectResult(auth).catch(() => {});
-            unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
               if (currentUser) {
+                try {
+                  await reload(currentUser);
+                  const jeton = await currentUser.getIdTokenResult();
+                  if (new Date(jeton.authTime).getTime() / 1000 < CONNEXION_MINIMALE_SECONDES) {
+                    await signOut(auth);
+                    return;
+                  }
+                } catch (erreur) {
+                  const code = (erreur as { code?: string }).code;
+                  if (code === 'auth/user-not-found' || code === 'auth/user-disabled' || code === 'auth/user-token-expired' || code === 'auth/invalid-user-token') {
+                    await signOut(auth);
+                    return;
+                  }
+                }
+                if (!active || auth.currentUser?.uid !== currentUser.uid) return;
                 setUser({
                   uid: currentUser.uid,
                   email: currentUser.email,
@@ -79,6 +101,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                   photoURL: currentUser.photoURL,
                 });
               } else {
+                if (!active) return;
                 // Check if local guest session exists
                 const saved = lireUtilisateurLocal();
                 if (saved) setUser(saved);
@@ -95,6 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (active) setLoading(false);
         });
     }
+    if (!isFirebaseConfigured && !MODE_E2E) reinitialiserStockage(window.localStorage);
     // Mode local : la session est déjà initialisée de façon synchrone
     // (lazy initializer), rien à faire ici.
 

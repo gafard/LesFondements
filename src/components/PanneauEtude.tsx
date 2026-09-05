@@ -71,9 +71,9 @@ export default function PanneauEtude() {
   useEffect(() => {
     if (!reference) return;
     prechargerLivre(reference.livre.code);
-    void lirePassage(reference).then((resultat) => {
+    void lirePassage(reference, { chapitreComplet: true }).then((resultat) => {
       setPassage(resultat);
-      setVersetActif(resultat?.versets[0]?.v ?? null);
+      setVersetActif(reference.versetDebut ?? resultat?.versets[0]?.v ?? null);
     });
   }, [reference]);
 

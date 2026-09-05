@@ -1749,8 +1749,12 @@ function etiquetteDeSource(source: QuestionMeditation['source']): string | null 
 }
 
 function etiquetteDePhase(phase: QuestionMeditation['phase']): string | null {
-  if (phase === 'regarder') return 'Regarder';
   if (phase === 'comprendre') return 'Comprendre';
+  if (phase === 'me-situer') return 'Me situer';
+  if (phase === 'reconsiderer') return 'Reconsidérer';
+  if (phase === 'repondre') return 'Répondre';
+  if (phase === 'relire') return 'Relire';
+  if (phase === 'regarder') return 'Regarder';
   if (phase === 'relier') return 'Relier';
   if (phase === 'mettre-en-mots') return 'Mettre en mots';
   return null;
@@ -1924,7 +1928,7 @@ function PileDeNotes({
           <TexteAvecReferences>{question.question}</TexteAvecReferences>
         </label>
         {devant && (
-          <div className="mt-4">
+          <div className="mt-4 space-y-2">
             <ChampDictée
               valeur={reponse}
               onEnregistrer={(valeur) => onEnregistrer(`q:${question.id}`, valeur)}
@@ -1934,6 +1938,25 @@ function PileDeNotes({
               theme="clair"
               lignes={3}
             />
+            {!reponse.trim() && (
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 text-2xs text-encre-700/70">
+                <span className="italic">Libre à toi :</span>
+                <button
+                  type="button"
+                  onClick={() => onEnregistrer(`q:${question.id}`, 'J’ai encore une question sur ce passage.')}
+                  className="rounded-md border border-encre-950/10 bg-white/40 px-2 py-0.5 hover:bg-white/80 transition-colors"
+                >
+                  J’ai encore une question
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onEnregistrer(`q:${question.id}`, 'Je préfère y réfléchir et garder ce passage en silence.')}
+                  className="rounded-md border border-encre-950/10 bg-white/40 px-2 py-0.5 hover:bg-white/80 transition-colors"
+                >
+                  Je préfère y réfléchir
+                </button>
+              </div>
+            )}
           </div>
         )}
       </>

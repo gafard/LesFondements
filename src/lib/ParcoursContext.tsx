@@ -23,6 +23,8 @@ import {
   type ParcoursGate,
 } from './parcoursStore';
 import type { GroupMember, GroupSession, ParcoursGroup, UserProfile } from './types';
+import { getUserProgress } from './firestore';
+import { limiteLecture } from './parcoursDomain';
 import { chargerPreferencesLocales, synchroniserNotifications } from './notifications';
 
 interface ParcoursContextValue {
@@ -38,8 +40,8 @@ interface ParcoursContextValue {
   /** Fiche ouverte pour tout le groupe, 0 si le parcours est fermé. */
   unlockedStep: number;
   /**
-   * Jusqu'où l'on peut lire seul : la fiche du groupe, plus la suivante,
-   * qu'on prépare en avance. Le partage, lui, reste sur `unlockedStep`.
+   * Dernière fiche lisible : tous les prérequis personnels sont terminés,
+   * et le groupe a atteint cette fiche lorsqu’on suit le parcours en cellule.
    */
   preparationStep: number;
   refresh: () => Promise<void>;
@@ -70,6 +72,8 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
   /** Identité dont le parcours a fini de charger : pilote l'état `loading`. */
   const [loadedUid, setLoadedUid] = useState<string | null>(() => (user && profile ? user.uid : null));
 
+  const [progression, setProgression] = useState<{ uid: string; fiches: number[] } | null>(null);
+
   const load = useCallback(async () => {
     if (!user) {
       setProfile(null);
@@ -80,7 +84,8 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const nextProfile = await ensureProfile(user);
+    const [nextProfile, progress] = await Promise.all([ensureProfile(user), getUserProgress(user.uid)]);
+    setProgression({ uid: user.uid, fiches: progress.completedFiches });
     setProfile(nextProfile);
 
     if (!nextProfile.groupId) {
@@ -232,7 +237,8 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
         membership?.role === 'co_animateur'),
     unlockedStep: gate.state === 'ouvert' ? gate.unlockedStep : gate.state === 'termine' ? 20 : 0,
     preparationStep:
-      !group && profile?.studyMode === 'personnel' ? 20 : gate.state === 'ouvert' ? gate.preparationStep : gate.state === 'termine' ? 20 : 0,
+      user && progression?.uid === user.uid && ((!group && profile?.studyMode === 'personnel') || gate.state === 'ouvert' || gate.state === 'termine')
+        ? limiteLecture(group, progression.fiches) : 1,
     refresh: load,
     updateProfile,
     isLocalMode: !hasRemoteBackend(),

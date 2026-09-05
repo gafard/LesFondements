@@ -8,7 +8,15 @@
  * nombreuses : observer, comprendre, relier et mettre en mots.
  */
 
-export type PhaseQuestion = 'regarder' | 'comprendre' | 'relier' | 'mettre-en-mots';
+export type PhaseQuestion =
+  | 'regarder'
+  | 'comprendre'
+  | 'relier'
+  | 'mettre-en-mots'
+  | 'me-situer'
+  | 'reconsiderer'
+  | 'repondre'
+  | 'relire';
 export type PrioriteQuestion = 'essentielle' | 'approfondissement';
 
 export interface QuestionEditoriale {

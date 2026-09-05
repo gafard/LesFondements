@@ -77,7 +77,7 @@ function FicheContent() {
   const cleReprise = searchParams.get('reprendre');
 
   const { user } = useAuth();
-  const { group, membership, unlockedStep, preparationStep, refresh } = useParcours();
+  const { group, membership, unlockedStep, preparationStep, refresh, loading: parcoursLoading } = useParcours();
   const cleAnnotations = `annotations:${ficheId}`;
 
   const [fiche, setFiche] = useState<FicheLivret | null | undefined>(undefined);
@@ -112,13 +112,10 @@ function FicheContent() {
 
   const meta = FICHES_META.find((m) => m.id === ficheId);
   const preparee = membership?.preparedSteps.includes(ficheId) ?? false;
-  // Découplage : l'utilisateur peut toujours préparer la fiche en cours ET la suivante chez lui
-  // Lisible seul : la fiche du groupe, plus la suivante — de quoi toujours
-  // préparer la prochaine rencontre sans attendre que l'animateur clôture.
+  // Les prérequis personnels et l’avancée du groupe limitent toutes les entrées.
   const maxFicheAccessible = Math.min(20, Math.max(1, preparationStep || unlockedStep || 1));
-  const fermee = !!group && ficheId > maxFicheAccessible;
-  // Lue en avance, mais pas encore vécue ensemble : on peut tout travailler,
-  // rien déposer au groupe. La fraîcheur de la rencontre ne se prépare pas.
+  const fermee = ficheId > maxFicheAccessible;
+  // Conservé pour les écrans de partage ; aucune fiche future n’est lisible.
   const enPreparation = !!group && ficheId > unlockedStep;
 
   useEffect(() => {
@@ -229,13 +226,15 @@ function FicheContent() {
     );
   }
 
+  if (ficheId > 1 && parcoursLoading) return <ChargementLecture titre={meta.titre} />;
+
   if (fermee) {
     return (
       <FicheFermee
         ficheId={ficheId}
         nomGroupe={group?.name}
         etapeGroupe={group?.currentStep}
-        unlockedStep={unlockedStep}
+        unlockedStep={maxFicheAccessible}
       />
     );
   }
@@ -255,7 +254,7 @@ function FicheContent() {
   }
 
   const precedente = ficheId > 1 ? ficheId - 1 : null;
-  const suivante = ficheId < 20 && (!group || ficheId < maxFicheAccessible) ? ficheId + 1 : null;
+  const suivante = ficheId < 20 && ficheId < maxFicheAccessible ? ficheId + 1 : null;
   const nbQuestions = meta.nbQuestions;
   // Deux jeux de réponses cohabitent sous le préfixe « q: » : celles des
   // temps à part, écrites jour après jour, et celles du livret, qui se
@@ -1198,8 +1197,8 @@ function FicheFermee({
         </h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-parchemin-100/70">
           {nomGroupe
-            ? `${nomGroupe} en est à la fiche ${etapeGroupe}. Chaque fiche se referme sur une rencontre avant que la suivante ne s'ouvre : c'est ce qui garde le groupe ensemble.`
-            : 'Chaque fiche se referme sur une rencontre avant que la suivante ne s’ouvre.'}
+            ? `${nomGroupe} en est à la fiche ${etapeGroupe}. Terminez vos fiches précédentes ; la suite s’ouvre ensuite au rythme des rencontres du groupe.`
+            : 'Terminez la fiche précédente pour ouvrir la suivante. Vous pouvez reprendre votre lecture là où vous l’avez laissée.'}
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
