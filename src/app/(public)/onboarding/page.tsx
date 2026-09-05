@@ -109,6 +109,15 @@ export default function OnboardingPage() {
     router.push('/dashboard');
   };
 
+  const quitterPrologue = async () => {
+    try {
+      await updateProfile({ onboardingSeenAt: Date.now() });
+    } catch {
+      // non bloquant
+    }
+    router.push('/dashboard');
+  };
+
   const validerPosition = async () => {
     if (!place) return;
     await updateProfile({ place });
@@ -842,9 +851,9 @@ export default function OnboardingPage() {
                 pleinEcran={true}
                 titre="Prologue officiel (50s)"
                 sousTitre="« Poser des piliers solides »"
-                onPasser={() => router.push('/dashboard')}
+                onPasser={() => void quitterPrologue()}
                 onVideoEnded={() => {
-                  router.push('/dashboard');
+                  void quitterPrologue();
                 }}
               />
             </div>
@@ -852,7 +861,7 @@ export default function OnboardingPage() {
             <div className="mt-8 flex flex-col items-center gap-3">
               <button
                 type="button"
-                onClick={() => router.push('/dashboard')}
+                onClick={() => void quitterPrologue()}
                 className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold shadow-xl hover:scale-105 transition-all"
               >
                 Accéder à ma table d&apos;étude
@@ -860,7 +869,7 @@ export default function OnboardingPage() {
               </button>
               <button
                 type="button"
-                onClick={() => router.push('/dashboard')}
+                onClick={() => void quitterPrologue()}
                 className="text-2xs font-bold text-parchemin-100/40 hover:text-parchemin-100/70 transition-colors"
               >
                 Passer la vidéo

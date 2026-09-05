@@ -20,6 +20,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import { getGroupByCode, requestToJoin } from '@/lib/parcoursStore';
 import type { ParcoursGroup } from '@/lib/types';
+import LecteurVideoOnboarding from '@/components/LecteurVideoOnboarding';
 
 const WEEKDAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
@@ -28,7 +29,7 @@ export default function RejoindreParCode() {
   const router = useRouter();
   const code = decodeURIComponent(String(params.code ?? ''));
   const { user, loading: authLoading } = useAuth();
-  const { refresh, profile } = useParcours();
+  const { refresh, profile, updateProfile } = useParcours();
 
   const [group, setGroup] = useState<ParcoursGroup | null | undefined>(undefined);
   const [busy, setBusy] = useState(false);
@@ -64,6 +65,15 @@ export default function RejoindreParCode() {
     }
   };
 
+  const allerAuDashboard = async () => {
+    try {
+      await updateProfile({ onboardingSeenAt: Date.now() });
+    } catch (err) {
+      console.error('Erreur enregistrement accueil:', err);
+    }
+    router.push('/dashboard');
+  };
+
   const ModeIcon =
     group?.meeting.mode === 'ligne' ? Video : group?.meeting.mode === 'hybride' ? Monitor : MapPin;
 
@@ -86,7 +96,7 @@ export default function RejoindreParCode() {
       <span className="vitrail left-[-6rem] top-[-4rem] h-80 w-80 bg-or-400/12 animate-souffle relative z-1" />
       <span className="vitrail bottom-[-8rem] right-[-6rem] h-96 w-96 bg-encre-400/25 relative z-1" />
 
-      <div className="relative z-10 w-full max-w-lg">
+      <div className={`relative z-10 w-full transition-all duration-500 ${envoye ? 'max-w-2xl' : 'max-w-lg'}`}>
         {group === undefined ? (
           <div className="flex flex-col items-center gap-3 py-20">
             <Loader2 className="h-6 w-6 animate-spin text-or-300" />
@@ -110,24 +120,49 @@ export default function RejoindreParCode() {
             </Link>
           </div>
         ) : envoye ? (
-          <div className="animate-reveal rounded-3xl border border-white/12 bg-white/[0.05] p-8 text-center">
-            <span className="mx-auto grid h-16 w-16 animate-halo place-items-center rounded-full bg-or-400/15 text-or-300">
-              <CheckCircle2 className="h-8 w-8" strokeWidth={1.75} />
+          <div className="animate-reveal rounded-3xl border border-white/15 bg-white/[0.06] p-6 sm:p-8 text-center shadow-2xl backdrop-blur-md">
+            <span className="mx-auto grid h-14 w-14 sm:h-16 sm:w-16 animate-halo place-items-center rounded-full bg-or-400/20 text-or-300">
+              <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
             </span>
-            <h1 className="mt-5 font-serif text-2xl font-bold text-parchemin-100">
-              C&apos;est envoyé
-            </h1>
-            <p className="mx-auto mt-3 max-w-sm text-xs leading-relaxed text-parchemin-100/65">
+            <h1 className="mt-5 font-serif text-2xl sm:text-3xl font-bold text-parchemin-100">
               {group.visibility === 'ouvert'
-                ? `Vous faites partie de ${group.name}. La première fiche est ouverte.`
-                : `${group.leaderName} reçoit votre demande. Dès qu'elle est validée, le parcours s'ouvre.`}
+                ? `Bienvenue dans ${group.name} !`
+                : `Demande transmise à ${group.leaderName}`}
+            </h1>
+            <p className="mx-auto mt-2.5 max-w-md text-xs sm:text-sm leading-relaxed text-parchemin-100/75">
+              {group.visibility === 'ouvert'
+                ? `Votre place est prête dans la cellule. Prenez 50 secondes pour poser les fondations de votre cœur avant d'ouvrir la première fiche.`
+                : `Votre demande d'adhésion a été transmise. En attendant la validation, découvrez l'esprit du parcours en 50 secondes.`}
             </p>
-            <Link
-              href="/dashboard"
-              className="bouton-or mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold"
-            >
-              Voir mon espace <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-            </Link>
+
+            {/* Lecteur Vidéo Prologue officiel */}
+            <div className="mx-auto mt-6 w-full max-w-xl">
+              <LecteurVideoOnboarding
+                src="/video/onboarding.mp4"
+                poster="/video/onboarding_poster.jpg"
+                autoPlay={true}
+                titre="Prologue officiel (50s)"
+                sousTitre="« Poser des piliers solides »"
+                onPasser={() => void allerAuDashboard()}
+                onVideoEnded={() => void allerAuDashboard()}
+              />
+            </div>
+
+            <div className="mt-7 flex flex-col items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void allerAuDashboard()}
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold shadow-xl transition-all hover:scale-105"
+              >
+                Accéder à ma table d&apos;étude
+                <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+              <p className="text-2xs text-parchemin-100/45">
+                {group.visibility === 'ouvert'
+                  ? 'Fiche 1 & Lettre du Père prêtes sur votre espace.'
+                  : `${group.leaderName} validera votre accès très prochainement.`}
+              </p>
+            </div>
           </div>
         ) : (
           <div className="animate-reveal">

@@ -6,7 +6,9 @@ import {
   BookOpen,
   Bookmark,
   Check,
+  Compass,
   BellRing,
+  Play,
   RotateCcw,
   Sunrise,
   Mail,
@@ -19,6 +21,7 @@ import { getAnswers, getUserProgress } from '@/lib/firestore';
 import { chargerFiche, type FicheLivret } from '@/lib/livret';
 import NotificationCenter from '@/components/NotificationCenter';
 import Illumination from '@/components/Illumination';
+import LecteurVideoOnboarding from '@/components/LecteurVideoOnboarding';
 import { VERSETS_CONNUS, normaliserReference, texteDuVerset } from '@/data/versets';
 import { etapesTempsApart } from '@/lib/tempsApart';
 import ReprendreParole from '@/components/ReprendreParole';
@@ -50,10 +53,11 @@ function DashboardSkeleton() {
 
 function DashboardContent() {
   const { user } = useAuth();
-  const { group, preparationStep } = useParcours();
+  const { group, preparationStep, profile, updateProfile } = useParcours();
   const [fiche, setFiche] = useState<FicheLivret | null>(null);
   const [reponsesFiche, setReponsesFiche] = useState<Record<string, string>>({});
   const [notifOuvert, setNotifOuvert] = useState(false);
+  const [prologueOuvert, setPrologueOuvert] = useState(false);
 
   const [fichePersonnelle, setFichePersonnelle] = useState(1);
   useEffect(() => {
@@ -112,6 +116,16 @@ function DashboardContent() {
               <p className="mt-1 text-sm text-encre-700 font-serif italic">
                 Un passage à recevoir. Du temps pour demeurer. La liberté de répondre.
               </p>
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPrologueOuvert(true)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-or-400/50 bg-or-50/80 px-3.5 py-1.5 text-xs font-bold text-or-950 shadow-2xs transition hover:bg-or-100 active:scale-95"
+                >
+                  <Play className="h-3.5 w-3.5 fill-or-700 text-or-700" />
+                  Prologue vidéo (50s)
+                </button>
+              </div>
             </div>
 
             <Illumination
@@ -122,6 +136,33 @@ function DashboardContent() {
             />
           </div>
         </div>
+
+        {/* ══ Bannière d'accueil si le prologue n'a pas encore été visionné ══ */}
+        {profile && !profile.onboardingSeenAt && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-3xl border border-or-400/70 bg-gradient-to-r from-or-100/90 via-parchemin-50 to-or-50/90 p-5 shadow-sm animate-reveal">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-or-500 text-encre-950 shadow-sm">
+                <Compass className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="font-serif text-sm sm:text-base font-bold text-encre-950">
+                  Bienvenue sur le parcours ! Poser des piliers solides
+                </p>
+                <p className="text-2xs sm:text-xs text-encre-700">
+                  Prenez 50 secondes pour découvrir la vision et l’esprit des 20 fondements avant de commencer.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPrologueOuvert(true)}
+              className="bouton-or inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold shadow-sm transition hover:scale-105"
+            >
+              <Play className="h-3.5 w-3.5 fill-encre-950" />
+              Lancer le prologue (50s)
+            </button>
+          </div>
+        )}
 
 
         <ReprendreParole ficheId={ficheCouranteId} section={premierIndexNonFait} />
@@ -325,6 +366,50 @@ function DashboardContent() {
         ouvert={notifOuvert}
         onFermer={() => setNotifOuvert(false)}
       />
+
+      {/* Modal du Prologue vidéo */}
+      {prologueOuvert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-encre-950/85 p-4 backdrop-blur-md animate-reveal">
+          <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/20 bg-encre-950 p-4 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between px-2">
+              <p className="font-serif text-sm font-bold text-parchemin-100 flex items-center gap-2">
+                <Play className="h-4 w-4 fill-or-400 text-or-400" />
+                Prologue officiel · Les Fondements
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setPrologueOuvert(false);
+                  if (profile && !profile.onboardingSeenAt) {
+                    void updateProfile({ onboardingSeenAt: Date.now() });
+                  }
+                }}
+                className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-parchemin-100 hover:bg-white/20 transition active:scale-95"
+              >
+                Fermer ✕
+              </button>
+            </div>
+            <LecteurVideoOnboarding
+              src="/video/onboarding.mp4"
+              poster="/video/onboarding_poster.jpg"
+              autoPlay={true}
+              titre="Prologue officiel (50s)"
+              sousTitre="« Poser des piliers solides »"
+              onPasser={() => {
+                setPrologueOuvert(false);
+                if (profile && !profile.onboardingSeenAt) {
+                  void updateProfile({ onboardingSeenAt: Date.now() });
+                }
+              }}
+              onVideoEnded={() => {
+                if (profile && !profile.onboardingSeenAt) {
+                  void updateProfile({ onboardingSeenAt: Date.now() });
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
