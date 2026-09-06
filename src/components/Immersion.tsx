@@ -39,6 +39,7 @@ import ShareableVerseCard from '@/components/ShareableVerseCard';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
 import Illumination from '@/components/Illumination';
 import ChampDictée from '@/components/ChampDictée';
+import LettreDuPere from '@/components/LettreDuPere';
 import { Etincelle, MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import {
   AMBIANCES,
@@ -415,6 +416,7 @@ export default function Immersion({
   const [manifesteVivienne, setManifesteVivienne] = useState<ManifesteVivienne | null>(null);
   const [enchainer, setEnchainer] = useState(false);
   const [cloture, setCloture] = useState(false);
+  const [lettrePleinEcran, setLettrePleinEcran] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [erreurVoix, setErreurVoix] = useState<string | null>(null);
   const [noteOuverte, setNoteOuverte] = useState(false);
@@ -766,8 +768,16 @@ export default function Immersion({
   };
 
   const terminer = async () => {
-    try { await onTerminer(); setCloture(true); }
-    catch { setErreurVoix('La fin de ce temps n’a pas pu être conservée. Vos champs restent ouverts ; réessayez avant de quitter.'); }
+    try {
+      await onTerminer();
+      setCloture(true);
+      if (fiche.id === 1) {
+        void arreterAmbiance();
+        setLettrePleinEcran(true);
+      }
+    } catch {
+      setErreurVoix('La fin de ce temps n’a pas pu être conservée. Vos champs restent ouverts ; réessayez avant de quitter.');
+    }
   };
 
   // ── Repères du sommaire ─────────────────────────────────────
@@ -898,7 +908,15 @@ export default function Immersion({
             <span className="truncate text-right text-or-300/65">{libelleScene}</span>
           </div>
           {cloture ? (
-            <SceneCloture fiche={fiche} onQuitter={onQuitter} tempsDuJour={sectionIndex !== null} />
+            <SceneCloture
+              fiche={fiche}
+              onQuitter={onQuitter}
+              tempsDuJour={sectionIndex !== null}
+              onOuvrirLettre={() => {
+                void arreterAmbiance();
+                setLettrePleinEcran(true);
+              }}
+            />
           ) : (
             <div key={index} className="immersion-transition">
               <RenduScene
@@ -966,7 +984,7 @@ export default function Immersion({
                 onClick={() => void terminer()}
                 className="bouton-or inline-flex shrink-0 items-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-bold shadow-md"
               >
-                <span>{dejaPreparee ? 'Terminer' : 'J’ai préparé'}</span>
+                <span>{fiche.id === 1 ? 'Valider & Ouvrir la Lettre' : dejaPreparee ? 'Terminer' : 'J’ai préparé'}</span>
                 <Check className="h-4 w-4" strokeWidth={2.5} />
               </button>
             ) : scene.type === 'seuil' ? (
@@ -1044,6 +1062,15 @@ export default function Immersion({
           if (lecture) lireScene(scene);
         }}
       />
+      {/* ─── DÉCLENCHEMENT PLEIN ÉCRAN DE LA LETTRE DU PÈRE (FICHE 1) ─── */}
+      {lettrePleinEcran && fiche.id === 1 && (
+        <LettreDuPere
+          modePleinEcranDirect={true}
+          onFermer={() => {
+            setLettrePleinEcran(false);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -1725,6 +1752,17 @@ function RenduScene({
               ? 'Vos réponses sont enregistrées. Vous pourrez les relire avant la rencontre.'
               : 'En validant, votre groupe verra que vous êtes prêt pour la rencontre. Vos réponses, elles, restent les vôtres.'}
           </p>
+          {fiche.id === 1 && (
+            <div className="mt-8 mx-auto max-w-md rounded-3xl border border-or-400/40 bg-or-500/10 p-5 text-center animate-reveal">
+              <span className="text-2xl">✉️</span>
+              <p className="mt-2 font-serif text-base font-bold text-or-200">
+                La Lettre d&apos;Amour du Père
+              </p>
+              <p className="mt-1 text-2xs text-parchemin-100/75 leading-relaxed">
+                En cliquant sur « Valider & Ouvrir la Lettre », la lettre manuscrite s&apos;ouvrira en plein écran avec sa nappe céleste et sa lecture audio.
+              </p>
+            </div>
+          )}
         </div>
       );
   }
@@ -3409,10 +3447,12 @@ function SceneCloture({
   fiche,
   onQuitter,
   tempsDuJour = false,
+  onOuvrirLettre,
 }: {
   fiche: FicheLivret;
   onQuitter: () => void;
   tempsDuJour?: boolean;
+  onOuvrirLettre?: () => void;
 }) {
   return (
     <div className="animate-reveal py-16 text-center sm:py-24">
@@ -3431,12 +3471,35 @@ function SceneCloture({
           ? 'Ce temps peut se poursuivre dans ta journée. Retrouve dans ton carnet les mots que tu as choisi d’enregistrer.'
           : 'Tes écrits restent dans ton espace personnel. Si tu vis le parcours en cellule, seule la préparation de la fiche est signalée au groupe.'}
       </p>
-      <button
-        onClick={onQuitter}
-        className="bouton-or mt-9 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold"
-      >
-        {tempsDuJour ? 'Revenir à ma table' : 'Revenir à la fiche'}
-      </button>
+
+      {fiche.id === 1 && onOuvrirLettre && (
+        <div className="mt-8 mx-auto max-w-sm rounded-3xl border border-or-400/35 bg-white/[0.04] p-5 backdrop-blur-sm shadow-xl text-center">
+          <p className="font-serif text-base font-bold text-parchemin-100 flex items-center justify-center gap-2">
+            <span>✉️</span>
+            <span>La Lettre d&apos;Amour du Père</span>
+          </p>
+          <p className="mt-1.5 text-2xs leading-relaxed text-parchemin-100/65">
+            54 paroles d&apos;amour et promesses bibliques adressées personnellement à votre cœur.
+          </p>
+          <button
+            type="button"
+            onClick={onOuvrirLettre}
+            className="bouton-or mt-4 inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-bold shadow-md hover:scale-105 transition-all"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-amber-950" />
+            (Re)lire la Lettre en plein écran
+          </button>
+        </div>
+      )}
+
+      <div className="mt-9 flex flex-col items-center justify-center gap-3">
+        <button
+          onClick={onQuitter}
+          className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-bold shadow-lg"
+        >
+          {tempsDuJour ? 'Revenir à ma table' : 'Revenir à la fiche'}
+        </button>
+      </div>
     </div>
   );
 }

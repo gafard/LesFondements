@@ -79,13 +79,25 @@ export const LETTRE_DU_PERE: ParagrapheLettre[] = [
   { texte: "Je t'attends les bras ouverts.", reference: "Luc 15:11-32" },
 ];
 
-export default function LettreDuPere() {
-  const [ouverte, setOuverte] = useState(false);
-  const [enveloppeOuverte, setEnveloppeOuverte] = useState(false);
+interface LettreDuPereProps {
+  modePleinEcranDirect?: boolean;
+  autoOuvrir?: boolean;
+  onFermer?: () => void;
+}
+
+export default function LettreDuPere({
+  modePleinEcranDirect = false,
+  autoOuvrir = false,
+  onFermer,
+}: LettreDuPereProps = {}) {
+  const [ouverte, setOuverte] = useState(autoOuvrir);
+  const [enveloppeOuverte, setEnveloppeOuverte] = useState(autoOuvrir);
   const [ligneActive, setLigneActive] = useState<number>(0);
-  const [enLecture, setEnLecture] = useState(false);
+  const [enLecture, setEnLecture] = useState(autoOuvrir);
   const [musiqueActive, setMusiqueActive] = useState(true);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreen, setFullscreen] = useState(modePleinEcranDirect);
+
+  const estPleinEcran = fullscreen || modePleinEcranDirect;
 
   const musiqueAudioRef = useRef<HTMLAudioElement | null>(null);
   const timerLectureRef = useRef<number | null>(null);
@@ -227,13 +239,45 @@ export default function LettreDuPere() {
     setOuverte(false);
     setEnveloppeOuverte(false);
     setFullscreen(false);
+    onFermer?.();
   };
 
   return (
-    <div className="relative my-8">
+    <div
+      className={
+        estPleinEcran
+          ? 'fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 sm:p-8 backdrop-blur-md overflow-y-auto animate-fade-in'
+          : 'relative my-8'
+      }
+    >
+      {estPleinEcran && (
+        <button
+          type="button"
+          onClick={fermer}
+          className="fixed right-4 top-4 z-[110] inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-parchemin-100 hover:bg-white/20 transition active:scale-95 shadow-lg border border-white/15"
+          aria-label="Fermer la lettre"
+        >
+          <span>Fermer</span>
+          <X className="h-4 w-4" />
+        </button>
+      )}
+
       {/* ─── SCÈNE 1 : L'ENVELOPPE FERMÉE AVEC CACHET DE CIRE ─── */}
       {!ouverte && (
-        <div className="flex flex-col items-center justify-center py-8 px-4">
+        <div className={`flex flex-col items-center justify-center py-8 px-4 ${estPleinEcran ? 'w-full max-w-xl animate-reveal' : ''}`}>
+          {estPleinEcran && (
+            <div className="mb-6 text-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-or-400/50 bg-or-500/15 px-4 py-1.5 text-2xs font-bold uppercase tracking-[0.2em] text-or-200 shadow-sm">
+                <Sparkles className="h-3.5 w-3.5 text-or-300" /> Fiche 1 · Clôture Sacrée
+              </span>
+              <h3 className="mt-3 font-serif text-3xl sm:text-4xl font-bold text-parchemin-100">
+                Une lettre pour ton cœur
+              </h3>
+              <p className="mt-2 font-serif text-sm italic text-parchemin-100/75 max-w-md mx-auto">
+                Avant de repartir dans ta journée, ton Père Céleste a déposé cette lettre pour toi.
+              </p>
+            </div>
+          )}
           <div
             className="relative group cursor-pointer w-full flex justify-center"
             onClick={ouvrirLettre}
@@ -352,14 +396,16 @@ export default function LettreDuPere() {
       {ouverte && (
         <div
           className={`${
-            fullscreen
-              ? 'fixed inset-0 z-[80] bg-black/80 backdrop-blur-md p-4 sm:p-8 flex items-center justify-center overflow-y-auto'
-              : 'relative'
+            estPleinEcran && !fullscreen
+              ? 'relative w-full flex items-center justify-center'
+              : fullscreen
+                ? 'fixed inset-0 z-[80] bg-black/80 backdrop-blur-md p-4 sm:p-8 flex items-center justify-center overflow-y-auto'
+                : 'relative'
           } animate-fade-in`}
         >
           <div
             className={`feuille feuille-dechiree relative mx-auto w-full ${
-              fullscreen ? 'max-w-4xl max-h-[90vh]' : 'max-w-3xl'
+              estPleinEcran ? 'max-w-4xl max-h-[90vh]' : 'max-w-3xl'
             } rounded-4xl border-2 border-or-300/60 bg-[#fffdf8] p-6 sm:p-12 shadow-2xl overflow-hidden flex flex-col`}
           >
             {/* Rubans adhésifs aux 4 coins pour l'effet manuscrit sur la table */}
