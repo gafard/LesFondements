@@ -123,10 +123,11 @@ function RelectureForm({ pas, onEnregistrer, onTerminer }: {
   );
 }
 
-export function PasDuJour({ ficheId }: { ficheId: number }) {
+export function PasDuJour({ ficheId, masquerSiVide = false }: { ficheId: number; masquerSiVide?: boolean }) {
   const { user } = useAuth();
   const { pas, chargement, enregistrer } = usePasDeVie(user?.uid, ficheId);
   const aRevoir = pas.find(pasARelire) ?? pas[0];
+  if (masquerSiVide && !aRevoir) return null;
   return (
     <section aria-labelledby="pas-du-jour" className="pas-du-jour">
       <div className="pas-du-jour-entete">

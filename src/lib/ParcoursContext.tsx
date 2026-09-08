@@ -44,6 +44,7 @@ interface ParcoursContextValue {
    * et le groupe a atteint cette fiche lorsqu’on suit le parcours en cellule.
    */
   preparationStep: number;
+  completedFiches: number[];
   refresh: () => Promise<void>;
   updateProfile: (patch: Partial<UserProfile>) => Promise<void>;
   /** Mode local sans backend : les groupes d'annuaire sont des exemples. */
@@ -204,7 +205,7 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [group?.demo, group?.id, membership?.status, user]);
 
-  const loading = authLoading || (!!user && loadedUid !== user.uid);
+  const loading = authLoading || (!!user && (loadedUid !== user.uid || progression?.uid !== user.uid));
 
   const gate = useMemo<ParcoursGate>(() => {
     if (loading) return { state: 'chargement' };
@@ -240,6 +241,7 @@ export function ParcoursProvider({ children }: { children: React.ReactNode }) {
       user && progression?.uid === user.uid
         ? limiteLecture(group, progression.fiches)
         : 1,
+    completedFiches: user && progression?.uid === user.uid ? progression.fiches : [],
     refresh: load,
     updateProfile,
     isLocalMode: !hasRemoteBackend(),

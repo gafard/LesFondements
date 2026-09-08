@@ -44,7 +44,7 @@ import MEDITATIONS from '@/data/meditation-questions.json';
 import TITRES_DES_TEMPS from '@/data/tempsTitres.json';
 import { enregistrerRevision, qualiteDepuisScore } from '@/lib/memorisation';
 import { FICHES_META } from '@/data/fichesMeta';
-import { useDeclarerFondSombre } from '@/lib/fondSombre';
+import AttenteFiche from '@/components/AttenteFiche';
 import Illumination from '@/components/Illumination';
 import { MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
@@ -230,12 +230,7 @@ function FicheContent() {
 
   if (fermee) {
     return (
-      <FicheFermee
-        ficheId={ficheId}
-        nomGroupe={group?.name}
-        etapeGroupe={group?.currentStep}
-        unlockedStep={maxFicheAccessible}
-      />
+      <AttenteFiche ficheId={ficheId} />
     );
   }
 
@@ -1168,53 +1163,6 @@ function BlocQuestion({
           )}
         </button>
       )}
-    </div>
-  );
-}
-
-function FicheFermee({
-  ficheId,
-  nomGroupe,
-  etapeGroupe,
-  unlockedStep,
-}: {
-  ficheId: number;
-  nomGroupe?: string;
-  etapeGroupe?: number;
-  unlockedStep: number;
-}) {
-  useDeclarerFondSombre();
-
-  return (
-    <div className="nuit nuit-grain relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-28">
-      <span className="vitrail left-[-6rem] top-[-4rem] h-80 w-80 bg-or-400/12 animate-souffle" />
-      <div className="animate-reveal relative z-10 max-w-lg text-center">
-        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white/8 text-parchemin-100/60">
-          <Lock className="h-7 w-7" strokeWidth={1.75} />
-        </span>
-        <h1 className="mt-6 font-serif text-3xl font-bold text-parchemin-100">
-          La fiche {ficheId} n&apos;est pas encore ouverte
-        </h1>
-        <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-parchemin-100/70">
-          {nomGroupe
-            ? `${nomGroupe} en est à la fiche ${etapeGroupe}. Terminez vos fiches précédentes ; la suite s’ouvre ensuite au rythme des rencontres du groupe.`
-            : 'Terminez la fiche précédente pour ouvrir la suivante. Vous pouvez reprendre votre lecture là où vous l’avez laissée.'}
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href={`/fiches/${unlockedStep || 1}`}
-            className="bouton-or inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold"
-          >
-            Aller à la fiche {unlockedStep || 1}
-          </Link>
-          <Link
-            href="/fiches"
-            className="rounded-full bg-white/10 px-6 py-3.5 text-xs font-bold text-parchemin-100 transition-colors hover:bg-white/18"
-          >
-            Voir le sentier
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }

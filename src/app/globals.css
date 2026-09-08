@@ -1360,3 +1360,31 @@
 }
 .immersion-transition { animation: immersion-transition 240ms ease-out both; }
 @media (prefers-reduced-motion: reduce) { .immersion-transition { animation: none; } }
+
+/* La lecture garde le bleu nuit, sur une seule surface calme. */
+.immersion-calme {
+  background: #09182c;
+}
+.immersion-calme .immersion-sous-main,
+.immersion-calme .immersion-ruban,
+.immersion-calme > .vitrail {
+  display: none;
+}
+.immersion-calme .immersion-page-nuit {
+  max-width: 46rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.immersion-calme .immersion-page-nuit::before {
+  display: none;
+}
+.immersion-calme .immersion-console,
+.immersion-calme .immersion-console-haute {
+  background: #10233a;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.immersion-calme footer {
+  background: linear-gradient(transparent, #09182c 25%);
+}

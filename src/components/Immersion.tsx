@@ -420,8 +420,6 @@ export default function Immersion({
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [erreurVoix, setErreurVoix] = useState<string | null>(null);
   const [noteOuverte, setNoteOuverte] = useState(false);
-  // Le chrome s'efface pour laisser la scène seule ; un toucher le rappelle.
-  const [chrome, setChrome] = useState(true);
   const [feuille, setFeuille] = useState(false);
   /** Confort de lecture, de 0,9 à 1,3. */
   const [taille, setTaille] = useState(1);
@@ -512,17 +510,6 @@ export default function Immersion({
   const rangMoment = momentDe(moments, index);
   const moment = moments[rangMoment];
 
-  // ── Effacement du chrome ────────────────────────────────────
-  // La scène doit pouvoir rester seule. Les commandes s'effacent après
-  // quelques secondes ; un toucher n'importe où les rappelle. Elles
-  // reviennent aussi à chaque changement de scène — le temps de se
-  // repérer — ce que `aller` se charge de faire.
-  useEffect(() => {
-    if (!chrome || feuille || noteOuverte) return;
-    const minuterie = window.setTimeout(() => setChrome(false), 4000);
-    return () => window.clearTimeout(minuterie);
-  }, [chrome, feuille, noteOuverte, index]);
-
   // ── L'écran et les commandes du système ─────────────────────
   // Une immersion dure dix minutes, dont une partie sans toucher l'écran.
   // Sans ces deux-là, le téléphone s'éteint au milieu d'un silence et la
@@ -542,7 +529,7 @@ export default function Immersion({
     (delta: number) => {
       if (delta > 0 && !ancragePret) return;
       // On change de scène : les commandes reviennent le temps de se repérer.
-      setChrome(true);
+
       setErreurVoix(null);
       arreterLecture();
       setIndex((valeur) => Math.max(0, Math.min(scenario.length - 1, valeur + delta)));
@@ -784,10 +771,8 @@ export default function Immersion({
 
   return (
     <div
-      className="immersion-bureau fixed inset-0 z-[60] overflow-hidden"
-      // En capture, et sans rien empêcher : le toucher rappelle les
-      // commandes et poursuit sa route vers le champ ou le bouton visé.
-      onPointerDownCapture={() => setChrome(true)}
+      className="immersion-bureau immersion-calme fixed inset-0 z-[60] overflow-hidden"
+
     >
       <div className="immersion-sous-main absolute inset-3 sm:inset-6" />
       <span className="immersion-ruban absolute left-5 top-0 z-20 hidden h-24 w-10 items-end justify-center pb-4 text-or-200 sm:flex">
@@ -803,21 +788,16 @@ export default function Immersion({
           Trois informations, pas une de plus : où l'on est, dans quel
           moment, et combien il reste. Tout le reste vit dans la feuille. */}
       <header
-        className={`absolute inset-x-0 top-0 z-20 px-4 pt-4 transition-all duration-500 sm:px-8 sm:pt-6 ${
-          chrome ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0'
-        }`}
+        className="absolute inset-x-0 top-0 z-20 px-4 pt-4 sm:px-8 sm:pt-6"
         style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
       >
         <div className="mx-auto flex max-w-4xl items-center gap-3">
           <div className="immersion-console-haute min-w-0 flex-1 rounded-full border border-white/10 px-4 py-2 shadow-2xl backdrop-blur-xl">
-            <p className="truncate text-2xs font-bold text-parchemin-100/70">
-              Fiche {fiche.id}
-              <span className="mx-1.5 text-parchemin-100/55">·</span>
-              <span className="text-parchemin-100">{moment?.titre ?? 'Lecture'}</span>
-              <span className="mx-1.5 text-parchemin-100/55">·</span>
-              {rangMoment + 1}/{moments.length}
-              <span className="mx-1.5 text-parchemin-100/55">·</span>
-              {moment?.minutes ?? 1} min
+            <p className="text-xs font-bold leading-snug text-parchemin-100">
+              Fiche {fiche.id} · {moment?.titre ?? 'Lecture'}
+            </p>
+            <p className="mt-1 text-xs text-parchemin-100/75">
+              {rangMoment + 1}/{moments.length} · ≈ {moment?.minutes ?? 1} min
             </p>
             <div className="rail mt-1.5">
               <span style={{ width: `${Math.round(progression * 100)}%` }} />
@@ -900,12 +880,11 @@ export default function Immersion({
         onTouchEnd={finTouche}
         tabIndex={0}
         aria-label="Contenu de l’immersion"
-        className="absolute inset-0 z-10 overflow-y-auto px-3 pb-32 pt-28 sm:px-8 sm:pt-36"
+        className="absolute inset-0 z-10 overflow-y-auto px-3 pb-36 pt-24 sm:px-8 sm:pt-28"
       >
         <div className="immersion-page-nuit mx-auto min-h-[calc(100svh-12rem)] max-w-4xl rounded-[1.75rem] border border-white/10 px-5 py-5 shadow-2xl sm:px-10 sm:py-8">
-          <div className="mb-2 flex items-center justify-between gap-3 border-b border-white/8 pb-3 text-3xs font-black uppercase tracking-[0.18em] text-parchemin-100/55">
-            <span>Table de travail</span>
-            <span className="truncate text-right text-or-300/65">{libelleScene}</span>
+          <div className="mb-2 border-b border-white/8 pb-3 text-xs font-semibold text-parchemin-100/75">
+            <span>{libelleScene}</span>
           </div>
           {cloture ? (
             <SceneCloture
@@ -937,9 +916,7 @@ export default function Immersion({
           gestes utiles : revenir, écouter si besoin, poursuivre. */}
       {!cloture && (
         <footer
-          className={`absolute inset-x-0 bottom-0 z-20 px-3 pb-4 transition-all duration-500 sm:px-8 sm:pb-7 ${
-            chrome ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
-          }`}
+          className="absolute inset-x-0 bottom-0 z-20 px-3 pb-4 sm:px-8 sm:pb-7"
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
           <div className="immersion-console mx-auto flex max-w-xl items-center justify-between gap-2.5 rounded-full border border-white/12 px-3 py-2 shadow-2xl">
@@ -947,7 +924,7 @@ export default function Immersion({
             <button
               onClick={() => aller(-1)}
               disabled={index === 0}
-              className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/8 text-parchemin-100/70 transition-colors hover:bg-white/16 hover:text-parchemin-100 disabled:opacity-20 ${
+              className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/8 text-parchemin-100/70 transition-colors hover:bg-white/16 hover:text-parchemin-100 disabled:opacity-20 ${
                 index === 0 ? 'invisible pointer-events-none' : ''
               }`}
               aria-label="Précédent"
@@ -3125,7 +3102,7 @@ function SceneAncrageVerset({
 
 function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
   return (
-    <div className="relative py-8 text-center sm:py-12">
+    <div className="relative py-4 text-center sm:py-8">
       <MotFantome
         tone="nuit"
         haut="-4%"
@@ -3138,7 +3115,7 @@ function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
 
       <Illumination
         fiche={fiche.id}
-        taille={172}
+        taille={104}
         anime
         className="relative z-10 mx-auto"
       />
@@ -3153,7 +3130,7 @@ function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
         {fiche.sousTitre}
       </p>
 
-      <div className="mx-auto mt-10 max-w-md space-y-2.5 text-left">
+      <div className="mx-auto mt-6 max-w-lg space-y-3 text-left">
         {[
           PROFILS_FICHES[fiche.id]?.invitation || 'Prendre le temps de lire et de recevoir.',
           'Gardez une Bible à portée de main : plusieurs passages sont à lire dedans.',
@@ -3161,7 +3138,7 @@ function SceneSeuil({ fiche }: { fiche: FicheLivret }) {
         ].map((ligne) => (
           <p
             key={ligne}
-            className="flex gap-3 rounded-2xl bg-white/[0.05] px-4 py-3 text-2xs leading-relaxed text-parchemin-100/70"
+            className="flex gap-3 text-sm leading-relaxed text-parchemin-100/80"
           >
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-or-400" />
             {ligne}

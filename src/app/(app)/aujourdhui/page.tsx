@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Immersion, { ChargementImmersion } from '@/components/Immersion';
 import ParcoursGate from '@/components/ParcoursGate';
+import AttenteFiche from '@/components/AttenteFiche';
 import { useAuth } from '@/lib/AuthContext';
 import { getAnswers, saveAnswer, markFicheCompleted } from '@/lib/firestore';
 import { chargerFiche, type FicheLivret } from '@/lib/livret';
@@ -100,7 +101,7 @@ function AujourdhuiContent() {
     );
   }
 
-  if (ficheId > Math.max(1, preparationStep)) return <div className="p-8 text-encre-950"><p>Terminez la fiche précédente pour poursuivre. En cellule, attendez aussi son ouverture par votre groupe.</p><button onClick={() => router.push('/dashboard')} className="mt-4 min-h-11 rounded-full border px-5">Revenir à mon temps</button></div>;
+  if (ficheId > Math.max(1, preparationStep)) return <AttenteFiche ficheId={ficheId} />;
 
   return (
     <ParcoursGate acces={ficheId === 1 ? 'decouverte' : 'lecture'}>
