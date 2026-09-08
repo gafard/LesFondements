@@ -100,8 +100,6 @@ function CelluleContent() {
   const [onglet, setOnglet] = useState<Onglet>('rencontre');
   const [posts, setPosts] = useState<GroupPost[]>([]);
   const [sessions, setSessions] = useState<GroupSession[]>([]);
-  const [codeCopie, setCodeCopie] = useState(false);
-  const [inviteOuvert, setInviteOuvert] = useState(false);
   const [modalInviteOuverte, setModalInviteOuverte] = useState(false);
   const [reglagesOuvert, setReglagesOuvert] = useState(false);
 
@@ -137,20 +135,6 @@ function CelluleContent() {
   const prochaine = nextMeetingDate(group.meeting, group.stepOpenedAt);
   const enRencontre = group.stepPhase === 'rencontre' && session?.status === 'ouverte';
   const prets = actifs.filter((m) => m.preparedSteps.includes(group.currentStep)).length;
-
-  const copierCode = async () => {
-    try {
-      const joinUrl = typeof window !== 'undefined'
-        ? `${window.location.origin}/rejoindre/${group.inviteCode}`
-        : `https://parcours.lesfondements.workers.dev/rejoindre/${group.inviteCode}`;
-      const message = `Rejoins-moi sur le parcours « Les Fondements » dans notre groupe « ${group.name} » !\n\nLien direct pour nous rejoindre :\n${joinUrl}\n\n(Code : ${group.inviteCode})`;
-      await navigator.clipboard.writeText(message);
-      setCodeCopie(true);
-      setTimeout(() => setCodeCopie(false), 2000);
-    } catch {
-      /* presse-papiers indisponible */
-    }
-  };
 
   const ouvrirRencontre = async () => {
     await openMeeting(group.id, user.uid);
@@ -428,7 +412,6 @@ function CelluleContent() {
         {onglet === 'membres' && (
           <OngletMembres
             onInviter={() => setModalInviteOuverte(true)}
-            inviteOuvert={inviteOuvert}
           />
         )}
 
@@ -758,10 +741,8 @@ function genererBinomes(membres: GroupMember[]): GroupMember[][] {
 
 function OngletMembres({
   onInviter,
-  inviteOuvert,
 }: {
   onInviter: () => void;
-  inviteOuvert: boolean;
 }) {
   const { user } = useAuth();
   const { group, members, isLeader } = useParcours();
@@ -785,20 +766,11 @@ function OngletMembres({
               className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-4 py-2 text-2xs font-bold text-parchemin-100 transition-colors hover:bg-encre-800"
             >
               <UserPlus className="h-3.5 w-3.5" />
-              {inviteOuvert ? 'Masquer les invitations' : `Inviter (${places} place${places > 1 ? 's' : ''})`}
+              Inviter ({places} place{places > 1 ? 's' : ''})
             </button>
           )}
         </div>
 
-        {inviteOuvert && (
-          <div className="mt-4 border-t border-parchemin-300 pt-4">
-            <InvitePanel
-              group={group}
-              inviter={{ uid: user.uid, displayName: user.displayName || 'Un compagnon' }}
-              tone="clair"
-            />
-          </div>
-        )}
 
         <ul className="mt-4 divide-y divide-parchemin-300">
           {actifs.map((membre) => (
