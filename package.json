@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "npm run build:next && npm run build:bundle",
     "build:next": "next build",
-    "build:bundle": "opennextjs-cloudflare build --skipNextBuild && ./scripts/stage-sites-build.sh",
+    "build:bundle": "opennextjs-cloudflare build --skipNextBuild && node scripts/abaisser-pour-safari.mjs .open-next/assets/_next/static/chunks && node scripts/verifier-safari.mjs .open-next/assets/_next/static/chunks && ./scripts/stage-sites-build.sh",
     "build:cloud": "npm run build",
     "build:sites": "npm run build",
     "preview:cloud": "opennextjs-cloudflare preview",
@@ -35,7 +35,8 @@
     "test:habiter": "esbuild scripts/test-habiter.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-habiter.mjs --log-level=warning && node /tmp/lesfondements-test-habiter.mjs",
     "test:carnet": "node scripts/test-carnet-stockage.mjs",
     "test:carrousels": "esbuild scripts/test-carrousels.ts --bundle --platform=node --format=esm --outfile=/tmp/lesfondements-test-carrousels.mjs --log-level=warning && node /tmp/lesfondements-test-carrousels.mjs",
-    "test:acces": "esbuild scripts/test-acces-fiches.ts --bundle --platform=node --format=esm --outfile=/tmp/lf-test-acces.mjs --log-level=warning && node /tmp/lf-test-acces.mjs"
+    "test:acces": "esbuild scripts/test-acces-fiches.ts --bundle --platform=node --format=esm --outfile=/tmp/lf-test-acces.mjs --log-level=warning && node /tmp/lf-test-acces.mjs",
+    "test:safari": "node scripts/verifier-safari.mjs .open-next/assets/_next/static/chunks"
   },
   "dependencies": {
     "@types/web-push": "^3.6.4",
