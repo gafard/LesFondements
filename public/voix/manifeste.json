@@ -1,5 +1,5 @@
 {
- "genereLe": "2026-09-24T01:03:21.007Z",
+ "genereLe": "2026-09-24T01:12:05.496Z",
  "voixParDefaut": "yG4Uc56cLYQyZFnWaYv2",
  "pistes": {
   "f1.seuil": {
@@ -28,11 +28,12 @@
   },
   "f1.s0.b2": {
    "id": "f1.s0.b2",
-   "url": "/voix/eleven/f1.s0.b2.mp3",
+   "url": "/voix/eleven/f1.s0.b2.mp3?v=37f9336a928ba1d1",
    "source": "eleven",
-   "empreinte": "e11fb65a1f30",
+   "empreinte": "317e86db3533",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_128"
+   "modele": "eleven_multilingual_v2"
   },
   "f1.s0.b3": {
    "id": "f1.s0.b3",
@@ -212,11 +213,12 @@
   },
   "f1.s2.b6": {
    "id": "f1.s2.b6",
-   "url": "/voix/eleven/f1.s2.b6.mp3",
+   "url": "/voix/eleven/f1.s2.b6.mp3?v=c584469608d4ecf9",
    "source": "eleven",
-   "empreinte": "b7cbbff4faa9",
+   "empreinte": "26e0802d483c",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_128"
+   "modele": "eleven_multilingual_v2"
   },
   "f1.s2.b8": {
    "id": "f1.s2.b8",
@@ -244,11 +246,12 @@
   },
   "f1.s2.b12": {
    "id": "f1.s2.b12",
-   "url": "/voix/eleven/f1.s2.b12.mp3",
+   "url": "/voix/eleven/f1.s2.b12.mp3?v=42c1fbe1384f60dc",
    "source": "eleven",
-   "empreinte": "6d1063221573",
+   "empreinte": "ff88ffd412a4",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_128"
+   "modele": "eleven_multilingual_v2"
   },
   "f1.s2.b13": {
    "id": "f1.s2.b13",
@@ -268,11 +271,12 @@
   },
   "f1.s2.b16": {
    "id": "f1.s2.b16",
-   "url": "/voix/eleven/f1.s2.b16.mp3",
+   "url": "/voix/eleven/f1.s2.b16.mp3?v=93f668368c0a2e68",
    "source": "eleven",
-   "empreinte": "dc593cb7d00b",
+   "empreinte": "69505bfd0737",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_128"
+   "modele": "eleven_multilingual_v2"
   },
   "f1.r0": {
    "id": "f1.r0",
@@ -804,11 +808,12 @@
   },
   "f2.s0.b0": {
    "id": "f2.s0.b0",
-   "url": "/voix/eleven/f2.s0.b0.mp3",
+   "url": "/voix/eleven/f2.s0.b0.mp3?v=19d06ac1b16a3432",
    "source": "eleven",
-   "empreinte": "dbad633faf77",
-   "voix": "6aRkp7Pz4MBOSpUyJCTO",
-   "format": "mp3_44100_128"
+   "empreinte": "77dcda401831",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "f2.s0.b1": {
    "id": "f2.s0.b1",
@@ -852,11 +857,12 @@
   },
   "f2.s1.b2": {
    "id": "f2.s1.b2",
-   "url": "/voix/eleven/f2.s1.b2.mp3",
+   "url": "/voix/eleven/f2.s1.b2.mp3?v=1af7a23fc88231ca",
    "source": "eleven",
-   "empreinte": "33d6f9885171",
-   "voix": "6aRkp7Pz4MBOSpUyJCTO",
-   "format": "mp3_44100_128"
+   "empreinte": "7b877c4ef92b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "f2.s2": {
    "id": "f2.s2",

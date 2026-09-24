@@ -521,9 +521,12 @@ async function main() {
       await writeFile(temporaire, audio);
       await rename(temporaire, chemin);
       const taille = (await stat(chemin)).size;
+      // Une nouvelle version audio doit aussi renouveler l'URL : le service
+      // worker et les paquets hors ligne peuvent conserver l'ancien MP3.
+      const versionAudio = createHash('sha256').update(audio).digest('hex').slice(0, 16);
       sortie[piste.id] = {
         id: piste.id,
-        url: `/voix/eleven/${piste.id}.mp3`,
+        url: `/voix/eleven/${piste.id}.mp3?v=${versionAudio}`,
         source: 'eleven',
         empreinte,
         format: FORMAT,

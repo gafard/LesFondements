@@ -39,12 +39,28 @@ La clé existante ne dispose pas de la permission `user_read` permettant de
 consulter le solde ElevenLabs. Aucun abonnement ni réglage de facturation n'a été
 modifié.
 
+## Actualisation complémentaire des six anciennes pistes
+
+À la demande suivante de l'utilisateur, les six pistes des fiches 1 et 2 dont le
+texte avait changé ont été actualisées : `f1.s0.b2`, `f1.s2.b6`, `f1.s2.b12`,
+`f1.s2.b16`, `f2.s0.b0` et `f2.s1.b2`.
+
+Ce complément représente **2 402 caractères**, six générations sans reprise
+réseau et environ 2,7 minutes d'audio. Les six fichiers ont passé les contrôles
+FFprobe et un décodage complet FFmpeg. Les 125 autres pistes des fiches 1 et 2
+ont été conservées. Le total des deux demandes est de **120 206 caractères
+soumis** ; le complément a été autorisé après le premier lot.
+
+Les six URLs audio portent désormais une version calculée à partir du fichier
+MP3. Le lecteur ne réutilise ainsi pas une ancienne réponse du cache à la place
+du nouvel enregistrement. Le générateur applique cette règle aux futures pistes,
+et le test de reprise vérifie le renouvellement de l'URL lorsque l'audio change.
+
 ## Prochaine reprise
 
-Il reste **731 pistes / 188 435 caractères** :
-
-- 725 pistes absentes dans les fiches 11 à 20 ;
-- 6 pistes anciennes à actualiser dans les fiches 1 et 2 (2 402 caractères).
+Il reste **725 pistes / 186 033 caractères**, toutes absentes dans les fiches
+11 à 20. Aucune piste existante n'est encore signalée comme obsolète par
+l'inventaire.
 
 Consulter d'abord l'inventaire à jour, sans génération ni modification :
 

@@ -12,7 +12,7 @@ try {
   await writeFile(path.join(root,'src/data/livret.json'),JSON.stringify({fiches:[{id:3,titre:'Titre',sousTitre:'Suite',sections:[{titre:'Section',blocs:[{type:'texte',texte:'Un paragraphe à écouter.'}]}],resume:[],questionsLibres:[]}]}));
   const mock=path.join(root,'mock.mjs');
   await writeFile(mock,`import fs from 'node:fs';
-let n=0; globalThis.fetch=async (url,opts)=>{n++;fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(JSON.parse(opts.body))+'\\n');if(process.env.TEST_FAIL==='1') return new Response('quota_exceeded',{status:401}); if(process.env.TEST_RETRY==='1') throw new Error('fetch failed');if(process.env.TEST_CRASH==='1'&&n===2) process.exit(17);return new Response(new Uint8Array(2000),{headers:{'content-type':'audio/mpeg'}});};`);
+let n=0; globalThis.fetch=async (url,opts)=>{n++;fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(JSON.parse(opts.body))+'\\n');if(process.env.TEST_FAIL==='1') return new Response('quota_exceeded',{status:401}); if(process.env.TEST_RETRY==='1') throw new Error('fetch failed');if(process.env.TEST_CRASH==='1'&&n===2) process.exit(17);return new Response(new Uint8Array(2000).fill(Number(process.env.TEST_AUDIO_BYTE ?? 0)),{headers:{'content-type':'audio/mpeg'}});};`);
   const log=path.join(root,'requests.jsonl');
   const manifest=path.join(root,'public/voix/manifeste.json');
   const run=(args=[],env={})=>spawnSync(process.execPath,['--import',mock,path.join(root,'scripts/generer-voix.mjs'),'--pause','0','--fiches','3',...args],{env:{PATH:process.env.PATH,ELEVENLABS_API_KEY:'mock-only',ELEVENLABS_VOICE_ID:'test-voice',TEST_LOG:log,...env},encoding:'utf8'});
@@ -25,8 +25,13 @@ let n=0; globalThis.fetch=async (url,opts)=>{n++;fs.appendFileSync(process.env.T
   assert.equal(run().status,0);assert.equal(await count(),4,'Une nouvelle relance doit être gratuite');
   assert.equal(run(['--manquantes-seules'],{ELEVENLABS_VOICE_ID:'another-voice'}).status,0);assert.equal(await count(),4,'Conserver les voix existantes');
   assert.equal(run(['--max-caracteres','1.5']).status,1);assert.equal(await count(),4);
+  const ancienneUrl=JSON.parse(await readFile(manifest,'utf8')).pistes['f3.seuil'].url;
   await writeFile(manifest,'{bad json');assert.equal(run().status,1);assert.equal(await count(),4,'Un manifeste corrompu ne déclenche aucun appel');
   await rm(manifest);assert.equal(run([],{TEST_FAIL:'1'}).status,1);assert.equal(await count(),5,'Arrêt dès le premier refus');
   await rm(manifest); const retry=run(['--max-caracteres','30'],{TEST_RETRY:'1'});assert.equal(retry.status,1);assert.equal(await count(),6,'La limite inclut les reprises réseau');
-  console.log('✓ Inventaire sans écriture, enveloppe zéro, reprise après crash, absence de doublons, conservation des voix, validation de la limite, manifeste corrompu, arrêt sur refus et limite incluant les reprises. Aucun appel réel à ElevenLabs.');
+  assert.equal(run([],{TEST_AUDIO_BYTE:'1'}).status,0);
+  const nouvelleUrl=JSON.parse(await readFile(manifest,'utf8')).pistes['f3.seuil'].url;
+  assert.notEqual(nouvelleUrl,ancienneUrl,'Un nouvel audio doit avoir une nouvelle clé de cache');
+  assert.equal(new URL(nouvelleUrl,'https://test.local').pathname,new URL(ancienneUrl,'https://test.local').pathname,'Le fichier garde son emplacement stable');
+  console.log('✓ Version audio du cache, inventaire sans écriture, enveloppe zéro, reprise après crash, absence de doublons, conservation des voix, validation de la limite, manifeste corrompu, arrêt sur refus et limite incluant les reprises. Aucun appel réel à ElevenLabs.');
 } finally { await rm(root,{recursive:true,force:true}); }
