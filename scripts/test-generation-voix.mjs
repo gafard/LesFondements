@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {mkdtemp, mkdir, copyFile, writeFile, readFile, rm} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+const root=await mkdtemp(path.join(tmpdir(),'fondements-eleven-test-'));
+try {
+  for(const dir of ['scripts','src/lib','src/data']) await mkdir(path.join(root,dir),{recursive:true});
+  for(const file of ['scripts/generer-voix.mjs','src/lib/prononciation.mjs']) await copyFile(file,path.join(root,file));
+  await writeFile(path.join(root,'src/data/versetsLivret.json'),'{}');
+  await writeFile(path.join(root,'src/data/livret.json'),JSON.stringify({fiches:[{id:3,titre:'Titre',sousTitre:'Suite',sections:[{titre:'Section',blocs:[{type:'texte',texte:'Un paragraphe à écouter.'}]}],resume:[],questionsLibres:[]}]}));
+  const mock=path.join(root,'mock.mjs');
+  await writeFile(mock,`import fs from 'node:fs';
+let n=0; globalThis.fetch=async (url,opts)=>{n++;fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(JSON.parse(opts.body))+'\\n');if(process.env.TEST_FAIL==='1') return new Response('quota_exceeded',{status:401}); if(process.env.TEST_RETRY==='1') throw new Error('fetch failed');if(process.env.TEST_CRASH==='1'&&n===2) process.exit(17);return new Response(new Uint8Array(2000),{headers:{'content-type':'audio/mpeg'}});};`);
+  const log=path.join(root,'requests.jsonl');
+  const manifest=path.join(root,'public/voix/manifeste.json');
+  const run=(args=[],env={})=>spawnSync(process.execPath,['--import',mock,path.join(root,'scripts/generer-voix.mjs'),'--pause','0','--fiches','3',...args],{env:{PATH:process.env.PATH,ELEVENLABS_API_KEY:'mock-only',ELEVENLABS_VOICE_ID:'test-voice',TEST_LOG:log,...env},encoding:'utf8'});
+  const count=async()=>existsSync(log)?(await readFile(log,'utf8')).trim().split('\n').length:0;
+  assert.equal(run(['--inventaire']).status,0);assert.equal(await count(),0);assert.equal(existsSync(manifest),false);
+  assert.equal(run(['--max-caracteres','0']).status,0);assert.equal(await count(),0);
+  assert.equal(run([], {TEST_CRASH:'1'}).status,17);
+  assert.equal(Object.keys(JSON.parse(await readFile(manifest,'utf8')).pistes).length,1,'Le premier succès doit survivre au crash du processus');
+  assert.equal(run().status,0);assert.equal(await count(),4,'La reprise ne doit pas refacturer la première piste');
+  assert.equal(run().status,0);assert.equal(await count(),4,'Une nouvelle relance doit être gratuite');
+  assert.equal(run(['--manquantes-seules'],{ELEVENLABS_VOICE_ID:'another-voice'}).status,0);assert.equal(await count(),4,'Conserver les voix existantes');
+  assert.equal(run(['--max-caracteres','1.5']).status,1);assert.equal(await count(),4);
+  await writeFile(manifest,'{bad json');assert.equal(run().status,1);assert.equal(await count(),4,'Un manifeste corrompu ne déclenche aucun appel');
+  await rm(manifest);assert.equal(run([],{TEST_FAIL:'1'}).status,1);assert.equal(await count(),5,'Arrêt dès le premier refus');
+  await rm(manifest); const retry=run(['--max-caracteres','30'],{TEST_RETRY:'1'});assert.equal(retry.status,1);assert.equal(await count(),6,'La limite inclut les reprises réseau');
+  console.log('✓ Inventaire sans écriture, enveloppe zéro, reprise après crash, absence de doublons, conservation des voix, validation de la limite, manifeste corrompu, arrêt sur refus et limite incluant les reprises. Aucun appel réel à ElevenLabs.');
+} finally { await rm(root,{recursive:true,force:true}); }

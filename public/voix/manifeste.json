@@ -1,5 +1,5 @@
 {
- "genereLe": "2026-08-26T01:08:16.154Z",
+ "genereLe": "2026-09-24T01:03:21.007Z",
  "voixParDefaut": "yG4Uc56cLYQyZFnWaYv2",
  "pistes": {
   "f1.seuil": {
@@ -1110,9 +1110,10 @@
    "id": "v.rm-6-23",
    "url": "/voix/eleven/v.rm-6-23.mp3",
    "source": "eleven",
-   "empreinte": "52f8f9f5315f",
+   "empreinte": "64df343e85cb",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_128"
+   "modele": "eleven_multilingual_v2"
   },
   "v.1-co-1-18": {
    "id": "v.1-co-1-18",
@@ -1142,9 +1143,10 @@
    "id": "v.1-jn-3-1a",
    "url": "/voix/eleven/v.1-jn-3-1a.mp3",
    "source": "eleven",
-   "empreinte": "ce44c3a1c0b1",
+   "empreinte": "66cfa699c852",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_128"
+   "modele": "eleven_multilingual_v2"
   },
   "v.sophonie-3-17": {
    "id": "v.sophonie-3-17",
@@ -1198,9 +1200,10 @@
    "id": "v.ep-2-10",
    "url": "/voix/eleven/v.ep-2-10.mp3",
    "source": "eleven",
-   "empreinte": "aa5c00585186",
+   "empreinte": "12a0aa381011",
    "format": "mp3_44100_128",
-   "voix": "yG4Uc56cLYQyZFnWaYv2"
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "v.ep-5-8": {
    "id": "v.ep-5-8",
@@ -1222,17 +1225,19 @@
    "id": "v.ga-5-24",
    "url": "/voix/eleven/v.ga-5-24.mp3",
    "source": "eleven",
-   "empreinte": "b0b9a8760bba",
+   "empreinte": "1944c1d6ebb1",
    "format": "mp3_44100_128",
-   "voix": "yG4Uc56cLYQyZFnWaYv2"
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "v.rm-6-11": {
    "id": "v.rm-6-11",
    "url": "/voix/eleven/v.rm-6-11.mp3",
    "source": "eleven",
-   "empreinte": "8c90e4e68cac",
+   "empreinte": "b010baba6e74",
    "format": "mp3_44100_128",
-   "voix": "yG4Uc56cLYQyZFnWaYv2"
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "v.jn-15-5": {
    "id": "v.jn-15-5",
@@ -1254,9 +1259,10 @@
    "id": "v.mt-5-29",
    "url": "/voix/eleven/v.mt-5-29.mp3",
    "source": "eleven",
-   "empreinte": "4038b8760180",
+   "empreinte": "058b5669170f",
    "format": "mp3_44100_128",
-   "voix": "yG4Uc56cLYQyZFnWaYv2"
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "v.ps-147-3": {
    "id": "v.ps-147-3",
@@ -1302,9 +1308,10 @@
    "id": "v.ac-1-4-5",
    "url": "/voix/eleven/v.ac-1-4-5.mp3",
    "source": "eleven",
-   "empreinte": "7460243dd164",
+   "empreinte": "629444662c54",
    "format": "mp3_44100_128",
-   "voix": "yG4Uc56cLYQyZFnWaYv2"
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "v.ac-4-33": {
    "id": "v.ac-4-33",
@@ -1398,9 +1405,10 @@
    "id": "v.rm-10-13-14",
    "url": "/voix/eleven/v.rm-10-13-14.mp3",
    "source": "eleven",
-   "empreinte": "80e8d0e23e2a",
+   "empreinte": "e0e060357575",
    "format": "mp3_44100_128",
-   "voix": "yG4Uc56cLYQyZFnWaYv2"
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   },
   "v.he-10-25": {
    "id": "v.he-10-25",
@@ -1446,9 +1454,10 @@
    "id": "v.1-jn-3-23",
    "url": "/voix/eleven/v.1-jn-3-23.mp3",
    "source": "eleven",
-   "empreinte": "24dfe8c4b7b6",
+   "empreinte": "32236dfa043d",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_64"
+   "modele": "eleven_multilingual_v2"
   },
   "v.gn-12-3": {
    "id": "v.gn-12-3",
@@ -1462,9 +1471,10 @@
    "id": "v.ga-3-28",
    "url": "/voix/eleven/v.ga-3-28.mp3",
    "source": "eleven",
-   "empreinte": "44a967be6026",
+   "empreinte": "58523c7815f5",
+   "format": "mp3_44100_128",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
-   "format": "mp3_44100_64"
+   "modele": "eleven_multilingual_v2"
   },
   "v.he-9-27": {
    "id": "v.he-9-27",
@@ -1473,6 +1483,4173 @@
    "empreinte": "f07da3165dc6",
    "voix": "yG4Uc56cLYQyZFnWaYv2",
    "format": "mp3_44100_64"
+  },
+  "f3.seuil": {
+   "id": "f3.seuil",
+   "url": "/voix/eleven/f3.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "3c847f9d3810",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0": {
+   "id": "f3.s0",
+   "url": "/voix/eleven/f3.s0.mp3",
+   "source": "eleven",
+   "empreinte": "07c320e0104c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b1": {
+   "id": "f3.s0.b1",
+   "url": "/voix/eleven/f3.s0.b1.mp3",
+   "source": "eleven",
+   "empreinte": "e7649cbe1d49",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b2": {
+   "id": "f3.s0.b2",
+   "url": "/voix/eleven/f3.s0.b2.mp3",
+   "source": "eleven",
+   "empreinte": "295e9a908000",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b3": {
+   "id": "f3.s0.b3",
+   "url": "/voix/eleven/f3.s0.b3.mp3",
+   "source": "eleven",
+   "empreinte": "e81554953444",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b4": {
+   "id": "f3.s0.b4",
+   "url": "/voix/eleven/f3.s0.b4.mp3",
+   "source": "eleven",
+   "empreinte": "95c53aed6437",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b6": {
+   "id": "f3.s0.b6",
+   "url": "/voix/eleven/f3.s0.b6.mp3",
+   "source": "eleven",
+   "empreinte": "e1a1237c1eb2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b7": {
+   "id": "f3.s0.b7",
+   "url": "/voix/eleven/f3.s0.b7.mp3",
+   "source": "eleven",
+   "empreinte": "17279fce3665",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b9": {
+   "id": "f3.s0.b9",
+   "url": "/voix/eleven/f3.s0.b9.mp3",
+   "source": "eleven",
+   "empreinte": "f9177f30ba72",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b11": {
+   "id": "f3.s0.b11",
+   "url": "/voix/eleven/f3.s0.b11.mp3",
+   "source": "eleven",
+   "empreinte": "3c6ba5727980",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s0.b12": {
+   "id": "f3.s0.b12",
+   "url": "/voix/eleven/f3.s0.b12.mp3",
+   "source": "eleven",
+   "empreinte": "c0a356dff431",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s1": {
+   "id": "f3.s1",
+   "url": "/voix/eleven/f3.s1.mp3",
+   "source": "eleven",
+   "empreinte": "94030fbb6c3d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s1.b0": {
+   "id": "f3.s1.b0",
+   "url": "/voix/eleven/f3.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "277b1a5c1c51",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s1.b1": {
+   "id": "f3.s1.b1",
+   "url": "/voix/eleven/f3.s1.b1.mp3",
+   "source": "eleven",
+   "empreinte": "ad6a8c2866d7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s1.b2": {
+   "id": "f3.s1.b2",
+   "url": "/voix/eleven/f3.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "ff35b3394dec",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s1.b3": {
+   "id": "f3.s1.b3",
+   "url": "/voix/eleven/f3.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "73ab05daa6b9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2": {
+   "id": "f3.s2",
+   "url": "/voix/eleven/f3.s2.mp3",
+   "source": "eleven",
+   "empreinte": "4a33cdcf2e78",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b1": {
+   "id": "f3.s2.b1",
+   "url": "/voix/eleven/f3.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "558e3e9f6b65",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b3": {
+   "id": "f3.s2.b3",
+   "url": "/voix/eleven/f3.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "c94696fbe54f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b4": {
+   "id": "f3.s2.b4",
+   "url": "/voix/eleven/f3.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "b6f928ee677c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b5": {
+   "id": "f3.s2.b5",
+   "url": "/voix/eleven/f3.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "157b084135d4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b6": {
+   "id": "f3.s2.b6",
+   "url": "/voix/eleven/f3.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "9f048f1fa432",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b7": {
+   "id": "f3.s2.b7",
+   "url": "/voix/eleven/f3.s2.b7.mp3",
+   "source": "eleven",
+   "empreinte": "fa4a46317dcb",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b8": {
+   "id": "f3.s2.b8",
+   "url": "/voix/eleven/f3.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "2c7cabeffc16",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b9": {
+   "id": "f3.s2.b9",
+   "url": "/voix/eleven/f3.s2.b9.mp3",
+   "source": "eleven",
+   "empreinte": "cc4d72ddeb46",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b10": {
+   "id": "f3.s2.b10",
+   "url": "/voix/eleven/f3.s2.b10.mp3",
+   "source": "eleven",
+   "empreinte": "3e3913d9f1d4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b12": {
+   "id": "f3.s2.b12",
+   "url": "/voix/eleven/f3.s2.b12.mp3",
+   "source": "eleven",
+   "empreinte": "0a14dc64f57d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b13": {
+   "id": "f3.s2.b13",
+   "url": "/voix/eleven/f3.s2.b13.mp3",
+   "source": "eleven",
+   "empreinte": "60ae2edf0130",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b14": {
+   "id": "f3.s2.b14",
+   "url": "/voix/eleven/f3.s2.b14.mp3",
+   "source": "eleven",
+   "empreinte": "c9f9101669c1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b15": {
+   "id": "f3.s2.b15",
+   "url": "/voix/eleven/f3.s2.b15.mp3",
+   "source": "eleven",
+   "empreinte": "f9db7d6409e1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b16": {
+   "id": "f3.s2.b16",
+   "url": "/voix/eleven/f3.s2.b16.mp3",
+   "source": "eleven",
+   "empreinte": "894246e89ef4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b18": {
+   "id": "f3.s2.b18",
+   "url": "/voix/eleven/f3.s2.b18.mp3",
+   "source": "eleven",
+   "empreinte": "7e90bf7d3880",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s2.b19": {
+   "id": "f3.s2.b19",
+   "url": "/voix/eleven/f3.s2.b19.mp3",
+   "source": "eleven",
+   "empreinte": "496d9efbb522",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s3": {
+   "id": "f3.s3",
+   "url": "/voix/eleven/f3.s3.mp3",
+   "source": "eleven",
+   "empreinte": "2490324f1275",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s3.b0": {
+   "id": "f3.s3.b0",
+   "url": "/voix/eleven/f3.s3.b0.mp3",
+   "source": "eleven",
+   "empreinte": "18a92d66652d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.s3.b1": {
+   "id": "f3.s3.b1",
+   "url": "/voix/eleven/f3.s3.b1.mp3",
+   "source": "eleven",
+   "empreinte": "ac6db77f983e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.r0": {
+   "id": "f3.r0",
+   "url": "/voix/eleven/f3.r0.mp3",
+   "source": "eleven",
+   "empreinte": "f32c170f0c10",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.r1": {
+   "id": "f3.r1",
+   "url": "/voix/eleven/f3.r1.mp3",
+   "source": "eleven",
+   "empreinte": "0689dddf7be2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.r2": {
+   "id": "f3.r2",
+   "url": "/voix/eleven/f3.r2.mp3",
+   "source": "eleven",
+   "empreinte": "c5d5d7e20537",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q0": {
+   "id": "f3.q0",
+   "url": "/voix/eleven/f3.q0.mp3",
+   "source": "eleven",
+   "empreinte": "39dcf1a8c79c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q1": {
+   "id": "f3.q1",
+   "url": "/voix/eleven/f3.q1.mp3",
+   "source": "eleven",
+   "empreinte": "e0dd36fc79f9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q2": {
+   "id": "f3.q2",
+   "url": "/voix/eleven/f3.q2.mp3",
+   "source": "eleven",
+   "empreinte": "0712043fa2bb",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q3": {
+   "id": "f3.q3",
+   "url": "/voix/eleven/f3.q3.mp3",
+   "source": "eleven",
+   "empreinte": "bec8ad3354e7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q4": {
+   "id": "f3.q4",
+   "url": "/voix/eleven/f3.q4.mp3",
+   "source": "eleven",
+   "empreinte": "e00a8a8438a0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q5": {
+   "id": "f3.q5",
+   "url": "/voix/eleven/f3.q5.mp3",
+   "source": "eleven",
+   "empreinte": "23129d958131",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q6": {
+   "id": "f3.q6",
+   "url": "/voix/eleven/f3.q6.mp3",
+   "source": "eleven",
+   "empreinte": "87574bc04e5b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q7": {
+   "id": "f3.q7",
+   "url": "/voix/eleven/f3.q7.mp3",
+   "source": "eleven",
+   "empreinte": "5fd8abf2d61c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q8": {
+   "id": "f3.q8",
+   "url": "/voix/eleven/f3.q8.mp3",
+   "source": "eleven",
+   "empreinte": "c97954941273",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f3.q9": {
+   "id": "f3.q9",
+   "url": "/voix/eleven/f3.q9.mp3",
+   "source": "eleven",
+   "empreinte": "d56e8452b225",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.seuil": {
+   "id": "f4.seuil",
+   "url": "/voix/eleven/f4.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "0ab2c0164bb3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s0": {
+   "id": "f4.s0",
+   "url": "/voix/eleven/f4.s0.mp3",
+   "source": "eleven",
+   "empreinte": "f567e75bde27",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s0.b0": {
+   "id": "f4.s0.b0",
+   "url": "/voix/eleven/f4.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "b052e0922683",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s0.b1": {
+   "id": "f4.s0.b1",
+   "url": "/voix/eleven/f4.s0.b1.mp3",
+   "source": "eleven",
+   "empreinte": "1d701c8638a6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s0.b2": {
+   "id": "f4.s0.b2",
+   "url": "/voix/eleven/f4.s0.b2.mp3",
+   "source": "eleven",
+   "empreinte": "c369fbdc99d0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s0.b3": {
+   "id": "f4.s0.b3",
+   "url": "/voix/eleven/f4.s0.b3.mp3",
+   "source": "eleven",
+   "empreinte": "f16380328fc3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s0.b4": {
+   "id": "f4.s0.b4",
+   "url": "/voix/eleven/f4.s0.b4.mp3",
+   "source": "eleven",
+   "empreinte": "4f1d21970e7e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s0.b6": {
+   "id": "f4.s0.b6",
+   "url": "/voix/eleven/f4.s0.b6.mp3",
+   "source": "eleven",
+   "empreinte": "f194a7ddc954",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1": {
+   "id": "f4.s1",
+   "url": "/voix/eleven/f4.s1.mp3",
+   "source": "eleven",
+   "empreinte": "aebc346a3682",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b0": {
+   "id": "f4.s1.b0",
+   "url": "/voix/eleven/f4.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "45b3ef1eb458",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b2": {
+   "id": "f4.s1.b2",
+   "url": "/voix/eleven/f4.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "24ac147e71c2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b3": {
+   "id": "f4.s1.b3",
+   "url": "/voix/eleven/f4.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "ce149ff71bea",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b4": {
+   "id": "f4.s1.b4",
+   "url": "/voix/eleven/f4.s1.b4.mp3",
+   "source": "eleven",
+   "empreinte": "d6e16ff1b400",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b5": {
+   "id": "f4.s1.b5",
+   "url": "/voix/eleven/f4.s1.b5.mp3",
+   "source": "eleven",
+   "empreinte": "be98233407bc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b6": {
+   "id": "f4.s1.b6",
+   "url": "/voix/eleven/f4.s1.b6.mp3",
+   "source": "eleven",
+   "empreinte": "df6f37545d90",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b7": {
+   "id": "f4.s1.b7",
+   "url": "/voix/eleven/f4.s1.b7.mp3",
+   "source": "eleven",
+   "empreinte": "2da57009456b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b8": {
+   "id": "f4.s1.b8",
+   "url": "/voix/eleven/f4.s1.b8.mp3",
+   "source": "eleven",
+   "empreinte": "0b8567a0f462",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b10": {
+   "id": "f4.s1.b10",
+   "url": "/voix/eleven/f4.s1.b10.mp3",
+   "source": "eleven",
+   "empreinte": "8a2924904f92",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b11": {
+   "id": "f4.s1.b11",
+   "url": "/voix/eleven/f4.s1.b11.mp3",
+   "source": "eleven",
+   "empreinte": "73c7f5453776",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b12": {
+   "id": "f4.s1.b12",
+   "url": "/voix/eleven/f4.s1.b12.mp3",
+   "source": "eleven",
+   "empreinte": "18cf9309edb1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b13": {
+   "id": "f4.s1.b13",
+   "url": "/voix/eleven/f4.s1.b13.mp3",
+   "source": "eleven",
+   "empreinte": "04293d9ea00c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b14": {
+   "id": "f4.s1.b14",
+   "url": "/voix/eleven/f4.s1.b14.mp3",
+   "source": "eleven",
+   "empreinte": "55b0efaf25c0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s1.b15": {
+   "id": "f4.s1.b15",
+   "url": "/voix/eleven/f4.s1.b15.mp3",
+   "source": "eleven",
+   "empreinte": "912912f55f2c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2": {
+   "id": "f4.s2",
+   "url": "/voix/eleven/f4.s2.mp3",
+   "source": "eleven",
+   "empreinte": "8242c606fe3a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b1": {
+   "id": "f4.s2.b1",
+   "url": "/voix/eleven/f4.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "49d6b40b20b1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b2": {
+   "id": "f4.s2.b2",
+   "url": "/voix/eleven/f4.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "6eb84db00dca",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b3": {
+   "id": "f4.s2.b3",
+   "url": "/voix/eleven/f4.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "21a4c52d1db4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b4": {
+   "id": "f4.s2.b4",
+   "url": "/voix/eleven/f4.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "72a63aab6a5e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b5": {
+   "id": "f4.s2.b5",
+   "url": "/voix/eleven/f4.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "a8fbc6dc8abc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b6": {
+   "id": "f4.s2.b6",
+   "url": "/voix/eleven/f4.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "8124013792c3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b7": {
+   "id": "f4.s2.b7",
+   "url": "/voix/eleven/f4.s2.b7.mp3",
+   "source": "eleven",
+   "empreinte": "1576049315a4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b8": {
+   "id": "f4.s2.b8",
+   "url": "/voix/eleven/f4.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "275c296c55c5",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b9": {
+   "id": "f4.s2.b9",
+   "url": "/voix/eleven/f4.s2.b9.mp3",
+   "source": "eleven",
+   "empreinte": "818f23332bf9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b11": {
+   "id": "f4.s2.b11",
+   "url": "/voix/eleven/f4.s2.b11.mp3",
+   "source": "eleven",
+   "empreinte": "73a4d87123ff",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b12": {
+   "id": "f4.s2.b12",
+   "url": "/voix/eleven/f4.s2.b12.mp3",
+   "source": "eleven",
+   "empreinte": "61c95a3bf04b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b13": {
+   "id": "f4.s2.b13",
+   "url": "/voix/eleven/f4.s2.b13.mp3",
+   "source": "eleven",
+   "empreinte": "4c5f4597be97",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b14": {
+   "id": "f4.s2.b14",
+   "url": "/voix/eleven/f4.s2.b14.mp3",
+   "source": "eleven",
+   "empreinte": "190924745f07",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b15": {
+   "id": "f4.s2.b15",
+   "url": "/voix/eleven/f4.s2.b15.mp3",
+   "source": "eleven",
+   "empreinte": "7c1f70a33148",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b16": {
+   "id": "f4.s2.b16",
+   "url": "/voix/eleven/f4.s2.b16.mp3",
+   "source": "eleven",
+   "empreinte": "0ffd741ec9a9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b17": {
+   "id": "f4.s2.b17",
+   "url": "/voix/eleven/f4.s2.b17.mp3",
+   "source": "eleven",
+   "empreinte": "60663c1afa05",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b18": {
+   "id": "f4.s2.b18",
+   "url": "/voix/eleven/f4.s2.b18.mp3",
+   "source": "eleven",
+   "empreinte": "79ef3e51ae41",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b19": {
+   "id": "f4.s2.b19",
+   "url": "/voix/eleven/f4.s2.b19.mp3",
+   "source": "eleven",
+   "empreinte": "a14ec7fa90ae",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b20": {
+   "id": "f4.s2.b20",
+   "url": "/voix/eleven/f4.s2.b20.mp3",
+   "source": "eleven",
+   "empreinte": "25041699ce6b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b21": {
+   "id": "f4.s2.b21",
+   "url": "/voix/eleven/f4.s2.b21.mp3",
+   "source": "eleven",
+   "empreinte": "9fcac112a5c2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s2.b23": {
+   "id": "f4.s2.b23",
+   "url": "/voix/eleven/f4.s2.b23.mp3",
+   "source": "eleven",
+   "empreinte": "0590d2de703f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3": {
+   "id": "f4.s3",
+   "url": "/voix/eleven/f4.s3.mp3",
+   "source": "eleven",
+   "empreinte": "c5e07e19200e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b0": {
+   "id": "f4.s3.b0",
+   "url": "/voix/eleven/f4.s3.b0.mp3",
+   "source": "eleven",
+   "empreinte": "96adcf60a3e6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b1": {
+   "id": "f4.s3.b1",
+   "url": "/voix/eleven/f4.s3.b1.mp3",
+   "source": "eleven",
+   "empreinte": "a8dc273c7d63",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b2": {
+   "id": "f4.s3.b2",
+   "url": "/voix/eleven/f4.s3.b2.mp3",
+   "source": "eleven",
+   "empreinte": "bc00e8749dc1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b4": {
+   "id": "f4.s3.b4",
+   "url": "/voix/eleven/f4.s3.b4.mp3",
+   "source": "eleven",
+   "empreinte": "b8e42edd8d86",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b5": {
+   "id": "f4.s3.b5",
+   "url": "/voix/eleven/f4.s3.b5.mp3",
+   "source": "eleven",
+   "empreinte": "4dfc25cf65cd",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b6": {
+   "id": "f4.s3.b6",
+   "url": "/voix/eleven/f4.s3.b6.mp3",
+   "source": "eleven",
+   "empreinte": "b5c0e9baf770",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b7": {
+   "id": "f4.s3.b7",
+   "url": "/voix/eleven/f4.s3.b7.mp3",
+   "source": "eleven",
+   "empreinte": "cd0cc41b49b7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b8": {
+   "id": "f4.s3.b8",
+   "url": "/voix/eleven/f4.s3.b8.mp3",
+   "source": "eleven",
+   "empreinte": "6326e3099fd4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b9": {
+   "id": "f4.s3.b9",
+   "url": "/voix/eleven/f4.s3.b9.mp3",
+   "source": "eleven",
+   "empreinte": "aae197cb085c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b10": {
+   "id": "f4.s3.b10",
+   "url": "/voix/eleven/f4.s3.b10.mp3",
+   "source": "eleven",
+   "empreinte": "50c5cbab7d65",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b11": {
+   "id": "f4.s3.b11",
+   "url": "/voix/eleven/f4.s3.b11.mp3",
+   "source": "eleven",
+   "empreinte": "1d8299580191",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b12": {
+   "id": "f4.s3.b12",
+   "url": "/voix/eleven/f4.s3.b12.mp3",
+   "source": "eleven",
+   "empreinte": "b72c38df1086",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b14": {
+   "id": "f4.s3.b14",
+   "url": "/voix/eleven/f4.s3.b14.mp3",
+   "source": "eleven",
+   "empreinte": "6a0e745021a0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b15": {
+   "id": "f4.s3.b15",
+   "url": "/voix/eleven/f4.s3.b15.mp3",
+   "source": "eleven",
+   "empreinte": "292ec42dc33d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b16": {
+   "id": "f4.s3.b16",
+   "url": "/voix/eleven/f4.s3.b16.mp3",
+   "source": "eleven",
+   "empreinte": "f4005d24233c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b17": {
+   "id": "f4.s3.b17",
+   "url": "/voix/eleven/f4.s3.b17.mp3",
+   "source": "eleven",
+   "empreinte": "4202141bb308",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b18": {
+   "id": "f4.s3.b18",
+   "url": "/voix/eleven/f4.s3.b18.mp3",
+   "source": "eleven",
+   "empreinte": "106c6caab1d3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b20": {
+   "id": "f4.s3.b20",
+   "url": "/voix/eleven/f4.s3.b20.mp3",
+   "source": "eleven",
+   "empreinte": "249ad7499da1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b21": {
+   "id": "f4.s3.b21",
+   "url": "/voix/eleven/f4.s3.b21.mp3",
+   "source": "eleven",
+   "empreinte": "c3fa67939f71",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b22": {
+   "id": "f4.s3.b22",
+   "url": "/voix/eleven/f4.s3.b22.mp3",
+   "source": "eleven",
+   "empreinte": "d81e54e5aa8e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s3.b23": {
+   "id": "f4.s3.b23",
+   "url": "/voix/eleven/f4.s3.b23.mp3",
+   "source": "eleven",
+   "empreinte": "0d72359216ac",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4": {
+   "id": "f4.s4",
+   "url": "/voix/eleven/f4.s4.mp3",
+   "source": "eleven",
+   "empreinte": "cf2f19ba60f7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b0": {
+   "id": "f4.s4.b0",
+   "url": "/voix/eleven/f4.s4.b0.mp3",
+   "source": "eleven",
+   "empreinte": "fd02f811ccdb",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b1": {
+   "id": "f4.s4.b1",
+   "url": "/voix/eleven/f4.s4.b1.mp3",
+   "source": "eleven",
+   "empreinte": "d3708c7c5455",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b2": {
+   "id": "f4.s4.b2",
+   "url": "/voix/eleven/f4.s4.b2.mp3",
+   "source": "eleven",
+   "empreinte": "390c99cf42e9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b3": {
+   "id": "f4.s4.b3",
+   "url": "/voix/eleven/f4.s4.b3.mp3",
+   "source": "eleven",
+   "empreinte": "feec62bd7267",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b4": {
+   "id": "f4.s4.b4",
+   "url": "/voix/eleven/f4.s4.b4.mp3",
+   "source": "eleven",
+   "empreinte": "0c3612d70398",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b5": {
+   "id": "f4.s4.b5",
+   "url": "/voix/eleven/f4.s4.b5.mp3",
+   "source": "eleven",
+   "empreinte": "741f4ca1bf80",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b7": {
+   "id": "f4.s4.b7",
+   "url": "/voix/eleven/f4.s4.b7.mp3",
+   "source": "eleven",
+   "empreinte": "e46c5abf1111",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b8": {
+   "id": "f4.s4.b8",
+   "url": "/voix/eleven/f4.s4.b8.mp3",
+   "source": "eleven",
+   "empreinte": "cbfc790ff29f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b9": {
+   "id": "f4.s4.b9",
+   "url": "/voix/eleven/f4.s4.b9.mp3",
+   "source": "eleven",
+   "empreinte": "33415b3c2d5f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b10": {
+   "id": "f4.s4.b10",
+   "url": "/voix/eleven/f4.s4.b10.mp3",
+   "source": "eleven",
+   "empreinte": "c752a7bb4f44",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b11": {
+   "id": "f4.s4.b11",
+   "url": "/voix/eleven/f4.s4.b11.mp3",
+   "source": "eleven",
+   "empreinte": "0cfb7a5f5570",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b12": {
+   "id": "f4.s4.b12",
+   "url": "/voix/eleven/f4.s4.b12.mp3",
+   "source": "eleven",
+   "empreinte": "eacfde0c1877",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.s4.b13": {
+   "id": "f4.s4.b13",
+   "url": "/voix/eleven/f4.s4.b13.mp3",
+   "source": "eleven",
+   "empreinte": "bafb04029e07",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.r0": {
+   "id": "f4.r0",
+   "url": "/voix/eleven/f4.r0.mp3",
+   "source": "eleven",
+   "empreinte": "6cf1ee65e627",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.r1": {
+   "id": "f4.r1",
+   "url": "/voix/eleven/f4.r1.mp3",
+   "source": "eleven",
+   "empreinte": "0426dc8f6460",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.r2": {
+   "id": "f4.r2",
+   "url": "/voix/eleven/f4.r2.mp3",
+   "source": "eleven",
+   "empreinte": "1b37014f550a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.r3": {
+   "id": "f4.r3",
+   "url": "/voix/eleven/f4.r3.mp3",
+   "source": "eleven",
+   "empreinte": "064349063aa9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q0": {
+   "id": "f4.q0",
+   "url": "/voix/eleven/f4.q0.mp3",
+   "source": "eleven",
+   "empreinte": "a9cfd3e00821",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q1": {
+   "id": "f4.q1",
+   "url": "/voix/eleven/f4.q1.mp3",
+   "source": "eleven",
+   "empreinte": "34cbb46abd0c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q2": {
+   "id": "f4.q2",
+   "url": "/voix/eleven/f4.q2.mp3",
+   "source": "eleven",
+   "empreinte": "f960e0001ea7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q3": {
+   "id": "f4.q3",
+   "url": "/voix/eleven/f4.q3.mp3",
+   "source": "eleven",
+   "empreinte": "582b010b5328",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q4": {
+   "id": "f4.q4",
+   "url": "/voix/eleven/f4.q4.mp3",
+   "source": "eleven",
+   "empreinte": "fe2dfbfdb6f0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q5": {
+   "id": "f4.q5",
+   "url": "/voix/eleven/f4.q5.mp3",
+   "source": "eleven",
+   "empreinte": "81f927e648e2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q6": {
+   "id": "f4.q6",
+   "url": "/voix/eleven/f4.q6.mp3",
+   "source": "eleven",
+   "empreinte": "476305addf33",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q7": {
+   "id": "f4.q7",
+   "url": "/voix/eleven/f4.q7.mp3",
+   "source": "eleven",
+   "empreinte": "72f4f1aaf4d0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q8": {
+   "id": "f4.q8",
+   "url": "/voix/eleven/f4.q8.mp3",
+   "source": "eleven",
+   "empreinte": "9149036af338",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q9": {
+   "id": "f4.q9",
+   "url": "/voix/eleven/f4.q9.mp3",
+   "source": "eleven",
+   "empreinte": "350352931066",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q10": {
+   "id": "f4.q10",
+   "url": "/voix/eleven/f4.q10.mp3",
+   "source": "eleven",
+   "empreinte": "df2ec3971b7f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q11": {
+   "id": "f4.q11",
+   "url": "/voix/eleven/f4.q11.mp3",
+   "source": "eleven",
+   "empreinte": "d7b1940d220e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q12": {
+   "id": "f4.q12",
+   "url": "/voix/eleven/f4.q12.mp3",
+   "source": "eleven",
+   "empreinte": "f88312b39f68",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q13": {
+   "id": "f4.q13",
+   "url": "/voix/eleven/f4.q13.mp3",
+   "source": "eleven",
+   "empreinte": "544ed29f9fa8",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q14": {
+   "id": "f4.q14",
+   "url": "/voix/eleven/f4.q14.mp3",
+   "source": "eleven",
+   "empreinte": "b89c13840361",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f4.q15": {
+   "id": "f4.q15",
+   "url": "/voix/eleven/f4.q15.mp3",
+   "source": "eleven",
+   "empreinte": "838bfe2b150e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.seuil": {
+   "id": "f5.seuil",
+   "url": "/voix/eleven/f5.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "c894b2b284ab",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0": {
+   "id": "f5.s0",
+   "url": "/voix/eleven/f5.s0.mp3",
+   "source": "eleven",
+   "empreinte": "d4e1c6a69ae3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0.b0": {
+   "id": "f5.s0.b0",
+   "url": "/voix/eleven/f5.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "6eb66d988d04",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0.b1": {
+   "id": "f5.s0.b1",
+   "url": "/voix/eleven/f5.s0.b1.mp3",
+   "source": "eleven",
+   "empreinte": "d9bc026bc6c2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0.b2": {
+   "id": "f5.s0.b2",
+   "url": "/voix/eleven/f5.s0.b2.mp3",
+   "source": "eleven",
+   "empreinte": "966cebfa35cb",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0.b3": {
+   "id": "f5.s0.b3",
+   "url": "/voix/eleven/f5.s0.b3.mp3",
+   "source": "eleven",
+   "empreinte": "9c34eac39fb2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0.b5": {
+   "id": "f5.s0.b5",
+   "url": "/voix/eleven/f5.s0.b5.mp3",
+   "source": "eleven",
+   "empreinte": "f7d2e6a4f7c9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0.b6": {
+   "id": "f5.s0.b6",
+   "url": "/voix/eleven/f5.s0.b6.mp3",
+   "source": "eleven",
+   "empreinte": "fcb9fee5886f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s0.b7": {
+   "id": "f5.s0.b7",
+   "url": "/voix/eleven/f5.s0.b7.mp3",
+   "source": "eleven",
+   "empreinte": "f06f17989281",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s1": {
+   "id": "f5.s1",
+   "url": "/voix/eleven/f5.s1.mp3",
+   "source": "eleven",
+   "empreinte": "0baa39badbfc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s1.b0": {
+   "id": "f5.s1.b0",
+   "url": "/voix/eleven/f5.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "f0b15bd08a10",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s1.b1": {
+   "id": "f5.s1.b1",
+   "url": "/voix/eleven/f5.s1.b1.mp3",
+   "source": "eleven",
+   "empreinte": "039931651123",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s1.b3": {
+   "id": "f5.s1.b3",
+   "url": "/voix/eleven/f5.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "a21bc7162258",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s1.b4": {
+   "id": "f5.s1.b4",
+   "url": "/voix/eleven/f5.s1.b4.mp3",
+   "source": "eleven",
+   "empreinte": "9b818f07e289",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s1.b5": {
+   "id": "f5.s1.b5",
+   "url": "/voix/eleven/f5.s1.b5.mp3",
+   "source": "eleven",
+   "empreinte": "d3a6426ef86c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2": {
+   "id": "f5.s2",
+   "url": "/voix/eleven/f5.s2.mp3",
+   "source": "eleven",
+   "empreinte": "4bd0bea30cf3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b0": {
+   "id": "f5.s2.b0",
+   "url": "/voix/eleven/f5.s2.b0.mp3",
+   "source": "eleven",
+   "empreinte": "39babca1739d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b1": {
+   "id": "f5.s2.b1",
+   "url": "/voix/eleven/f5.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "d03da2bcda06",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b2": {
+   "id": "f5.s2.b2",
+   "url": "/voix/eleven/f5.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "8097704d6171",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b3": {
+   "id": "f5.s2.b3",
+   "url": "/voix/eleven/f5.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "4183a90f0096",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b4": {
+   "id": "f5.s2.b4",
+   "url": "/voix/eleven/f5.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "5a101268ca97",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b5": {
+   "id": "f5.s2.b5",
+   "url": "/voix/eleven/f5.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "17dbf3db2b11",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b6": {
+   "id": "f5.s2.b6",
+   "url": "/voix/eleven/f5.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "ce49426c685e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b7": {
+   "id": "f5.s2.b7",
+   "url": "/voix/eleven/f5.s2.b7.mp3",
+   "source": "eleven",
+   "empreinte": "64cb39972925",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b8": {
+   "id": "f5.s2.b8",
+   "url": "/voix/eleven/f5.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "720844954b22",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b9": {
+   "id": "f5.s2.b9",
+   "url": "/voix/eleven/f5.s2.b9.mp3",
+   "source": "eleven",
+   "empreinte": "8806c464b22a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b11": {
+   "id": "f5.s2.b11",
+   "url": "/voix/eleven/f5.s2.b11.mp3",
+   "source": "eleven",
+   "empreinte": "aed0191b99fd",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s2.b12": {
+   "id": "f5.s2.b12",
+   "url": "/voix/eleven/f5.s2.b12.mp3",
+   "source": "eleven",
+   "empreinte": "0200c9df4809",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3": {
+   "id": "f5.s3",
+   "url": "/voix/eleven/f5.s3.mp3",
+   "source": "eleven",
+   "empreinte": "38176f527515",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b0": {
+   "id": "f5.s3.b0",
+   "url": "/voix/eleven/f5.s3.b0.mp3",
+   "source": "eleven",
+   "empreinte": "dd4c86a30a8b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b1": {
+   "id": "f5.s3.b1",
+   "url": "/voix/eleven/f5.s3.b1.mp3",
+   "source": "eleven",
+   "empreinte": "090b70097f55",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b2": {
+   "id": "f5.s3.b2",
+   "url": "/voix/eleven/f5.s3.b2.mp3",
+   "source": "eleven",
+   "empreinte": "dfa209bb384c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b3": {
+   "id": "f5.s3.b3",
+   "url": "/voix/eleven/f5.s3.b3.mp3",
+   "source": "eleven",
+   "empreinte": "950a7a60d354",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b4": {
+   "id": "f5.s3.b4",
+   "url": "/voix/eleven/f5.s3.b4.mp3",
+   "source": "eleven",
+   "empreinte": "df2bc5b53fbf",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b5": {
+   "id": "f5.s3.b5",
+   "url": "/voix/eleven/f5.s3.b5.mp3",
+   "source": "eleven",
+   "empreinte": "b292c59de6dd",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b6": {
+   "id": "f5.s3.b6",
+   "url": "/voix/eleven/f5.s3.b6.mp3",
+   "source": "eleven",
+   "empreinte": "462b55ad8cbd",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.s3.b7": {
+   "id": "f5.s3.b7",
+   "url": "/voix/eleven/f5.s3.b7.mp3",
+   "source": "eleven",
+   "empreinte": "57f0dad26b31",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.r0": {
+   "id": "f5.r0",
+   "url": "/voix/eleven/f5.r0.mp3",
+   "source": "eleven",
+   "empreinte": "5000209d5f3a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.r1": {
+   "id": "f5.r1",
+   "url": "/voix/eleven/f5.r1.mp3",
+   "source": "eleven",
+   "empreinte": "8265e2702c1d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.r2": {
+   "id": "f5.r2",
+   "url": "/voix/eleven/f5.r2.mp3",
+   "source": "eleven",
+   "empreinte": "fca4009d29b1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.r3": {
+   "id": "f5.r3",
+   "url": "/voix/eleven/f5.r3.mp3",
+   "source": "eleven",
+   "empreinte": "695ea9669d6a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.q0": {
+   "id": "f5.q0",
+   "url": "/voix/eleven/f5.q0.mp3",
+   "source": "eleven",
+   "empreinte": "f854b00920e8",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.q1": {
+   "id": "f5.q1",
+   "url": "/voix/eleven/f5.q1.mp3",
+   "source": "eleven",
+   "empreinte": "6e5c1878d812",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.q2": {
+   "id": "f5.q2",
+   "url": "/voix/eleven/f5.q2.mp3",
+   "source": "eleven",
+   "empreinte": "6f368b2373b1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.q3": {
+   "id": "f5.q3",
+   "url": "/voix/eleven/f5.q3.mp3",
+   "source": "eleven",
+   "empreinte": "4d09f3342848",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.q4": {
+   "id": "f5.q4",
+   "url": "/voix/eleven/f5.q4.mp3",
+   "source": "eleven",
+   "empreinte": "f37627b5f0d9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f5.q5": {
+   "id": "f5.q5",
+   "url": "/voix/eleven/f5.q5.mp3",
+   "source": "eleven",
+   "empreinte": "66aa9c7da0f7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.seuil": {
+   "id": "f6.seuil",
+   "url": "/voix/eleven/f6.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "1c68246f478f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s0.b0": {
+   "id": "f6.s0.b0",
+   "url": "/voix/eleven/f6.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "14645265a986",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s1": {
+   "id": "f6.s1",
+   "url": "/voix/eleven/f6.s1.mp3",
+   "source": "eleven",
+   "empreinte": "4713ef69466e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s1.b0": {
+   "id": "f6.s1.b0",
+   "url": "/voix/eleven/f6.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "bcedb95136ee",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s1.b1": {
+   "id": "f6.s1.b1",
+   "url": "/voix/eleven/f6.s1.b1.mp3",
+   "source": "eleven",
+   "empreinte": "c709d9aad11c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s1.b2": {
+   "id": "f6.s1.b2",
+   "url": "/voix/eleven/f6.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "9144f342bb7d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s1.b3": {
+   "id": "f6.s1.b3",
+   "url": "/voix/eleven/f6.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "baf5f6921ff0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s1.b5": {
+   "id": "f6.s1.b5",
+   "url": "/voix/eleven/f6.s1.b5.mp3",
+   "source": "eleven",
+   "empreinte": "b0879ee30505",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s1.b6": {
+   "id": "f6.s1.b6",
+   "url": "/voix/eleven/f6.s1.b6.mp3",
+   "source": "eleven",
+   "empreinte": "477acaf96ee3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2": {
+   "id": "f6.s2",
+   "url": "/voix/eleven/f6.s2.mp3",
+   "source": "eleven",
+   "empreinte": "282888b43987",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b0": {
+   "id": "f6.s2.b0",
+   "url": "/voix/eleven/f6.s2.b0.mp3",
+   "source": "eleven",
+   "empreinte": "ce3e6bbb067e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b1": {
+   "id": "f6.s2.b1",
+   "url": "/voix/eleven/f6.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "e27fd5bca553",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b2": {
+   "id": "f6.s2.b2",
+   "url": "/voix/eleven/f6.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "2c273db149f7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b3": {
+   "id": "f6.s2.b3",
+   "url": "/voix/eleven/f6.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "677b554077aa",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b4": {
+   "id": "f6.s2.b4",
+   "url": "/voix/eleven/f6.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "2165fc497d85",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b5": {
+   "id": "f6.s2.b5",
+   "url": "/voix/eleven/f6.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "c1a55ebd63e3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b6": {
+   "id": "f6.s2.b6",
+   "url": "/voix/eleven/f6.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "8fe32642f413",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b7": {
+   "id": "f6.s2.b7",
+   "url": "/voix/eleven/f6.s2.b7.mp3",
+   "source": "eleven",
+   "empreinte": "128fb99ac200",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s2.b8": {
+   "id": "f6.s2.b8",
+   "url": "/voix/eleven/f6.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "e8bd127efdb1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3": {
+   "id": "f6.s3",
+   "url": "/voix/eleven/f6.s3.mp3",
+   "source": "eleven",
+   "empreinte": "970b781802a6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3.b1": {
+   "id": "f6.s3.b1",
+   "url": "/voix/eleven/f6.s3.b1.mp3",
+   "source": "eleven",
+   "empreinte": "516f40518389",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3.b2": {
+   "id": "f6.s3.b2",
+   "url": "/voix/eleven/f6.s3.b2.mp3",
+   "source": "eleven",
+   "empreinte": "f3bfc6573ab5",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3.b3": {
+   "id": "f6.s3.b3",
+   "url": "/voix/eleven/f6.s3.b3.mp3",
+   "source": "eleven",
+   "empreinte": "e585301479f5",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3.b5": {
+   "id": "f6.s3.b5",
+   "url": "/voix/eleven/f6.s3.b5.mp3",
+   "source": "eleven",
+   "empreinte": "48eb3990484c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3.b6": {
+   "id": "f6.s3.b6",
+   "url": "/voix/eleven/f6.s3.b6.mp3",
+   "source": "eleven",
+   "empreinte": "4075dd94e775",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3.b7": {
+   "id": "f6.s3.b7",
+   "url": "/voix/eleven/f6.s3.b7.mp3",
+   "source": "eleven",
+   "empreinte": "961f972fb601",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s3.b9": {
+   "id": "f6.s3.b9",
+   "url": "/voix/eleven/f6.s3.b9.mp3",
+   "source": "eleven",
+   "empreinte": "0af81cc1a4ff",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4": {
+   "id": "f6.s4",
+   "url": "/voix/eleven/f6.s4.mp3",
+   "source": "eleven",
+   "empreinte": "accd271057bf",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b0": {
+   "id": "f6.s4.b0",
+   "url": "/voix/eleven/f6.s4.b0.mp3",
+   "source": "eleven",
+   "empreinte": "e86708613361",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b1": {
+   "id": "f6.s4.b1",
+   "url": "/voix/eleven/f6.s4.b1.mp3",
+   "source": "eleven",
+   "empreinte": "4f6f4f98c4bc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b2": {
+   "id": "f6.s4.b2",
+   "url": "/voix/eleven/f6.s4.b2.mp3",
+   "source": "eleven",
+   "empreinte": "b3cb16750483",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b3": {
+   "id": "f6.s4.b3",
+   "url": "/voix/eleven/f6.s4.b3.mp3",
+   "source": "eleven",
+   "empreinte": "968043e60c46",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b4": {
+   "id": "f6.s4.b4",
+   "url": "/voix/eleven/f6.s4.b4.mp3",
+   "source": "eleven",
+   "empreinte": "b45adc602e1b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b5": {
+   "id": "f6.s4.b5",
+   "url": "/voix/eleven/f6.s4.b5.mp3",
+   "source": "eleven",
+   "empreinte": "2140d5038fec",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b6": {
+   "id": "f6.s4.b6",
+   "url": "/voix/eleven/f6.s4.b6.mp3",
+   "source": "eleven",
+   "empreinte": "4ffdb6767739",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b7": {
+   "id": "f6.s4.b7",
+   "url": "/voix/eleven/f6.s4.b7.mp3",
+   "source": "eleven",
+   "empreinte": "7cfdeb288abc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b8": {
+   "id": "f6.s4.b8",
+   "url": "/voix/eleven/f6.s4.b8.mp3",
+   "source": "eleven",
+   "empreinte": "454385d80f66",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b9": {
+   "id": "f6.s4.b9",
+   "url": "/voix/eleven/f6.s4.b9.mp3",
+   "source": "eleven",
+   "empreinte": "3080f8469653",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b10": {
+   "id": "f6.s4.b10",
+   "url": "/voix/eleven/f6.s4.b10.mp3",
+   "source": "eleven",
+   "empreinte": "bf46cd77a44d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b11": {
+   "id": "f6.s4.b11",
+   "url": "/voix/eleven/f6.s4.b11.mp3",
+   "source": "eleven",
+   "empreinte": "af19208d5e81",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b12": {
+   "id": "f6.s4.b12",
+   "url": "/voix/eleven/f6.s4.b12.mp3",
+   "source": "eleven",
+   "empreinte": "3dcb93896845",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b13": {
+   "id": "f6.s4.b13",
+   "url": "/voix/eleven/f6.s4.b13.mp3",
+   "source": "eleven",
+   "empreinte": "3d99e66d8502",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b14": {
+   "id": "f6.s4.b14",
+   "url": "/voix/eleven/f6.s4.b14.mp3",
+   "source": "eleven",
+   "empreinte": "179425208f55",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b15": {
+   "id": "f6.s4.b15",
+   "url": "/voix/eleven/f6.s4.b15.mp3",
+   "source": "eleven",
+   "empreinte": "31cd6beb4d92",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b16": {
+   "id": "f6.s4.b16",
+   "url": "/voix/eleven/f6.s4.b16.mp3",
+   "source": "eleven",
+   "empreinte": "77f0d127da71",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b17": {
+   "id": "f6.s4.b17",
+   "url": "/voix/eleven/f6.s4.b17.mp3",
+   "source": "eleven",
+   "empreinte": "8ca94899da1b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b18": {
+   "id": "f6.s4.b18",
+   "url": "/voix/eleven/f6.s4.b18.mp3",
+   "source": "eleven",
+   "empreinte": "c6cb5f84fa33",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b19": {
+   "id": "f6.s4.b19",
+   "url": "/voix/eleven/f6.s4.b19.mp3",
+   "source": "eleven",
+   "empreinte": "9100140afa7d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.s4.b20": {
+   "id": "f6.s4.b20",
+   "url": "/voix/eleven/f6.s4.b20.mp3",
+   "source": "eleven",
+   "empreinte": "f191d5624726",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.r0": {
+   "id": "f6.r0",
+   "url": "/voix/eleven/f6.r0.mp3",
+   "source": "eleven",
+   "empreinte": "10589322913c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.r1": {
+   "id": "f6.r1",
+   "url": "/voix/eleven/f6.r1.mp3",
+   "source": "eleven",
+   "empreinte": "768378dbd279",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.r2": {
+   "id": "f6.r2",
+   "url": "/voix/eleven/f6.r2.mp3",
+   "source": "eleven",
+   "empreinte": "d3d25648a70b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.r3": {
+   "id": "f6.r3",
+   "url": "/voix/eleven/f6.r3.mp3",
+   "source": "eleven",
+   "empreinte": "6beef6b62c9b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.q0": {
+   "id": "f6.q0",
+   "url": "/voix/eleven/f6.q0.mp3",
+   "source": "eleven",
+   "empreinte": "9c7a5f04c471",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.q1": {
+   "id": "f6.q1",
+   "url": "/voix/eleven/f6.q1.mp3",
+   "source": "eleven",
+   "empreinte": "691d29c98108",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.q2": {
+   "id": "f6.q2",
+   "url": "/voix/eleven/f6.q2.mp3",
+   "source": "eleven",
+   "empreinte": "fc5c2ffd1c10",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.q3": {
+   "id": "f6.q3",
+   "url": "/voix/eleven/f6.q3.mp3",
+   "source": "eleven",
+   "empreinte": "3a494b938bb8",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f6.q4": {
+   "id": "f6.q4",
+   "url": "/voix/eleven/f6.q4.mp3",
+   "source": "eleven",
+   "empreinte": "04dee14f950a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.seuil": {
+   "id": "f7.seuil",
+   "url": "/voix/eleven/f7.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "1ec79dc5acb3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s0.b0": {
+   "id": "f7.s0.b0",
+   "url": "/voix/eleven/f7.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "92d8bc2a1d7d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s1": {
+   "id": "f7.s1",
+   "url": "/voix/eleven/f7.s1.mp3",
+   "source": "eleven",
+   "empreinte": "f60767156753",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s1.b0": {
+   "id": "f7.s1.b0",
+   "url": "/voix/eleven/f7.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "09ff5020782f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s1.b1": {
+   "id": "f7.s1.b1",
+   "url": "/voix/eleven/f7.s1.b1.mp3",
+   "source": "eleven",
+   "empreinte": "240a7564265b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s1.b2": {
+   "id": "f7.s1.b2",
+   "url": "/voix/eleven/f7.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "42636a11bba2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2": {
+   "id": "f7.s2",
+   "url": "/voix/eleven/f7.s2.mp3",
+   "source": "eleven",
+   "empreinte": "5f0f31a7ee0d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2.b0": {
+   "id": "f7.s2.b0",
+   "url": "/voix/eleven/f7.s2.b0.mp3",
+   "source": "eleven",
+   "empreinte": "d381f11fa02c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2.b1": {
+   "id": "f7.s2.b1",
+   "url": "/voix/eleven/f7.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "aaffd527d4da",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2.b2": {
+   "id": "f7.s2.b2",
+   "url": "/voix/eleven/f7.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "39475165bd8d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2.b3": {
+   "id": "f7.s2.b3",
+   "url": "/voix/eleven/f7.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "7a851d30db98",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2.b4": {
+   "id": "f7.s2.b4",
+   "url": "/voix/eleven/f7.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "b2f13bdca861",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2.b5": {
+   "id": "f7.s2.b5",
+   "url": "/voix/eleven/f7.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "0b3176b6089a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s2.b6": {
+   "id": "f7.s2.b6",
+   "url": "/voix/eleven/f7.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "a4b65bd542ce",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3": {
+   "id": "f7.s3",
+   "url": "/voix/eleven/f7.s3.mp3",
+   "source": "eleven",
+   "empreinte": "85c42253ae1a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b0": {
+   "id": "f7.s3.b0",
+   "url": "/voix/eleven/f7.s3.b0.mp3",
+   "source": "eleven",
+   "empreinte": "6236cf5e4cf1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b2": {
+   "id": "f7.s3.b2",
+   "url": "/voix/eleven/f7.s3.b2.mp3",
+   "source": "eleven",
+   "empreinte": "ab616371c3e2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b3": {
+   "id": "f7.s3.b3",
+   "url": "/voix/eleven/f7.s3.b3.mp3",
+   "source": "eleven",
+   "empreinte": "aaf03a931784",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b4": {
+   "id": "f7.s3.b4",
+   "url": "/voix/eleven/f7.s3.b4.mp3",
+   "source": "eleven",
+   "empreinte": "72e4fc493284",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b5": {
+   "id": "f7.s3.b5",
+   "url": "/voix/eleven/f7.s3.b5.mp3",
+   "source": "eleven",
+   "empreinte": "342c2330bf5f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b6": {
+   "id": "f7.s3.b6",
+   "url": "/voix/eleven/f7.s3.b6.mp3",
+   "source": "eleven",
+   "empreinte": "52735935fe29",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b7": {
+   "id": "f7.s3.b7",
+   "url": "/voix/eleven/f7.s3.b7.mp3",
+   "source": "eleven",
+   "empreinte": "96e389c61f9a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b8": {
+   "id": "f7.s3.b8",
+   "url": "/voix/eleven/f7.s3.b8.mp3",
+   "source": "eleven",
+   "empreinte": "7379a1643082",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b10": {
+   "id": "f7.s3.b10",
+   "url": "/voix/eleven/f7.s3.b10.mp3",
+   "source": "eleven",
+   "empreinte": "bee12c202bfe",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b12": {
+   "id": "f7.s3.b12",
+   "url": "/voix/eleven/f7.s3.b12.mp3",
+   "source": "eleven",
+   "empreinte": "ef7e65d452c4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b13": {
+   "id": "f7.s3.b13",
+   "url": "/voix/eleven/f7.s3.b13.mp3",
+   "source": "eleven",
+   "empreinte": "954000d0881f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s3.b14": {
+   "id": "f7.s3.b14",
+   "url": "/voix/eleven/f7.s3.b14.mp3",
+   "source": "eleven",
+   "empreinte": "24a055a0f5b4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4": {
+   "id": "f7.s4",
+   "url": "/voix/eleven/f7.s4.mp3",
+   "source": "eleven",
+   "empreinte": "fd0a50ed5844",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b0": {
+   "id": "f7.s4.b0",
+   "url": "/voix/eleven/f7.s4.b0.mp3",
+   "source": "eleven",
+   "empreinte": "bd3342982e80",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b2": {
+   "id": "f7.s4.b2",
+   "url": "/voix/eleven/f7.s4.b2.mp3",
+   "source": "eleven",
+   "empreinte": "1f3fcd1dac22",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b3": {
+   "id": "f7.s4.b3",
+   "url": "/voix/eleven/f7.s4.b3.mp3",
+   "source": "eleven",
+   "empreinte": "0f6a73eb7ebd",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b4": {
+   "id": "f7.s4.b4",
+   "url": "/voix/eleven/f7.s4.b4.mp3",
+   "source": "eleven",
+   "empreinte": "bb372aab502a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b5": {
+   "id": "f7.s4.b5",
+   "url": "/voix/eleven/f7.s4.b5.mp3",
+   "source": "eleven",
+   "empreinte": "bbe31d44135c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b6": {
+   "id": "f7.s4.b6",
+   "url": "/voix/eleven/f7.s4.b6.mp3",
+   "source": "eleven",
+   "empreinte": "6abe6cc8fe86",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b7": {
+   "id": "f7.s4.b7",
+   "url": "/voix/eleven/f7.s4.b7.mp3",
+   "source": "eleven",
+   "empreinte": "d18f4863ddc1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b9": {
+   "id": "f7.s4.b9",
+   "url": "/voix/eleven/f7.s4.b9.mp3",
+   "source": "eleven",
+   "empreinte": "f7136deaeb37",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b10": {
+   "id": "f7.s4.b10",
+   "url": "/voix/eleven/f7.s4.b10.mp3",
+   "source": "eleven",
+   "empreinte": "bb11099047a7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b11": {
+   "id": "f7.s4.b11",
+   "url": "/voix/eleven/f7.s4.b11.mp3",
+   "source": "eleven",
+   "empreinte": "3e02e5c3038d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b12": {
+   "id": "f7.s4.b12",
+   "url": "/voix/eleven/f7.s4.b12.mp3",
+   "source": "eleven",
+   "empreinte": "97c5b8923f17",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b13": {
+   "id": "f7.s4.b13",
+   "url": "/voix/eleven/f7.s4.b13.mp3",
+   "source": "eleven",
+   "empreinte": "9c669f47e4de",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b14": {
+   "id": "f7.s4.b14",
+   "url": "/voix/eleven/f7.s4.b14.mp3",
+   "source": "eleven",
+   "empreinte": "a0bc7ea77430",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.s4.b15": {
+   "id": "f7.s4.b15",
+   "url": "/voix/eleven/f7.s4.b15.mp3",
+   "source": "eleven",
+   "empreinte": "505e15b9377d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.r0": {
+   "id": "f7.r0",
+   "url": "/voix/eleven/f7.r0.mp3",
+   "source": "eleven",
+   "empreinte": "8cbca12e83ef",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.r1": {
+   "id": "f7.r1",
+   "url": "/voix/eleven/f7.r1.mp3",
+   "source": "eleven",
+   "empreinte": "c418fa3e73fa",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.r2": {
+   "id": "f7.r2",
+   "url": "/voix/eleven/f7.r2.mp3",
+   "source": "eleven",
+   "empreinte": "435fb734ded3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.r3": {
+   "id": "f7.r3",
+   "url": "/voix/eleven/f7.r3.mp3",
+   "source": "eleven",
+   "empreinte": "f62576ad753f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q0": {
+   "id": "f7.q0",
+   "url": "/voix/eleven/f7.q0.mp3",
+   "source": "eleven",
+   "empreinte": "ce4319b74eff",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q1": {
+   "id": "f7.q1",
+   "url": "/voix/eleven/f7.q1.mp3",
+   "source": "eleven",
+   "empreinte": "b0ba19aa6456",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q2": {
+   "id": "f7.q2",
+   "url": "/voix/eleven/f7.q2.mp3",
+   "source": "eleven",
+   "empreinte": "46e6e9a676f5",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q3": {
+   "id": "f7.q3",
+   "url": "/voix/eleven/f7.q3.mp3",
+   "source": "eleven",
+   "empreinte": "112fb1737339",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q4": {
+   "id": "f7.q4",
+   "url": "/voix/eleven/f7.q4.mp3",
+   "source": "eleven",
+   "empreinte": "0b085eb3d7ba",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q5": {
+   "id": "f7.q5",
+   "url": "/voix/eleven/f7.q5.mp3",
+   "source": "eleven",
+   "empreinte": "6c7488747a18",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q6": {
+   "id": "f7.q6",
+   "url": "/voix/eleven/f7.q6.mp3",
+   "source": "eleven",
+   "empreinte": "467529040b36",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q7": {
+   "id": "f7.q7",
+   "url": "/voix/eleven/f7.q7.mp3",
+   "source": "eleven",
+   "empreinte": "4839746e0830",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q8": {
+   "id": "f7.q8",
+   "url": "/voix/eleven/f7.q8.mp3",
+   "source": "eleven",
+   "empreinte": "92314e53654f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q9": {
+   "id": "f7.q9",
+   "url": "/voix/eleven/f7.q9.mp3",
+   "source": "eleven",
+   "empreinte": "3510e6facb94",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q10": {
+   "id": "f7.q10",
+   "url": "/voix/eleven/f7.q10.mp3",
+   "source": "eleven",
+   "empreinte": "24d3e30194a5",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q11": {
+   "id": "f7.q11",
+   "url": "/voix/eleven/f7.q11.mp3",
+   "source": "eleven",
+   "empreinte": "a56cd186992c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q12": {
+   "id": "f7.q12",
+   "url": "/voix/eleven/f7.q12.mp3",
+   "source": "eleven",
+   "empreinte": "e525716bd8c9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q13": {
+   "id": "f7.q13",
+   "url": "/voix/eleven/f7.q13.mp3",
+   "source": "eleven",
+   "empreinte": "1d882ae78770",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f7.q14": {
+   "id": "f7.q14",
+   "url": "/voix/eleven/f7.q14.mp3",
+   "source": "eleven",
+   "empreinte": "5ef7927f4e4a",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.seuil": {
+   "id": "f8.seuil",
+   "url": "/voix/eleven/f8.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "b6ceb508ef22",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s0.b0": {
+   "id": "f8.s0.b0",
+   "url": "/voix/eleven/f8.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "100047bb4479",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1": {
+   "id": "f8.s1",
+   "url": "/voix/eleven/f8.s1.mp3",
+   "source": "eleven",
+   "empreinte": "a1dd0a2dd37e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b0": {
+   "id": "f8.s1.b0",
+   "url": "/voix/eleven/f8.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "481f46b230b9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b2": {
+   "id": "f8.s1.b2",
+   "url": "/voix/eleven/f8.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "a74c913cc565",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b3": {
+   "id": "f8.s1.b3",
+   "url": "/voix/eleven/f8.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "5b3e91a0ee9c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b4": {
+   "id": "f8.s1.b4",
+   "url": "/voix/eleven/f8.s1.b4.mp3",
+   "source": "eleven",
+   "empreinte": "975f270e57c5",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b6": {
+   "id": "f8.s1.b6",
+   "url": "/voix/eleven/f8.s1.b6.mp3",
+   "source": "eleven",
+   "empreinte": "1dfd61d909f6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b7": {
+   "id": "f8.s1.b7",
+   "url": "/voix/eleven/f8.s1.b7.mp3",
+   "source": "eleven",
+   "empreinte": "cc7b7e74aa50",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b8": {
+   "id": "f8.s1.b8",
+   "url": "/voix/eleven/f8.s1.b8.mp3",
+   "source": "eleven",
+   "empreinte": "677e2e06d696",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b9": {
+   "id": "f8.s1.b9",
+   "url": "/voix/eleven/f8.s1.b9.mp3",
+   "source": "eleven",
+   "empreinte": "db78e3d05b13",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b11": {
+   "id": "f8.s1.b11",
+   "url": "/voix/eleven/f8.s1.b11.mp3",
+   "source": "eleven",
+   "empreinte": "d2188151fedd",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b12": {
+   "id": "f8.s1.b12",
+   "url": "/voix/eleven/f8.s1.b12.mp3",
+   "source": "eleven",
+   "empreinte": "8ac5d6a37ec7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b14": {
+   "id": "f8.s1.b14",
+   "url": "/voix/eleven/f8.s1.b14.mp3",
+   "source": "eleven",
+   "empreinte": "b4e750ce31f9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b15": {
+   "id": "f8.s1.b15",
+   "url": "/voix/eleven/f8.s1.b15.mp3",
+   "source": "eleven",
+   "empreinte": "6e2fa052b022",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b16": {
+   "id": "f8.s1.b16",
+   "url": "/voix/eleven/f8.s1.b16.mp3",
+   "source": "eleven",
+   "empreinte": "e50bc190b80f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b17": {
+   "id": "f8.s1.b17",
+   "url": "/voix/eleven/f8.s1.b17.mp3",
+   "source": "eleven",
+   "empreinte": "5abf1c2ed74e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s1.b18": {
+   "id": "f8.s1.b18",
+   "url": "/voix/eleven/f8.s1.b18.mp3",
+   "source": "eleven",
+   "empreinte": "5cddb9117d63",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2": {
+   "id": "f8.s2",
+   "url": "/voix/eleven/f8.s2.mp3",
+   "source": "eleven",
+   "empreinte": "6ac0f84d3fe6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b0": {
+   "id": "f8.s2.b0",
+   "url": "/voix/eleven/f8.s2.b0.mp3",
+   "source": "eleven",
+   "empreinte": "c3a9bbc56d5d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b1": {
+   "id": "f8.s2.b1",
+   "url": "/voix/eleven/f8.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "7c2cbb8d97a9",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b2": {
+   "id": "f8.s2.b2",
+   "url": "/voix/eleven/f8.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "bc052e9f6322",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b3": {
+   "id": "f8.s2.b3",
+   "url": "/voix/eleven/f8.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "bc2bcb80596b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b4": {
+   "id": "f8.s2.b4",
+   "url": "/voix/eleven/f8.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "313a02e7d3d1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b5": {
+   "id": "f8.s2.b5",
+   "url": "/voix/eleven/f8.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "33d6c04655df",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b6": {
+   "id": "f8.s2.b6",
+   "url": "/voix/eleven/f8.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "2df98d8bca38",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b7": {
+   "id": "f8.s2.b7",
+   "url": "/voix/eleven/f8.s2.b7.mp3",
+   "source": "eleven",
+   "empreinte": "4321e46fee2d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b8": {
+   "id": "f8.s2.b8",
+   "url": "/voix/eleven/f8.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "3aa8290e0095",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b9": {
+   "id": "f8.s2.b9",
+   "url": "/voix/eleven/f8.s2.b9.mp3",
+   "source": "eleven",
+   "empreinte": "28f1838042e3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b10": {
+   "id": "f8.s2.b10",
+   "url": "/voix/eleven/f8.s2.b10.mp3",
+   "source": "eleven",
+   "empreinte": "6b50727279e6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.s2.b11": {
+   "id": "f8.s2.b11",
+   "url": "/voix/eleven/f8.s2.b11.mp3",
+   "source": "eleven",
+   "empreinte": "92eb511f377e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.r0": {
+   "id": "f8.r0",
+   "url": "/voix/eleven/f8.r0.mp3",
+   "source": "eleven",
+   "empreinte": "a301a1c87925",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.r1": {
+   "id": "f8.r1",
+   "url": "/voix/eleven/f8.r1.mp3",
+   "source": "eleven",
+   "empreinte": "b274f8ac955c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.r2": {
+   "id": "f8.r2",
+   "url": "/voix/eleven/f8.r2.mp3",
+   "source": "eleven",
+   "empreinte": "7b8090500769",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.r3": {
+   "id": "f8.r3",
+   "url": "/voix/eleven/f8.r3.mp3",
+   "source": "eleven",
+   "empreinte": "27af54347a02",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.r4": {
+   "id": "f8.r4",
+   "url": "/voix/eleven/f8.r4.mp3",
+   "source": "eleven",
+   "empreinte": "ef94e35436c3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.q0": {
+   "id": "f8.q0",
+   "url": "/voix/eleven/f8.q0.mp3",
+   "source": "eleven",
+   "empreinte": "6deac1cbd3ea",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.q1": {
+   "id": "f8.q1",
+   "url": "/voix/eleven/f8.q1.mp3",
+   "source": "eleven",
+   "empreinte": "136c6eaaac60",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.q2": {
+   "id": "f8.q2",
+   "url": "/voix/eleven/f8.q2.mp3",
+   "source": "eleven",
+   "empreinte": "4759eaa1ef88",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.q3": {
+   "id": "f8.q3",
+   "url": "/voix/eleven/f8.q3.mp3",
+   "source": "eleven",
+   "empreinte": "4cb6b7e04731",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.q4": {
+   "id": "f8.q4",
+   "url": "/voix/eleven/f8.q4.mp3",
+   "source": "eleven",
+   "empreinte": "8e43840213d6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f8.q5": {
+   "id": "f8.q5",
+   "url": "/voix/eleven/f8.q5.mp3",
+   "source": "eleven",
+   "empreinte": "28ff9e50b401",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.seuil": {
+   "id": "f9.seuil",
+   "url": "/voix/eleven/f9.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "fd0809297636",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s0.b0": {
+   "id": "f9.s0.b0",
+   "url": "/voix/eleven/f9.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "62c967ba3727",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s0.b1": {
+   "id": "f9.s0.b1",
+   "url": "/voix/eleven/f9.s0.b1.mp3",
+   "source": "eleven",
+   "empreinte": "840ecd9eb299",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s0.b2": {
+   "id": "f9.s0.b2",
+   "url": "/voix/eleven/f9.s0.b2.mp3",
+   "source": "eleven",
+   "empreinte": "ef610a1abad0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s0.b3": {
+   "id": "f9.s0.b3",
+   "url": "/voix/eleven/f9.s0.b3.mp3",
+   "source": "eleven",
+   "empreinte": "f5ffbf0be4f0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s0.b4": {
+   "id": "f9.s0.b4",
+   "url": "/voix/eleven/f9.s0.b4.mp3",
+   "source": "eleven",
+   "empreinte": "1a5fd681baad",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s0.b5": {
+   "id": "f9.s0.b5",
+   "url": "/voix/eleven/f9.s0.b5.mp3",
+   "source": "eleven",
+   "empreinte": "16b73051e0ba",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s1": {
+   "id": "f9.s1",
+   "url": "/voix/eleven/f9.s1.mp3",
+   "source": "eleven",
+   "empreinte": "08cd6df479bb",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s1.b0": {
+   "id": "f9.s1.b0",
+   "url": "/voix/eleven/f9.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "85c447a41a23",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s1.b1": {
+   "id": "f9.s1.b1",
+   "url": "/voix/eleven/f9.s1.b1.mp3",
+   "source": "eleven",
+   "empreinte": "144741a4ba2c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s1.b2": {
+   "id": "f9.s1.b2",
+   "url": "/voix/eleven/f9.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "cd177d1b2601",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s1.b3": {
+   "id": "f9.s1.b3",
+   "url": "/voix/eleven/f9.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "66a8a9eedf82",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2": {
+   "id": "f9.s2",
+   "url": "/voix/eleven/f9.s2.mp3",
+   "source": "eleven",
+   "empreinte": "8a10fe6b68d1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b0": {
+   "id": "f9.s2.b0",
+   "url": "/voix/eleven/f9.s2.b0.mp3",
+   "source": "eleven",
+   "empreinte": "d9f7f10e5b8d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b2": {
+   "id": "f9.s2.b2",
+   "url": "/voix/eleven/f9.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "949e928616f6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b3": {
+   "id": "f9.s2.b3",
+   "url": "/voix/eleven/f9.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "5993a50eaa95",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b4": {
+   "id": "f9.s2.b4",
+   "url": "/voix/eleven/f9.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "92edbbb1bde6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b5": {
+   "id": "f9.s2.b5",
+   "url": "/voix/eleven/f9.s2.b5.mp3",
+   "source": "eleven",
+   "empreinte": "1502a7d6ee09",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b6": {
+   "id": "f9.s2.b6",
+   "url": "/voix/eleven/f9.s2.b6.mp3",
+   "source": "eleven",
+   "empreinte": "1f4bda8d1f04",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b7": {
+   "id": "f9.s2.b7",
+   "url": "/voix/eleven/f9.s2.b7.mp3",
+   "source": "eleven",
+   "empreinte": "8f0c715503a1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b8": {
+   "id": "f9.s2.b8",
+   "url": "/voix/eleven/f9.s2.b8.mp3",
+   "source": "eleven",
+   "empreinte": "1d690a9bce03",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b9": {
+   "id": "f9.s2.b9",
+   "url": "/voix/eleven/f9.s2.b9.mp3",
+   "source": "eleven",
+   "empreinte": "253797c07e75",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s2.b10": {
+   "id": "f9.s2.b10",
+   "url": "/voix/eleven/f9.s2.b10.mp3",
+   "source": "eleven",
+   "empreinte": "b512ca5c4a82",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3": {
+   "id": "f9.s3",
+   "url": "/voix/eleven/f9.s3.mp3",
+   "source": "eleven",
+   "empreinte": "44fb31f044bf",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b0": {
+   "id": "f9.s3.b0",
+   "url": "/voix/eleven/f9.s3.b0.mp3",
+   "source": "eleven",
+   "empreinte": "6a3de24acfe6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b1": {
+   "id": "f9.s3.b1",
+   "url": "/voix/eleven/f9.s3.b1.mp3",
+   "source": "eleven",
+   "empreinte": "c75b1515a6d5",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b2": {
+   "id": "f9.s3.b2",
+   "url": "/voix/eleven/f9.s3.b2.mp3",
+   "source": "eleven",
+   "empreinte": "bb8681fe85db",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b4": {
+   "id": "f9.s3.b4",
+   "url": "/voix/eleven/f9.s3.b4.mp3",
+   "source": "eleven",
+   "empreinte": "d2abb9d93e27",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b5": {
+   "id": "f9.s3.b5",
+   "url": "/voix/eleven/f9.s3.b5.mp3",
+   "source": "eleven",
+   "empreinte": "3aa39b5c1335",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b6": {
+   "id": "f9.s3.b6",
+   "url": "/voix/eleven/f9.s3.b6.mp3",
+   "source": "eleven",
+   "empreinte": "facf9d4ed5dc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b7": {
+   "id": "f9.s3.b7",
+   "url": "/voix/eleven/f9.s3.b7.mp3",
+   "source": "eleven",
+   "empreinte": "b7995c0511c1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b8": {
+   "id": "f9.s3.b8",
+   "url": "/voix/eleven/f9.s3.b8.mp3",
+   "source": "eleven",
+   "empreinte": "4fd9b948c800",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b9": {
+   "id": "f9.s3.b9",
+   "url": "/voix/eleven/f9.s3.b9.mp3",
+   "source": "eleven",
+   "empreinte": "14961815e72e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s3.b10": {
+   "id": "f9.s3.b10",
+   "url": "/voix/eleven/f9.s3.b10.mp3",
+   "source": "eleven",
+   "empreinte": "c8a32fab278f",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4": {
+   "id": "f9.s4",
+   "url": "/voix/eleven/f9.s4.mp3",
+   "source": "eleven",
+   "empreinte": "e69b79682306",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b0": {
+   "id": "f9.s4.b0",
+   "url": "/voix/eleven/f9.s4.b0.mp3",
+   "source": "eleven",
+   "empreinte": "f99cf60f56d0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b1": {
+   "id": "f9.s4.b1",
+   "url": "/voix/eleven/f9.s4.b1.mp3",
+   "source": "eleven",
+   "empreinte": "925c35c86ab8",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b2": {
+   "id": "f9.s4.b2",
+   "url": "/voix/eleven/f9.s4.b2.mp3",
+   "source": "eleven",
+   "empreinte": "19a2a6586e78",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b3": {
+   "id": "f9.s4.b3",
+   "url": "/voix/eleven/f9.s4.b3.mp3",
+   "source": "eleven",
+   "empreinte": "f508717affa6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b4": {
+   "id": "f9.s4.b4",
+   "url": "/voix/eleven/f9.s4.b4.mp3",
+   "source": "eleven",
+   "empreinte": "440a60d006ac",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b5": {
+   "id": "f9.s4.b5",
+   "url": "/voix/eleven/f9.s4.b5.mp3",
+   "source": "eleven",
+   "empreinte": "e559549ade94",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b6": {
+   "id": "f9.s4.b6",
+   "url": "/voix/eleven/f9.s4.b6.mp3",
+   "source": "eleven",
+   "empreinte": "a7acf606b5ab",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b7": {
+   "id": "f9.s4.b7",
+   "url": "/voix/eleven/f9.s4.b7.mp3",
+   "source": "eleven",
+   "empreinte": "2a690dce9910",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b8": {
+   "id": "f9.s4.b8",
+   "url": "/voix/eleven/f9.s4.b8.mp3",
+   "source": "eleven",
+   "empreinte": "8f762529358c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b9": {
+   "id": "f9.s4.b9",
+   "url": "/voix/eleven/f9.s4.b9.mp3",
+   "source": "eleven",
+   "empreinte": "6daf6d7fed7b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b10": {
+   "id": "f9.s4.b10",
+   "url": "/voix/eleven/f9.s4.b10.mp3",
+   "source": "eleven",
+   "empreinte": "98bbb0460332",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b11": {
+   "id": "f9.s4.b11",
+   "url": "/voix/eleven/f9.s4.b11.mp3",
+   "source": "eleven",
+   "empreinte": "db08e9719cb8",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b12": {
+   "id": "f9.s4.b12",
+   "url": "/voix/eleven/f9.s4.b12.mp3",
+   "source": "eleven",
+   "empreinte": "c45af6040f48",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b13": {
+   "id": "f9.s4.b13",
+   "url": "/voix/eleven/f9.s4.b13.mp3",
+   "source": "eleven",
+   "empreinte": "f83c15e40173",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b14": {
+   "id": "f9.s4.b14",
+   "url": "/voix/eleven/f9.s4.b14.mp3",
+   "source": "eleven",
+   "empreinte": "a755371699b7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b15": {
+   "id": "f9.s4.b15",
+   "url": "/voix/eleven/f9.s4.b15.mp3",
+   "source": "eleven",
+   "empreinte": "8eb2656819c8",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b16": {
+   "id": "f9.s4.b16",
+   "url": "/voix/eleven/f9.s4.b16.mp3",
+   "source": "eleven",
+   "empreinte": "32bfd0b24d91",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b17": {
+   "id": "f9.s4.b17",
+   "url": "/voix/eleven/f9.s4.b17.mp3",
+   "source": "eleven",
+   "empreinte": "49d71a4d3e24",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b18": {
+   "id": "f9.s4.b18",
+   "url": "/voix/eleven/f9.s4.b18.mp3",
+   "source": "eleven",
+   "empreinte": "759bfb3e8de6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b19": {
+   "id": "f9.s4.b19",
+   "url": "/voix/eleven/f9.s4.b19.mp3",
+   "source": "eleven",
+   "empreinte": "5a39443a1773",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.s4.b20": {
+   "id": "f9.s4.b20",
+   "url": "/voix/eleven/f9.s4.b20.mp3",
+   "source": "eleven",
+   "empreinte": "aa0637d5e3bc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.r0": {
+   "id": "f9.r0",
+   "url": "/voix/eleven/f9.r0.mp3",
+   "source": "eleven",
+   "empreinte": "61c13ce1de10",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.r1": {
+   "id": "f9.r1",
+   "url": "/voix/eleven/f9.r1.mp3",
+   "source": "eleven",
+   "empreinte": "453d66413573",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.r2": {
+   "id": "f9.r2",
+   "url": "/voix/eleven/f9.r2.mp3",
+   "source": "eleven",
+   "empreinte": "dcb522aa569b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.r3": {
+   "id": "f9.r3",
+   "url": "/voix/eleven/f9.r3.mp3",
+   "source": "eleven",
+   "empreinte": "423efbdda1bf",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.q0": {
+   "id": "f9.q0",
+   "url": "/voix/eleven/f9.q0.mp3",
+   "source": "eleven",
+   "empreinte": "b4ed22942767",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.q1": {
+   "id": "f9.q1",
+   "url": "/voix/eleven/f9.q1.mp3",
+   "source": "eleven",
+   "empreinte": "0326821aa14e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.q2": {
+   "id": "f9.q2",
+   "url": "/voix/eleven/f9.q2.mp3",
+   "source": "eleven",
+   "empreinte": "2911cb6d5a82",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.q3": {
+   "id": "f9.q3",
+   "url": "/voix/eleven/f9.q3.mp3",
+   "source": "eleven",
+   "empreinte": "7c1c8206699d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.q4": {
+   "id": "f9.q4",
+   "url": "/voix/eleven/f9.q4.mp3",
+   "source": "eleven",
+   "empreinte": "f93ab6ea0a34",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.q5": {
+   "id": "f9.q5",
+   "url": "/voix/eleven/f9.q5.mp3",
+   "source": "eleven",
+   "empreinte": "3ab185e2fa34",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f9.q6": {
+   "id": "f9.q6",
+   "url": "/voix/eleven/f9.q6.mp3",
+   "source": "eleven",
+   "empreinte": "364a2420b3a1",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.seuil": {
+   "id": "f10.seuil",
+   "url": "/voix/eleven/f10.seuil.mp3",
+   "source": "eleven",
+   "empreinte": "c2942ab87460",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0": {
+   "id": "f10.s0",
+   "url": "/voix/eleven/f10.s0.mp3",
+   "source": "eleven",
+   "empreinte": "402d0443132d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b0": {
+   "id": "f10.s0.b0",
+   "url": "/voix/eleven/f10.s0.b0.mp3",
+   "source": "eleven",
+   "empreinte": "90f20afb3499",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b1": {
+   "id": "f10.s0.b1",
+   "url": "/voix/eleven/f10.s0.b1.mp3",
+   "source": "eleven",
+   "empreinte": "77814211233b",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b2": {
+   "id": "f10.s0.b2",
+   "url": "/voix/eleven/f10.s0.b2.mp3",
+   "source": "eleven",
+   "empreinte": "04a5069173dc",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b3": {
+   "id": "f10.s0.b3",
+   "url": "/voix/eleven/f10.s0.b3.mp3",
+   "source": "eleven",
+   "empreinte": "eb0ca99d55fa",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b4": {
+   "id": "f10.s0.b4",
+   "url": "/voix/eleven/f10.s0.b4.mp3",
+   "source": "eleven",
+   "empreinte": "00a12764480c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b5": {
+   "id": "f10.s0.b5",
+   "url": "/voix/eleven/f10.s0.b5.mp3",
+   "source": "eleven",
+   "empreinte": "5c6912864664",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b6": {
+   "id": "f10.s0.b6",
+   "url": "/voix/eleven/f10.s0.b6.mp3",
+   "source": "eleven",
+   "empreinte": "b2b4204cbea2",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s0.b7": {
+   "id": "f10.s0.b7",
+   "url": "/voix/eleven/f10.s0.b7.mp3",
+   "source": "eleven",
+   "empreinte": "e3cb87c04648",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1": {
+   "id": "f10.s1",
+   "url": "/voix/eleven/f10.s1.mp3",
+   "source": "eleven",
+   "empreinte": "a370bddcdac0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b0": {
+   "id": "f10.s1.b0",
+   "url": "/voix/eleven/f10.s1.b0.mp3",
+   "source": "eleven",
+   "empreinte": "4d3387e14b4e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b2": {
+   "id": "f10.s1.b2",
+   "url": "/voix/eleven/f10.s1.b2.mp3",
+   "source": "eleven",
+   "empreinte": "376ee7eb03f0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b3": {
+   "id": "f10.s1.b3",
+   "url": "/voix/eleven/f10.s1.b3.mp3",
+   "source": "eleven",
+   "empreinte": "1cc1891d7ca3",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b4": {
+   "id": "f10.s1.b4",
+   "url": "/voix/eleven/f10.s1.b4.mp3",
+   "source": "eleven",
+   "empreinte": "395cb1575edb",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b5": {
+   "id": "f10.s1.b5",
+   "url": "/voix/eleven/f10.s1.b5.mp3",
+   "source": "eleven",
+   "empreinte": "e8224464a1a4",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b7": {
+   "id": "f10.s1.b7",
+   "url": "/voix/eleven/f10.s1.b7.mp3",
+   "source": "eleven",
+   "empreinte": "f56e96d3f3ad",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b8": {
+   "id": "f10.s1.b8",
+   "url": "/voix/eleven/f10.s1.b8.mp3",
+   "source": "eleven",
+   "empreinte": "34e071784864",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b9": {
+   "id": "f10.s1.b9",
+   "url": "/voix/eleven/f10.s1.b9.mp3",
+   "source": "eleven",
+   "empreinte": "e7b47123b7f0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b11": {
+   "id": "f10.s1.b11",
+   "url": "/voix/eleven/f10.s1.b11.mp3",
+   "source": "eleven",
+   "empreinte": "f744aca98baf",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b12": {
+   "id": "f10.s1.b12",
+   "url": "/voix/eleven/f10.s1.b12.mp3",
+   "source": "eleven",
+   "empreinte": "15581a7e15b6",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b14": {
+   "id": "f10.s1.b14",
+   "url": "/voix/eleven/f10.s1.b14.mp3",
+   "source": "eleven",
+   "empreinte": "25a450a6331d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b16": {
+   "id": "f10.s1.b16",
+   "url": "/voix/eleven/f10.s1.b16.mp3",
+   "source": "eleven",
+   "empreinte": "9eb38625104e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b18": {
+   "id": "f10.s1.b18",
+   "url": "/voix/eleven/f10.s1.b18.mp3",
+   "source": "eleven",
+   "empreinte": "4106d0961328",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s1.b20": {
+   "id": "f10.s1.b20",
+   "url": "/voix/eleven/f10.s1.b20.mp3",
+   "source": "eleven",
+   "empreinte": "8729d1fb341e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s2": {
+   "id": "f10.s2",
+   "url": "/voix/eleven/f10.s2.mp3",
+   "source": "eleven",
+   "empreinte": "a8ea0a4a374e",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s2.b0": {
+   "id": "f10.s2.b0",
+   "url": "/voix/eleven/f10.s2.b0.mp3",
+   "source": "eleven",
+   "empreinte": "b2f57597f2b0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s2.b1": {
+   "id": "f10.s2.b1",
+   "url": "/voix/eleven/f10.s2.b1.mp3",
+   "source": "eleven",
+   "empreinte": "9c2581c415e7",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s2.b2": {
+   "id": "f10.s2.b2",
+   "url": "/voix/eleven/f10.s2.b2.mp3",
+   "source": "eleven",
+   "empreinte": "928d349aa335",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s2.b3": {
+   "id": "f10.s2.b3",
+   "url": "/voix/eleven/f10.s2.b3.mp3",
+   "source": "eleven",
+   "empreinte": "54aa0c809534",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.s2.b4": {
+   "id": "f10.s2.b4",
+   "url": "/voix/eleven/f10.s2.b4.mp3",
+   "source": "eleven",
+   "empreinte": "43d25afbbf22",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.r0": {
+   "id": "f10.r0",
+   "url": "/voix/eleven/f10.r0.mp3",
+   "source": "eleven",
+   "empreinte": "65345f1877e0",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.r1": {
+   "id": "f10.r1",
+   "url": "/voix/eleven/f10.r1.mp3",
+   "source": "eleven",
+   "empreinte": "0343df963a06",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.r2": {
+   "id": "f10.r2",
+   "url": "/voix/eleven/f10.r2.mp3",
+   "source": "eleven",
+   "empreinte": "3e150863b96d",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.q0": {
+   "id": "f10.q0",
+   "url": "/voix/eleven/f10.q0.mp3",
+   "source": "eleven",
+   "empreinte": "196ac8b612eb",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.q1": {
+   "id": "f10.q1",
+   "url": "/voix/eleven/f10.q1.mp3",
+   "source": "eleven",
+   "empreinte": "2a3cdfbbcbec",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.q2": {
+   "id": "f10.q2",
+   "url": "/voix/eleven/f10.q2.mp3",
+   "source": "eleven",
+   "empreinte": "3e160361d3ac",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
+  },
+  "f10.q3": {
+   "id": "f10.q3",
+   "url": "/voix/eleven/f10.q3.mp3",
+   "source": "eleven",
+   "empreinte": "cc85d5c4dd4c",
+   "format": "mp3_44100_128",
+   "voix": "yG4Uc56cLYQyZFnWaYv2",
+   "modele": "eleven_multilingual_v2"
   }
  }
 }

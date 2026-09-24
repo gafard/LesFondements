@@ -23,7 +23,13 @@
  *   # Reconstruire le manifeste après avoir déposé des enregistrements
  *   node scripts/generer-voix.mjs --manifeste-seul
  *
- * Variables d'environnement (dans .env.local) :
+ *   # Reprendre les pistes absentes, dans une enveloppe de caractères
+ *   npm run voix:generer -- --manquantes-seules --max-caracteres 10000
+ *
+ *   # Inventaire exact, sans génération ni modification de fichier
+ *   npm run voix:generer -- --inventaire --manquantes-seules
+ *
+ * Variables d'environnement (dans .env.voice.local) :
  *   ELEVENLABS_API_KEY    obligatoire pour générer
  *   ELEVENLABS_VOICE_ID   la voix à utiliser
  *   ELEVENLABS_MODEL_ID   par défaut « eleven_multilingual_v2 »
@@ -31,7 +37,7 @@
 
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { preparerPourLaVoix } from '../src/lib/prononciation.mjs';
@@ -77,6 +83,9 @@ const EURO_PAR_MILLE_CARACTERES = 0.0003 * 1000;
 function lireArguments(argv) {
   const options = {
     estimation: false,
+    inventaire: false,
+    manquantesSeules: false,
+    maxCaracteres: Infinity,
     manifesteSeul: false,
     force: false,
     fiches: null,
@@ -88,6 +97,15 @@ function lireArguments(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const argument = argv[i];
     if (argument === '--estimation') options.estimation = true;
+    else if (argument === '--inventaire') options.inventaire = true;
+    else if (argument === '--manquantes-seules') options.manquantesSeules = true;
+    else if (argument === '--max-caracteres') {
+      const valeur = argv[++i];
+      if (!/^\d+$/.test(valeur ?? '') || !Number.isSafeInteger(Number(valeur))) {
+        throw new Error('--max-caracteres attend un entier positif ou nul.');
+      }
+      options.maxCaracteres = Number(valeur);
+    }
     else if (argument === '--manifeste-seul') options.manifesteSeul = true;
     else if (argument === '--force') options.force = true;
     else if (argument === '--versets') options.versetsSeuls = true;
@@ -103,6 +121,9 @@ function lireArguments(argv) {
       options.pause = Number.parseInt(argv[i + 1] ?? '400', 10);
       i += 1;
     }
+  }
+  if (options.force && options.manquantesSeules) {
+    throw new Error('--force et --manquantes-seules sont incompatibles.');
   }
   return options;
 }
@@ -295,6 +316,9 @@ async function synthetiserAvecReprises(texte, config, essais = 3) {
 async function synthetiser(texte, config) {
   const url = `https://api.elevenlabs.io/v1/text-to-speech/${config.voix}?output_format=${FORMAT}`;
 
+  // Compter aussi les essais dont la réponse serait perdue après facturation.
+  config.reserverCaracteres(texte.length);
+
   const reponse = await fetch(url, {
     method: 'POST',
     headers: {
@@ -329,11 +353,8 @@ async function synthetiser(texte, config) {
 
 async function lireManifeste() {
   if (!existsSync(MANIFESTE)) return { genereLe: '', pistes: {} };
-  try {
-    return JSON.parse(await readFile(MANIFESTE, 'utf8'));
-  } catch {
-    return { genereLe: '', pistes: {} };
-  }
+  // Un manifeste illisible ne doit jamais déclencher une régénération payante.
+  return JSON.parse(await readFile(MANIFESTE, 'utf8'));
 }
 
 async function fichiersHumains() {
@@ -348,11 +369,27 @@ async function fichiersHumains() {
 
 async function ecrireManifeste(pistes, voixParDefaut) {
   await mkdir(DOSSIER, { recursive: true });
+  const temporaire = `${MANIFESTE}.${process.pid}.tmp`;
   await writeFile(
-    MANIFESTE,
+    temporaire,
     `${JSON.stringify({ genereLe: new Date().toISOString(), voixParDefaut, pistes }, null, 1)}\n`,
     'utf8'
   );
+  await rename(temporaire, MANIFESTE);
+}
+
+function raisonGeneration(piste, existante, config, options) {
+  const chemin = path.join(DOSSIER_ELEVEN, `${piste.id}.mp3`);
+  if (!existsSync(chemin)) return 'absente';
+  if (options.force) return 'forcee';
+  if (existante?.source !== 'eleven') return 'sansManifeste';
+  if (existante.empreinte !== empreinteDe(piste.texte)) return 'texteModifie';
+  // Reprendre conserve les voix et débits des pistes déjà valides.
+  if (options.manquantesSeules) return null;
+  if (existante.voix !== config.voix) return 'autreVoix';
+  if ((existante.format ?? 'mp3_44100_128') !== FORMAT) return 'autreFormat';
+  if (existante.modele && existante.modele !== config.modele) return 'autreModele';
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -382,13 +419,42 @@ async function main() {
 
   const manifeste = await lireManifeste();
   const humains = await fichiersHumains();
+  let caracteresSoumis = 0;
   const config = {
     cle: process.env.ELEVENLABS_API_KEY,
     voix: process.env.ELEVENLABS_VOICE_ID,
     modele: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
+    reserverCaracteres(taille) {
+      if (caracteresSoumis + taille > options.maxCaracteres) {
+        throw new Error('Enveloppe de caractères insuffisante pour un nouvel essai.');
+      }
+      caracteresSoumis += taille;
+    },
   };
 
+  if (options.inventaire) {
+    const parFiche = {};
+    const raisons = {};
+    let aGenerer = 0;
+    let caracteresRestants = 0;
+    for (const piste of pistes) {
+      const raison = humains.has(piste.id) ? null : raisonGeneration(piste, manifeste.pistes[piste.id], config, options);
+      const bilan = parFiche[piste.fiche] ??= { total: 0, aGenerer: 0, caracteres: 0 };
+      bilan.total += 1;
+      if (raison) {
+        bilan.aGenerer += 1;
+        bilan.caracteres += piste.texte.length;
+        aGenerer += 1;
+        caracteresRestants += piste.texte.length;
+        raisons[raison] = (raisons[raison] ?? 0) + 1;
+      }
+    }
+    console.log(JSON.stringify({ total: pistes.length, aGenerer, caracteresRestants, raisons, parFiche }, null, 2));
+    return;
+  }
+
   const sortie = { ...manifeste.pistes };
+  let caracteresGeneres = 0;
   let generees = 0;
   let ignorees = 0;
   let humaines = 0;
@@ -429,15 +495,7 @@ async function main() {
     // 2. Déjà générée avec la MÊME voix et texte inchangé : on passe.
     const existante = sortie[piste.id];
     const chemin = path.join(DOSSIER_ELEVEN, `${piste.id}.mp3`);
-    if (
-      !options.force &&
-      existante?.source === 'eleven' &&
-      existante?.voix === config.voix &&
-      existante.empreinte === empreinte &&
-      // Les pistes d'avant ce champ ont été produites en 128 kbps.
-      (existante.format ?? 'mp3_44100_128') === FORMAT &&
-      existsSync(chemin)
-    ) {
+    if (!raisonGeneration(piste, existante, config, options)) {
       ignorees += 1;
       continue;
     }
@@ -446,15 +504,22 @@ async function main() {
       console.error(
         '\n  ELEVENLABS_API_KEY et ELEVENLABS_VOICE_ID sont nécessaires pour générer.'
       );
-      console.error('  Ajoutez-les à .env.local, ou lancez --estimation pour chiffrer d’abord.\n');
+      console.error('  Ajoutez-les à .env.voice.local, ou lancez --inventaire pour chiffrer d’abord.\n');
       process.exit(1);
+    }
+
+    if (caracteresSoumis + piste.texte.length > options.maxCaracteres) {
+      console.log(`\n  Enveloppe atteinte : ${caracteresSoumis} caractères soumis ; prochaine piste ${piste.id} (${piste.texte.length}).`);
+      break;
     }
 
     process.stdout.write(`  ${piste.id.padEnd(14)} ${piste.texte.length.toString().padStart(5)} c. `);
     try {
       const audio = await synthetiserAvecReprises(piste.texte, config);
       await mkdir(DOSSIER_ELEVEN, { recursive: true });
-      await writeFile(chemin, audio);
+      const temporaire = `${chemin}.${process.pid}.tmp`;
+      await writeFile(temporaire, audio);
+      await rename(temporaire, chemin);
       const taille = (await stat(chemin)).size;
       sortie[piste.id] = {
         id: piste.id,
@@ -463,13 +528,18 @@ async function main() {
         empreinte,
         format: FORMAT,
         voix: config.voix,
+        modele: config.modele,
       };
+      // Sauvegarder chaque succès pour reprendre après une coupure sans le refacturer.
+      await ecrireManifeste(sortie, config.voix);
       generees += 1;
+      caracteresGeneres += piste.texte.length;
       console.log(`✓ ${(taille / 1024).toFixed(0)} Ko`);
     } catch (erreur) {
       console.log(`✗ ${erreur.message}`);
       // On s'arrête : mieux vaut corriger que brûler le quota sur une erreur
       // répétée (clé invalide, voix inexistante, quota dépassé).
+      process.exitCode = 1;
       break;
     }
 
@@ -479,8 +549,9 @@ async function main() {
   await ecrireManifeste(sortie, config.voix);
 
   console.log(
-    `\n  ${generees} générée(s) · ${ignorees} inchangée(s) · ${humaines} enregistrement(s) humain(s)`
+    `\n  ${generees} générée(s) · ${ignorees} inchangée(s) · ${humaines} enregistrement(s) humain(s) · ${caracteresGeneres} caractères générés`
   );
+  console.log(`  ${caracteresSoumis} caractères soumis, reprises comprises.`);
   console.log(`  Manifeste : ${path.relative(RACINE, MANIFESTE)}\n`);
 }
 
