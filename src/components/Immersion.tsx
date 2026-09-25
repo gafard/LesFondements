@@ -1497,105 +1497,15 @@ function RenduScene({
       );
 
     case 'pas': {
-      const clePas = scene.id ? `pas:${scene.id}` : `pas:${fiche.id}`;
-      const cleMoment = scene.id ? `pas-moment:${scene.id}` : `pas-moment:${fiche.id}`;
+      // Le carnet permet déjà de garder « un pas à vivre » : un second
+      // formulaire détaillé pour le même pas faisait trop de questions.
       const referenceChoisie = scene.id
         ? reponses[`verset-choisi:${scene.id}`] ?? scene.reference
         : scene.reference;
-      const passageChoisi = scene.options?.find((option) => option.reference === referenceChoisie)
-        ?? scene.options?.[0];
-      const rappelTransformation = scene.pratique?.rappelQuestionId
-        ? reponses[`q:${scene.pratique.rappelQuestionId}`]?.trim()
-        : '';
-      const modeTransformation = scene.pratique?.mode === 'transformation';
       return (
         <div className="py-8">
           <TraceParole key={scene.id || fiche.id} ficheId={fiche.id} cle={`trace:${scene.id || `f${fiche.id}`}`} reference={referenceChoisie || ''} sombre />
           <div className="mt-6"><FilDeLaParole ficheId={fiche.id} /></div>
-          <details className="mt-6 rounded-2xl border border-white/15 p-5" open={Boolean(reponses[clePas])}>
-          <summary className="min-h-11 cursor-pointer text-sm font-bold text-or-300">Si je souhaite préparer un pas concret</summary>
-          <p className="my-3 text-sm text-parchemin-100/75">{PROFILS_FICHES[fiche.id]?.invitation}</p>
-          <span className="text-2xs font-bold uppercase tracking-[0.22em] text-or-300/70">
-            {tempsDuJour ? 'Vivre cette Parole' : 'Vivre cette vérité'}
-          </span>
-          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight text-parchemin-100 sm:text-4xl">
-            {tempsDuJour && passageChoisi
-              ? 'Une Parole reçue. Un petit pas à vivre.'
-              : 'Quelle vérité veux-tu garder présente cette semaine ?'}
-          </h2>
-          {tempsDuJour && passageChoisi ? (
-            <>
-              <div className="mt-6 rounded-3xl border border-or-400/22 bg-or-400/8 px-5 py-5">
-                <p className="text-2xs font-black uppercase tracking-[0.16em] text-or-300">
-                  La Parole que tu gardes · {passageChoisi.reference}
-                </p>
-                <p className="mt-3 font-serif text-lg italic leading-relaxed text-parchemin-100 sm:text-xl">
-                  « {passageChoisi.texte} »
-                </p>
-              </div>
-              {rappelTransformation && (
-                <aside className="post-it-jaune pose-1 relative mt-7 max-w-xl rounded-[4px] p-5 text-encre-950 shadow-xl sm:p-6">
-                  <span className="punaise punaise-bleue -top-2.5 left-8" aria-hidden="true" />
-                  <p className="text-xs font-black uppercase tracking-[0.12em] text-encre-700/65">
-                    {scene.pratique?.rappelTitre ?? 'La situation que tu as identifiée'}
-                  </p>
-                  <p className="mt-3 font-serif text-lg font-bold leading-relaxed sm:text-xl">
-                    {rappelTransformation}
-                  </p>
-                </aside>
-              )}
-              {!modeTransformation && (
-                <>
-                  <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
-                    {scene.pratique?.questionMoment
-                      ?? 'Dans quel moment concret de ta journée voudrais-tu revenir à cette Parole ?'}
-                  </p>
-                  <ChampEcriture
-                    valeur={reponses[cleMoment] ?? ''}
-                    onEnregistrer={(valeur) => onEnregistrer(cleMoment, valeur)}
-                    placeholder={scene.pratique?.placeholderMoment ?? 'Je veux me souvenir de ce verset lorsque…'}
-                    ariaLabel="Le moment où je veux me souvenir de ce verset"
-                    lignes={3}
-                  />
-                </>
-              )}
-              <p className="mt-6 max-w-2xl font-serif text-xl font-bold leading-relaxed text-parchemin-100">
-                {scene.pratique?.questionAction
-                  ?? 'Et quand ce moment arrivera, qu’aimerais-tu faire à partir de cette Parole ?'}
-              </p>
-              <ChampEcriture
-                valeur={reponses[clePas] ?? ''}
-                onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
-                placeholder={scene.pratique?.placeholderAction ?? 'Quand ce moment arrivera, je veux…'}
-                ariaLabel="Comment je veux vivre cette Parole"
-                lignes={3}
-              />
-            </>
-          ) : (
-            <>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-parchemin-100/65">
-                Reviens une dernière fois à ce que tu as découvert de Dieu. Y a-t-il une situation
-                concrète dans laquelle tu veux choisir de vivre à partir de cette vérité ?
-              </p>
-              <ChampEcriture
-                valeur={reponses[clePas] ?? ''}
-                onEnregistrer={(valeur) => onEnregistrer(clePas, valeur)}
-                placeholder="Cette semaine, je veux…"
-                lignes={4}
-              />
-            </>
-          )}
-          <div className="mt-7 rounded-2xl border border-or-300/25 bg-or-300/10 p-5">
-            <p className="text-base leading-relaxed text-parchemin-100">
-              Choisis un geste assez petit pour l’essayer dans une situation réelle. Tu peux aussi
-              prendre le temps d’y réfléchir : rien à promettre pour avancer.
-            </p>
-            {reponses[clePas]?.trim() && <p className="mt-3 text-base leading-relaxed text-or-200">
-              Retrouve ce pas dans « Mon chemin intérieur ». Après l’avoir essayé, tu pourras
-              raconter ce qui s’est passé, puis choisir de le poursuivre ou de l’ajuster.
-            </p>}
-          </div>
-          </details>
         </div>
       );
     }

@@ -5,16 +5,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
-  Award,
-  Bookmark,
   BookMarked,
-  Brain,
   Compass,
   LayoutDashboard,
   LogOut,
+  Mail,
   Menu,
   MessageCircle,
   PenLine,
+  ScrollText,
   User,
   Users,
   X,
@@ -29,16 +28,23 @@ const ROUTES_IMMERSIVES = ['/onboarding', '/rejoindre', '/login', '/groupes/renc
 const LIENS_PRINCIPAUX = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/fiches', label: 'Le parcours', icon: Compass },
+  { href: '/journal', label: 'Mon carnet', icon: PenLine },
   { href: '/groupes', label: 'Ma cellule', icon: Users },
-  { href: '/memorisation', label: 'Mémorisation', icon: Brain },
-  { href: '/journal', label: 'Journal', icon: PenLine },
 ];
 
 const LIENS_SECONDAIRES = [
-  { href: '/ressources', label: 'Bibliothèque & Contact', icon: BookMarked },
+  { href: '/mode-emploi', label: 'Mode d’emploi', icon: ScrollText },
   { href: '/temoignages', label: 'Témoignages', icon: MessageCircle },
-  { href: '/index-thematique', label: 'Index thématique', icon: Bookmark },
-  { href: '/certificat', label: 'Mon attestation', icon: Award },
+  { href: '/ressources', label: 'Ressources', icon: BookMarked },
+  { href: '/contact', label: 'Contact', icon: Mail },
+];
+
+/** Sans compte : la vitrine du parcours. */
+const LIENS_PUBLICS = [
+  { href: '/fiches', label: 'Le parcours' },
+  { href: '/mode-emploi', label: 'Mode d’emploi' },
+  { href: '/ressources', label: 'Ressources' },
+  { href: '/temoignages', label: 'Témoignages' },
 ];
 
 export default function Navbar() {
@@ -159,7 +165,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-1 lg:flex">
             {user ? (
               <>
-                {LIENS_PRINCIPAUX.map((lien) => (
+                {[...LIENS_PRINCIPAUX, ...LIENS_SECONDAIRES.slice(0, 2)].map((lien) => (
                   <Link
                     key={lien.href}
                     href={lien.href}
@@ -206,13 +212,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                {[
-                  { href: '/fiches', label: 'Le parcours' },
-                  { href: '/index-thematique', label: 'Thèmes' },
-                  { href: '/ressources', label: 'Bibliographie' },
-                  // Public sans compte : c'est la vitrine du parcours.
-                  { href: '/temoignages', label: 'Témoignages' },
-                ].map((lien) => (
+                {LIENS_PUBLICS.map((lien) => (
                   <Link
                     key={lien.href}
                     href={lien.href}
@@ -293,11 +293,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                {[
-                  { href: '/fiches', label: 'Le parcours' },
-                  { href: '/index-thematique', label: 'Index thématique' },
-                  { href: '/ressources', label: 'Bibliographie' },
-                ].map((lien) => (
+                {LIENS_PUBLICS.map((lien) => (
                   <Link
                     key={lien.href}
                     href={lien.href}

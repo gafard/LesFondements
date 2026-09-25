@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Immersion, { ChargementImmersion } from '@/components/Immersion';
 import ParcoursGate from '@/components/ParcoursGate';
-import AttenteFiche from '@/components/AttenteFiche';
 import { useAuth } from '@/lib/AuthContext';
 import { getAnswers, saveAnswer, markFicheCompleted } from '@/lib/firestore';
 import { chargerFiche, type FicheLivret } from '@/lib/livret';
@@ -101,10 +100,8 @@ function AujourdhuiContent() {
     );
   }
 
-  if (ficheId > Math.max(1, preparationStep)) return <AttenteFiche ficheId={ficheId} />;
-
   return (
-    <ParcoursGate acces={ficheId === 1 ? 'decouverte' : 'lecture'}>
+    <>
     {erreur && <div role="alert" className="fixed inset-x-4 top-4 z-[100] rounded-xl bg-white p-4 text-encre-950">{erreur}</div>}
     <Immersion
       key={`${user?.uid}:${ficheId}:${sectionIndex}`}
@@ -118,7 +115,7 @@ function AujourdhuiContent() {
       indexInitial={sceneInitiale}
       momentInitial={momentInitial}
     />
-    </ParcoursGate>
+    </>
   );
 }
 

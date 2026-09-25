@@ -61,10 +61,10 @@ export default function manifest(): MetadataRoute.Manifest {
         description: 'Déposer ce que la lecture a remué',
       },
       {
-        name: 'Le verset du jour',
-        short_name: 'Verset',
-        url: '/memorisation',
-        description: 'Réviser et réciter les versets à retenir',
+        name: 'Le parcours',
+        short_name: 'Parcours',
+        url: '/fiches',
+        description: 'Les vingt fiches et l’index thématique',
       },
     ],
   };

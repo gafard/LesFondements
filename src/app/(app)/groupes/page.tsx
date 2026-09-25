@@ -846,12 +846,12 @@ function OngletMembres({
               target="_blank"
               className="text-3xs font-bold text-or-800 hover:underline flex items-center gap-1"
             >
-              <Printer className="h-3 w-3" /> Fiche prière (A4)
+              <Printer className="h-3 w-3" /> Imprimer le résumé
             </Link>
           </div>
 
           <p className="text-2xs text-encre-600 leading-relaxed">
-            <em>« Le faire en équipe, à 2 ou 3 »</em> (Guide pastoral, p. 160).
+            <em>« Le faire en équipe, à 2 ou 3 »</em> (« Prendre soin les uns des autres », p. 160).
             Pour veiller les uns sur les autres et prier en binôme cette semaine :
           </p>
 
@@ -1480,7 +1480,7 @@ function OngletGuide() {
           </div>
 
           <div className="rounded-2xl border border-or-300 bg-or-100/80 p-4">
-            <strong className="mb-1 block text-or-950">Fiche Mémo Pastoral (A4)</strong>
+            <strong className="mb-1 block text-or-950">« Prendre soin les uns des autres » (résumé)</strong>
             <p className="text-2xs text-or-900 mb-2.5">
               Le guide complet « Prendre soin les uns des autres » (p. 160-162) prêt à imprimer pour votre Bible.
             </p>
@@ -1490,7 +1490,7 @@ function OngletGuide() {
               className="inline-flex items-center gap-1.5 rounded-full bg-encre-950 px-3.5 py-1.5 text-2xs font-bold text-parchemin-100 shadow-xs hover:bg-encre-800 transition-colors"
             >
               <Printer className="h-3 w-3 text-or-300" />
-              Imprimer la fiche prière (A4)
+              Imprimer le résumé
             </Link>
           </div>
 

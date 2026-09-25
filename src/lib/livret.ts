@@ -160,3 +160,11 @@ export function dureeLecture(fiche: FicheLivret): number {
     .reduce((total, bloc) => total + bloc.texte.split(/\s+/).length, 0);
   return Math.max(4, Math.round(mots / 180));
 }
+
+/**
+ * Le livret complet en PDF. Un seul endroit pour son adresse : une édition
+ * corrigée (sans l'ancien site, qui n'existe plus) pourra la remplacer ici,
+ * par exemple en la déposant dans `public/`.
+ */
+export const LIEN_LIVRET_PDF =
+  'https://leparcoursdesfondements.files.wordpress.com/2012/01/livret-vf-12-03-2015.pdf';

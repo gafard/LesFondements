@@ -406,6 +406,9 @@
   border-left: 3px solid #f6c453;
   font-family: Georgia, serif;
   font-style: italic;
+  /* Les versets cités se distinguent du fil de l'exposé : un peu plus
+     petits, ils se lisent comme un appui et non comme le texte principal. */
+  font-size: 0.9em;
   color: #1c3159;
 }
 .prose-livret ul { margin: 0.6rem 0 1.1rem 1.1rem; list-style: disc; }

@@ -196,6 +196,13 @@ export default function EcranLancement() {
             <ArrowRight className="h-3 w-3" />
           </Link>
         )}
+        <Link
+          href="/mode-emploi"
+          className="mt-2 flex items-center justify-center gap-1.5 text-2xs font-bold text-encre-500 transition-colors hover:text-or-700"
+        >
+          Le mode d&apos;emploi du parcours
+          <ArrowRight className="h-3 w-3" />
+        </Link>
 
         {/* ── Verset du jour ── */}
         {verset && (

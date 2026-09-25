@@ -13,10 +13,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Headphones,
-  Lock,
   MessageSquare,
   PenLine,
   Quote,
+  RotateCw,
   Heart,
   Users,
   Sunrise,
@@ -32,6 +32,7 @@ import TexteSurlignable, { type SelectionTexte } from '@/components/TexteSurlign
 import EcouteContinueFiche from '@/components/EcouteContinueFiche';
 import GuidePastoralCellule from '@/components/GuidePastoralCellule';
 import ChampDictée from '@/components/ChampDictée';
+import { TraceParole } from '@/components/TraceParole';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
 import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswer, flushPendingWrites } from '@/lib/firestore';
 import {
@@ -44,7 +45,6 @@ import MEDITATIONS from '@/data/meditation-questions.json';
 import TITRES_DES_TEMPS from '@/data/tempsTitres.json';
 import { enregistrerRevision, qualiteDepuisScore } from '@/lib/memorisation';
 import { FICHES_META } from '@/data/fichesMeta';
-import AttenteFiche from '@/components/AttenteFiche';
 import Illumination from '@/components/Illumination';
 import { MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
@@ -77,7 +77,7 @@ function FicheContent() {
   const cleReprise = searchParams.get('reprendre');
 
   const { user } = useAuth();
-  const { group, membership, unlockedStep, preparationStep, refresh, loading: parcoursLoading } = useParcours();
+  const { group, membership, unlockedStep, refresh } = useParcours();
   const cleAnnotations = `annotations:${ficheId}`;
 
   const [fiche, setFiche] = useState<FicheLivret | null | undefined>(undefined);
@@ -112,10 +112,10 @@ function FicheContent() {
 
   const meta = FICHES_META.find((m) => m.id === ficheId);
   const preparee = membership?.preparedSteps.includes(ficheId) ?? false;
-  // Les prérequis personnels et l’avancée du groupe limitent toutes les entrées.
-  const maxFicheAccessible = Math.min(20, Math.max(1, preparationStep));
-  const fermee = ficheId > maxFicheAccessible;
-  // Conservé pour les écrans de partage ; aucune fiche future n’est lisible.
+  // Toutes les fiches se lisent librement : l'Évangile du Royaume est un
+  // tout, et chacun peut vouloir une vue d'ensemble ou explorer un thème.
+  // On encourage la progression, on ne l'impose pas. Seul le dépôt au
+  // groupe suit le rythme de la cellule.
   const enPreparation = !!group && ficheId > unlockedStep;
 
   useEffect(() => {
@@ -226,14 +226,6 @@ function FicheContent() {
     );
   }
 
-  if (ficheId > 1 && parcoursLoading) return <ChargementLecture titre={meta.titre} />;
-
-  if (fermee) {
-    return (
-      <AttenteFiche ficheId={ficheId} />
-    );
-  }
-
   if (fiche === undefined) return <ChargementLecture titre={meta.titre} />;
   if (fiche === null) {
     return (
@@ -249,7 +241,7 @@ function FicheContent() {
   }
 
   const precedente = ficheId > 1 ? ficheId - 1 : null;
-  const suivante = ficheId < 20 && ficheId < maxFicheAccessible ? ficheId + 1 : null;
+  const suivante = ficheId < 20 ? ficheId + 1 : null;
   const nbQuestions = meta.nbQuestions;
   // Deux jeux de réponses cohabitent sous le préfixe « q: » : celles des
   // temps à part, écrites jour après jour, et celles du livret, qui se
@@ -444,7 +436,7 @@ function FicheContent() {
                 seulement ce qui le concerne en premier. */}
             {[7, 8, 15].includes(fiche.id) && (
               <Link
-                href="/guide-pastoral"
+                href="/ressources?onglet=prendre-soin"
                 className="postit postit-vert pose-4 relative block rounded-3xl p-5 shadow-md transition-transform hover:-translate-y-0.5"
               >
                 <span className="ruban -top-3 left-9 -rotate-2 rounded-[2px]" />
@@ -460,7 +452,7 @@ function FicheContent() {
                   sont au Seigneur — pas à nous.
                 </p>
                 <span className="mt-2 inline-block text-2xs font-bold text-emerald-900 underline underline-offset-2">
-                  Ouvrir le guide pastoral
+                  Ouvrir « Prendre soin les uns des autres »
                 </span>
               </Link>
             )}
@@ -588,6 +580,17 @@ function FicheContent() {
                 )}
               </section>
             ))}
+
+            {/* Ce que chacun a perçu — une révélation, une question, une
+                incompréhension — c'est ce dont on repart à la rencontre. Le
+                carnet se tenait dans les temps du jour ; il est ici, au
+                moment où l'on prépare le partage. */}
+            <TraceParole
+              ficheId={fiche.id}
+              cle={`trace:rencontre:f${fiche.id}`}
+              titre="Ce que je veux apporter à la rencontre"
+              invitation="Une nouvelle révélation, une question ou une incompréhension, un approfondissement : ce que cette fiche a éveillé en moi, pour revenir ensemble sur les points clés."
+            />
 
             {fiche.questionsLibres.length > 0 && (
               <section className="feuille rounded-4xl border border-parchemin-300 p-5 shadow-sm sm:p-7">
@@ -742,9 +745,7 @@ function FicheContent() {
               Fiche {suivante} <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-parchemin-200 px-4 py-2.5 text-2xs font-bold text-encre-300">
-              <Lock className="h-3 w-3" /> Fiche {ficheId + 1}
-            </span>
+            <span />
           )}
         </div>
 
@@ -755,13 +756,15 @@ function FicheContent() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="space-y-2 max-w-xl">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-or-200/90 px-3 py-1 text-3xs font-bold uppercase tracking-wider text-or-950 font-serif">
-                  ✨ Premier Fondement Posé
+                  Premier fondement posé
                 </span>
                 <h3 className="font-serif text-xl sm:text-2xl font-bold text-encre-950">
-                  Vous avez exploré « Connaître Dieu »
+                  Partager cette fiche en cellule
                 </h3>
                 <p className="font-serif text-xs text-encre-700 leading-relaxed">
-                  Pour aller plus loin, vivre les 19 fiches suivantes et partager vos découvertes chaque semaine, rassemblez 4 ou 5 compagnons ou rejoignez une cellule existante.
+                  « Connaître Dieu » est une fiche fondamentale : elle gagne à être reprise ensemble.
+                  Rejoignez une cellule dès maintenant — ou rassemblez 4 ou 5 compagnons — pour
+                  partager ce que vous y avez découvert, vos questions, et poursuivre le parcours.
                 </p>
               </div>
               <Link
@@ -1024,6 +1027,7 @@ function CarteVerset({
 }) {
   const texte = texteDuVerset(reference);
   const [epreuve, setEpreuve] = useState(false);
+  const [retournee, setRetournee] = useState(Boolean(valeur));
   const [garde, setGarde] = useState<number | null>(null);
   const { user } = useAuth();
 
@@ -1055,10 +1059,23 @@ function CarteVerset({
         </span>
       </div>
 
+      {/* La référence d'abord : on cherche le verset de mémoire, puis on
+          retourne la carte pour le voir écrit. */}
       {texte ? (
-        <p className="mt-2 font-serif text-sm italic leading-relaxed text-encre-800">
-          « {texte} »
-        </p>
+        retournee ? (
+          <p className="mt-2 font-serif text-[0.8125rem] italic leading-relaxed text-encre-800">
+            « {texte} »
+          </p>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setRetournee(true)}
+            className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-encre-950/12 bg-white/50 px-3.5 text-2xs font-bold text-encre-700 transition-colors hover:bg-white/80"
+          >
+            <RotateCw className="h-3 w-3" />
+            Retourner la carte pour lire le verset
+          </button>
+        )
       ) : (
         <p className="mt-2 text-2xs text-encre-600/80">
           Ouvrez votre Bible et recopiez ce passage de votre main :
@@ -1179,14 +1196,8 @@ function ChargementLecture({ titre }: { titre: string }) {
 }
 
 export default function Page() {
-  const params = useParams();
-  const rawId = Array.isArray(params?.id) ? params.id[0] : params?.id;
-  const parsedId = rawId ? Number.parseInt(rawId, 10) : 1;
-  const ficheId = Number.isFinite(parsedId) ? parsedId : 1;
-  const acces = ficheId === 1 ? 'decouverte' : 'lecture';
-
   return (
-    <ParcoursGate acces={acces}>
+    <ParcoursGate acces="decouverte">
       <Suspense fallback={<ChargementImmersion />}>
         <FicheContent />
       </Suspense>

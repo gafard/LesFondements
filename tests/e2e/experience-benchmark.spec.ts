@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { semerSession, UTILISATEUR } from './fixtures';
 
-test('accueil : prochain temps dominant, prologue unique et fermeture au clavier', async ({ page }, info) => {
+test('accueil : fiche complète dominante, prologue unique et fermeture au clavier', async ({ page }, info) => {
   await semerSession(page);
   await page.goto('/dashboard');
-  const prochain = page.getByRole('region', { name: 'Dieu règne' });
-  await expect(prochain.getByRole('link', { name: 'Commencer mon temps' })).toBeVisible();
+  const prochain = page.getByRole('region', { name: 'Connaître Dieu' });
+  await expect(prochain.getByRole('link', { name: 'Consulter la fiche complète' })).toHaveAttribute('href', '/fiches/1');
   expect((await prochain.boundingBox())!.y).toBeLessThan(300);
   await expect(page.getByRole('button', { name: 'Découvrir le parcours · 50 s' })).toHaveCount(1);
   await expect(page.getByRole('heading', { name: 'Cellule E2E' })).toBeVisible();
@@ -20,45 +20,41 @@ test('accueil : prochain temps dominant, prologue unique et fermeture au clavier
   await expect(page.getByRole('button', { name: 'Découvrir le parcours · 50 s' })).toBeFocused();
 });
 
-test('accueil : un ancien marque-page vers une fiche future ne détourne pas la reprise', async ({ page }) => {
+test('accueil : les doublons ont quitté le tableau de bord', async ({ page }) => {
   await semerSession(page);
-  await page.addInitScript(uid => localStorage.setItem(`lf.dernierPassage:${uid}`, JSON.stringify({ uid, url: '/aujourdhui?fiche=2&section=0&scene=3', titre: 'Fiche 2', date: Date.now() })), UTILISATEUR.uid);
   await page.goto('/dashboard');
-  await expect(page.getByRole('link', { name: 'Commencer mon temps' })).toHaveAttribute('href', '/aujourdhui?fiche=1&section=0');
+  await expect(page.getByText('Les temps de cette fiche', { exact: false })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Avancer par un temps guidé' })).toHaveAttribute('href', '/aujourdhui?fiche=1');
 });
 
-test('cellule : préparation terminée, prochaine action vers la rencontre et verrou explicite', async ({ page }) => {
+test('cellule : préparation terminée, la fiche reste à relire et la cellule à portée', async ({ page }) => {
   await semerSession(page, { fichesTerminees: [1] });
   await page.goto('/dashboard');
-  await expect(page.getByRole('heading', { name: 'Prêt pour la rencontre.' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Préparer la rencontre', exact: true })).toHaveAttribute('href', '/groupes');
-  await page.goto('/aujourdhui?fiche=2');
-  await expect(page.getByText('Ta préparation de la fiche 1 est terminée.', { exact: false })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Préparer la rencontre' })).toHaveAttribute('href', '/groupes');
+  await expect(page.getByRole('link', { name: 'Relire la fiche complète' })).toHaveAttribute('href', '/fiches/1');
+  await expect(page.getByRole('link', { name: 'Voir ma cellule et préparer le partage' })).toHaveAttribute('href', '/groupes');
 });
 
-test('cellule avancée : le membre est renvoyé vers sa propre première fiche inachevée', async ({ page }) => {
-  await semerSession(page, { etape: 3 });
-  await page.goto('/fiches/2');
-  await expect(page.getByRole('link', { name: 'Reprendre la fiche 1' })).toHaveAttribute('href', '/aujourdhui?fiche=1');
-  await expect(page.getByText('La suite tient aussi compte', { exact: false })).toContainText('fiche 3');
+test('coque : la page d’accueil reste accessible depuis l’application', async ({ page }) => {
+  await semerSession(page);
+  await page.goto('/dashboard');
+  const accueil = page.locator('a[href="/"]').filter({ hasText: 'Page d’accueil' });
+  await expect(accueil.first()).toBeAttached();
 });
 
-test('parcours : chapitre courant ouvert, recherche dans les autres chapitres et verrous conservés', async ({ page }, info) => {
+test('parcours : vingt fiches ouvertes, sans chapitres, index thématique relié', async ({ page }, info) => {
   await semerSession(page);
   await page.goto('/fiches');
-  await expect(page.getByRole('heading', { name: 'Recevoir', exact: true })).toBeVisible();
-  await expect(page.locator('details[open]')).toHaveCount(1);
-  await expect(page.locator('a[href="/fiches/2"]')).toHaveCount(0);
+  await expect(page.locator('details')).toHaveCount(0);
+  await expect(page.locator('ol a[href="/fiches/20"]')).toHaveCount(1);
+  await expect(page.getByRole('link', { name: 'Étudier la fiche 1' })).toHaveAttribute('href', '/fiches/1');
   await page.screenshot({ path: info.outputPath('parcours.png'), fullPage: true });
   const analyse = await new AxeBuilder({ page }).include('#contenu-principal').withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(analyse.violations).toEqual([]);
-  await page.getByRole('textbox', { name: 'Retrouver une fiche' }).fill('20');
-  await expect(page.getByRole('heading', { name: 'Demeurer et espérer' })).toBeVisible();
-  await expect(page.locator('details[open]')).toHaveCount(1);
-  await expect(page.locator('a[href="/fiches/20"]')).toHaveCount(0);
-  await page.getByRole('textbox', { name: 'Retrouver une fiche' }).fill('introuvablexyz');
-  await expect(page.getByRole('status').filter({ hasText: 'Aucune fiche' })).toContainText('Aucune fiche');
+  const loi = page.getByRole('listitem').filter({ hasText: 'Loi (Torah)' });
+  await expect(loi.getByRole('link', { name: 'Fiche 2' })).toHaveAttribute('href', '/fiches/2');
+  await expect(loi.getByRole('link', { name: 'Fiche 18' })).toHaveAttribute('href', '/fiches/18');
+  await page.getByRole('textbox', { name: 'Retrouver une fiche ou un thème' }).fill('introuvablexyz');
+  await expect(page.getByRole('status').filter({ hasText: 'Aucun titre' })).toContainText('Aucun titre');
 });
 
 test('immersion : commandes stables, sans débordement et retour au temps précédent', async ({ page }, info) => {

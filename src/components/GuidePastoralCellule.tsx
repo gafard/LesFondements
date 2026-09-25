@@ -24,14 +24,14 @@ export default function GuidePastoralCellule({ ficheId }: GuidePastoralProps) {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-3xs font-bold uppercase tracking-[0.2em] text-or-800 font-serif">
-                Annexe Pastorale · Fiche {ficheId}
+                Annexe · Fiche {ficheId}
               </span>
               <span className="rounded-full bg-or-100 px-2 py-0.5 text-3xs font-semibold text-or-900">
                 Ouvert à tous
               </span>
             </div>
             <h3 className="font-serif text-lg sm:text-xl font-bold text-encre-950">
-              Guide pastoral : Prendre soin les uns des autres
+              Prendre soin les uns des autres
             </h3>
             <p className="mt-0.5 text-xs text-encre-600 font-serif italic">
               « Ce n’est pas réservé à une élite. Tout le monde est appelé à prendre soin de ses frères et sœurs. »
@@ -44,10 +44,10 @@ export default function GuidePastoralCellule({ ficheId }: GuidePastoralProps) {
             href="/guide-pastoral"
             target="_blank"
             className="inline-flex items-center gap-1.5 rounded-full border border-parchemin-300 bg-white px-3.5 py-2 text-2xs font-bold text-encre-700 hover:bg-parchemin-100 shadow-2xs transition-colors"
-            title="Ouvrir la version imprimable pour glisser dans la Bible"
+            title="Imprimer la fiche « Prendre soin les uns des autres » (résumé)"
           >
             <Printer className="h-3.5 w-3.5 text-or-700" />
-            <span>Fiche Bible (A4)</span>
+            <span>Imprimer le résumé</span>
           </Link>
 
           <button
@@ -55,7 +55,7 @@ export default function GuidePastoralCellule({ ficheId }: GuidePastoralProps) {
             onClick={() => setOuvert((v) => !v)}
             className="inline-flex items-center gap-1.5 rounded-full bg-encre-950 px-4 py-2 text-2xs font-bold text-parchemin-100 hover:bg-encre-900 shadow-xs transition-transform active:scale-95"
           >
-            <span>{ouvert ? 'Masquer' : 'Consulter le guide'}</span>
+            <span>{ouvert ? 'Masquer' : 'Consulter l’annexe'}</span>
             <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${ouvert ? 'rotate-180' : ''}`} />
           </button>
         </div>

@@ -6,7 +6,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { getCachedJournalEntries, getJournalEntries, addJournalEntry, deleteJournalEntry, timestampToDate } from '@/lib/firestore';
 import type { JournalEntry } from '@/lib/firestore';
 import Image from 'next/image';
-import { PenLine, Plus, Trash2, Calendar } from 'lucide-react';
+import Link from 'next/link';
+import { PenLine, Plus, Printer, Trash2, Calendar } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
 import CarnetUnifie from '@/components/CarnetUnifie';
 import ChampDictée from '@/components/ChampDictée';
@@ -173,6 +174,26 @@ function Journal() {
             })
           )}
         </div>
+
+        {/* Le Carnet de Disciple était un onglet à part ; il est la suite
+            naturelle de ces pages : les emporter, imprimées ou reliées. */}
+        <section className="feuille relative mt-12 rounded-3xl border border-parchemin-300 p-6 shadow-sm sm:p-8">
+          <span className="ruban -top-3 left-8 -rotate-2 rounded-[2px]" />
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-or-800">
+            <Printer className="h-4 w-4" /> Carnet de Disciple
+          </p>
+          <h2 className="mt-3 font-serif text-2xl font-bold text-encre-950">Emporter mon carnet</h2>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-encre-700">
+            Réponses personnelles, notes, versets préférés et attestation de fin de parcours,
+            mis en page comme un carnet relié — à imprimer ou à garder en PDF.
+          </p>
+          <Link
+            href="/carnet-export"
+            className="bouton-or mt-5 inline-flex min-h-11 items-center gap-2 rounded-full px-6 text-sm font-bold"
+          >
+            Composer mon Carnet de Disciple (PDF)
+          </Link>
+        </section>
       </div>
     </div>
   );

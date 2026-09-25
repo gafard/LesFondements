@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import EcranLancement from '@/components/EcranLancement';
+import { FICHES_META } from '@/data/fichesMeta';
+import { LIEN_LIVRET_PDF } from '@/lib/livret';
 import LecteurVideoOnboarding from '@/components/LecteurVideoOnboarding';
 import Image from 'next/image';
 import {
@@ -15,33 +17,6 @@ import {
   Search,
   Quote,
 } from 'lucide-react';
-
-const chapters = [
-  { 
-    range: '01—05', 
-    title: 'Recevoir', 
-    detail: 'Dieu, le salut, la grâce souveraine et votre identité nouvelle en Christ.',
-    badge: 'Fondation'
-  },
-  { 
-    range: '06—10', 
-    title: 'Être transformé', 
-    detail: 'Vie nouvelle, liberté des forteresses, pardon et puissance du Saint-Esprit.',
-    badge: 'Libération'
-  },
-  { 
-    range: '11—15', 
-    title: 'Devenir disciple', 
-    detail: 'Dons de l’Esprit, caractère forgé, communauté relationnelle et mission du Royaume.',
-    badge: 'Maturité'
-  },
-  { 
-    range: '16—20', 
-    title: 'Demeurer & espérer', 
-    detail: 'L\'intimité de la prière, la Bible vivante, les alliances et l\'espérance éternelle.',
-    badge: 'Transmission'
-  },
-];
 
 const rhythms = [
   {
@@ -172,12 +147,12 @@ export default function Home() {
             Une marche personnelle et fraternelle
           </p>
           <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
-            La Fiche 1 s&apos;ouvre librement.
+            Les fiches s&apos;ouvrent librement.
             <br />
             <span className="italic text-or-600">Le parcours se vit ensemble.</span>
           </h2>
           <p className="mt-4 text-xs sm:text-sm leading-relaxed text-encre-700">
-            Découvrez la première étape sans barrière. Pour vivre les 20 semaines et forger une foi solide, rassemblez vos compagnons de route.
+            Étudiez chaque fiche chez vous, à votre rythme. Pour en parler, poser vos questions et prier ensemble, rejoignez une cellule — dès la fiche 1.
           </p>
         </div>
 
@@ -271,8 +246,14 @@ export default function Home() {
 
         <div className="mx-auto mt-10 max-w-2xl rounded-3xl border border-[#ded6c8] bg-white/80 px-6 py-5 text-center shadow-2xs backdrop-blur-md">
           <p className="font-serif text-sm sm:text-base italic leading-relaxed text-slate-800">
-            « La Fiche 1 s&apos;explore librement. Dès la Fiche 2, vous la préparez chez vous, vous la vivez ensemble en cellule, puis la suivante s&apos;ouvre. »
+            « Chaque fiche se prépare chez soi, puis se partage en cellule. On avance de préférence dans l&apos;ordre, mais toutes les fiches restent ouvertes pour qui veut une vue d&apos;ensemble. »
           </p>
+          <Link
+            href="/mode-emploi"
+            className="mt-3 inline-flex min-h-11 items-center gap-2 text-xs font-bold text-or-800 underline underline-offset-4"
+          >
+            Lire le mode d&apos;emploi du parcours <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </section>
 
@@ -376,51 +357,40 @@ export default function Home() {
               La feuille de route
             </p>
             <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
-              20 étapes.<br /><span className="italic text-or-600">Un sentier qui vous déplace.</span>
+              20 fiches.<br /><span className="italic text-or-600">Un seul Évangile du Royaume.</span>
             </h2>
             <p className="mt-4 text-xs sm:text-sm leading-relaxed text-encre-600">
-              Le parcours avance comme une histoire vivante : recevoir, être transformé, devenir disciple, puis demeurer et transmettre.
+              Les fiches se répondent les unes aux autres : chacune éclaire un aspect d’un même tout.
             </p>
           </div>
 
-          {/* 4 Grand Chapters Cards */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {chapters.map((chapter, index) => {
-              const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
-              const pose = poses[index % poses.length];
-
-              return (
-                <div
-                  key={chapter.range}
-                  className={`feuille ${pose} relative z-10 rounded-3xl border border-parchemin-300 p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md`}
+          <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {FICHES_META.map((fiche) => (
+              <li key={fiche.id}>
+                <Link
+                  href={`/fiches/${fiche.id}`}
+                  className="feuille relative flex h-full items-baseline gap-3 rounded-2xl border border-parchemin-300 px-4 py-3.5 shadow-2xs transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <span className="punaise -top-2.5 left-6" />
-                  <span className="timbre block w-fit rounded px-2.5 py-0.5 text-2xs font-bold text-or-800">
-                    {chapter.badge}
+                  <span className="font-mono text-xs font-bold text-or-700">
+                    {String(fiche.id).padStart(2, '0')}
                   </span>
-                  <span className="mt-4 block font-mono text-xs font-bold tracking-widest text-encre-400">
-                    FICHES {chapter.range}
+                  <span className="font-serif text-sm font-bold leading-snug text-encre-950">
+                    {fiche.titre}
                   </span>
-                  <h3 className="mt-1 font-serif text-2xl font-bold text-encre-950">
-                    {chapter.title}
-                  </h3>
-                  <p className="mt-2.5 text-xs leading-relaxed text-encre-600">
-                    {chapter.detail}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+                </Link>
+              </li>
+            ))}
+          </ol>
 
           <div className="mt-14 text-center">
             <Link
               href="/login"
               className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-xs font-bold shadow-lg"
             >
-              Trouver un groupe et ouvrir la fiche 1 <ArrowRight className="h-4 w-4" />
+              Commencer le parcours <ArrowRight className="h-4 w-4" />
             </Link>
             <p className="mx-auto mt-3 max-w-sm text-2xs leading-relaxed text-encre-500">
-              Les fiches s&apos;ouvrent une à une, au rythme de votre groupe.
+              Seul ou en cellule, à votre rythme.
             </p>
           </div>
         </div>
@@ -491,7 +461,7 @@ export default function Home() {
                 </p>
               </div>
               <a
-                href="https://leparcoursdesfondements.files.wordpress.com/2012/01/livret-vf-12-03-2015.pdf"
+                href={LIEN_LIVRET_PDF}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-amber-300 font-semibold hover:underline text-2xs shrink-0 inline-flex items-center gap-1"

@@ -32,16 +32,12 @@ test('fiche 1 : Parole, réponse, prière, mémorisation et vie restent un seul 
   await page.getByRole('button', { name: /^Ps 46:11/ }).click();
   await page.getByRole('button', { name: 'Continuer' }).click();
 
-  await expect(page.getByText('Vivre cette Parole', { exact: true }).first()).toBeVisible();
-  await page.getByPlaceholder('Je veux me souvenir de ce verset lorsque…').fill(
-    'Je commencerai à m’inquiéter avant ma réunion.'
-  );
-  await page.getByPlaceholder('Quand ce moment arrivera, je veux…').fill(
-    'M’arrêter et revenir à cette Parole.'
-  );
+  // Le pas concret détaillé a été retiré : le carnet privé suffit.
+  await expect(page.getByText('Mon carnet · privé', { exact: true })).toBeVisible();
+  await expect(page.getByText('Si je souhaite préparer un pas concret')).toHaveCount(0);
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await page.getByRole('button', { name: 'J’ai préparé' }).click();
-  await expect(page.getByRole('heading', { name: 'La Parole est semée.' })).toBeVisible();
+  // À la fin de la fiche 1, la validation ouvre la Lettre d'amour du Père.
+  await page.getByRole('button', { name: 'Valider & Ouvrir la Lettre' }).click();
 
   await expect
     .poll(() =>

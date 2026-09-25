@@ -1,31 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   HeartHandshake,
-  Quote,
-  ScrollText,
-  MessageSquareHeart,
-  Send,
-  CheckCircle2,
   BookOpen,
+  Download,
   Library,
   Layers,
   Search,
   ChevronRight,
-  Mail,
-  HelpCircle,
   Printer,
-  Lightbulb,
-  MessageCircle,
 } from 'lucide-react';
-import { chargerLivret, type Bloc, type Livret } from '@/lib/livret';
-import { useAuth } from '@/lib/AuthContext';
-import { hasRemoteBackend } from '@/lib/parcoursStore';
-import { getFirebaseDb } from '@/lib/firebase';
+import { chargerLivret, LIEN_LIVRET_PDF, type Bloc, type Livret } from '@/lib/livret';
 
-type Onglet = 'presentation' | 'prendre-soin' | 'bibliographie' | 'retours';
+type Onglet = 'prendre-soin' | 'bibliographie' | 'livret';
 
 interface LivreVisual {
   id: string;
@@ -219,39 +209,37 @@ const LIVRES_BIBLIOTHEQUE: LivreVisual[] = [
 ];
 
 export default function RessourcesPage() {
-  const { user } = useAuth();
+  return (
+    <Suspense fallback={null}>
+      <Ressources />
+    </Suspense>
+  );
+}
+
+function ongletDemande(valeur: string | null): Onglet {
+  return valeur === 'bibliographie' || valeur === 'livret' ? valeur : 'prendre-soin';
+}
+
+function Ressources() {
+  const searchParams = useSearchParams();
   const [livret, setLivret] = useState<Livret | null>(null);
-  const [onglet, setOnglet] = useState<Onglet>('presentation');
+  const [onglet, setOnglet] = useState<Onglet>(() => ongletDemande(searchParams.get('onglet')));
 
   // Bibliothèque state
   const [modeVue, setModeVue] = useState<'rayonnage' | 'table'>('table');
   const [livreSelectionne, setLivreSelectionne] = useState<LivreVisual | null>(null);
   const [filtreRecherche, setFiltreRecherche] = useState('');
 
-  // Retours & Besoins Form state
-  const [categorie, setCategorie] = useState<'suggestion' | 'temoignage' | 'aide' | 'theologie'>('suggestion');
-  const [nom, setNom] = useState(user?.displayName || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [message, setMessage] = useState('');
-  const [envoiEnCours, setEnvoiEnCours] = useState(false);
-  const [messageEnvoye, setMessageEnvoye] = useState(false);
-  const [erreurEnvoi, setErreurEnvoi] = useState('');
-
   useEffect(() => {
     void chargerLivret().then(setLivret);
   }, []);
 
-  // Les champs se pré-remplissent à l'affichage plutôt que par un effet :
-  // recopier `user` dans l'état déclenchait un rendu en cascade, et écrasait
-  // ce que la personne venait de taper si `user` changeait entre-temps.
-  const nomAffiche = nom || user?.displayName || '';
-  const emailAffiche = email || user?.email || '';
-
-  const onglets: { id: Onglet; label: string; icon: typeof ScrollText }[] = [
-    { id: 'presentation', label: 'Mode d’emploi', icon: ScrollText },
+  // Le mode d'emploi a sa page, liée depuis l'accueil ; le formulaire de
+  // contact aussi. Restent ici les annexes du livret.
+  const onglets: { id: Onglet; label: string; icon: typeof Library }[] = [
     { id: 'prendre-soin', label: 'Prendre soin les uns des autres', icon: HeartHandshake },
-    { id: 'bibliographie', label: 'Bibliothèque d’Étude', icon: Library },
-    { id: 'retours', label: 'Retours & Besoins (Nous écrire)', icon: MessageSquareHeart },
+    { id: 'bibliographie', label: 'Bibliographie', icon: Library },
+    { id: 'livret', label: 'Télécharger le livret complet', icon: Download },
   ];
 
   const livresFiltres = LIVRES_BIBLIOTHEQUE.filter((l) => {
@@ -266,47 +254,20 @@ export default function RessourcesPage() {
     );
   });
 
-  const envoyerRetour = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-    if (message.trim().length > 5000) { setErreurEnvoi('Votre message dépasse 5 000 caractères. Raccourcissez-le avant l’envoi.'); return; }
-
-    if (envoiEnCours) return;
-    setEnvoiEnCours(true); setErreurEnvoi('');
-    const retourData = {
-      uid: user?.uid || null,
-      nom: nomAffiche.trim().slice(0, 120) || 'Ami des Fondements',
-      email: emailAffiche.trim().slice(0, 254) || 'Non renseigné',
-      categorie, message: message.trim().slice(0, 5000),
-      date: Date.now(), dateIso: new Date().toISOString(),
-    };
-    try {
-      if (!hasRemoteBackend()) {
-        setErreurEnvoi('L’envoi à l’équipe est indisponible dans cette version locale. Votre texte reste dans le formulaire ; copiez-le avant de quitter.');
-        return;
-      }
-      const [db, { collection, addDoc }] = await Promise.all([getFirebaseDb(), import('firebase/firestore')]);
-      await addDoc(collection(db, 'retours'), retourData);
-      setMessageEnvoye(true); setMessage('');
-    } catch {
-      setErreurEnvoi('L’envoi n’a pas été confirmé. Votre texte reste ici. Vérifiez votre connexion avant de réessayer.');
-    } finally { setEnvoiEnCours(false); }
-  };
-
   return (
     <div className="table-travail min-h-screen pb-20 pt-6">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* En-tête */}
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <p className="manuscrit mb-2 text-xl text-or-800">
-            Documentation, bibliothèque & dialogue fraternel
+            Les annexes du livret
           </p>
           <h1 className="font-serif text-3xl font-bold text-encre-950 sm:text-4xl">
-            Ressources des Fondements
+            Ressources
           </h1>
           <p className="mx-auto mt-2 max-w-lg text-xs leading-relaxed text-encre-600 sm:text-sm">
-            La vision originelle du parcours, le guide pastoral pour votre cellule, les ouvrages de référence reliés et l&apos;espace pour nous écrire.
+            Prendre soin les uns des autres, la bibliographie et le livret complet à télécharger.
           </p>
         </div>
 
@@ -332,38 +293,6 @@ export default function RessourcesPage() {
           <p className="animate-pulse text-center font-serif text-sm text-encre-400 py-16">
             Ouverture du livret…
           </p>
-        ) : onglet === 'presentation' ? (
-          /* ══ ONGLET 1 : MODE D'EMPLOI ══ */
-          <div className="feuille relative space-y-8 rounded-3xl border border-parchemin-300 p-6 sm:p-10 shadow-md">
-            <span className="attache-pince -top-3 left-1/2 -translate-x-1/2" />
-            <span className="ruban -top-2.5 right-8 rotate-1 rounded-[2px]" />
-
-            <blockquote className="rounded-3xl border border-or-300 bg-amber-50/70 p-6 text-center shadow-xs">
-              <Quote className="mx-auto h-5 w-5 text-or-600" strokeWidth={1.5} />
-              <p className="mt-3 font-serif text-base italic leading-relaxed text-encre-900">
-                « Notre but est de placer tout homme en présence de Dieu et d&apos;amener les
-                chrétiens à leur pleine maturité spirituelle par une communion vivante avec le
-                Christ. »
-              </p>
-              <span className="manuscrit mt-2 block text-base text-or-800">Colossiens 1:28</span>
-            </blockquote>
-
-            {livret.presentation.map((section, index) => (
-              <section key={index} className="pt-2">
-                {section.titre && (
-                  <h2 className="mb-4 flex items-baseline gap-3 font-serif text-xl font-bold text-encre-950 border-b border-parchemin-200 pb-2">
-                    <span className="text-sm text-or-600 font-sans">•</span>
-                    {section.titre}
-                  </h2>
-                )}
-                <div className="prose-livret text-sm text-encre-700 leading-relaxed">
-                  {section.blocs.map((bloc, i) => (
-                    <RenduBloc key={i} bloc={bloc} />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
         ) : onglet === 'prendre-soin' ? (
           /* ══ ONGLET 2 : PRENDRE SOIN LES UNS DES AUTRES ══ */
           <div className="feuille relative space-y-8 rounded-3xl border border-parchemin-300 p-6 sm:p-10 shadow-md">
@@ -373,7 +302,7 @@ export default function RessourcesPage() {
             <div className="rounded-2xl border border-or-300 bg-amber-50/90 p-5 shadow-2xs">
               <div className="flex items-center gap-2 mb-2 text-or-900 font-bold text-sm">
                 <HeartHandshake className="h-4 w-4 text-or-700" />
-                Guide pastoral des cellules de partage
+                Prendre soin les uns des autres
               </div>
               <p className="text-xs leading-relaxed text-or-950">
                 Cette annexe accompagne particulièrement les fiches 7, 8 et 15. Le livret la donne aux responsables
@@ -386,7 +315,7 @@ export default function RessourcesPage() {
                   className="timbre inline-flex items-center gap-1.5 rounded-lg bg-or-300 px-3.5 py-1.5 text-2xs font-bold text-or-950 hover:bg-or-400 transition-colors shadow-2xs"
                 >
                   <Printer className="h-3 w-3" />
-                  Imprimer la Fiche Bible (A4)
+                  Imprimer la fiche « Prendre soin les uns des autres » (résumé)
                 </Link>
                 {[7, 8, 15].map((id) => (
                   <Link
@@ -420,6 +349,12 @@ export default function RessourcesPage() {
           /* ══ ONGLET 3 : LA BIBLIOTHÈQUE D'ÉTUDE RELIÉE ══ */
           <div className="space-y-6">
             
+            <p className="rounded-2xl border border-parchemin-300 bg-white/70 p-4 text-xs leading-relaxed text-encre-700">
+              Ces ouvrages ont été précieux pour constituer les fiches. Plusieurs passages en
+              sont des <strong>extraits choisis</strong>, repris tels quels ; chaque carte indique
+              les fiches concernées.
+            </p>
+
             {/* Barre d'outils de la Bibliothèque */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-3xl border border-parchemin-300 bg-white/80 p-4 shadow-sm backdrop-blur-md">
               <div className="relative w-full sm:w-80">
@@ -529,7 +464,7 @@ export default function RessourcesPage() {
                       <div>
                         <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2 mb-3">
                           <span className="text-3xs font-mono tracking-wider uppercase text-amber-200/70 font-bold">
-                            Ouvrage Référencé
+                            Ouvrage référencé · Extraits choisis
                           </span>
                           <span className="text-3xs font-serif italic text-white/50">
                             {livre.fiches.length > 0 ? `${livre.fiches.length} fiches` : 'Général'}
@@ -596,7 +531,7 @@ export default function RessourcesPage() {
 
                   <div className="border border-white/15 rounded-2xl p-6">
                     <span className="text-3xs uppercase font-bold tracking-widest text-amber-300/80 block mb-1">
-                      Fiche de Lecture & Citation
+                      Ouvrage référencé · Extraits choisis
                     </span>
                     {livreSelectionne.auteur && (
                       <h4 className="font-serif text-base text-amber-200">
@@ -636,220 +571,34 @@ export default function RessourcesPage() {
                 </div>
               </div>
             )}
-
-            <div className="rounded-2xl border border-parchemin-300/80 bg-white/70 p-5 text-xs leading-relaxed text-encre-700 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <p className="font-serif font-bold text-encre-950 mb-1">
-                  À propos des sources & traductions :
-                </p>
-                <p className="text-2xs text-encre-600">
-                  Le livret est librement téléchargeable en version PDF originale. Les versets bibliques y sont tirés de la Bible du Semeur (BDS), sauf mention contraire.
-                </p>
-              </div>
-              <a
-                href="https://leparcoursdesfondements.files.wordpress.com/2012/01/livret-vf-12-03-2015.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-or-500 bg-amber-50 px-4 py-2 text-2xs font-bold text-or-950 hover:bg-or-100 transition-colors shadow-2xs"
-              >
-                Ouvrir le Livret PDF original ↗
-              </a>
-            </div>
           </div>
         ) : (
-          /* ══ ONGLET 4 : RETOURS & BESOINS (NOUS ÉCRIRE) ══ */
-          <div className="feuille relative space-y-8 rounded-3xl border border-parchemin-300 p-6 sm:p-10 shadow-md">
-            <span className="punaise-rouge -top-3 left-10" />
-            <span className="ruban -top-2.5 right-8 -rotate-1 rounded-[2px]" />
-
-            <div className="border-b border-parchemin-300 pb-5">
-              <span className="text-3xs font-bold uppercase tracking-widest text-or-800">
-                Dialogue, Écoute & Suggestions
-              </span>
+          /* ══ TÉLÉCHARGER LE LIVRET COMPLET ══ */
+          <div className="feuille relative space-y-6 rounded-3xl border border-parchemin-300 p-6 sm:p-10 shadow-md">
+            <span className="ruban -top-2.5 left-8 -rotate-1 rounded-[2px]" />
+            <div>
+              <p className="text-3xs font-bold uppercase tracking-widest text-or-800">Édition originale · 2015</p>
               <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-bold text-encre-950">
-                Les retours et besoins
+                Le livret complet
               </h2>
-              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-encre-700">
-                « Nous recevrons avec plaisir vos retours d&apos;expérience et suggestions. Nous sommes disponibles également pour toute forme d&apos;aide ou de conseils vous permettant de tirer le meilleur parti de ce parcours. »
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-encre-700">
+                Les vingt fiches, les annexes, la bibliographie et l’index thématique, dans la mise
+                en page d’origine — à lire, imprimer ou relier. Il est librement téléchargeable.
               </p>
             </div>
-
-            {messageEnvoye ? (
-              <div className="rounded-3xl border border-emerald-300 bg-emerald-50/90 p-7 text-center shadow-xs animate-fade-in">
-                <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600 mb-3" />
-                <h3 className="font-serif text-xl font-bold text-emerald-950">
-                  Votre message a été transmis avec joie !
-                </h3>
-                <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-emerald-800">
-                  Merci pour votre cœur, votre investissement dans le discipulat et votre précieux retour d&apos;expérience. L&apos;équipe vous répondra avec attention.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setMessageEnvoye(false)}
-                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-900 px-6 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition-colors shadow-xs"
-                >
-                  Envoyer un autre message
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={envoyerRetour} className="space-y-6">
-                {erreurEnvoi && <p role="alert" className="rounded-xl border border-or-400 bg-or-50 p-4 text-sm text-encre-900">{erreurEnvoi}</p>}
-                {/* Choix du type de retour */}
-                <div>
-                  <label className="block text-xs font-bold text-encre-900 mb-2">
-                    De quoi s&apos;agit-il ?
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      {
-                        id: 'suggestion',
-                        label: 'Suggestion d’amélioration',
-                        icon: Lightbulb,
-                        desc: 'Une idée ou proposition pour enrichir l’outil',
-                      },
-                      {
-                        id: 'temoignage',
-                        label: 'Retour d’expérience / Témoignage',
-                        icon: MessageCircle,
-                        desc: 'Comment votre cellule ou groupe vit le parcours',
-                      },
-                      {
-                        id: 'aide',
-                        label: 'Demande d’aide ou conseil d’animation',
-                        icon: HelpCircle,
-                        desc: 'Besoin d’un accompagnement pour animer',
-                      },
-                      {
-                        id: 'theologie',
-                        label: 'Question théologique ou coquille',
-                        icon: BookOpen,
-                        desc: 'Une précision sur un verset ou une fiche',
-                      },
-                    ].map((item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => setCategorie(item.id as typeof categorie)}
-                        className={`text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 ${
-                          categorie === item.id
-                            ? 'border-or-600 bg-amber-50/90 shadow-2xs ring-1 ring-or-500'
-                            : 'border-parchemin-300 bg-white/60 hover:bg-white hover:border-parchemin-400'
-                        }`}
-                      >
-                        <item.icon
-                          className={`h-4 w-4 mt-0.5 shrink-0 ${
-                            categorie === item.id ? 'text-or-700' : 'text-encre-400'
-                          }`}
-                        />
-                        <div>
-                          <p className="text-xs font-bold text-encre-950">{item.label}</p>
-                          <p className="text-3xs text-encre-600 mt-0.5">{item.desc}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Informations de contact */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1.5">
-                      Votre prénom / nom
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Samuel M."
-                      value={nomAffiche}
-                      onChange={(e) => setNom(e.target.value)}
-                      className="w-full px-4 py-2.5 text-xs rounded-xl border border-parchemin-300 bg-white focus:outline-none focus:ring-2 focus:ring-or-400 text-encre-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1.5">
-                      Votre adresse e-mail (pour vous répondre)
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="samuel@exemple.com"
-                      value={emailAffiche}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-2.5 text-xs rounded-xl border border-parchemin-300 bg-white focus:outline-none focus:ring-2 focus:ring-or-400 text-encre-900"
-                    />
-                  </div>
-                </div>
-
-                {/* Message */}
-                <div>
-                  <label className="block text-2xs font-bold uppercase tracking-wider text-encre-700 mb-1.5">
-                    Votre message ou retour d&apos;expérience
-                  </label>
-                  <textarea
-                    maxLength={5000}
-                    required
-                    rows={5}
-                    placeholder="Partagez vos impressions, vos questions ou vos besoins d'animation pour votre cellule..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="w-full p-4 text-xs sm:text-sm rounded-2xl border border-parchemin-300 bg-white focus:outline-none focus:ring-2 focus:ring-or-400 text-encre-900 leading-relaxed placeholder:text-encre-400"
-                  />
-                </div>
-
-                {/* Bouton d'envoi */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                  <div className="flex items-center gap-2 text-2xs text-encre-600">
-                    <Mail className="h-3.5 w-3.5 text-or-700" />
-                    <span>Retour concernant le Parcours des Fondements · Fonction expérimentale de cette adaptation numérique</span>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={envoiEnCours || !message.trim()}
-                    className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-3 text-xs font-bold shadow-md disabled:opacity-50"
-                  >
-                    {envoiEnCours ? (
-                      'Transmission en cours…'
-                    ) : (
-                      <>
-                        <Send className="h-3.5 w-3.5" />
-                        Envoyer mon message
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Bloc d'information complémentaire */}
-            <div className="rounded-2xl border border-or-300/80 bg-amber-50/60 p-5 text-xs leading-relaxed text-encre-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <p className="font-bold text-encre-950">
-                  Télécharger le livret original (PDF)
-                </p>
-                <p className="text-2xs text-encre-600 mt-0.5">
-                  Livret complet original (édition 2015) mis à disposition sur le portail moneglisepreferee.net
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <a
-                  href="https://leparcoursdesfondements.files.wordpress.com/2012/01/livret-vf-12-03-2015.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-or-600 bg-or-400 text-encre-950 px-4 py-2 text-2xs font-bold hover:bg-or-300 transition-colors shadow-2xs"
-                >
-                  Télécharger le Livret PDF ↗
-                </a>
-                <a
-                  href="https://moneglisepreferee.net"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-parchemin-300 bg-white px-4 py-2 text-2xs font-bold text-encre-800 hover:bg-parchemin-50 transition-colors shadow-2xs"
-                >
-                  Visiter moneglisepreferee.net ↗
-                </a>
-              </div>
-            </div>
+            <a
+              href={LIEN_LIVRET_PDF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bouton-or inline-flex min-h-12 items-center gap-2 rounded-full px-7 text-sm font-bold shadow-md"
+            >
+              <Download className="h-4 w-4" />
+              Télécharger le livret (PDF)
+            </a>
+            <p className="border-t border-parchemin-300 pt-4 text-xs leading-relaxed text-encre-600">
+              Dans le livret, les versets sont tirés de la Bible du Semeur, sauf mention contraire.
+              Dans l’application, les versets s’affichent en Louis Segond 1910.
+            </p>
           </div>
         )}
       </div>

@@ -27,11 +27,10 @@ import {
   enregistrerRevision,
   revisionsDues,
   type EtatMemoire,
-  type QualiteRappel,
+  qualiteDepuisScore,
 } from '@/lib/memorisation';
 
 import RecitationVocale from '@/components/RecitationVocale';
-import { TraceParole } from '@/components/TraceParole';
 import EpreuveMemoire from '@/components/EpreuveMemoire';
 import { Mic } from 'lucide-react';
 
@@ -66,7 +65,6 @@ function MemorisationContent() {
   const [filtre, setFiltre] = useState<number | 'toutes' | 'dues'>('dues');
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [memoire, setMemoire] = useState<EtatMemoire>({});
-  const [scoreVocal, setScoreVocal] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -129,13 +127,12 @@ function MemorisationContent() {
   const acquis = (cartes ?? []).filter((c) => memoire[cleMemoire(c.reference)]?.masteredAt).length;
   const dues = revisionsDues(memoire).length;
 
-  const noter = async (quality: QualiteRappel) => {
+  // La récitation suffit à situer le verset dans les révisions : on ne
+  // demande plus en plus « comment ce verset vous est-il revenu ».
+  const retenirScore = async (score: number) => {
     if (!user || !carte) return;
-    const record = await enregistrerRevision(user.uid, carte.reference, quality, scoreVocal);
+    const record = await enregistrerRevision(user.uid, carte.reference, qualiteDepuisScore(score), score);
     setMemoire((current) => ({ ...current, [cleMemoire(carte.reference)]: record }));
-    setScoreVocal(0);
-    setMode('aucun');
-    window.setTimeout(() => aller(1), 260);
   };
 
   if (cartes === null) {
@@ -409,7 +406,7 @@ function MemorisationContent() {
                   key={carte.reference}
                   reference={carte.reference}
                   texte={carte.texte || carte.copie}
-                  onScore={setScoreVocal}
+                  onScore={(score) => void retenirScore(score)}
                 />
               </div>
             )}
@@ -419,7 +416,7 @@ function MemorisationContent() {
                 <RecitationVocale
                   reference={carte.reference}
                   texteCible={carte.texte || carte.copie}
-                  onScore={setScoreVocal}
+                  onScore={(score) => void retenirScore(score)}
                 />
               </div>
             )}
@@ -453,37 +450,9 @@ function MemorisationContent() {
               </button>
             </div>
 
-            {retournee && (
-              <div className="fiche-bristol mt-5 rounded-3xl p-5 shadow-sm">
-                <p className="manuscrit text-center text-xl font-bold text-encre-950">
-                  Comment ce verset vous est-il revenu ?
-                </p>
-                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {[
-                    { quality: 0 as const, label: 'Oublié', tone: 'bg-rose-100 text-rose-800' },
-                    { quality: 1 as const, label: 'Difficile', tone: 'bg-orange-100 text-orange-800' },
-                    { quality: 2 as const, label: 'Bien', tone: 'bg-emerald-100 text-emerald-800' },
-                    { quality: 3 as const, label: 'Évident', tone: 'bg-indigo-100 text-indigo-800' },
-                  ].map((option) => (
-                    <button
-                      key={option.quality}
-                      onClick={() => void noter(option.quality)}
-                      className={`rounded-2xl px-3 py-3 text-xs font-bold transition-transform hover:-translate-y-0.5 ${option.tone}`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-                <p className="mt-3 text-center text-2xs text-encre-500">
-                  Correspondance de la transcription : {scoreVocal}% · ce repère sert uniquement à organiser les révisions.
-                </p>
-              </div>
-            )}
-
             <div className="mt-6 space-y-4">
               <p className="text-sm leading-relaxed text-encre-700">Vous pouvez relire le texte puis le redire intérieurement, à voix haute ou par écrit, sans microphone. La mémoire du texte et sa compréhension se travaillent ensemble.</p>
               <Link href={`/fiches/${carte.ficheId}`} className="inline-flex min-h-11 items-center text-sm font-semibold underline">Revenir au contexte dans la fiche {carte.ficheId}</Link>
-              <details className="rounded-2xl border border-parchemin-300 p-4"><summary className="min-h-11 cursor-pointer font-semibold">Ce que je comprends de ce passage</summary><TraceParole key={carte.cle} ficheId={carte.ficheId} cle={`trace:memoire:${carte.reference}`} reference={carte.reference} natureInitiale="comprehension" invitation="Que dit ce passage dans son contexte, et que souhaites-tu en garder ?" /></details>
             </div>
             <div className="mt-6 rounded-3xl border border-parchemin-400 bg-white p-5">
               <div className="mb-2 flex items-center justify-between text-2xs font-bold">

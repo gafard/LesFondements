@@ -20,12 +20,7 @@ export default function CarnetUnifie() {
     && `${e.titre} ${e.contenu} ${e.reference || ''}`.toLocaleLowerCase('fr').includes(recherche.toLocaleLowerCase('fr')))
     .sort((a, b) => (b.date || 0) - (a.date || 0) || b.ficheId - a.ficheId);
   return <section className="mb-10" aria-label="Mes écrits du parcours">
-    <div className="flex flex-wrap gap-3 text-sm font-semibold">
-      <Link href="/transformation" className="rounded-full border border-parchemin-400 px-4 py-3">Relire mes pas</Link>
-      <Link href="/carnet-export" className="rounded-full border border-parchemin-400 px-4 py-3">Composer mon export</Link>
-      <Link href="/recherche" className="rounded-full border border-parchemin-400 px-4 py-3">Chercher aussi dans le journal</Link>
-    </div>
-    <h2 className="mt-8 font-serif text-2xl font-bold text-encre-950">Les pages de mon parcours</h2>
+    <h2 className="font-serif text-2xl font-bold text-encre-950">Les pages de mon parcours</h2>
     <p className="mt-2 text-sm text-encre-600">Réponses, prières, questions, versets et relectures. L’étoile garde une page à retrouver.</p>
     <div className="my-5 grid gap-3 sm:grid-cols-2">
       <label className="text-sm text-encre-700">Type d’écrit<select className="mt-1 min-h-11 w-full rounded-xl border border-parchemin-400 bg-white px-3" value={filtre} onChange={e => setFiltre(e.target.value)}>

@@ -8,23 +8,17 @@ import { ouvrirCentre } from '@/lib/centre';
 import { useApplication } from '@/lib/application';
 import type { LucideIcon } from 'lucide-react';
 import {
-  Award,
   Bell,
-  Bookmark,
   Smartphone,
   BookMarked,
-  Brain,
   Compass,
   Home,
+  Landmark,
   LogOut,
-  MessageCircle,
+  Mail,
   MoreHorizontal,
   PenLine,
-  Printer,
-  Search,
-  Shield,
   ShieldCheck,
-  TrendingUp,
   Users,
   X,
 } from 'lucide-react';
@@ -70,18 +64,22 @@ const PRINCIPALES: Destination[] = [
   { href: '/groupes', label: 'Ma cellule', court: 'Cellule', icon: Users },
 ];
 
+// Le tableau de bord portait une dizaine d'entrées secondaires, dont
+// beaucoup redisaient ce que la fiche ou le carnet disent déjà. Les pages
+// existent toujours (on y arrive depuis la fiche, le carnet ou l'accueil) ;
+// la navigation ne garde que ce qui n'a pas d'autre porte.
 const SECONDAIRES: Destination[] = [
-  { href: '/memorisation', label: 'La Parole en mémoire', court: 'Versets', icon: Brain },
-  { href: '/recherche', label: 'Retrouver mes écrits', court: 'Recherche', icon: Search },
-  { href: '/transformation', label: 'Mon chemin intérieur', court: 'Chemin', icon: TrendingUp },
-  { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
-  { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
-  { href: '/ressources', label: 'Bibliothèque & Contact', court: 'Ressources', icon: BookMarked },
-  { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Bookmark },
-  { href: '/guide-pastoral', label: 'Guide pastoral', court: 'Guide', icon: Shield },
-  { href: '/certificat', label: 'Relire mon parcours', court: 'Relecture', icon: Award },
+  { href: '/ressources', label: 'Ressources', court: 'Ressources', icon: BookMarked },
+  { href: '/contact', label: 'Contact · retours et besoins', court: 'Contact', icon: Mail },
   { href: '/parametres', label: 'Mes réglages', court: 'Réglages', icon: ShieldCheck },
 ];
+
+const ACCUEIL: Destination = {
+  href: '/',
+  label: 'Page d’accueil',
+  court: 'Accueil',
+  icon: Landmark,
+};
 
 const ONGLETS_MOBILES = PRINCIPALES.slice(0, 4);
 const MENU_MOBILE = SECONDAIRES;
@@ -206,6 +204,9 @@ function ColonneLaterale({
         {SECONDAIRES.map((lien) => (
           <LienLateral key={lien.href} lien={lien} actif={estActive(pathname, lien.href)} />
         ))}
+        {/* Depuis l'application, rien ne ramenait à la page d'accueil : la
+            barre du haut disparaît dès qu'on entre dans son espace. */}
+        <LienLateral lien={ACCUEIL} actif={false} />
       </nav>
 
       <button
@@ -417,7 +418,7 @@ function BarreOnglets({
                   Tous les outils
                 </h2>
                 <p className="mt-1 text-xs text-encre-600">
-                  Carnets, ressources et repères du parcours.
+                  Ressources, contact et réglages.
                 </p>
               </div>
               <button
@@ -433,24 +434,21 @@ function BarreOnglets({
             <div className="max-h-[calc(min(72vh,42rem)-8rem)] overflow-y-auto px-4 pb-5 pt-4">
               <Link
                 ref={premierLien}
-                href={SECONDAIRES[0].href}
+                href={ACCUEIL.href}
                 onClick={() => setPlusOuvert(false)}
                 className="mb-4 flex min-h-14 items-center gap-3 rounded-2xl border border-or-300 bg-or-50 px-4 py-3 text-encre-950"
               >
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-or-100 text-or-800">
-                  <Brain className="h-5 w-5" />
+                  <Landmark className="h-5 w-5" />
                 </span>
                 <span>
-                  <span className="block font-serif text-base font-bold">Mémorisation</span>
-                  <span className="block text-2xs text-encre-600">Revoir et réciter les versets</span>
+                  <span className="block font-serif text-base font-bold">Page d’accueil</span>
+                  <span className="block text-2xs text-encre-600">Présentation, mode d’emploi, témoignages</span>
                 </span>
               </Link>
 
-              <p className="mb-2 px-1 text-3xs font-black uppercase tracking-[0.16em] text-encre-500">
-                Aller plus loin
-              </p>
               <div className="grid grid-cols-2 gap-2.5">
-                {SECONDAIRES.slice(1).map((lien) => {
+                {SECONDAIRES.map((lien) => {
                   const Icone = lien.icon;
                   const actif = estActive(pathname, lien.href);
                   return (
