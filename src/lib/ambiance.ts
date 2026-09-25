@@ -1,5 +1,5 @@
 import ambiancesImportees from '@/data/ambiances-importees.json';
-import { preparerPourLaVoix } from './prononciation.mjs';
+import { preparerPourLaVoix, allegerTextePourVoix } from './prononciation.mjs';
 import { decouperTextePourStudio } from './decoupageVoix';
 import { urlVoixStudio, voixStudioPossible } from './voixStudio';
 import { chargerManifesteVoix } from './voix';
@@ -454,6 +454,7 @@ async function urlDePiste(id?: string, genre: GenreVoix = getGenreVoix()): Promi
 type OptionsLecture = {
   vitesse?: number;
   genre?: GenreVoix;
+  alleger?: boolean;
   onDebut?: () => void;
   onFin?: () => void;
   onErreur?: () => void;
@@ -502,7 +503,7 @@ export function lireAVoixHaute(
   options: OptionsLecture = {}
 ): boolean {
   const genre = options.genre ?? getGenreVoix();
-  const dit = preparerPourLaVoix(texte);
+  const dit = options.alleger !== false ? allegerTextePourVoix(texte) : preparerPourLaVoix(texte);
   arreterLecture();
   if (!dit.trim()) return false;
 

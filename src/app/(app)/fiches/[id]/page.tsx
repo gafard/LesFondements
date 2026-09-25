@@ -112,9 +112,9 @@ function FicheContent() {
 
   const meta = FICHES_META.find((m) => m.id === ficheId);
   const preparee = membership?.preparedSteps.includes(ficheId) ?? false;
-  // Les prérequis personnels et l’avancée du groupe limitent toutes les entrées.
-  const maxFicheAccessible = Math.min(20, Math.max(1, preparationStep));
-  const fermee = ficheId > maxFicheAccessible;
+  // Consultation libre de l'ensemble des 20 fiches, guidage séquentiel conseillé.
+  const maxFicheAccessible = 20;
+  const fermee = false;
   // Conservé pour les écrans de partage ; aucune fiche future n’est lisible.
   const enPreparation = !!group && ficheId > unlockedStep;
 
@@ -228,12 +228,6 @@ function FicheContent() {
 
   if (ficheId > 1 && parcoursLoading) return <ChargementLecture titre={meta.titre} />;
 
-  if (fermee) {
-    return (
-      <AttenteFiche ficheId={ficheId} />
-    );
-  }
-
   if (fiche === undefined) return <ChargementLecture titre={meta.titre} />;
   if (fiche === null) {
     return (
@@ -249,7 +243,7 @@ function FicheContent() {
   }
 
   const precedente = ficheId > 1 ? ficheId - 1 : null;
-  const suivante = ficheId < 20 && ficheId < maxFicheAccessible ? ficheId + 1 : null;
+  const suivante = ficheId < 20 ? ficheId + 1 : null;
   const nbQuestions = meta.nbQuestions;
   // Deux jeux de réponses cohabitent sous le préfixe « q: » : celles des
   // temps à part, écrites jour après jour, et celles du livret, qui se
@@ -1183,7 +1177,7 @@ export default function Page() {
   const rawId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const parsedId = rawId ? Number.parseInt(rawId, 10) : 1;
   const ficheId = Number.isFinite(parsedId) ? parsedId : 1;
-  const acces = ficheId === 1 ? 'decouverte' : 'lecture';
+  const acces = 'decouverte';
 
   return (
     <ParcoursGate acces={acces}>

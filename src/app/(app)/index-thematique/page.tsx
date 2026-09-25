@@ -113,7 +113,7 @@ export default function IndexThematiquePage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {filtrees.map((entree, index) => {
-              const ouverte = !group || (entree.ficheId ?? 21) <= unlockedStep;
+              const ouverte = true;
               const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
               const pose = poses[index % poses.length];
 
@@ -124,7 +124,6 @@ export default function IndexThematiquePage() {
                     <h2 className="font-serif text-base font-bold leading-snug text-encre-950">
                       {entree.theme}
                     </h2>
-                    {!ouverte && <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-encre-300" />}
                   </div>
 
                   {entree.eclairage && (

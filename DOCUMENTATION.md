@@ -4,7 +4,7 @@
 
 ## 🌟 1. Vision Spirituelle & Pédagogique
 
-La plateforme **« Les Fondements »** est une application web et mobile progressive (PWA) de formation de disciples, conçue pour transformer le livret de référence de 164 pages (*moneglisepreferee.net*, 2015) en une expérience vivante, tactile, interactive et immersive.
+La plateforme **« Les Fondements »** est une application web et mobile progressive (PWA) de formation de disciples, conçue pour transformer le livret de référence de 164 pages (édition 2015) en une expérience vivante, tactile, interactive et immersive.
 
 ### Les 3 Principes Fondateurs :
 1. **Une table de travail vivante** : L'interface abandonne la froideur des applications utilitaires classiques pour recréer l'intimité chaleureuse d'une véritable table d'étude en bois noble, agrémentée de parchemins authentiques, de notes manuscrites, de Post-its colorés, de punaises 3D, de trombones métalliques, de rubans washi tape et de sceaux officiels.

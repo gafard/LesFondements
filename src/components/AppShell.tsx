@@ -15,6 +15,7 @@ import {
   BookMarked,
   Brain,
   Compass,
+  Globe,
   Home,
   LogOut,
   MessageCircle,
@@ -68,23 +69,20 @@ const PRINCIPALES: Destination[] = [
   { href: '/fiches', label: 'Le parcours', court: 'Parcours', icon: Compass },
   { href: '/journal', label: 'Mon carnet', court: 'Carnet', icon: PenLine },
   { href: '/groupes', label: 'Ma cellule', court: 'Cellule', icon: Users },
+  { href: '/ressources', label: 'Ressources', court: 'Ressources', icon: BookMarked },
 ];
 
 const SECONDAIRES: Destination[] = [
   { href: '/memorisation', label: 'La Parole en mémoire', court: 'Versets', icon: Brain },
-  { href: '/recherche', label: 'Retrouver mes écrits', court: 'Recherche', icon: Search },
-  { href: '/transformation', label: 'Mon chemin intérieur', court: 'Chemin', icon: TrendingUp },
-  { href: '/carnet-export', label: 'Carnet de Disciple (PDF)', court: 'Carnet', icon: Printer },
-  { href: '/temoignages', label: 'Témoignages', court: 'Témoignages', icon: MessageCircle },
-  { href: '/ressources', label: 'Bibliothèque & Contact', court: 'Ressources', icon: BookMarked },
-  { href: '/index-thematique', label: 'Index thématique', court: 'Index', icon: Bookmark },
-  { href: '/guide-pastoral', label: 'Guide pastoral', court: 'Guide', icon: Shield },
-  { href: '/certificat', label: 'Relire mon parcours', court: 'Relecture', icon: Award },
   { href: '/parametres', label: 'Mes réglages', court: 'Réglages', icon: ShieldCheck },
+  { href: '/', label: 'Présentation publique', court: 'Accueil', icon: Globe },
 ];
 
 const ONGLETS_MOBILES = PRINCIPALES.slice(0, 4);
-const MENU_MOBILE = SECONDAIRES;
+const MENU_MOBILE = [
+  ...PRINCIPALES.slice(4),
+  ...SECONDAIRES,
+];
 
 function estActive(pathname: string, href: string): boolean {
   return href === '/dashboard' ? pathname === href : pathname.startsWith(href);
@@ -155,22 +153,32 @@ function ColonneLaterale({
 
   return (
     <aside className="nuit reliure-bureau sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto px-4 py-5 text-parchemin-100 lg:flex xl:w-72">
-      <Link href="/dashboard" className="group mb-6 flex items-center gap-3 px-2">
-        <Image
-          src="/logo-transparent.png"
-          alt="Les Fondements"
-          width={36}
-          height={36}
-          className="h-9 w-9 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
-          priority
-        />
-        <span className="flex flex-col leading-none">
-          <span className="font-serif text-base font-bold text-parchemin-100">Les Fondements</span>
-          <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-or-400/80">
-            Parcours vivant
+      <div className="mb-6 flex items-center justify-between px-2">
+        <Link href="/dashboard" className="group flex items-center gap-3">
+          <Image
+            src="/logo-transparent.png"
+            alt="Les Fondements"
+            width={36}
+            height={36}
+            className="h-9 w-9 shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
+            priority
+          />
+          <span className="flex flex-col leading-none">
+            <span className="font-serif text-base font-bold text-parchemin-100">Les Fondements</span>
+            <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-or-400/80">
+              Parcours vivant
+            </span>
           </span>
-        </span>
-      </Link>
+        </Link>
+        <Link
+          href="/"
+          title="Retour au site public"
+          className="rounded-lg p-2 text-parchemin-100/50 hover:bg-white/10 hover:text-parchemin-100 transition-colors"
+          aria-label="Présentation publique"
+        >
+          <Globe className="h-4 w-4" />
+        </Link>
+      </div>
 
       {group && gate.state === 'ouvert' && (
         <Link
@@ -302,6 +310,14 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
           <div className="mobile-sync">
             <SyncStatusBadge />
           </div>
+          <Link
+            href="/"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-parchemin-300 active:scale-95"
+            aria-label="Présentation publique"
+            title="Retour à la présentation publique"
+          >
+            <Globe className="h-4 w-4" />
+          </Link>
           <button
             onClick={onOuvrirNotifs}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-parchemin-300 active:scale-95"
@@ -431,31 +447,17 @@ function BarreOnglets({
             </div>
 
             <div className="max-h-[calc(min(72vh,42rem)-8rem)] overflow-y-auto px-4 pb-5 pt-4">
-              <Link
-                ref={premierLien}
-                href={SECONDAIRES[0].href}
-                onClick={() => setPlusOuvert(false)}
-                className="mb-4 flex min-h-14 items-center gap-3 rounded-2xl border border-or-300 bg-or-50 px-4 py-3 text-encre-950"
-              >
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-or-100 text-or-800">
-                  <Brain className="h-5 w-5" />
-                </span>
-                <span>
-                  <span className="block font-serif text-base font-bold">Mémorisation</span>
-                  <span className="block text-2xs text-encre-600">Revoir et réciter les versets</span>
-                </span>
-              </Link>
-
               <p className="mb-2 px-1 text-3xs font-black uppercase tracking-[0.16em] text-encre-500">
-                Aller plus loin
+                Menu & Repères
               </p>
               <div className="grid grid-cols-2 gap-2.5">
-                {SECONDAIRES.slice(1).map((lien) => {
+                {MENU_MOBILE.map((lien, idx) => {
                   const Icone = lien.icon;
                   const actif = estActive(pathname, lien.href);
                   return (
                     <Link
                       key={lien.href}
+                      ref={idx === 0 ? premierLien : undefined}
                       href={lien.href}
                       onClick={() => setPlusOuvert(false)}
                       aria-current={actif ? 'page' : undefined}

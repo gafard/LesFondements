@@ -27,11 +27,11 @@ export default function GuidePastoralPrintPage() {
           className="inline-flex items-center gap-2 rounded-full bg-encre-950 px-5 py-2.5 text-xs font-bold text-parchemin-100 shadow-md hover:bg-encre-800 transition-all hover:scale-105 active:scale-95"
         >
           <Printer className="h-4 w-4 text-or-300" />
-          <span>Imprimer la Fiche Bible (A4)</span>
+          <span>Imprimer la fiche Prendre soin les uns des autres (Résumé)</span>
         </button>
       </div>
 
-      {/* Feuille A4 Mémo Pastoral */}
+      {/* Feuille A4 Mémo Fraternel */}
       <main className="mx-auto max-w-4xl rounded-3xl bg-white p-8 sm:p-12 shadow-xl border border-parchemin-300 print:border-none print:shadow-none print:p-6 print:max-w-none print:rounded-none">
         
         {/* En-tête officiel */}
@@ -39,7 +39,7 @@ export default function GuidePastoralPrintPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-3xs font-bold uppercase tracking-[0.25em] text-or-800 font-serif">
-                Parcours des Fondements · Annexe Pastorale
+                Parcours des Fondements · Repères fraternels
               </span>
               <span className="rounded-full bg-parchemin-200 px-2 py-0.5 text-3xs font-semibold text-encre-800 print:hidden">
                 Accompagnement Fiches 7, 8 &amp; 15
@@ -49,7 +49,7 @@ export default function GuidePastoralPrintPage() {
               Prendre soin les uns des autres
             </h1>
             <p className="mt-1 font-serif text-xs italic text-encre-600">
-              Guide pastoral des cellules de partage et de prière d’accompagnement
+              Repères pour les cellules de partage et la prière d’accompagnement
             </p>
           </div>
 

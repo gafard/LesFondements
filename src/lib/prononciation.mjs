@@ -299,3 +299,31 @@ export function preparerPourLaVoix(texte) {
   sortie += texte.slice(position);
   return sortie.replace(/\s{2,}/g, ' ').trim();
 }
+
+/**
+ * Allège un texte destiné à la lecture audio continue en retirant les
+ * références bibliques entre parenthèses qui hachent la diction
+ * (ex: « (1 Jn 4:16 ; Ps 103) » -> retiré).
+ * Les phrases s'enchaînent avec fluidité et sérénité.
+ *
+ * @param {string} texte
+ * @returns {string}
+ */
+export function allegerTextePourVoix(texte) {
+  if (typeof texte !== 'string' || !texte) return texte ?? '';
+
+  // 1. Retirer les références entre parenthèses
+  let epure = texte.replace(
+    /\s*\([^)]*(?:[123]\s*)?(?:Gn|Gen|Ex|Lv|Nb|Dt|Jos|Jg|Rt|Sam|S\b|Rois|R\b|Chr|Ch\b|Esd|Ne|Est|Jb|Ps|Pr|Ec|Ct|Es|Jr|Lm|Ez|Dn|Os|Jl|Am|Ab|Jon|Mi|Na|Ha|So|Ag|Za|Ml|Mt|Mc|Lc|Jn|Ac|Rm|Co|Ga|Ep|Ph|Col|Th|Tm|Tt|Phm|He|Jc|P\b|Pi\b|Jd|Ap)[^)]*\)/gi,
+    ''
+  );
+
+  // 2. Nettoyer les ponctuations orphelines
+  epure = epure
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/([,;])\s*([.!?])/g, '$2')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  return preparerPourLaVoix(epure);
+}

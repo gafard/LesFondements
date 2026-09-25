@@ -250,7 +250,7 @@ export default function RessourcesPage() {
   const onglets: { id: Onglet; label: string; icon: typeof ScrollText }[] = [
     { id: 'presentation', label: 'Mode d’emploi', icon: ScrollText },
     { id: 'prendre-soin', label: 'Prendre soin les uns des autres', icon: HeartHandshake },
-    { id: 'bibliographie', label: 'Bibliothèque d’Étude', icon: Library },
+    { id: 'bibliographie', label: 'Bibliographie', icon: Library },
     { id: 'retours', label: 'Retours & Besoins (Nous écrire)', icon: MessageSquareHeart },
   ];
 
@@ -306,7 +306,7 @@ export default function RessourcesPage() {
             Ressources des Fondements
           </h1>
           <p className="mx-auto mt-2 max-w-lg text-xs leading-relaxed text-encre-600 sm:text-sm">
-            La vision originelle du parcours, le guide pastoral pour votre cellule, les ouvrages de référence reliés et l&apos;espace pour nous écrire.
+            La vision originelle du parcours, prendre soin les uns des autres en cellule, la bibliographie des ouvrages référencés et l&apos;espace pour nous écrire.
           </p>
         </div>
 
@@ -373,11 +373,11 @@ export default function RessourcesPage() {
             <div className="rounded-2xl border border-or-300 bg-amber-50/90 p-5 shadow-2xs">
               <div className="flex items-center gap-2 mb-2 text-or-900 font-bold text-sm">
                 <HeartHandshake className="h-4 w-4 text-or-700" />
-                Guide pastoral des cellules de partage
+                Prendre soin les uns des autres dans la cellule de partage
               </div>
               <p className="text-xs leading-relaxed text-or-950">
-                Cette annexe accompagne particulièrement les fiches 7, 8 et 15. Le livret la donne aux responsables
-                avant les temps de prière personnels — mais elle concerne la vie et l&apos;amour fraternel de tout le groupe.
+                Cette annexe accompagne particulièrement les fiches 7, 8 et 15. Le livret la donne à chacun
+                avant les temps de prière et d’écoute fraternelle — elle concerne la vie et l&apos;amour fraternel de tout le groupe.
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Link
@@ -386,7 +386,7 @@ export default function RessourcesPage() {
                   className="timbre inline-flex items-center gap-1.5 rounded-lg bg-or-300 px-3.5 py-1.5 text-2xs font-bold text-or-950 hover:bg-or-400 transition-colors shadow-2xs"
                 >
                   <Printer className="h-3 w-3" />
-                  Imprimer la Fiche Bible (A4)
+                  Imprimer la fiche Prendre soin les uns des autres (Résumé)
                 </Link>
                 {[7, 8, 15].map((id) => (
                   <Link
@@ -529,7 +529,7 @@ export default function RessourcesPage() {
                       <div>
                         <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2 mb-3">
                           <span className="text-3xs font-mono tracking-wider uppercase text-amber-200/70 font-bold">
-                            Ouvrage Référencé
+                            Ouvrage référencé - Extraits choisis
                           </span>
                           <span className="text-3xs font-serif italic text-white/50">
                             {livre.fiches.length > 0 ? `${livre.fiches.length} fiches` : 'Général'}
@@ -596,7 +596,7 @@ export default function RessourcesPage() {
 
                   <div className="border border-white/15 rounded-2xl p-6">
                     <span className="text-3xs uppercase font-bold tracking-widest text-amber-300/80 block mb-1">
-                      Fiche de Lecture & Citation
+                      Ouvrage référencé - Extraits choisis
                     </span>
                     {livreSelectionne.auteur && (
                       <h4 className="font-serif text-base text-amber-200">
@@ -828,7 +828,7 @@ export default function RessourcesPage() {
                   Télécharger le livret original (PDF)
                 </p>
                 <p className="text-2xs text-encre-600 mt-0.5">
-                  Livret complet original (édition 2015) mis à disposition sur le portail moneglisepreferee.net
+                  Livret complet original de Damien Pradel (édition 2015, 164 pages) en accès libre.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -839,14 +839,6 @@ export default function RessourcesPage() {
                   className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-or-600 bg-or-400 text-encre-950 px-4 py-2 text-2xs font-bold hover:bg-or-300 transition-colors shadow-2xs"
                 >
                   Télécharger le Livret PDF ↗
-                </a>
-                <a
-                  href="https://moneglisepreferee.net"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-parchemin-300 bg-white px-4 py-2 text-2xs font-bold text-encre-800 hover:bg-parchemin-50 transition-colors shadow-2xs"
-                >
-                  Visiter moneglisepreferee.net ↗
                 </a>
               </div>
             </div>

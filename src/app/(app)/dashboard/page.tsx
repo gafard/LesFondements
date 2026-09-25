@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { BellRing, Bookmark, Check, ChevronDown, Play, Users } from 'lucide-react';
+import { BellRing, Bookmark, Check, ChevronDown, Globe, Play, Users } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -57,9 +57,18 @@ function DashboardContent({ ficheId }: { ficheId: number }) {
   return (
     <div className="min-h-screen bg-parchemin-50 px-4 pb-10 pt-7 text-encre-950 sm:px-7">
       <div className="mx-auto max-w-4xl space-y-7">
-        <header>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-or-800">Aujourd’hui</p>
-          <h1 className="mt-2 font-serif text-2xl font-bold sm:text-3xl">Bonjour{user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}.</h1>
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-or-800">Aujourd’hui</p>
+            <h1 className="mt-2 font-serif text-2xl font-bold sm:text-3xl">Bonjour{user?.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}.</h1>
+          </div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 self-start rounded-full border border-parchemin-300 bg-white px-3.5 py-1.5 text-xs font-bold text-encre-700 shadow-2xs hover:border-or-400 hover:text-encre-950 transition-colors"
+          >
+            <Globe className="h-3.5 w-3.5 text-or-600" />
+            <span>Présentation publique</span>
+          </Link>
         </header>
         {contenu ? <ReprendreParole ficheId={ficheId} section={prochaine} titre={contenu.fiche.titre} titreSection={sections[prochaine]?.section.titre || contenu.fiche.titre} terminee={terminee} enCellule={!!group} parcoursTermine={parcoursTermine} />
           : erreur ? <p role="alert">Ce temps n’a pas pu être chargé. <Link href={`/fiches/${ficheId}`} className="underline">Ouvrir la fiche {ficheId}</Link></p>
