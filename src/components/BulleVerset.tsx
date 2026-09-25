@@ -63,12 +63,13 @@ function calculerPosition(element: HTMLElement, hauteurEstimee = 220): PositionB
 
 /**
  * Papillon d'étude posé sous le verset cliqué :
- * Privilégie La Bible du Semeur (BDS) et son streaming audio réel en studio.
+ * Affiche la Louis Segond 1910 (domaine public) ; la Semeur, traduction du
+ * livret, reste consultable d'un clic quand le passage est connu.
  */
 export default function BulleVerset() {
   const bulle = useBulleVerset();
   const [passage, setPassage] = useState<Passage | null | undefined>(undefined);
-  const [versionChoisie, setVersionChoisie] = useState<'bds' | 'lsg'>('bds');
+  const [versionChoisie, setVersionChoisie] = useState<'bds' | 'lsg'>('lsg');
   const [copie, setCopie] = useState(false);
   const [audioEnCours, setAudioEnCours] = useState(false);
   const [position, setPosition] = useState<PositionBulle | null>(null);
@@ -83,7 +84,7 @@ export default function BulleVerset() {
     setPassage(undefined);
     setCopie(false);
     setAudioEnCours(false);
-    setVersionChoisie('bds');
+    setVersionChoisie('lsg');
     if (bulle?.ancre) {
       setPosition(calculerPosition(bulle.ancre));
     } else {
@@ -180,7 +181,7 @@ export default function BulleVerset() {
   const comparaison = getComparaisonVerset(bulle.reference.brut) || getComparaisonVerset(formaterReference(bulle.reference));
   const texteConnuSegond = texteDuVerset(bulle.reference.brut) || texteDuVerset(formaterReference(bulle.reference));
 
-  // Texte à afficher selon la version (BDS par défaut si disponible)
+  // Texte à afficher selon la version (Segond par défaut)
   const texteSemeur = comparaison?.bds;
   const texteSegond = passage ? texteSeul(passage.versets) : texteConnuSegond || comparaison?.lsg || '';
 
@@ -293,7 +294,7 @@ export default function BulleVerset() {
       >
         <span className="ruban -top-2.5 left-1/2 -translate-x-1/2 -rotate-2 rounded-[2px]" />
 
-        {/* En-tête avec sélecteur de version (Semeur par défaut) */}
+        {/* En-tête avec sélecteur de version (Segond par défaut) */}
         <div className="flex items-center justify-between gap-2 border-b border-parchemin-300/80 pb-2">
           <div>
             <p className="manuscrit text-2xl font-bold leading-none text-or-700">{titre}</p>
@@ -304,9 +305,7 @@ export default function BulleVerset() {
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 text-encre-500">
-                  <span>📖 Segond 1910</span>
-                  <span>•</span>
-                  <span className="font-semibold text-or-700">🎧 Audio Semeur (BDS)</span>
+                  📖 Louis Segond 1910
                 </span>
               )}
             </div>
@@ -315,18 +314,6 @@ export default function BulleVerset() {
           <div className="flex items-center gap-1.5">
             {texteSemeur && (
               <div className="flex items-center rounded-lg bg-parchemin-200/70 p-0.5 text-3xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setVersionChoisie('bds')}
-                  className={`rounded px-1.5 py-0.5 transition-all ${
-                    versionChoisie === 'bds'
-                      ? 'bg-or-600 text-white shadow-2xs'
-                      : 'text-encre-600 hover:text-encre-950'
-                  }`}
-                  title="La Bible du Semeur (Traduction du livret)"
-                >
-                  Semeur
-                </button>
                 <button
                   type="button"
                   onClick={() => setVersionChoisie('lsg')}
@@ -338,6 +325,18 @@ export default function BulleVerset() {
                   title="Louis Segond 1910"
                 >
                   LSG
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVersionChoisie('bds')}
+                  className={`rounded px-1.5 py-0.5 transition-all ${
+                    versionChoisie === 'bds'
+                      ? 'bg-or-600 text-white shadow-2xs'
+                      : 'text-encre-600 hover:text-encre-950'
+                  }`}
+                  title="La Bible du Semeur (Traduction du livret)"
+                >
+                  Semeur
                 </button>
               </div>
             )}

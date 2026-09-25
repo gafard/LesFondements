@@ -32,6 +32,17 @@ const cas = new Map([
   ['De 16:16', 'Deutéronome, chapitre 16, verset 16'],
   ['2 Corinthiens, chapitre 3', 'deuxième lettre aux Corinthiens, chapitre 3'],
   ['Il y a plus de 1000 citations.', 'Il y a plus de 1000 citations.'],
+  // Les références d'appui, entre parenthèses, ne sont pas lues.
+  [
+    'Cette rupture s’est répercutée sur l’humanité (Rm 5:12 ; 1 Co 15:22). Nous avons péché.',
+    'Cette rupture s’est répercutée sur l’humanité. Nous avons péché.',
+  ],
+  ['La vie éternelle (Jn 3:16).', 'La vie éternelle.'],
+  ['Par la Loi (Rm 3:20, 28 ; Ga 3:11), rien.', 'Par la Loi, rien.'],
+  ['Voir aussi (cf. Ep 2:8-9) la grâce.', 'Voir aussi la grâce.'],
+  // Une parenthèse qui dit autre chose reste lue.
+  ['La mort spirituelle (= séparé de Dieu).', 'La mort spirituelle (= séparé de Dieu).'],
+  ['Lisez Jean 4:12.', 'Lisez Jean, chapitre 4, verset 12.'],
 ]);
 
 for (const [entree, attendu] of cas) {

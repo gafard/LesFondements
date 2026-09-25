@@ -257,18 +257,13 @@ function lireCoordonnees(reste, livre, nomLivre) {
 }
 
 /**
- * Développe toutes les références reconnues. La fonction est idempotente :
- * lui redonner un texte déjà préparé ne doit jamais le modifier une seconde
- * fois.
+ * Repère les références bibliques d'un texte.
  *
  * @param {string} texte
- * @returns {string}
+ * @returns {Array<{ debut: number, fin: number, texte: string }>}
  */
-export function preparerPourLaVoix(texte) {
-  if (typeof texte !== 'string' || !texte) return texte ?? '';
-
-  let sortie = '';
-  let position = 0;
+function trouverReferences(texte) {
+  const trouvees = [];
   RE_LIVRE.lastIndex = 0;
 
   for (let match = RE_LIVRE.exec(texte); match; match = RE_LIVRE.exec(texte)) {
@@ -290,12 +285,63 @@ export function preparerPourLaVoix(texte) {
     const coordonnees = lireCoordonnees(texte.slice(finLivre), livre, nomLivre);
     if (!coordonnees) continue;
 
-    sortie += texte.slice(position, debutLivre);
-    sortie += coordonnees.texte;
-    position = finLivre + coordonnees.longueur;
-    RE_LIVRE.lastIndex = position;
+    const fin = finLivre + coordonnees.longueur;
+    trouvees.push({ debut: debutLivre, fin, texte: coordonnees.texte });
+    RE_LIVRE.lastIndex = fin;
   }
 
-  sortie += texte.slice(position);
+  return trouvees;
+}
+
+/** Ce qui peut accompagner des références dans une parenthèse d'appui. */
+const RE_LIANTS =
+  /^(?:[\s;,.:+\-–—…\d]|et\b|cf\b\.?|voir\b|aussi\b|selon\b|etc\b\.?|vv?\.|(?:LS|LSG|PV|S21|BDS|NBS|TOB|NEG|Darby)\b)*$/i;
+
+/**
+ * Les références citées en appui, entre parenthèses — « (Rm 5:12 ; 1 Co
+ * 15:22) » — se lisent d'un coup d'œil mais s'entendent mal : « Romains,
+ * chapitre 5, verset 12 ; première lettre aux Corinthiens… » coupe le fil
+ * du texte. À l'oreille, on les omet. Une parenthèse qui dit autre chose
+ * (« (= séparé de Dieu) ») est gardée.
+ *
+ * @param {string} texte
+ * @returns {string}
+ */
+function retirerReferencesDAppui(texte) {
+  return texte.replace(/\s*\(([^()]*)\)/g, (entiere, contenu) => {
+    const references = trouverReferences(contenu);
+    if (!references.length) return entiere;
+    let reste = '';
+    let position = 0;
+    for (const reference of references) {
+      reste += contenu.slice(position, reference.debut);
+      position = reference.fin;
+    }
+    reste += contenu.slice(position);
+    return RE_LIANTS.test(reste) ? '' : entiere;
+  });
+}
+
+/**
+ * Développe toutes les références reconnues, après avoir omis celles qui
+ * ne sont citées qu'en appui. La fonction est idempotente : lui redonner un
+ * texte déjà préparé ne doit jamais le modifier une seconde fois.
+ *
+ * @param {string} texte
+ * @returns {string}
+ */
+export function preparerPourLaVoix(texte) {
+  if (typeof texte !== 'string' || !texte) return texte ?? '';
+
+  const allege = retirerReferencesDAppui(texte);
+  let sortie = '';
+  let position = 0;
+  for (const reference of trouverReferences(allege)) {
+    sortie += allege.slice(position, reference.debut);
+    sortie += reference.texte;
+    position = reference.fin;
+  }
+
+  sortie += allege.slice(position);
   return sortie.replace(/\s{2,}/g, ' ').trim();
 }
