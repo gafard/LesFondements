@@ -322,18 +322,18 @@ function LoginContent() {
             Continuer avec Google
           </button>
 
-          {/* Mode Découverte libre : Fiche 1 & Lettre du Père */}
+          {/* Mode Découverte libre : 20 fiches en accès libre */}
           <Link
-            href="/fiches/1"
+            href="/fiches"
             className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-50 border border-or-400/80 py-3.5 text-xs font-bold text-or-950 transition-all hover:bg-amber-100 shadow-xs hover:scale-101"
           >
             <BookOpen className="h-4 w-4 text-or-700" />
-            Explorer en accès libre (Fiche 1 & Lettre du Père)
+            Découvrir les 20 fiches (Accès libre)
           </Link>
         </div>
 
         <p className="mt-5 text-center text-2xs leading-relaxed text-parchemin-100/40">
-          La Fiche 1 est en accès libre. Pour les 19 fiches suivantes, vous rejoindrez votre cellule de partage.
+          Toutes les fiches sont en consultation libre. La création de compte permet de rejoindre une cellule et de garder vos notes personnelles.
         </p>
       </div>
     </div>

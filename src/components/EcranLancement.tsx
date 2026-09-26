@@ -168,10 +168,10 @@ export default function EcranLancement() {
                 Vingt fiches préparées seul, vécues chaque semaine en cellule.
               </p>
               <Link
-                href="/fiches/1"
+                href="/fiches"
                 className="bouton-or mt-6 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-bold shadow-lg"
               >
-                Explorer la Fiche 1 (Accès libre)
+                Découvrir les 20 fiches (Accès libre)
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
               <Link

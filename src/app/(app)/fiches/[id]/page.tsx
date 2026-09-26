@@ -755,7 +755,7 @@ function FicheContent() {
                   Vous avez exploré « Connaître Dieu »
                 </h3>
                 <p className="font-serif text-xs text-encre-700 leading-relaxed">
-                  Pour aller plus loin, vivre les 19 fiches suivantes et partager vos découvertes chaque semaine, rassemblez 4 ou 5 compagnons ou rejoignez une cellule existante.
+                  Vous venez de poser ce premier fondement. Pour approfondir ces vérités, partager vos réflexions chaque semaine et cheminer au fil des 20 étapes, rassemblez quelques compagnons de route ou rejoignez une cellule de communion.
                 </p>
               </div>
               <Link

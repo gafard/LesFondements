@@ -311,21 +311,33 @@ export default function RessourcesPage() {
         </div>
 
         {/* Navigation des Onglets */}
-        <div className="mb-8 flex gap-1.5 overflow-x-auto border-b border-parchemin-300 pb-px scrollbar-none">
-          {onglets.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setOnglet(tab.id)}
-              className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-xs font-bold transition-all ${
-                onglet === tab.id
-                  ? 'border-or-600 text-or-800 bg-amber-50/60 rounded-t-xl'
-                  : 'border-transparent text-encre-500 hover:text-encre-800 hover:bg-parchemin-100/50'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" strokeWidth={2} />
-              {tab.label}
-            </button>
-          ))}
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-parchemin-300 pb-2">
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
+            {onglets.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setOnglet(tab.id)}
+                className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-xs font-bold transition-all ${
+                  onglet === tab.id
+                    ? 'border-or-600 text-or-800 bg-amber-50/60 rounded-t-xl'
+                    : 'border-transparent text-encre-500 hover:text-encre-800 hover:bg-parchemin-100/50'
+                }`}
+              >
+                <tab.icon className="h-4 w-4" strokeWidth={2} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <a
+            href="https://leparcoursdesfondements.files.wordpress.com/2012/01/livret-vf-12-03-2015.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-or-500/80 bg-or-300/90 hover:bg-or-400 px-4 py-2 text-2xs font-bold text-encre-950 transition-colors shadow-2xs"
+          >
+            <Printer className="h-3.5 w-3.5" />
+            Télécharger le livret complet (PDF ↗)
+          </a>
         </div>
 
         {!livret ? (

@@ -111,10 +111,10 @@ export default function Home() {
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
-                href="/fiches/1"
+                href="/fiches"
                 className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold text-slate-950 shadow-lg hover:scale-105 transition-all"
               >
-                Explorer la Fiche 1 (Accès libre)
+                Découvrir les 20 fiches (Accès libre)
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
@@ -172,12 +172,12 @@ export default function Home() {
             Une marche personnelle et fraternelle
           </p>
           <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
-            La Fiche 1 s&apos;ouvre librement.
+            20 fiches en libre consultation.
             <br />
-            <span className="italic text-or-600">Le parcours se vit ensemble.</span>
+            <span className="italic text-or-600">Un cheminement qui se vit ensemble.</span>
           </h2>
           <p className="mt-4 text-xs sm:text-sm leading-relaxed text-encre-700">
-            Découvrez la première étape sans barrière. Pour vivre les 20 semaines et forger une foi solide, rassemblez vos compagnons de route.
+            Explorez librement chaque fondement pour nourrir votre foi. Mais le trésor de la vie chrétienne prend toute sa force en communauté : formez ou rejoignez une cellule de 5 à 6 frères et sœurs.
           </p>
         </div>
 
@@ -271,7 +271,7 @@ export default function Home() {
 
         <div className="mx-auto mt-10 max-w-2xl rounded-3xl border border-[#ded6c8] bg-white/80 px-6 py-5 text-center shadow-2xs backdrop-blur-md">
           <p className="font-serif text-sm sm:text-base italic leading-relaxed text-slate-800">
-            « La Fiche 1 s&apos;explore librement. Dès la Fiche 2, vous la préparez chez vous, vous la vivez ensemble en cellule, puis la suivante s&apos;ouvre. »
+            « Vous pouvez consulter librement chacune des 20 fiches. Chaque semaine, la cellule permet de partager ses découvertes, de prier les uns pour les autres et d&apos;ancrer la Parole dans le quotidien. »
           </p>
         </div>
       </section>
@@ -413,14 +413,22 @@ export default function Home() {
           </div>
 
           <div className="mt-14 text-center">
-            <Link
-              href="/login"
-              className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-xs font-bold shadow-lg"
-            >
-              Trouver un groupe et ouvrir la fiche 1 <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/fiches"
+                className="bouton-or inline-flex items-center gap-2 rounded-full px-8 py-4 text-xs font-bold shadow-lg hover:scale-105 transition-all"
+              >
+                Parcourir les 20 fiches <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-full border border-encre-200 bg-encre-950 px-8 py-4 text-xs font-bold text-white shadow-sm transition-colors hover:bg-encre-800"
+              >
+                Rejoindre une cellule
+              </Link>
+            </div>
             <p className="mx-auto mt-3 max-w-sm text-2xs leading-relaxed text-encre-500">
-              Les fiches s&apos;ouvrent une à une, au rythme de votre groupe.
+              Progression conseillée fiche après fiche, seul et en communion fraternelle.
             </p>
           </div>
         </div>

@@ -163,11 +163,11 @@ function EcranFerme({
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
-            href="/fiches/1"
+            href="/fiches"
             className="bouton-or w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-bold shadow-lg"
           >
             <BookOpen className="h-4 w-4" />
-            Explorer la Fiche 1 (Accès libre)
+            Découvrir les fiches (Accès libre)
           </Link>
 
           <Link
