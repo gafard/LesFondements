@@ -64,6 +64,7 @@ export default function EcouteContinueFiche({
 }: EcouteContinueFicheProps) {
   const [indexPiste, setIndexPiste] = useState(0);
   const [enLecture, setEnLecture] = useState(false);
+  const [sansReferences, setSansReferences] = useState(true);
   const [manifeste, setManifeste] = useState<Manifeste | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -209,7 +210,16 @@ export default function EcouteContinueFiche({
       return;
     }
 
-    if (piste?.urlAudio && audioRef.current) {
+    // Si l'option "sans références" est active et qu'il s'agit d'un enseignement textuel,
+    // on privilégie la lecture allégée en direct pour ne pas énoncer les parenthèses.
+    if (!sansReferences && piste?.urlAudio && audioRef.current) {
+      arreterLecture();
+      audioRef.current.src = piste.urlAudio;
+      audioRef.current
+        .play()
+        .then(() => setEnLecture(true))
+        .catch(() => setEnLecture(false));
+    } else if (piste?.type === 'bible' && piste?.urlAudio && audioRef.current) {
       arreterLecture();
       audioRef.current.src = piste.urlAudio;
       audioRef.current
@@ -220,6 +230,7 @@ export default function EcouteContinueFiche({
       if (audioRef.current) audioRef.current.pause();
       setEnLecture(true);
       lireAVoixHaute(piste.texte, {
+        alleger: sansReferences,
         onFin: () => {
           if (idx + 1 < playlist.length) {
             jouerPiste(idx + 1);
@@ -229,6 +240,13 @@ export default function EcouteContinueFiche({
         },
         onErreur: () => setEnLecture(false),
       });
+    } else if (piste?.urlAudio && audioRef.current) {
+      arreterLecture();
+      audioRef.current.src = piste.urlAudio;
+      audioRef.current
+        .play()
+        .then(() => setEnLecture(true))
+        .catch(() => setEnLecture(false));
     }
   };
 
@@ -378,9 +396,23 @@ export default function EcouteContinueFiche({
             </button>
           </div>
 
-          <span className="text-3xs text-parchemin-100/50 italic hidden sm:inline font-serif">
-            Enchaînement automatique des sections
-          </span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSansReferences(!sansReferences)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-3xs font-semibold transition-colors ${
+                sansReferences
+                  ? 'bg-or-400/20 text-or-300 border border-or-400/30'
+                  : 'bg-white/5 text-parchemin-100/50 hover:text-white'
+              }`}
+              title="Passer sous silence les références entre parenthèses pour une écoute fluide"
+            >
+              <span>{sansReferences ? 'Sans références ✓' : 'Avec références'}</span>
+            </button>
+            <span className="text-3xs text-parchemin-100/50 italic hidden sm:inline font-serif">
+              Enchaînement automatique
+            </span>
+          </div>
         </div>
       </div>
     </div>

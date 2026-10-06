@@ -67,7 +67,7 @@ function DashboardContent({ ficheId }: { ficheId: number }) {
             className="inline-flex items-center gap-2 self-start rounded-full border border-parchemin-300 bg-white px-3.5 py-1.5 text-xs font-bold text-encre-700 shadow-2xs hover:border-or-400 hover:text-encre-950 transition-colors"
           >
             <Globe className="h-3.5 w-3.5 text-or-600" />
-            <span>Présentation publique</span>
+            <span>Accueil</span>
           </Link>
         </header>
         {contenu ? <ReprendreParole ficheId={ficheId} section={prochaine} titre={contenu.fiche.titre} titreSection={sections[prochaine]?.section.titre || contenu.fiche.titre} terminee={terminee} enCellule={!!group} parcoursTermine={parcoursTermine} />
@@ -84,7 +84,7 @@ function DashboardContent({ ficheId }: { ficheId: number }) {
           </section>
           {refVerset && <section className="rounded-3xl border border-or-200 bg-or-50 p-6" aria-labelledby="parole-titre">
             <h2 id="parole-titre" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-or-800"><Bookmark className="h-4 w-4" />{paroles.length ? 'La Parole que tu gardes' : 'Un passage à découvrir'}</h2>
-            {verset && <blockquote className="mt-4 font-serif text-lg leading-relaxed">« {verset} »</blockquote>}
+            {verset && <blockquote className="mt-4 font-serif text-sm sm:text-base italic font-normal leading-relaxed text-encre-800">« {verset} »</blockquote>}
             <p className="mt-3 text-sm font-semibold text-or-900">{refVerset}</p>
             <Link href={paroles.length ? '/memorisation' : `/fiches/${ficheId}`} className="mt-3 inline-flex min-h-11 items-center text-sm font-bold underline underline-offset-4">{paroles.length ? 'Revoir cette Parole' : 'Lire dans la fiche'}</Link>
           </section>}

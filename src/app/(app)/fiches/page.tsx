@@ -2,95 +2,168 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, Check, ChevronDown, LayoutGrid, Lock, Route, Search, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, Check, Route, Search } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
-import { etapePersonnelle } from '@/lib/parcoursDomain';
 import ParcoursGate from '@/components/ParcoursGate';
 import { FICHES_META } from '@/data/fichesMeta';
 
-const CHAPITRES = [
-  { id: 1, titre: 'Recevoir', sous: 'Dieu, le salut, la grâce et notre identité en Christ.', debut: 1, fin: 5 },
-  { id: 2, titre: 'Être transformé', sous: 'Vie nouvelle, liberté, pardon et puissance du Saint-Esprit.', debut: 6, fin: 10 },
-  { id: 3, titre: 'Devenir disciple', sous: 'Dons spirituels, caractère, Église et mission.', debut: 11, fin: 15 },
-  { id: 4, titre: 'Demeurer et espérer', sous: 'Prière, Bible, alliances et espérance éternelle.', debut: 16, fin: 20 },
-];
-
 function SentierContent() {
   const { user } = useAuth();
-  const { group, profile, membership, preparationStep, completedFiches, loading } = useParcours();
+  const { group, membership, preparationStep, completedFiches, loading } = useParcours();
   const [recherche, setRecherche] = useState('');
-  const [vue, setVue] = useState<'sentier' | 'grille'>('grille');
   const maxAccessible = Math.min(20, Math.max(1, preparationStep));
-  const personnelle = etapePersonnelle(completedFiches);
-  const attendCellule = !!group && personnelle > group.currentStep;
-  const personnel = !group && profile?.studyMode === 'personnel';
-  const chapitreActuel = Math.ceil(maxAccessible / 5);
-  const normaliser = (texte: string) => texte.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const normaliser = (texte: string) =>
+    texte
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
   const q = normaliser(recherche.trim());
-  const filtrees = FICHES_META.filter(fiche => !q || normaliser(`${fiche.titre} ${fiche.sousTitre}`).includes(q) || String(fiche.id) === q);
-  const terminees = group?.closedSteps.length ?? completedFiches.length;
-  const parcoursTermine = completedFiches.length === 20 && (!group || !!group.completedAt);
-  const raison = !group && !personnel ? 'Toutes les fiches sont en consultation libre. Vous pouvez choisir un chemin pour enregistrer vos pas.'
-    : attendCellule ? `Ta préparation est terminée. La cellule poursuit la fiche ${group.currentStep} ; vous pouvez explorer les autres fiches librement.`
-    : `Étape conseillée : fiche ${maxAccessible}.${group ? ` Ta cellule en est à la fiche ${group.currentStep}.` : ''}`;
+  const filtrees = FICHES_META.filter(
+    (fiche) =>
+      !q ||
+      normaliser(`${fiche.titre} ${fiche.sousTitre}`).includes(q) ||
+      String(fiche.id) === q
+  );
 
   const carte = (fiche: typeof FICHES_META[number]) => {
     const partagee = !!group?.closedSteps.includes(fiche.id);
-    const preparee = completedFiches.includes(fiche.id) || !!membership?.preparedSteps.includes(fiche.id);
+    const preparee =
+      completedFiches.includes(fiche.id) ||
+      !!membership?.preparedSteps.includes(fiche.id);
     const courante = fiche.id === maxAccessible;
-    const label = partagee ? 'Partagée en cellule' : preparee ? 'Préparation terminée' : courante ? 'Étape conseillée' : 'Consultation libre';
-    const contenu = <>
-      <div className="flex items-start justify-between gap-3">
-        <span className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${courante ? 'bg-or-300 text-encre-950' : 'bg-parchemin-100 text-encre-700'}`}>{String(fiche.id).padStart(2, '0')}</span>
-        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${partagee || preparee ? 'text-emerald-800' : courante ? 'text-or-800 font-bold' : 'text-encre-600'}`}>{partagee || preparee ? <Check className="h-3.5 w-3.5" /> : null}{label}</span>
-      </div>
-      <h3 className="mt-4 font-serif text-xl font-bold leading-snug text-encre-950">{fiche.titre}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-encre-700">{fiche.sousTitre}</p>
-      <p className="mt-5 flex items-center gap-2 border-t border-parchemin-200 pt-4 text-sm leading-relaxed font-semibold text-encre-800">{preparee || partagee ? 'Relire la fiche' : 'Ouvrir la fiche'}<ArrowRight className="h-4 w-4 shrink-0 text-or-600" /></p>
-    </>;
+    // Ni « Étape conseillée » ni « Consultation libre » : le parcours s'allège.
+    // Seul l'accomplissement réel (terminé ou partagé) est signalé avec discrétion.
+    const label = partagee
+      ? 'Partagée en cellule'
+      : preparee
+      ? 'Préparation terminée'
+      : null;
+
+    const contenu = (
+      <>
+        <div className="flex items-start justify-between gap-3">
+          <span
+            className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${
+              courante ? 'bg-or-300 text-encre-950' : 'bg-parchemin-100 text-encre-700'
+            }`}
+          >
+            {String(fiche.id).padStart(2, '0')}
+          </span>
+          {label && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800">
+              <Check className="h-3.5 w-3.5" />
+              {label}
+            </span>
+          )}
+        </div>
+        <h3 className="mt-4 font-serif text-xl font-bold leading-snug text-encre-950">
+          {fiche.titre}
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-encre-700">{fiche.sousTitre}</p>
+        <p className="mt-5 flex items-center gap-2 border-t border-parchemin-200 pt-4 text-sm leading-relaxed font-semibold text-encre-800">
+          {preparee || partagee ? 'Relire la fiche' : 'Ouvrir la fiche'}
+          <ArrowRight className="h-4 w-4 shrink-0 text-or-600" />
+        </p>
+      </>
+    );
+
     return (
-      <Link key={fiche.id} href={`/fiches/${fiche.id}`} aria-current={courante ? 'step' : undefined} className={`block rounded-2xl border bg-white p-5 transition-colors hover:border-or-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-or-700 ${courante ? 'border-or-500 ring-1 ring-or-300 shadow-xs' : 'border-parchemin-300'}`}>{contenu}</Link>
+      <Link
+        key={fiche.id}
+        href={`/fiches/${fiche.id}`}
+        aria-current={courante ? 'step' : undefined}
+        className={`block rounded-2xl border bg-white p-5 transition-colors hover:border-or-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-or-700 ${
+          courante
+            ? 'border-or-500 ring-1 ring-or-300 shadow-xs'
+            : 'border-parchemin-300'
+        }`}
+      >
+        {contenu}
+      </Link>
     );
   };
 
-  return <div className="min-h-screen bg-parchemin-50 px-4 py-7 text-encre-950 sm:px-7">
-    <div className="mx-auto max-w-5xl">
-      <header className="max-w-2xl">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-or-800">Vingt fiches en accès libre</p>
-        <h1 className="mt-3 font-serif text-3xl font-bold sm:text-4xl">Le parcours des 20 fondements</h1>
-        <p className="mt-4 text-base leading-relaxed text-encre-700">Explorez librement chaque fiche. Un enseignement biblique solide, un temps pour répondre, une rencontre pour partager.</p>
-      </header>
-      {user && loading ? <p role="status" className="my-8">Ouverture de ta progression…</p> : <>
-        <section className="my-7 rounded-3xl border border-or-200 bg-white p-6" aria-label="Mon prochain pas">
-          <p className="text-xs font-bold uppercase tracking-widest text-or-800">{group ? group.name : personnel ? 'Mon chemin personnel' : 'Découvrir le parcours'}</p>
-          <h2 className="mt-3 font-serif text-xl font-bold">{parcoursTermine ? 'Vingt fiches parcourues' : attendCellule ? 'Le temps de se retrouver' : `Ton prochain pas · Fiche ${maxAccessible}`}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-encre-700">{parcoursTermine ? 'Reviens sur les passages et les découvertes que tu souhaites garder.' : raison}</p>
-          <Link href={parcoursTermine ? '/certificat' : attendCellule ? '/groupes' : `/aujourdhui?fiche=${maxAccessible}`} className="bouton-or mt-5 inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-bold">{parcoursTermine ? 'Relire mon parcours' : attendCellule ? 'Préparer la rencontre' : 'Reprendre mon temps'}<ArrowRight className="h-4 w-4" /></Link>
-          {!group && !personnel && <Link href="/onboarding" className="ml-0 mt-3 flex min-h-11 items-center gap-2 text-sm font-semibold underline underline-offset-4 sm:ml-5 sm:inline-flex"><Users className="h-4 w-4" />Choisir mon chemin</Link>}
-          {user && <p className="mt-4 text-sm text-encre-600">{terminees}/20 fiches {group ? 'partagées en cellule' : 'préparées'} · Tes réponses restent privées.</p>}
-        </section>
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end">
-          <div className="flex-1"><label htmlFor="recherche-fiches" className="mb-2 block text-sm font-semibold">Retrouver une fiche</label><div className="relative"><Search className="absolute left-4 top-4 h-4 w-4 text-encre-600" /><input id="recherche-fiches" value={recherche} onChange={event => setRecherche(event.target.value)} placeholder="Grâce, pardon, prière, identité…" className="min-h-12 w-full rounded-xl border border-parchemin-300 bg-white pl-11 pr-4 text-base focus:outline-2 focus:outline-or-600" /></div></div>
-          <div className="flex gap-2" aria-label="Présentation du parcours">{[{ valeur: 'grille' as const, label: 'Toutes les fiches (1 à 20)', icone: LayoutGrid }, { valeur: 'sentier' as const, label: 'Par thèmes', icone: Route }].map(option => <button key={option.valeur} aria-pressed={vue === option.valeur} onClick={() => setVue(option.valeur)} className={`inline-flex min-h-12 items-center gap-2 rounded-xl border px-4 text-sm font-semibold ${vue === option.valeur ? 'border-encre-950 bg-encre-950 text-white' : 'border-parchemin-300 bg-white text-encre-800'}`}><option.icone className="h-4 w-4" />{option.label}</button>)}</div>
-        </div>
-        {filtrees.length === 0 && <div role="status" className="rounded-2xl border border-parchemin-300 p-7"><p>Aucune fiche pour « {recherche} ».</p><button onClick={() => setRecherche('')} className="mt-3 min-h-11 font-semibold underline">Voir les vingt fiches</button></div>}
-        {vue === 'grille' ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{filtrees.map(carte)}</div> : <div className="space-y-4">{CHAPITRES.map(chapitre => {
-          const fiches = filtrees.filter(f => f.id >= chapitre.debut && f.id <= chapitre.fin);
-          if (!fiches.length) return null;
-          const actuel = chapitre.id === chapitreActuel;
-          const nombre = (group?.closedSteps ?? completedFiches).filter(id => id >= chapitre.debut && id <= chapitre.fin).length;
-          return <details key={`${chapitre.id}:${chapitreActuel}:${!!q}`} open={actuel || !!q} className="group rounded-3xl border border-parchemin-300 bg-white p-5 sm:p-6">
-            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-4"><span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-lg ${actuel ? 'bg-encre-950 text-or-300' : 'bg-parchemin-100 text-encre-700'}`}>{chapitre.id}</span><span className="flex-1"><span className="block text-xs font-semibold text-or-800">Fiches {chapitre.debut}–{chapitre.fin}{actuel ? ' · Thème actuel' : ''}</span><h2 className="mt-1 font-serif text-xl font-bold sm:text-2xl">{chapitre.titre}</h2><span className="mt-1 block text-xs text-encre-600">{nombre}/5 {group ? 'partagées' : 'préparées'}</span></span><ChevronDown className="h-5 w-5 shrink-0 transition-transform group-open:rotate-180" /></summary>
-            <p className="my-5 text-sm leading-relaxed text-encre-700">{chapitre.sous}</p><div className="grid gap-4 sm:grid-cols-2">{fiches.map(carte)}</div>
-          </details>;
-        })}</div>}
-        <p className="mt-8 flex items-start gap-2 text-sm leading-relaxed text-encre-600"><BookOpen className="mt-0.5 h-4 w-4 shrink-0" />Toutes les 20 fiches sont en accès libre pour consultation. Le parcours séquentiel reste conseillé pour approfondir pas à pas.</p>
-      </>}
+  return (
+    <div className="min-h-screen bg-parchemin-50 px-4 py-7 text-encre-950 sm:px-7">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-2xl">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-or-800">
+            Vingt fiches en accès libre
+          </p>
+          <h1 className="mt-3 font-serif text-3xl font-bold sm:text-4xl">
+            Le parcours des 20 fondements
+          </h1>
+          <p className="mt-4 text-base leading-relaxed text-encre-700">
+            Explorez librement chaque fiche. Un enseignement biblique solide, un temps pour
+            répondre, une rencontre pour partager.
+          </p>
+        </header>
+
+        {user && loading ? (
+          <p role="status" className="my-8">
+            Ouverture de ta progression…
+          </p>
+        ) : (
+          <>
+            <div className="my-7 flex flex-col gap-4 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <label htmlFor="recherche-fiches" className="mb-2 block text-sm font-semibold">
+                  Retrouver une fiche
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-4 top-4 h-4 w-4 text-encre-600" />
+                  <input
+                    id="recherche-fiches"
+                    value={recherche}
+                    onChange={(event) => setRecherche(event.target.value)}
+                    placeholder="Grâce, pardon, prière, identité…"
+                    className="min-h-12 w-full rounded-xl border border-parchemin-300 bg-white pl-11 pr-4 text-base focus:outline-2 focus:outline-or-600"
+                  />
+                </div>
+              </div>
+              <div>
+                <Link
+                  href="/index-thematique"
+                  className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-parchemin-300 bg-white px-4 text-sm font-semibold text-encre-800 hover:border-or-500 hover:text-encre-950 transition-colors"
+                >
+                  <Route className="h-4 w-4 text-or-700" />
+                  <span>Par thèmes (Index)</span>
+                </Link>
+              </div>
+            </div>
+
+            {filtrees.length === 0 && (
+              <div role="status" className="rounded-2xl border border-parchemin-300 p-7">
+                <p>Aucune fiche pour « {recherche} ».</p>
+                <button
+                  onClick={() => setRecherche('')}
+                  className="mt-3 min-h-11 font-semibold underline"
+                >
+                  Voir les vingt fiches
+                </button>
+              </div>
+            )}
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtrees.map(carte)}
+            </div>
+
+            <p className="mt-8 flex items-start gap-2 text-sm leading-relaxed text-encre-600">
+              <BookOpen className="mt-0.5 h-4 w-4 shrink-0" />
+              Toutes les 20 fiches sont en libre consultation pour votre étude personnelle ou en petit groupe.
+            </p>
+          </>
+        )}
+      </div>
     </div>
-  </div>;
+  );
 }
 
 export default function Page() {
-  return <ParcoursGate acces="decouverte"><SentierContent /></ParcoursGate>;
+  return (
+    <ParcoursGate acces="decouverte">
+      <SentierContent />
+    </ParcoursGate>
+  );
 }

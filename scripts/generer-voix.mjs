@@ -40,7 +40,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import { preparerPourLaVoix } from '../src/lib/prononciation.mjs';
+import { preparerPourLaVoix, allegerTextePourVoix } from '../src/lib/prononciation.mjs';
 import versetsLivret from '../src/data/versetsLivret.json' with { type: 'json' };
 
 /** « 1 Jn 4:16 » → « 1jn-4-16 ». Doit rester identique à `pisteId.verset`. */
@@ -180,7 +180,7 @@ function pistesDuLivret(livret, filtre, versetsSeuls = false) {
         pistes.push({
           id: `f${fiche.id}.s${indexSection}.b${indexBloc}`,
           fiche: fiche.id,
-          texte: preparerPourLaVoix(bloc.texte),
+          texte: allegerTextePourVoix(bloc.texte),
         });
       });
     });
@@ -190,7 +190,7 @@ function pistesDuLivret(livret, filtre, versetsSeuls = false) {
       pistes.push({
         id: `f${fiche.id}.r${indexSection}`,
         fiche: fiche.id,
-        texte: preparerPourLaVoix(texte),
+        texte: allegerTextePourVoix(texte),
       });
     });
 

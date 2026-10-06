@@ -17,6 +17,7 @@ import {
   Compass,
   Globe,
   Home,
+  LayoutDashboard,
   LogOut,
   MessageCircle,
   MoreHorizontal,
@@ -65,7 +66,8 @@ interface Destination {
 }
 
 const PRINCIPALES: Destination[] = [
-  { href: '/dashboard', label: 'Aujourd’hui', court: 'Aujourd’hui', icon: Home },
+  { href: '/', label: 'Accueil', court: 'Accueil', icon: Home },
+  { href: '/dashboard', label: 'Tableau de bord', court: 'Aujourd’hui', icon: LayoutDashboard },
   { href: '/fiches', label: 'Le parcours', court: 'Parcours', icon: Compass },
   { href: '/journal', label: 'Mon carnet', court: 'Carnet', icon: PenLine },
   { href: '/groupes', label: 'Ma cellule', court: 'Cellule', icon: Users },
@@ -75,7 +77,7 @@ const PRINCIPALES: Destination[] = [
 const SECONDAIRES: Destination[] = [
   { href: '/memorisation', label: 'La Parole en mémoire', court: 'Versets', icon: Brain },
   { href: '/parametres', label: 'Mes réglages', court: 'Réglages', icon: ShieldCheck },
-  { href: '/', label: 'Présentation publique', court: 'Accueil', icon: Globe },
+  { href: '/index-thematique', label: 'Index thématique', court: 'Thèmes', icon: Bookmark },
 ];
 
 const ONGLETS_MOBILES = PRINCIPALES.slice(0, 4);
@@ -85,7 +87,9 @@ const MENU_MOBILE = [
 ];
 
 function estActive(pathname: string, href: string): boolean {
-  return href === '/dashboard' ? pathname === href : pathname.startsWith(href);
+  if (href === '/') return pathname === '/';
+  if (href === '/dashboard') return pathname === '/dashboard';
+  return pathname.startsWith(href);
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -154,7 +158,7 @@ function ColonneLaterale({
   return (
     <aside className="nuit reliure-bureau sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto px-4 py-5 text-parchemin-100 lg:flex xl:w-72">
       <div className="mb-6 flex items-center justify-between px-2">
-        <Link href="/dashboard" className="group flex items-center gap-3">
+        <Link href="/" className="group flex items-center gap-3" title="Retour à l'accueil">
           <Image
             src="/logo-transparent.png"
             alt="Les Fondements"

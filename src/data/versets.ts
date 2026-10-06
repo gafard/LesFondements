@@ -1,12 +1,8 @@
 import versetsLivret from './versetsLivret.json';
 
-// Textes bibliques déjà présents dans l'application (version Louis Segond,
-// domaine public). Le livret, lui, laisse volontairement la place vide :
-// « Versets (écrire et méditer) ». Quand le texte n'est pas connu ici,
-// l'application propose de le recopier à la main, comme dans le livret.
-//
-// Ce fichier est la source de référence pour le texte Louis Segond 1910 :
-// `src/lib/bibleVersions.ts` s'y réfère pour ne pas dupliquer le texte.
+// Textes bibliques de l'application (version Segond 21 de référence pour le livret,
+// complétée par les passages historiques). Le livret laisse volontairement la place
+// pour que chaque disciple écrive et médite la Parole de sa main.
 
 const VERSETS_SELECTIONNES: Record<string, string> = {
   "1 Co 10:13": "Aucune tentation ne vous est survenue qui n’ait été humaine, et Dieu, qui est fidèle, ne permettra pas que vous soyez tentés au delà de vos forces; mais avec la tentation il préparera aussi le moyen d’en sortir, afin que vous puissiez la supporter.",

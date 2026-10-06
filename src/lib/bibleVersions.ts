@@ -18,12 +18,12 @@ export interface VersionBiblique {
 
 export const VERSIONS_BIBLIQUES: VersionBiblique[] = [
   {
-    code: 'lsg',
-    nom: 'Louis Segond 1910',
-    nomCourt: 'LSG',
-    description: 'Traduction historique de référence, fidèle aux textes originaux et annotée Strong.',
-    annee: '1910',
-    type: 'Litterale',
+    code: 's21',
+    nom: 'Segond 21',
+    nomCourt: 'S21',
+    description: '« L’original avec les mots d’aujourd’hui » — rigueur et clarté contemporaine (version de référence).',
+    annee: '2007',
+    type: 'Moderne',
   },
   {
     code: 'bds',
@@ -34,12 +34,12 @@ export const VERSIONS_BIBLIQUES: VersionBiblique[] = [
     type: 'Dynamique',
   },
   {
-    code: 's21',
-    nom: 'Segond 21',
-    nomCourt: 'S21',
-    description: '« L’original avec les mots d’aujourd’hui » — rigueur et modernité.',
-    annee: '2007',
-    type: 'Moderne',
+    code: 'lsg',
+    nom: 'Louis Segond 1910',
+    nomCourt: 'LSG',
+    description: 'Traduction historique de référence, fidèle aux textes originaux et annotée Strong.',
+    annee: '1910',
+    type: 'Litterale',
   },
   {
     code: 'nfc',
@@ -321,6 +321,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Psaume 90',
     lsg: 'Prière de Moïse, homme de Dieu. Seigneur ! tu as été pour nous un refuge, de génération en génération. Avant que les montagnes fussent nées, et que tu eusses créé la terre et le monde, d\'éternité en éternité tu es Dieu.',
     bds: 'Prière de Moïse, homme de Dieu. Seigneur, d\'âge en âge, tu as été notre refuge. Avant que soient nées les montagnes, et que tu aies créé la terre et l\'univers, depuis toujours et pour toujours, tu es Dieu.',
+    s21: 'Prière de Moïse, homme de Dieu. Seigneur, tu as été pour nous un refuge de génération en génération. Avant que les montagnes soient nées, et que tu aies créé la terre et le monde, d\'éternité en éternité tu es Dieu.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/19/90.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/19/90.mp3',
   },
@@ -328,6 +329,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Ésaïe 6:1',
     lsg: 'L\'année de la mort du roi Ozias, je vis le Seigneur assis sur un trône très élevé, et les pans de sa robe remplissaient le temple.',
     bds: 'L\'année de la mort du roi Ozias, je vis le Seigneur siégeant sur un trône très élevé. Les pans de sa robe remplissaient le temple.',
+    s21: 'L\'année de la mort du roi Ozias, j\'ai vu le Seigneur assis sur un trône très élevé, et les pans de sa robe remplissaient le temple.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/23/6.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/23/6.mp3',
   },
@@ -335,6 +337,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Psaume 93',
     lsg: 'L\'Éternel règne, il est revêtu de majesté, l\'Éternel est revêtu, il est ceint de force. Aussi le monde est ferme, il ne chancelle pas.',
     bds: 'L\'Éternel est roi, il est revêtu de majesté ; l\'Éternel est revêtu, il est armé de puissance. Aussi le monde est ferme, il ne vacille pas.',
+    s21: 'L\'Éternel règne, il est revêtu de majesté; l\'Éternel est revêtu, il est armé de force. Aussi le monde est ferme, il ne chancelle pas.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/19/93.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/19/93.mp3',
   },
@@ -342,6 +345,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Jean 17:3',
     lsg: 'Or, la vie éternelle, c\'est qu\'ils te connaissent, toi, le seul vrai Dieu, et celui que tu as envoyé, Jésus-Christ.',
     bds: 'Or, la vie éternelle consiste à te connaître, toi le seul vrai Dieu, et à connaître celui que tu as envoyé, Jésus-Christ.',
+    s21: 'Or, la vie éternelle, c\'est qu\'ils te connaissent, toi, le seul vrai Dieu, et celui que tu as envoyé, Jésus-Christ.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/43/17.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/43/17.mp3',
   },
@@ -349,6 +353,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Éphésiens 1:17',
     lsg: 'afin que le Dieu de notre Seigneur Jésus-Christ, le Père de gloire, vous donne un esprit de sagesse et de révélation, dans sa connaissance,',
     bds: 'Je demande au Dieu de notre Seigneur Jésus-Christ, au Père glorieux, de vous donner un esprit de sagesse qui vous le révèle et vous le fasse vraiment connaître.',
+    s21: 'Je demande que le Dieu de notre Seigneur Jésus-Christ, le Père de gloire, vous donne un esprit de sagesse et de révélation qui vous le fasse connaître,',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/49/1.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/49/1.mp3',
   },
@@ -356,6 +361,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Genèse 1',
     lsg: 'Au commencement, Dieu créa les cieux et la terre. La terre était informe et vide; il y avait des ténèbres à la surface de l\'abîme, et l\'esprit de Dieu se mouvait au-dessus des eaux.',
     bds: 'Au commencement, Dieu créa le ciel et la terre. La terre était chaotique et vide. Il y avait des ténèbres au-dessus de l\'abîme, et l\'Esprit de Dieu planait au-dessus des eaux.',
+    s21: 'Au commencement, Dieu créa le ciel et la terre. La terre était informe et vide; il y avait des ténèbres à la surface de l\'abîme et l\'Esprit de Dieu planait au-dessus des eaux.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/1/1.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/1/1.mp3',
   },
@@ -363,6 +369,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Ésaïe 53:4-5',
     lsg: 'Cependant, ce sont nos souffrances qu\'il a portées, c\'est de nos douleurs qu\'il s\'est chargé; et nous l\'avons considéré comme puni, frappé de Dieu, et humilié. Mais il était blessé pour nos péchés, brisé pour nos iniquités; le châtiment qui nous donne la paix est tombé sur lui, et c\'est par ses meurtrissures que nous sommes guéris.',
     bds: 'Pourtant, ce sont nos souffrances qu\'il a portées, c\'est de nos douleurs qu\'il s\'est chargé. Et nous, nous pensions que Dieu l\'avait frappé, puni et humilié. Mais il était blessé pour nos péchés, brisé pour nos fautes. La punition qui nous donne la paix est tombée sur lui, et c\'est par ses meurtrissures que nous sommes guéris.',
+    s21: 'Pourtant, ce sont nos souffrances qu\'il a portées, c\'est de nos douleurs qu\'il s\'est chargé. Et nous, nous l\'avons considéré comme puni, frappé par Dieu et humilié. Mais lui, il était blessé à cause de nos transgressions, brisé à cause de nos fautes: la punition qui nous donne la paix est tombée sur lui, et c\'est par ses blessures que nous sommes guéris.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/23/53.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/23/53.mp3',
   },
@@ -370,6 +377,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Philippiens 2:6-11',
     lsg: 'lequel, existant en forme de Dieu, n\'a point regardé comme une proie à arracher d\'être égal avec Dieu, mais s\'est dépouillé lui-même, en prenant une forme de serviteur... C\'est pourquoi aussi Dieu l\'a souverainement élevé, et lui a donné le nom qui est au-dessus de tout nom,',
     bds: 'Lui qui, dès l\'origine, était de condition divine, il n\'a pas cherché à profiter de l\'égalité avec Dieu, mais il s\'est dépouillé lui-même : il a pris la condition de serviteur et est devenu semblable aux êtres humains... C\'est pourquoi Dieu l\'a souverainement élevé et lui a donné le nom qui est au-dessus de tout nom.',
+    s21: 'Lui qui est de condition divine, il n\'a pas regardé son égalité avec Dieu comme une proie à arracher, mais il s\'est dépouillé lui-même en prenant une condition de serviteur, en devenant semblable aux êtres humains. Il s\'est humilié lui-même en faisant preuve d\'obéissance jusqu\'à la mort sur la croix. C\'est pourquoi Dieu l\'a souverainement élevé et lui a donné le nom qui est au-dessus de tout nom.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/50/2.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/50/2.mp3',
   },
@@ -377,6 +385,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Hébreux 11:1',
     lsg: 'Or la foi est une ferme assurance des choses qu\'on espère, une démonstration de celles qu\'on ne voit pas.',
     bds: 'La foi est une façon de posséder déjà ce qu\'on espère, un moyen d\'être sûr des réalités qu\'on ne voit pas.',
+    s21: 'Or la foi, c\'est la ferme assurance des choses qu\'on espère, la démonstration de celles qu\'on ne voit pas.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/58/11.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/58/11.mp3',
   },
@@ -384,6 +393,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Hébreux 11:6',
     lsg: 'Or sans la foi il est impossible de lui être agréable; car il faut que celui qui s\'approche de Dieu croie que Dieu existe, et qu\'il est le rémunérateur de ceux qui le cherchent.',
     bds: 'Or, sans la foi, il est impossible de lui être agréable. Car celui qui s\'approche de Dieu doit croire que Dieu existe et qu\'il récompense ceux qui le cherchent.',
+    s21: 'Or, sans la foi, il est impossible de lui être agréable. En effet, il faut que celui qui s\'approche de Dieu croie que Dieu existe et qu\'il récompense ceux qui le cherchent.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/58/11.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/58/11.mp3',
   },
@@ -391,6 +401,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: '1 Jean 1:9',
     lsg: 'Si nous confessons nos péchés, il est fidèle et juste pour nous les pardonner, et pour nous purifier de toute iniquité.',
     bds: 'Si nous confessons nos péchés, il est fidèle et juste pour nous les pardonner et pour nous purifier de tout mal.',
+    s21: 'Si nous confessons nos péchés, il est fidèle et juste pour nous les pardonner et pour nous purifier de toute injustice.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/62/1.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/62/1.mp3',
   },
@@ -398,6 +409,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Galates 5:22-23',
     lsg: 'Mais le fruit de l\'Esprit, c\'est l\'amour, la joie, la paix, la patience, la bonté, la bénignité, la fidélité, la douceur, la tempérance; la loi n\'est pas contre ces choses.',
     bds: 'Mais le fruit de l\'Esprit, c\'est l\'amour, la joie, la paix, la patience, la bonté, la bienveillance, la fidélité, la douceur, la maîtrise de soi. La Loi ne s\'oppose pas à de telles choses.',
+    s21: 'Mais le fruit de l\'Esprit, c\'est l\'amour, la joie, la paix, la patience, la bonté, la bienveillance, la foi, la douceur, la maîtrise de soi. La loi n\'est pas contre ces choses.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/48/5.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/48/5.mp3',
   },
@@ -405,6 +417,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Actes 1:8',
     lsg: 'Mais vous recevrez une puissance, le Saint-Esprit survenant sur vous, et vous serez mes témoins à Jérusalem, dans toute la Judée, dans la Samarie, et jusqu\'aux extrémités de la terre.',
     bds: 'Mais le Saint-Esprit descendra sur vous : vous recevrez sa puissance et vous serez mes témoins à Jérusalem, dans toute la Judée et la Samarie, et jusqu\'au bout du monde.',
+    s21: 'Mais vous recevrez une puissance lorsque le Saint-Esprit viendra sur vous, et vous serez mes témoins à Jérusalem, dans toute la Judée, dans la Samarie et jusqu\'aux extrémités de la terre.',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/44/1.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/44/1.mp3',
   },
@@ -412,6 +425,7 @@ export const VERSETS_MULTI_VERSIONS: Record<string, ComparaisonVerset> = {
     reference: 'Actes 2:38',
     lsg: 'Pierre leur dit : Repentez-vous, et que chacun de vous soit baptisé au nom de Jésus-Christ, pour le pardon de vos péchés; et vous recevrez le don du Saint-Esprit.',
     bds: 'Pierre leur répondit : — Changez, et que chacun de vous se fasse baptiser au nom de Jésus-Christ pour obtenir le pardon de ses péchés ; et vous recevrez le don du Saint-Esprit.',
+    s21: 'Pierre leur dit: « Changez d\'attitude et que chacun de vous soit baptisé au nom de Jésus-Christ pour le pardon de vos péchés, et vous recevrez le don du Saint-Esprit. »',
     audioLsg: 'https://www.wordproaudio.net/bibles/app/audio/7/44/2.mp3',
     audioBds: 'https://www.wordproaudio.net/bibles/app/audio/7/44/2.mp3',
   },
@@ -459,8 +473,23 @@ export function getComparaisonVerset(reference: string): ComparaisonVerset | nul
   if (!reference) return null;
   const norm = normaliserRef(reference);
   const entree = VERSETS_MULTI_VERSIONS[norm] || VERSETS_MULTI_VERSIONS[reference];
-  if (!entree) return null;
-  return { ...entree, lsg: VERSETS_CONNUS[norm] ?? entree.lsg };
+  const texteLivret = VERSETS_CONNUS[norm] || VERSETS_CONNUS[reference];
+  if (!entree) {
+    if (texteLivret) {
+      return {
+        reference,
+        s21: texteLivret,
+        lsg: texteLivret,
+        bds: texteLivret,
+      };
+    }
+    return null;
+  }
+  return {
+    ...entree,
+    s21: entree.s21 ?? texteLivret ?? entree.lsg,
+    lsg: entree.lsg ?? texteLivret,
+  };
 }
 
 /**

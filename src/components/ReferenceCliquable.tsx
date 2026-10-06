@@ -64,7 +64,7 @@ export default function TexteAvecReferences({
               ouvrirBulle(morceau.reference!, event.currentTarget);
             }}
             title={`Lire ${morceau.reference.livre.nom} ${morceau.reference.chapitre}`}
-            className={`cursor-pointer font-semibold underline decoration-dotted underline-offset-2 transition-colors ${styleLien}`}
+            className={`cursor-pointer font-normal text-[0.95em] underline decoration-dotted underline-offset-2 transition-colors ${styleLien}`}
           >
             {morceau.texte}
           </button>

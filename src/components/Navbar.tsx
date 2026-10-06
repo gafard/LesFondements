@@ -10,6 +10,7 @@ import {
   BookMarked,
   Brain,
   Compass,
+  Home,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -27,6 +28,7 @@ import { useFondSombre } from '@/lib/fondSombre';
 const ROUTES_IMMERSIVES = ['/onboarding', '/rejoindre', '/login', '/groupes/rencontre'];
 
 const LIENS_PRINCIPAUX = [
+  { href: '/', label: 'Accueil', icon: Home },
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/fiches', label: 'Le parcours', icon: Compass },
   { href: '/groupes', label: 'Ma cellule', icon: Users },

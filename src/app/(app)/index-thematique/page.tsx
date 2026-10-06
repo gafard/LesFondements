@@ -19,6 +19,8 @@ const ECLAIRAGES: Record<string, string> = {
     "Le sens de l'immersion, l'engagement de la foi, et le revêtement de puissance.",
   Délivrance:
     'Briser les liens, les malédictions et les emprises, pour marcher dans une liberté durable.',
+  'Dieu Père-Fils-Esprit':
+    "La nature relationnelle de Dieu : un seul Dieu en trois personnes qui s'aiment et agissent ensemble.",
   'Dîme, Sabbat, Fêtes':
     'Ce que deviennent ces pratiques sous la Nouvelle Alliance, sans légalisme ni mépris.',
   'Dualisme (pensée grecque)':

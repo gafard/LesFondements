@@ -1050,7 +1050,7 @@ function CarteVerset({
       </div>
 
       {texte ? (
-        <p className="mt-2 font-serif text-sm italic leading-relaxed text-encre-800">
+        <p className="mt-2 font-serif text-xs sm:text-[13px] font-normal italic leading-relaxed text-encre-800">
           « {texte} »
         </p>
       ) : (
