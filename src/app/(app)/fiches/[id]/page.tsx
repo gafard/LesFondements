@@ -1088,7 +1088,7 @@ function CarteVerset({
 
       <div className="flex items-start justify-between gap-2 pt-1">
         <p className="manuscrit text-2xl font-bold text-encre-950">
-          <TexteAvecReferences>{reference}</TexteAvecReferences>
+          <TexteAvecReferences className="reference-pleine">{reference}</TexteAvecReferences>
         </p>
         <span className="manuscrit text-sm font-semibold text-encre-600">
           À recopier

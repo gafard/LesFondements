@@ -49,29 +49,59 @@ export default function TexteAvecReferences({
       ? 'text-or-300 decoration-or-300/40 hover:decoration-or-300'
       : 'text-or-700 decoration-or-500/40 hover:decoration-or-600';
 
-  return (
-    <span className={className}>
-      {morceaux.map((morceau, index) =>
-        morceau.reference ? (
-          <button
-            key={index}
-            type="button"
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              // La bulle se pose sous le mot ; le panneau complet reste
-              // accessible depuis elle, pour qui veut aller plus loin.
-              ouvrirBulle(morceau.reference!, event.currentTarget);
-            }}
-            title={`Lire ${morceau.reference.livre.nom} ${morceau.reference.chapitre}`}
-            className={`cursor-pointer font-semibold underline decoration-dotted underline-offset-2 transition-colors ${styleLien}`}
-          >
-            {morceau.texte}
-          </button>
-        ) : (
-          <Fragment key={index}>{morceau.texte}</Fragment>
-        )
-      )}
-    </span>
-  );
+  // La référence se lit comme un appui, en plus petit que le texte. Ses
+  // parenthèses et ce qui la relie à la suivante (« ; », « et ») suivent la
+  // même taille : « (Ex 3:14 ; Ap 1:8) » forme un seul bloc discret.
+  const rendus: React.ReactNode[] = [];
+  morceaux.forEach((morceau, index) => {
+    if (morceau.reference) {
+      rendus.push(
+        <button
+          key={index}
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            // La bulle se pose sous le mot ; le panneau complet reste
+            // accessible depuis elle, pour qui veut aller plus loin.
+            ouvrirBulle(morceau.reference!, event.currentTarget);
+          }}
+          title={`Lire ${morceau.reference.livre.nom} ${morceau.reference.chapitre}`}
+          className={`reference-biblique cursor-pointer underline decoration-dotted underline-offset-2 transition-colors ${styleLien}`}
+        >
+          {morceau.texte}
+        </button>
+      );
+      return;
+    }
+    const avant = morceaux[index - 1]?.reference;
+    const apres = morceaux[index + 1]?.reference;
+    if (avant && apres && LIANT.test(morceau.texte)) {
+      rendus.push(<span key={index} className="reference-biblique">{morceau.texte}</span>);
+      return;
+    }
+    let texte = morceau.texte;
+    let ouvrante = '';
+    let fermante = '';
+    if (avant) {
+      const fin = texte.match(/^\s*\)/);
+      if (fin) { fermante = fin[0]; texte = texte.slice(fin[0].length); }
+    }
+    if (apres) {
+      const debut = texte.match(/\(\s*(?:cf\.?\s*|voir\s+)?$/i);
+      if (debut) { ouvrante = debut[0]; texte = texte.slice(0, -debut[0].length); }
+    }
+    rendus.push(
+      <Fragment key={index}>
+        {fermante && <span className="reference-biblique">{fermante}</span>}
+        {texte}
+        {ouvrante && <span className="reference-biblique">{ouvrante}</span>}
+      </Fragment>
+    );
+  });
+
+  return <span className={className}>{rendus}</span>;
 }
+
+/** Ce qui relie deux références dans une même parenthèse. */
+const LIANT = /^[\s;,.:+\-–]*(?:et|cf\.?|voir)?[\s;,.:+\-–]*$/i;

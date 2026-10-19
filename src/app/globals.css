@@ -406,16 +406,19 @@
   border-left: 3px solid #f6c453;
   font-family: Georgia, serif;
   font-style: italic;
-  /* Les versets cités se distinguent du fil de l'exposé : un peu plus
-     petits, ils se lisent comme un appui et non comme le texte principal. */
-  font-size: 0.85em;
-  font-weight: 400;
   color: #1c3159;
 }
-/* La référence d'un verset cité reste cliquable, sans gras : le verset
-   doit se lire comme un appui discret, pas comme une mise en avant. */
-.prose-livret blockquote button,
-.prose-livret blockquote strong { font-weight: 400; }
+/* Les références bibliques se lisent comme un appui : plus petites que le
+   texte, sans gras, qu'elles suivent une phrase de l'exposé ou un verset
+   cité en entier. Le verset lui-même garde la taille du texte. */
+.reference-biblique { font-size: 0.8em; font-weight: 400; }
+/* Une référence est un lien dans une phrase : la taille minimale des
+   boutons (44 px) l'écartait de ses parenthèses et creusait l'interligne.
+   Les cibles en ligne dans un texte en sont dispensées. */
+button.reference-biblique { min-width: 0; min-height: 0; }
+/* Quand la référence est à elle seule le titre (carte d'un verset), elle
+   garde la taille de son titre. */
+.reference-pleine .reference-biblique { font-size: inherit; }
 .prose-livret ul { margin: 0.6rem 0 1.1rem 1.1rem; list-style: disc; }
 .prose-livret li { margin-bottom: 0.45rem; line-height: 1.7; }
 

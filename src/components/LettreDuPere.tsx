@@ -513,7 +513,7 @@ export default function LettreDuPere({
                     </p>
                     <div className="mt-1 flex items-center justify-end">
                       <span className="font-serif text-2xs font-bold text-or-700 bg-white/80 px-2.5 py-0.5 rounded-full border border-or-200">
-                        <TexteAvecReferences>{paragraphe.reference}</TexteAvecReferences>
+                        <TexteAvecReferences className="reference-pleine">{paragraphe.reference}</TexteAvecReferences>
                       </span>
                     </div>
                   </div>
