@@ -1,60 +1,52 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { semerSession, UTILISATEUR } from './fixtures';
+import { semerSession } from './fixtures';
 
-test('accueil : fiche complète dominante, prologue unique et fermeture au clavier', async ({ page }, info) => {
+test('connexion : l’ancien tableau de bord ouvre le parcours', async ({ page }) => {
   await semerSession(page);
   await page.goto('/dashboard');
-  const prochain = page.getByRole('region', { name: 'Connaître Dieu' });
-  await expect(prochain.getByRole('link', { name: 'Consulter la fiche complète' })).toHaveAttribute('href', '/fiches/1');
-  expect((await prochain.boundingBox())!.y).toBeLessThan(300);
-  await expect(page.getByRole('button', { name: 'Découvrir le parcours · 50 s' })).toHaveCount(1);
-  await expect(page.getByRole('heading', { name: 'Cellule E2E' })).toBeVisible();
-  await page.screenshot({ path: info.outputPath('accueil.png'), fullPage: true });
-  const analyse = await new AxeBuilder({ page }).include('#contenu-principal').withTags(['wcag2a', 'wcag2aa']).analyze();
-  expect(analyse.violations).toEqual([]);
-  await page.getByRole('button', { name: 'Découvrir le parcours · 50 s' }).click();
-  await expect(page.getByRole('dialog', { name: 'Découvrir le parcours' })).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog', { name: 'Découvrir le parcours' })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Découvrir le parcours · 50 s' })).toBeFocused();
+  await expect(page).toHaveURL(/\/fiches$/);
+  await expect(page.getByRole('heading', { name: 'Le parcours des Fondements' })).toBeVisible();
 });
 
-test('accueil : les doublons ont quitté le tableau de bord', async ({ page }) => {
+test('coque : Accueil en tête du menu, plus d’onglet « Aujourd’hui »', async ({ page }) => {
   await semerSession(page);
-  await page.goto('/dashboard');
-  await expect(page.getByText('Les temps de cette fiche', { exact: false })).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Avancer par un temps guidé' })).toHaveAttribute('href', '/aujourdhui?fiche=1');
+  await page.goto('/fiches');
+  const menu = page.locator('aside nav').first();
+  await expect(menu.getByRole('link').first()).toHaveAttribute('href', '/');
+  await expect(menu.getByRole('link').first()).toHaveText('Accueil');
+  await expect(page.getByRole('link', { name: 'Aujourd’hui', exact: true })).toHaveCount(0);
+  await expect(page.locator('aside a[href="/"]').filter({ hasText: 'Les Fondements' })).toHaveCount(1);
 });
 
-test('cellule : préparation terminée, la fiche reste à relire et la cellule à portée', async ({ page }) => {
-  await semerSession(page, { fichesTerminees: [1] });
-  await page.goto('/dashboard');
-  await expect(page.getByRole('link', { name: 'Relire la fiche complète' })).toHaveAttribute('href', '/fiches/1');
-  await expect(page.getByRole('link', { name: 'Voir ma cellule et préparer le partage' })).toHaveAttribute('href', '/groupes');
-});
-
-test('coque : la page d’accueil reste accessible depuis l’application', async ({ page }) => {
-  await semerSession(page);
-  await page.goto('/dashboard');
-  const accueil = page.locator('a[href="/"]').filter({ hasText: 'Page d’accueil' });
-  await expect(accueil.first()).toBeAttached();
-});
-
-test('parcours : vingt fiches ouvertes, sans chapitres, index thématique relié', async ({ page }, info) => {
+test('parcours : vingt fiches sans repère d’étape, bascule « Par thèmes » reliée à l’index', async ({ page }, info) => {
   await semerSession(page);
   await page.goto('/fiches');
   await expect(page.locator('details')).toHaveCount(0);
   await expect(page.locator('ol a[href="/fiches/20"]')).toHaveCount(1);
-  await expect(page.getByRole('link', { name: 'Étudier la fiche 1' })).toHaveAttribute('href', '/fiches/1');
+  await expect(page.getByText('En cours', { exact: true })).toHaveCount(0);
   await page.screenshot({ path: info.outputPath('parcours.png'), fullPage: true });
   const analyse = await new AxeBuilder({ page }).include('#contenu-principal').withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(analyse.violations).toEqual([]);
+  await page.getByRole('button', { name: 'Par thèmes' }).click();
   const loi = page.getByRole('listitem').filter({ hasText: 'Loi (Torah)' });
   await expect(loi.getByRole('link', { name: 'Fiche 2' })).toHaveAttribute('href', '/fiches/2');
   await expect(loi.getByRole('link', { name: 'Fiche 18' })).toHaveAttribute('href', '/fiches/18');
-  await page.getByRole('textbox', { name: 'Retrouver une fiche ou un thème' }).fill('introuvablexyz');
-  await expect(page.getByRole('status').filter({ hasText: 'Aucun titre' })).toContainText('Aucun titre');
+  await expect(page.getByText('Dieu Père-Fils-Esprit', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Trinité/)).toHaveCount(0);
+  await page.getByRole('textbox', { name: 'Retrouver un thème' }).fill('introuvablexyz');
+  await expect(page.getByRole('status').filter({ hasText: 'Aucun thème' })).toContainText('Aucun thème');
+});
+
+test('fiche : sans temps du jour, l’exposé mène au résumé et le Mémo Bible se retourne', async ({ page }) => {
+  await semerSession(page);
+  await page.goto('/fiches/1');
+  await expect(page.getByRole('link', { name: 'Vivre mon temps du jour' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Résumé et questions de ce passage' }).first().click();
+  await expect(page.locator('#resume-0')).toBeVisible();
+  await page.getByRole('button', { name: 'Mémo Bible' }).click();
+  await page.getByRole('button', { name: 'Retourner pour lire le verset' }).first().click();
+  await expect(page.getByRole('button', { name: 'Retourner la carte' }).first()).toBeVisible();
 });
 
 test('immersion : commandes stables, sans débordement et retour au temps précédent', async ({ page }, info) => {

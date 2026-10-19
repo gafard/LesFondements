@@ -138,7 +138,7 @@ export function PasDuJour({ ficheId, masquerSiVide = false }: { ficheId: number;
         : aRevoir ? <CartePasDeVie key={`${aRevoir.ficheId}-${aRevoir.id}`} pas={aRevoir} onEnregistrer={enregistrer} compact />
           : <div className="grid gap-5 p-6 sm:grid-cols-[1fr_auto] sm:items-center sm:p-8">
             <div><p className="font-serif text-2xl font-bold text-encre-950">Une vérité. Un moment. Un petit pas.</p><p className="mt-2 max-w-xl text-base leading-relaxed text-encre-600">À la fin de votre temps à part, choisissez un geste à essayer dans votre journée. Vous pourrez revenir ici raconter ce qu’il a changé.</p></div>
-            <Link href={`/aujourdhui?fiche=${ficheId}`} className="pas-bouton"><ArrowRight className="h-4 w-4" aria-hidden="true" />Ouvrir mon temps à part</Link>
+            <Link href={`/fiches/${ficheId}`} className="pas-bouton"><ArrowRight className="h-4 w-4" aria-hidden="true" />Ouvrir la fiche</Link>
           </div>}
       <p className="flex items-center gap-2 border-t border-parchemin-300 px-6 py-4 text-sm text-encre-600"><RotateCcw className="h-4 w-4 shrink-0" aria-hidden="true" />Vous pouvez reprendre là où vous en êtes.</p>
     </section>

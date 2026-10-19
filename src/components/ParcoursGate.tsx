@@ -167,7 +167,7 @@ function EcranFerme({
             className="bouton-or w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-bold shadow-lg"
           >
             <BookOpen className="h-4 w-4" />
-            Explorer la Fiche 1 (Accès libre)
+            Découvrir la fiche 1
           </Link>
 
           <Link

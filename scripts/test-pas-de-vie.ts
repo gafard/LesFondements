@@ -18,7 +18,7 @@ assert.equal(pas.length, 2, 'Seules les véritables intentions de la fiche sont 
 assert.equal(pas[0].section, 1);
 assert.equal(pas[0].moment, 'Au repas');
 assert.equal(pas[1].action, 'Remercier', 'Les anciennes intentions restent accessibles.');
-assert.equal(lienVersPas(pas[0]), '/aujourdhui?fiche=1&section=1&moment=pas');
+assert.equal(lienVersPas(pas[0]), '/fiches/1?onglet=partage');
 assert.equal(lienVersPas(pas[1]), '/fiches/1');
 assert.equal(pasARelire(pas[0]), true);
 assert.equal(JSON.stringify(reponses), originaux, 'Lecture sans migration destructive.');

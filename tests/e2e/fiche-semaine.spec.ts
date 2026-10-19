@@ -40,7 +40,10 @@ test('fiche : la semaine préparée se retrouve avant la rencontre', async ({ pa
   // Regroupées par jour, sous le titre du temps où elles ont été écrites.
   await expect(page.getByText('3 notes · 2 jours')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Dieu règne' }).first()).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Rouvrir ce temps' }).first()).toBeVisible();
+  // Les temps guidés ne sont plus proposés : les notes restent à relire ici.
+  await expect(page.getByRole('link', { name: 'Rouvrir ce temps' })).toHaveCount(0);
+  // Le carnet privé se tient au moment où l'on prépare la rencontre.
+  await expect(page.getByRole('heading', { name: 'Ce que je veux apporter à la rencontre' })).toBeVisible();
 
   // Les questions du livret disent à quoi elles servent.
   await expect(page.getByText('Ce dont vous parlerez à la rencontre').first()).toBeVisible();

@@ -10,8 +10,8 @@ function RituelRedirect() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const params = searchParams.toString();
-    router.replace(params ? `/aujourdhui?${params}` : '/aujourdhui');
+    const fiche = searchParams.get('fiche');
+    router.replace(fiche ? `/fiches/${fiche}` : '/fiches');
   }, [router, searchParams]);
 
   return (

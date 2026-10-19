@@ -8,12 +8,10 @@ import { ouvrirCentre } from '@/lib/centre';
 import { useApplication } from '@/lib/application';
 import type { LucideIcon } from 'lucide-react';
 import {
-  Bell,
   Smartphone,
   BookMarked,
   Compass,
   Home,
-  Landmark,
   LogOut,
   Mail,
   MoreHorizontal,
@@ -24,8 +22,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
-import ConfortLecture from '@/components/ConfortLecture';
-import NotificationCenter from '@/components/NotificationCenter';
 import SyncStatusBadge from '@/components/SyncStatusBadge';
 import { flushPendingWrites } from '@/lib/firestore';
 
@@ -57,8 +53,10 @@ interface Destination {
   icon: LucideIcon;
 }
 
+// « Aujourd'hui » et ses temps guidés ont été retirés : ils redisaient la
+// fiche en la morcelant. On entre par l'accueil, puis par le parcours.
 const PRINCIPALES: Destination[] = [
-  { href: '/dashboard', label: 'Aujourd’hui', court: 'Aujourd’hui', icon: Home },
+  { href: '/', label: 'Accueil', court: 'Accueil', icon: Home },
   { href: '/fiches', label: 'Le parcours', court: 'Parcours', icon: Compass },
   { href: '/journal', label: 'Mon carnet', court: 'Carnet', icon: PenLine },
   { href: '/groupes', label: 'Ma cellule', court: 'Cellule', icon: Users },
@@ -74,24 +72,16 @@ const SECONDAIRES: Destination[] = [
   { href: '/parametres', label: 'Mes réglages', court: 'Réglages', icon: ShieldCheck },
 ];
 
-const ACCUEIL: Destination = {
-  href: '/',
-  label: 'Page d’accueil',
-  court: 'Accueil',
-  icon: Landmark,
-};
-
 const ONGLETS_MOBILES = PRINCIPALES.slice(0, 4);
 const MENU_MOBILE = SECONDAIRES;
 
 function estActive(pathname: string, href: string): boolean {
-  return href === '/dashboard' ? pathname === href : pathname.startsWith(href);
+  return href === '/' ? pathname === href : pathname.startsWith(href);
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const [notifOuvert, setNotifOuvert] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -109,29 +99,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     [pathname]
   );
 
-  // Sans compte, on ne montre pas une coque d'application vide.
-  if (sansCoque || !user) return <>{children}</>;
+  if (sansCoque) return <>{children}</>;
+  // Sans compte, on ne montre pas une coque d'application vide ; la barre
+  // publique, fixe en haut, garde sa place au-dessus du contenu.
+  if (!user) return <div className="pt-16">{children}</div>;
 
   return (
     <div className="coque-table-travail min-h-screen lg:flex">
       <a href="#contenu-principal" className="skip-link">Aller au contenu</a>
-      <ColonneLaterale pathname={pathname} onOuvrirNotifs={() => setNotifOuvert(true)} />
+      <ColonneLaterale pathname={pathname} />
 
       <div className="min-w-0 flex-1">
-        <BarreMobile onOuvrirNotifs={() => setNotifOuvert(true)} />
+        <BarreMobile />
         {/* La marge basse laisse la place à la barre d'onglets et au pouce. */}
         <main id="contenu-principal" tabIndex={-1} className="pb-[calc(5.25rem+env(safe-area-inset-bottom))] lg:pb-0">
           {children}
         </main>
       </div>
 
-      <BarreOnglets
-        key={pathname}
-        pathname={pathname}
-        onOuvrirNotifs={() => setNotifOuvert(true)}
-      />
-
-      <NotificationCenter ouvert={notifOuvert} onFermer={() => setNotifOuvert(false)} />
+      <BarreOnglets key={pathname} pathname={pathname} />
     </div>
   );
 }
@@ -140,20 +126,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 // Grand écran : une colonne latérale permanente
 // ─────────────────────────────────────────────────────────────
 
-function ColonneLaterale({
-  pathname,
-  onOuvrirNotifs,
-}: {
-  pathname: string;
-  onOuvrirNotifs: () => void;
-}) {
+function ColonneLaterale({ pathname }: { pathname: string }) {
   const { miseAJourPrete } = useApplication();
   const { logout } = useAuth();
   const { group, gate } = useParcours();
 
   return (
     <aside className="nuit reliure-bureau sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto px-4 py-5 text-parchemin-100 lg:flex xl:w-72">
-      <Link href="/dashboard" className="group mb-6 flex items-center gap-3 px-2">
+      <Link href="/" className="group mb-6 flex items-center gap-3 px-2">
         <Image
           src="/logo-transparent.png"
           alt="Les Fondements"
@@ -196,7 +176,6 @@ function ColonneLaterale({
         ))}
       </nav>
 
-      <ConfortLecture />
       <p className="mb-1 mt-6 px-3 text-2xs font-bold uppercase tracking-[0.16em] text-parchemin-100/55">
         Aller plus loin
       </p>
@@ -204,25 +183,14 @@ function ColonneLaterale({
         {SECONDAIRES.map((lien) => (
           <LienLateral key={lien.href} lien={lien} actif={estActive(pathname, lien.href)} />
         ))}
-        {/* Depuis l'application, rien ne ramenait à la page d'accueil : la
-            barre du haut disparaît dès qu'on entre dans son espace. */}
-        <LienLateral lien={ACCUEIL} actif={false} />
       </nav>
-
-      <button
-        onClick={onOuvrirNotifs}
-        className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-2xs font-bold text-or-300 transition-colors hover:bg-white/12"
-      >
-        <Bell className="h-4 w-4" strokeWidth={1.75} />
-        Rappels & Notifications
-      </button>
 
       {/* Installation, paquets hors connexion et mises à jour : un seul
           endroit, consultable quand on veut plutôt qu'une invite qui
           surgit et qu'on écarte pour toujours. */}
       <button
         onClick={ouvrirCentre}
-        className="mt-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-2xs font-bold text-parchemin-100/70 transition-colors hover:bg-white/12 hover:text-parchemin-100"
+        className="mt-4 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-2xs font-bold text-parchemin-100/70 transition-colors hover:bg-white/12 hover:text-parchemin-100"
       >
         <Smartphone className="h-4 w-4" strokeWidth={1.75} />
         L&apos;application
@@ -277,7 +245,7 @@ function LienLateral({ lien, actif }: { lien: Destination; actif: boolean }) {
 // Mobile : une barre de titre contextuelle, une barre d'onglets
 // ─────────────────────────────────────────────────────────────
 
-function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
+function BarreMobile() {
   const pathname = usePathname();
   const { group } = useParcours();
   const { logout } = useAuth();
@@ -289,7 +257,7 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
   return (
     <header className="sticky top-0 z-30 border-b border-parchemin-300 bg-parchemin-50/90 px-4 pb-2.5 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl lg:hidden">
       <div className="flex items-center justify-between gap-3">
-        <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
+        <Link href="/" className="flex items-center gap-2.5 min-w-0">
           <Image
             src="/logo-transparent.png"
             alt="Logo"
@@ -303,14 +271,6 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
           <div className="mobile-sync">
             <SyncStatusBadge />
           </div>
-          <button
-            onClick={onOuvrirNotifs}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-parchemin-300 active:scale-95"
-            aria-label="Rappels et notifications"
-            title="Rappels et notifications"
-          >
-            <Bell className="h-4 w-4" />
-          </button>
           <button
             onClick={() => void logout()}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-parchemin-200 text-encre-700 transition-colors hover:bg-rose-100 hover:text-rose-700 active:scale-95"
@@ -330,13 +290,7 @@ function BarreMobile({ onOuvrirNotifs }: { onOuvrirNotifs: () => void }) {
   );
 }
 
-function BarreOnglets({
-  pathname,
-  onOuvrirNotifs,
-}: {
-  pathname: string;
-  onOuvrirNotifs: () => void;
-}) {
+function BarreOnglets({ pathname }: { pathname: string }) {
   const [plusOuvert, setPlusOuvert] = useState(false);
   const boutonPlus = useRef<HTMLButtonElement>(null);
   const premierLien = useRef<HTMLAnchorElement>(null);
@@ -432,21 +386,6 @@ function BarreOnglets({
             </div>
 
             <div className="max-h-[calc(min(72vh,42rem)-8rem)] overflow-y-auto px-4 pb-5 pt-4">
-              <Link
-                ref={premierLien}
-                href={ACCUEIL.href}
-                onClick={() => setPlusOuvert(false)}
-                className="mb-4 flex min-h-14 items-center gap-3 rounded-2xl border border-or-300 bg-or-50 px-4 py-3 text-encre-950"
-              >
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-or-100 text-or-800">
-                  <Landmark className="h-5 w-5" />
-                </span>
-                <span>
-                  <span className="block font-serif text-base font-bold">Page d’accueil</span>
-                  <span className="block text-2xs text-encre-600">Présentation, mode d’emploi, témoignages</span>
-                </span>
-              </Link>
-
               <div className="grid grid-cols-2 gap-2.5">
                 {SECONDAIRES.map((lien) => {
                   const Icone = lien.icon;
@@ -454,6 +393,7 @@ function BarreOnglets({
                   return (
                     <Link
                       key={lien.href}
+                      ref={lien === SECONDAIRES[0] ? premierLien : undefined}
                       href={lien.href}
                       onClick={() => setPlusOuvert(false)}
                       aria-current={actif ? 'page' : undefined}
@@ -470,19 +410,7 @@ function BarreOnglets({
                 })}
               </div>
 
-              <ConfortLecture />
-              <div className="mt-4 grid grid-cols-2 gap-2.5 border-t border-dashed border-encre-950/15 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPlusOuvert(false);
-                    onOuvrirNotifs();
-                  }}
-                  className="flex min-h-12 items-center gap-2 rounded-2xl bg-encre-950 px-3 py-3 text-left text-xs font-bold text-parchemin-100"
-                >
-                  <Bell className="h-4 w-4 text-or-300" />
-                  Mes rappels
-                </button>
+              <div className="mt-4 border-t border-dashed border-encre-950/15 pt-4">
                 <button
                   type="button"
                   onClick={() => {

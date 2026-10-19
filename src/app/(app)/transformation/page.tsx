@@ -74,7 +74,7 @@ function TransformationContent() {
                   ? 'Aucun pas dans cette vue pour le moment. Retrouvez vos intentions ou laissez-vous le temps de vivre la suivante.'
                   : 'Après votre lecture, choisissez une situation et un geste simple. Votre intention et vos relectures trouveront leur place sur ces pages.'}</p>
                 {pas.length ? <button className="pas-bouton mt-6" type="button" onClick={() => setFiltre('tous')}>Retrouver mes pas</button>
-                  : <Link href={`/aujourdhui?fiche=${ficheId}`} className="pas-bouton mt-6">Ouvrir mon temps à part <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
+                  : <Link href={`/fiches/${ficheId}`} className="pas-bouton mt-6">Ouvrir la fiche <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
               </div>
             )}
           </section>

@@ -17,9 +17,13 @@ export function lireDernierPassage(uid?: string): DernierPassage | null {
     if (!brut) return null;
     const passage = JSON.parse(brut) as Partial<DernierPassage>;
     if (typeof passage.url !== 'string' || typeof passage.titre !== 'string') return null;
+    // Les temps guidés ne sont plus proposés : un ancien marque-page vers
+    // l'un d'eux rouvre la fiche entière.
+    const temps = passage.url.match(/^\/aujourdhui\?(?:.*&)?fiche=(\d+)/);
+    const url = temps ? `/fiches/${temps[1]}` : passage.url.startsWith('/aujourdhui') ? '/fiches' : passage.url;
     return {
       uid: passage.uid,
-      url: passage.url,
+      url,
       titre: passage.titre,
       sousTitre: typeof passage.sousTitre === 'string' ? passage.sousTitre : undefined,
       type: passage.type ?? 'fiche',

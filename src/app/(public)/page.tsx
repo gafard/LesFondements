@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import EcranLancement from '@/components/EcranLancement';
+import ApercuTemoignages from '@/components/ApercuTemoignages';
 import { FICHES_META } from '@/data/fichesMeta';
 import { LIEN_LIVRET_PDF } from '@/lib/livret';
 import LecteurVideoOnboarding from '@/components/LecteurVideoOnboarding';
@@ -11,7 +12,7 @@ import {
   HeartHandshake,
   PenLine,
   Users,
-  Brain,
+  Headphones,
   Award,
   Flame,
   Search,
@@ -89,7 +90,7 @@ export default function Home() {
                 href="/fiches/1"
                 className="bouton-or inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold text-slate-950 shadow-lg hover:scale-105 transition-all"
               >
-                Explorer la Fiche 1 (Accès libre)
+                Découvrir la fiche 1
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
@@ -147,7 +148,7 @@ export default function Home() {
             Une marche personnelle et fraternelle
           </p>
           <h2 className="font-serif text-3xl font-bold leading-tight text-encre-950 sm:text-5xl">
-            Les fiches s&apos;ouvrent librement.
+            Une fiche se prépare chez soi.
             <br />
             <span className="italic text-or-600">Le parcours se vit ensemble.</span>
           </h2>
@@ -246,7 +247,7 @@ export default function Home() {
 
         <div className="mx-auto mt-10 max-w-2xl rounded-3xl border border-[#ded6c8] bg-white/80 px-6 py-5 text-center shadow-2xs backdrop-blur-md">
           <p className="font-serif text-sm sm:text-base italic leading-relaxed text-slate-800">
-            « Chaque fiche se prépare chez soi, puis se partage en cellule. On avance de préférence dans l&apos;ordre, mais toutes les fiches restent ouvertes pour qui veut une vue d&apos;ensemble. »
+            « Chaque fiche se prépare chez soi, puis se partage en cellule, une fiche après l&apos;autre. »
           </p>
           <Link
             href="/mode-emploi"
@@ -439,12 +440,12 @@ export default function Home() {
 
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-white/10 text-amber-300 flex items-center justify-center flex-shrink-0">
-                    <Brain className="w-5 h-5" />
+                    <Headphones className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-serif font-bold text-lg">Mémorisation & Outils Visuels</h3>
+                    <h3 className="font-serif font-bold text-lg">Écouter, annoter, garder</h3>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Flashcards avec répétition espacée, export d&apos;images HD de versets pour WhatsApp/Instagram et Bible intégrée.
+                      Chaque fiche se lit ou s’écoute en entier ; les versets s’ouvrent d’un clic, et ce que vous voulez garder rejoint votre carnet.
                     </p>
                   </div>
                 </div>
@@ -513,6 +514,7 @@ export default function Home() {
         </div>
       </section>
 
+      <ApercuTemoignages />
     </div>
   );
 }

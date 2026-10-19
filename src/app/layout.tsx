@@ -4,6 +4,7 @@ import { AuthProvider } from '@/lib/AuthContext';
 import { ParcoursProvider } from '@/lib/ParcoursContext';
 import ClientTools from '@/components/ClientTools';
 import MesureProduit from '@/components/MesureProduit';
+import { AppliquerConfortLecture } from '@/components/ConfortLecture';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://parcours.lesfondements.workers.dev'),
@@ -88,6 +89,7 @@ export default function RootLayout({
             {children}
             <ClientTools />
             <MesureProduit />
+            <AppliquerConfortLecture />
           </ParcoursProvider>
         </AuthProvider>
       </body>

@@ -1,13 +1,10 @@
 'use client';
 
 import FormulaireContact from '@/components/FormulaireContact';
-import { useAuth } from '@/lib/AuthContext';
 
 export default function ContactPage() {
-  // Sans compte, la barre du haut est fixe : on lui laisse sa place.
-  const { user } = useAuth();
   return (
-    <div className={`table-travail min-h-screen pb-20 ${user ? 'pt-6' : 'pt-24'}`}>
+    <div className="table-travail min-h-screen pb-20 pt-6">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <p className="manuscrit mb-2 text-xl text-or-800">Nous écrire</p>

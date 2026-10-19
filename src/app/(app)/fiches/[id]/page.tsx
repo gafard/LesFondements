@@ -5,9 +5,9 @@ import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import {
-  Mic,
   ArrowRight,
   BookOpen,
+  Bookmark,
   Check,
   CheckCircle2,
   ChevronLeft,
@@ -16,10 +16,8 @@ import {
   MessageSquare,
   PenLine,
   Quote,
-  RotateCw,
   Heart,
   Users,
-  Sunrise,
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
@@ -32,6 +30,7 @@ import TexteSurlignable, { type SelectionTexte } from '@/components/TexteSurlign
 import EcouteContinueFiche from '@/components/EcouteContinueFiche';
 import GuidePastoralCellule from '@/components/GuidePastoralCellule';
 import ChampDictée from '@/components/ChampDictée';
+import MemoBible from '@/components/MemoBible';
 import { TraceParole } from '@/components/TraceParole';
 import { addPost, markStepPrepared } from '@/lib/parcoursStore';
 import { getAnswers, getCachedAnswers, markFicheCompleted, saveAnswer, flushPendingWrites } from '@/lib/firestore';
@@ -43,12 +42,10 @@ import {
 import { texteDuVerset } from '@/data/versets';
 import MEDITATIONS from '@/data/meditation-questions.json';
 import TITRES_DES_TEMPS from '@/data/tempsTitres.json';
-import { enregistrerRevision, qualiteDepuisScore } from '@/lib/memorisation';
 import { FICHES_META } from '@/data/fichesMeta';
 import Illumination from '@/components/Illumination';
 import { MotFantome, Pastille, TraitOrganique } from '@/components/decor';
 import TexteAvecReferences from '@/components/ReferenceCliquable';
-import EpreuveMemoire from '@/components/EpreuveMemoire';
 import {
   encoderAnnotations,
   lireAnnotationsAvecMigration,
@@ -57,7 +54,45 @@ import {
 } from '@/lib/annotations';
 import { lireDernierPassage, memoriserPassage } from '@/lib/marquePage';
 
-type Onglet = 'expose' | 'partage' | 'annexes';
+type Onglet = 'expose' | 'partage' | 'memo' | 'annexes';
+
+function normaliserTitre(titre: string | null | undefined): string {
+  return (titre ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\d+$/, '')
+    .replace(/[^a-z ]+/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .join(' ');
+}
+
+/**
+ * Le résumé qui reprend une partie de l'exposé. Les titres se répondent
+ * d'une partie à l'autre (« La Loi » et « La Loi »), parfois avec une
+ * variante (« Israël : choisi par Dieu » et « Israël a été choisi par
+ * Dieu ») ; une partie sans résumé propre n'a pas de lien.
+ */
+function resumeDeSection(fiche: FicheLivret, indexSection: number): number | null {
+  const titre = normaliserTitre(fiche.sections[indexSection]?.titre);
+  if (!titre) return null;
+  const mots = new Set(titre.split(' ').filter((mot) => mot.length > 2));
+  let meilleur: { index: number; score: number } | null = null;
+  fiche.resume.forEach((resume, index) => {
+    const autre = normaliserTitre(resume.titre);
+    if (!autre) return;
+    if (autre === titre || autre.includes(titre) || titre.includes(autre)) {
+      meilleur = { index, score: 2 };
+      return;
+    }
+    const autres = new Set(autre.split(' ').filter((mot) => mot.length > 2));
+    const communs = [...mots].filter((mot) => autres.has(mot)).length;
+    const score = communs / Math.max(1, Math.min(mots.size, autres.size));
+    if (score >= 0.75 && (!meilleur || score > meilleur.score)) meilleur = { index, score };
+  });
+  return (meilleur as { index: number } | null)?.index ?? null;
+}
 
 function ancrePourCle(cle: string): string {
   return cle
@@ -86,7 +121,7 @@ function FicheContent() {
   );
   const [onglet, setOnglet] = useState<Onglet>(() => {
     const demande = searchParams.get('onglet');
-    return demande === 'partage' || demande === 'annexes' ? demande : 'expose';
+    return demande === 'partage' || demande === 'memo' || demande === 'annexes' ? demande : 'expose';
   });
   const [annotations, setAnnotations] = useState<DocumentAnnotations>(() => {
     if (!user || !Number.isFinite(ficheId)) {
@@ -206,6 +241,13 @@ function FicheContent() {
     enregistrer(cleAnnotations, encoderAnnotations(prochain));
   }, [cleAnnotations, enregistrer]);
 
+  const ouvrirResume = (indexResume: number) => {
+    setOnglet('partage');
+    window.setTimeout(() => {
+      document.getElementById(`resume-${indexResume}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  };
+
   const marquerPreparee = useCallback(async () => {
     if (!user) return;
     await flushPendingWrites(user.uid);
@@ -297,14 +339,6 @@ function FicheContent() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-2.5">
-                <Link
-                  href={`/aujourdhui?fiche=${fiche.id}&retour=fiche`}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-or-300 px-6 py-3.5 text-xs font-bold text-encre-950 shadow-md transition hover:-translate-y-0.5 hover:bg-or-200"
-                >
-                  <Sunrise className="h-4 w-4" strokeWidth={2} />
-                  Vivre mon temps du jour
-                </Link>
-
                 <button
                   onClick={() => setEcouteContinueOuverte(true)}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-5 py-3.5 text-xs font-bold text-parchemin-100 backdrop-blur-sm transition-colors hover:bg-white/20"
@@ -333,6 +367,7 @@ function FicheContent() {
             [
               { id: 'expose' as const, label: 'L’exposé', icon: BookOpen },
               { id: 'partage' as const, label: 'Résumé et partage', icon: MessageSquare },
+              { id: 'memo' as const, label: 'Mémo Bible', icon: Bookmark },
               ...(fiche.annexes.length
                 ? [{ id: 'annexes' as const, label: 'Annexe', icon: Heart }]
                 : []),
@@ -380,6 +415,17 @@ function FicheContent() {
                     />
                   ))}
                 </div>
+                {/* Pour qui veut avancer pas à pas : de ce passage à son
+                    résumé et à ses questions, sans découpage imposé. */}
+                {resumeDeSection(fiche, index) !== null && (
+                  <button
+                    type="button"
+                    onClick={() => ouvrirResume(resumeDeSection(fiche, index)!)}
+                    className="mt-3 inline-flex min-h-11 items-center gap-2 text-2xs font-bold text-or-800 underline underline-offset-4 hover:text-or-950"
+                  >
+                    Résumé et questions de ce passage <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </section>
             ))}
 
@@ -490,7 +536,8 @@ function FicheContent() {
             {fiche.resume.map((section, indexSection) => (
               <section
                 key={indexSection}
-                className="rounded-4xl border border-parchemin-400 bg-white p-5 shadow-sm sm:p-7"
+                id={`resume-${indexSection}`}
+                className="scroll-mt-6 rounded-4xl border border-parchemin-400 bg-white p-5 shadow-sm sm:p-7"
               >
                 <h2 className="font-serif text-xl font-bold text-encre-950">{section.titre}</h2>
 
@@ -643,6 +690,16 @@ function FicheContent() {
                 />
               </div>
             </section>
+          </div>
+        )}
+
+        {/* ══ Mémo Bible ══ */}
+        {onglet === 'memo' && (
+          <div className="mt-8 space-y-5">
+            <p className="text-sm leading-relaxed text-encre-700">
+              Les versets de la fiche : cherchez-les de mémoire, puis retournez la carte.
+            </p>
+            <MemoBible references={fiche.resume.flatMap((section) => section.versets)} />
           </div>
         )}
 
@@ -984,12 +1041,6 @@ function MaSemaine({ ficheId, reponses }: { ficheId: number; reponses: Record<st
                 {String(jour.rang + 1).padStart(2, '0')}
               </span>
               <h3 className="font-serif text-base font-bold text-encre-950">{jour.titre}</h3>
-              <Link
-                href={`/aujourdhui?fiche=${ficheId}&section=${jour.rang}&retour=fiche`}
-                className="ml-auto shrink-0 text-2xs font-bold text-encre-600 underline underline-offset-2 hover:text-encre-900"
-              >
-                Rouvrir ce temps
-              </Link>
             </div>
             <ul className="mt-2.5 space-y-3">
               {jour.ecrits.map(({ question, reponse }) => (
@@ -1005,9 +1056,6 @@ function MaSemaine({ ficheId, reponses }: { ficheId: number; reponses: Record<st
         ))}
       </div>
 
-      <p className="mt-5 border-t border-parchemin-300 pt-3 text-2xs text-encre-600">
-        Ces notes se modifient dans le temps où vous les avez écrites.
-      </p>
     </section>
   );
 }
@@ -1026,25 +1074,13 @@ function CarteVerset({
   ancre?: string;
 }) {
   const texte = texteDuVerset(reference);
-  const [epreuve, setEpreuve] = useState(false);
-  const [retournee, setRetournee] = useState(Boolean(valeur));
-  const [garde, setGarde] = useState<number | null>(null);
-  const { user } = useAuth();
-
-  // L'épreuve rendait son verdict et l'oubliait. Le score ne rejoignait ni
-  // le compte des versets acquis, ni le calendrier des révisions : réciter
-  // depuis sa fiche ne comptait pour rien. Il compte maintenant, et la
-  // prochaine échéance s'ajuste comme depuis la page de mémorisation.
-  const retenirScore = async (score: number) => {
-    setGarde(score);
-    if (!user) return;
-    await enregistrerRevision(user.uid, reference, qualiteDepuisScore(score), score);
-  };
   const poses = ['pose-1', 'pose-2', 'pose-3', 'pose-4'];
   const pose = poses[index % poses.length];
   const postitColors = ['postit', 'postit-bleu', 'postit-rose', 'postit-vert'];
   const couleur = postitColors[index % postitColors.length];
 
+  // La carte à retourner et la récitation vivent dans l'onglet Mémo Bible :
+  // ici, on lit le verset et on le recopie, sans rien de plus.
   return (
     <div id={ancre} className={`${couleur} ${pose} relative rounded-2xl p-5 shadow-md transition-all`}>
       {/* Ruban adhésif / Washi tape */}
@@ -1059,23 +1095,10 @@ function CarteVerset({
         </span>
       </div>
 
-      {/* La référence d'abord : on cherche le verset de mémoire, puis on
-          retourne la carte pour le voir écrit. */}
       {texte ? (
-        retournee ? (
-          <p className="mt-2 font-serif text-[0.8125rem] italic leading-relaxed text-encre-800">
-            « {texte} »
-          </p>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setRetournee(true)}
-            className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-encre-950/12 bg-white/50 px-3.5 text-2xs font-bold text-encre-700 transition-colors hover:bg-white/80"
-          >
-            <RotateCw className="h-3 w-3" />
-            Retourner la carte pour lire le verset
-          </button>
-        )
+        <p className="mt-2 font-serif text-[0.8125rem] italic leading-relaxed text-encre-800">
+          « {texte} »
+        </p>
       ) : (
         <p className="mt-2 text-2xs text-encre-600/80">
           Ouvrez votre Bible et recopiez ce passage de votre main :
@@ -1091,32 +1114,6 @@ function CarteVerset({
           className="manuscrit w-full rounded-xl border border-encre-950/10 bg-white/70 px-3.5 py-2 text-base text-encre-950 outline-none placeholder:text-encre-400 placeholder:font-sans focus:bg-white focus:ring-1 focus:ring-or-400"
         />
       </div>
-
-      {/* L'épreuve vivait dans une page qu'il fallait aller chercher. Elle se
-          propose ici, sur le verset qu'on vient justement de recopier — au
-          moment où l'on sait si on le sait. */}
-      {texte && (
-        <div className="mt-3">
-          {epreuve ? (
-            <>
-              <EpreuveMemoire reference={reference} texte={texte} onScore={retenirScore} />
-              {garde !== null && (
-                <p className="mt-2 text-2xs font-bold text-encre-600">
-                  Gardé dans vos révisions · {garde}%
-                </p>
-              )}
-            </>
-          ) : (
-            <button
-              onClick={() => setEpreuve(true)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-encre-950/12 px-3.5 py-1.5 text-2xs font-bold text-encre-600 transition-colors hover:bg-white/60 hover:text-encre-900"
-            >
-              <Mic className="h-3 w-3" />
-              Le réciter sans regarder
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }

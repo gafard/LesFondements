@@ -171,7 +171,7 @@ export default function EcranLancement() {
                 href="/fiches/1"
                 className="bouton-or mt-6 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-bold shadow-lg"
               >
-                Explorer la Fiche 1 (Accès libre)
+                Découvrir la fiche 1
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
               <Link

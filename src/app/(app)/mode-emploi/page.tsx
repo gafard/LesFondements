@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Quote } from 'lucide-react';
 import { chargerLivret, type Bloc, type Livret } from '@/lib/livret';
-import { useAuth } from '@/lib/AuthContext';
 
 /**
  * Le mode d'emploi du livret, sur une page à part liée depuis l'accueil.
@@ -22,8 +21,6 @@ const PROLONGEMENTS: Record<string, { href: string; label: string }> = {
 };
 
 export default function ModeEmploiPage() {
-  // Sans compte, la barre du haut est fixe : on lui laisse sa place.
-  const { user } = useAuth();
   const [livret, setLivret] = useState<Livret | null>(null);
 
   useEffect(() => {
@@ -31,7 +28,7 @@ export default function ModeEmploiPage() {
   }, []);
 
   return (
-    <div className={`table-travail min-h-screen pb-20 ${user ? 'pt-6' : 'pt-24'}`}>
+    <div className="table-travail min-h-screen pb-20 pt-6">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <p className="manuscrit mb-2 text-xl text-or-800">Tirer le meilleur profit du parcours</p>

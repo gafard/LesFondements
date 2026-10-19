@@ -408,9 +408,14 @@
   font-style: italic;
   /* Les versets cités se distinguent du fil de l'exposé : un peu plus
      petits, ils se lisent comme un appui et non comme le texte principal. */
-  font-size: 0.9em;
+  font-size: 0.85em;
+  font-weight: 400;
   color: #1c3159;
 }
+/* La référence d'un verset cité reste cliquable, sans gras : le verset
+   doit se lire comme un appui discret, pas comme une mise en avant. */
+.prose-livret blockquote button,
+.prose-livret blockquote strong { font-weight: 400; }
 .prose-livret ul { margin: 0.6rem 0 1.1rem 1.1rem; list-style: disc; }
 .prose-livret li { margin-bottom: 0.45rem; line-height: 1.7; }
 

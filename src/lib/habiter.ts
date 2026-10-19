@@ -47,7 +47,7 @@ export function ecritsDuCarnet(ficheId: number, answers: Record<string, string>)
       const section = id.match(/^trace:f\d+-s(\d+)$/);
       return [{ ...base, contenu: trace.texte, titre: NATURES_TRACE[trace.nature], nature: trace.nature,
         date: trace.date, reference: trace.reference,
-        href: section ? `/aujourdhui?fiche=${ficheId}&section=${Number(section[1]) - 1}&moment=pas` : base.href }];
+        href: section ? `/fiches/${ficheId}?onglet=partage` : base.href }];
     }
     if (id.startsWith(PREFIXE_RELECTURE)) {
       const r = lireRelecture(contenu);

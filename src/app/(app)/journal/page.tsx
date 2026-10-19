@@ -10,6 +10,9 @@ import Link from 'next/link';
 import { PenLine, Plus, Printer, Trash2, Calendar } from 'lucide-react';
 import ParcoursGate from '@/components/ParcoursGate';
 import CarnetUnifie from '@/components/CarnetUnifie';
+import MemoBible from '@/components/MemoBible';
+import { chargerLivret, type Livret } from '@/lib/livret';
+import { FICHES_META } from '@/data/fichesMeta';
 import ChampDictée from '@/components/ChampDictée';
 
 function Journal() {
@@ -175,6 +178,8 @@ function Journal() {
           )}
         </div>
 
+        <MemoBibleDuCarnet />
+
         {/* Le Carnet de Disciple était un onglet à part ; il est la suite
             naturelle de ces pages : les emporter, imprimées ou reliées. */}
         <section className="feuille relative mt-12 rounded-3xl border border-parchemin-300 p-6 shadow-sm sm:p-8">
@@ -196,6 +201,47 @@ function Journal() {
         </section>
       </div>
     </div>
+  );
+}
+
+/** Les versets du parcours, fiche par fiche, à retrouver de mémoire. */
+function MemoBibleDuCarnet() {
+  const [livret, setLivret] = useState<Livret | null>(null);
+  const [ficheId, setFicheId] = useState(1);
+
+  useEffect(() => {
+    void chargerLivret().then(setLivret);
+  }, []);
+
+  const fiche = livret?.fiches.find((f) => f.id === ficheId);
+  return (
+    <section id="memo-bible" className="mt-12 scroll-mt-6" aria-labelledby="titre-memo-bible">
+      <h2 id="titre-memo-bible" className="font-serif text-2xl font-bold text-encre-950">Mémo Bible</h2>
+      <p className="mt-2 text-sm text-encre-600">
+        La référence d’abord ; retournez la carte pour lire le verset.
+      </p>
+      <label className="mt-4 block max-w-sm text-sm text-encre-700">
+        Fiche
+        <select
+          value={ficheId}
+          onChange={(event) => setFicheId(Number(event.target.value))}
+          className="mt-1 min-h-11 w-full rounded-xl border border-parchemin-400 bg-white px-3"
+        >
+          {FICHES_META.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.id} · {f.titre}
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="mt-6">
+        {fiche ? (
+          <MemoBible key={ficheId} references={fiche.resume.flatMap((section) => section.versets)} />
+        ) : (
+          <p className="animate-pulse text-sm text-encre-500">Ouverture des versets…</p>
+        )}
+      </div>
+    </section>
   );
 }
 

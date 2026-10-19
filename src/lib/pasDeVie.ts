@@ -88,8 +88,7 @@ export function pasARelire(pas: PasDeVie): boolean {
 }
 
 export function lienVersPas(pas: PasDeVie): string {
-  return pas.section === null ? `/fiches/${pas.ficheId}`
-    : `/aujourdhui?fiche=${pas.ficheId}&section=${pas.section}&moment=pas`;
+  return pas.section === null ? `/fiches/${pas.ficheId}` : `/fiches/${pas.ficheId}?onglet=partage`;
 }
 
 export function texteRelecture(r: RelecturePas): string {

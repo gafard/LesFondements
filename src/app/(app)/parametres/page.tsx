@@ -16,6 +16,8 @@ import {
 import { useAuth } from '@/lib/AuthContext';
 import { useParcours } from '@/lib/ParcoursContext';
 import ParcoursGate from '@/components/ParcoursGate';
+import ConfortLecture from '@/components/ConfortLecture';
+import NotificationCenter from '@/components/NotificationCenter';
 import { renommerDansLeGroupe } from '@/lib/parcoursStore';
 import {
   activerNotifications,
@@ -62,7 +64,9 @@ export default function ParametresPage() {
           </header>
 
           <SectionProfil />
+          <SectionConfort />
           <SectionRappels />
+          <SectionNotifications />
           <SectionConfidentialite />
 
           <p className="text-center text-sm">
@@ -73,6 +77,45 @@ export default function ParametresPage() {
         </main>
       </div>
     </ParcoursGate>
+  );
+}
+
+// ── Confort ───────────────────────────────────────────────────
+
+// « Réduire les mouvements » et les notifications occupaient la colonne de
+// navigation. Ce sont des réglages : ils sont ici.
+function SectionConfort() {
+  return (
+    <section className="fiche-bristol rounded-3xl border border-parchemin-300 p-6">
+      <h2 className="font-serif text-xl font-bold text-encre-950">Confort de lecture</h2>
+      <p className="mt-2 text-sm leading-relaxed text-encre-700">
+        Pour lire sans animations ni effets de mouvement.
+      </p>
+      <div className="max-w-sm text-encre-900">
+        <ConfortLecture />
+      </div>
+    </section>
+  );
+}
+
+function SectionNotifications() {
+  const [ouvert, setOuvert] = useState(false);
+  return (
+    <section className="fiche-bristol rounded-3xl border border-parchemin-300 p-6">
+      <h2 className="font-serif text-xl font-bold text-encre-950">Notifications</h2>
+      <p className="mt-2 text-sm leading-relaxed text-encre-700">
+        Le verset du matin, les rappels de rencontre et les nouvelles de la cellule : choisir ce que cet appareil reçoit.
+      </p>
+      <button
+        type="button"
+        onClick={() => setOuvert(true)}
+        className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-encre-950 px-5 text-sm font-bold text-parchemin-50"
+      >
+        <Bell className="h-4 w-4 text-or-300" aria-hidden="true" />
+        Régler mes notifications
+      </button>
+      <NotificationCenter ouvert={ouvert} onFermer={() => setOuvert(false)} />
+    </section>
   );
 }
 

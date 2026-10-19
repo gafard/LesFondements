@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 import {
   BookMarked,
   Compass,
-  LayoutDashboard,
   LogOut,
   Mail,
   Menu,
@@ -26,7 +25,6 @@ import { useFondSombre } from '@/lib/fondSombre';
 const ROUTES_IMMERSIVES = ['/onboarding', '/rejoindre', '/login', '/groupes/rencontre'];
 
 const LIENS_PRINCIPAUX = [
-  { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/fiches', label: 'Le parcours', icon: Compass },
   { href: '/journal', label: 'Mon carnet', icon: PenLine },
   { href: '/groupes', label: 'Ma cellule', icon: Users },
@@ -169,11 +167,7 @@ export default function Navbar() {
                   <Link
                     key={lien.href}
                     href={lien.href}
-                    className={lienClasse(
-                      lien.href === '/dashboard'
-                        ? pathname === '/dashboard'
-                        : pathname.startsWith(lien.href)
-                    )}
+                    className={lienClasse(pathname.startsWith(lien.href))}
                   >
                     <lien.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
                     {lien.label}

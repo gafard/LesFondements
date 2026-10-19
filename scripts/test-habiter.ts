@@ -16,7 +16,7 @@ const ecrits = ecritsDuCarnet(6, reponses);
 assert.equal(ecrits.length, 4);
 assert.equal(ecrits.filter(e => e.favori).length, 2, 'Les favoris comprennent aussi les anciens post-it.');
 assert.ok(ecrits.every(e => !e.contenu.includes('"version"') && e.contenu !== '1'));
-assert.equal(ecrits.find(e => e.id === 'trace:f6-s2')?.href, '/aujourdhui?fiche=6&section=1&moment=pas');
+assert.equal(ecrits.find(e => e.id === 'trace:f6-s2')?.href, '/fiches/6?onglet=partage');
 const pas = extrairePasDeVie(6, reponses);
 assert.equal(pas.length, 1, 'Un pas gardé dans une trace rejoint la relecture.');
 assert.equal(pas[0].action, trace.texte);
@@ -37,5 +37,6 @@ Object.assign(globalThis, { window: Object.assign(new EventTarget(), { localStor
 memoriserPassage({ uid: 'alice', url: '/aujourdhui?fiche=6&section=1&scene=4', titre: 'Fiche 6', type: 'immersion' });
 assert.equal(lireDernierPassage('bob'), null);
 assert.equal(lireDernierPassage(), null);
-assert.equal(lireDernierPassage('alice')?.url, '/aujourdhui?fiche=6&section=1&scene=4');
+// Un ancien marque-page vers un temps guidé rouvre la fiche entière.
+assert.equal(lireDernierPassage('alice')?.url, '/fiches/6');
 console.log('✓ Habiter : traces valides, anciens écrits, favoris, pas, vingt profils, rencontres 7/8/10 et reprise privée.');
